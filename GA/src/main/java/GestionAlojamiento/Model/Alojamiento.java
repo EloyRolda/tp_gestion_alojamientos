@@ -1,5 +1,6 @@
 package GestionAlojamiento.Model;
 
+import GestionAlojamiento.Model.Enums.TipoInmueble;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
@@ -70,4 +71,3 @@ public class Alojamiento {
     private Servicio servicio;
 }
 
-enum TipoInmueble {CASA, DEPARTAMENTO, HOTEL}

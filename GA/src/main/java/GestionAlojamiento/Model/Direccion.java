@@ -23,6 +23,8 @@ public class Direccion {
     private String provincia;
     @Column(name = "codigo_postal", length = 100, nullable = false)
     private String codigo_postal;
+    @Column(name = "ciudad", length = 100, nullable = false)
+    private String ciudad;
     @Column(name = "calle", length = 30, nullable = false)
     private String calle;
     @Column(name = "altura", nullable = false)

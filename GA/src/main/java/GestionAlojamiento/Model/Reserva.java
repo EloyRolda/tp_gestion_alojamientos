@@ -1,5 +1,6 @@
 package GestionAlojamiento.Model;
 
+import GestionAlojamiento.Model.Enums.TipoEstado;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import lombok.AllArgsConstructor;
@@ -51,4 +52,3 @@ public class Reserva {
 
 }
 
-enum TipoEstado {PENDIENTE, CONFIRMADA, CANCELADA}
