@@ -53,7 +53,7 @@ public class DireccionService {
     //------------------------ GUARDAR/BORRAR ------------------------
 
     @Transactional
-    public Direccion guardar(Direccion direccion) {
+    public Direccion crear(Direccion direccion) {
         //normalizado a lowercase
         direccion.setPais(direccion.getPais().toLowerCase());
         direccion.setCalle(direccion.getCalle().toLowerCase());

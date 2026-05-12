@@ -33,7 +33,7 @@ public class AnfitrionService {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + idUsuario));
 
         if (anfitrionRepository.existsById(idUsuario)) {
-            throw new RuntimeException("El usuario ya está registrado como anfitrión");
+            throw new RuntimeException("El usuario ya está registrado como anfitrión.");
         }
 
         Anfitrion anfitrion = new Anfitrion();

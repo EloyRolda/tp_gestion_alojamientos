@@ -50,7 +50,7 @@ public class UsuarioService {
 
     //------------------------ GUARDAR/BORRAR ------------------------
     @Transactional
-    public Usuario guardar(Usuario usuario) {
+    public Usuario crear(Usuario usuario) {
         //Comprobacion si el correo es repetido
         if (usuarioRepository.existsByEmail(usuario.getEmail().toLowerCase())) {
             throw new RuntimeException("Correo registrado en la base de datos por otro usuario.");
