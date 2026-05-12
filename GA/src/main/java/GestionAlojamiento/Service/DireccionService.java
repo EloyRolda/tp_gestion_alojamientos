@@ -106,7 +106,7 @@ public class DireccionService {
         direccion.setCalle(nuevaCalle.toLowerCase());
         return direccionRepository.save(direccion);
     }
-
+    @Transactional
     public Direccion actualizarAltura(Long id, Integer nuevaAltura) {
         Direccion direccion = direccionRepository.findById(id).orElseThrow(() -> new RuntimeException("Id no registrado en la base de datos."));
         direccion.setAltura(nuevaAltura);
