@@ -129,6 +129,10 @@ public class AlojamientoService {
         return alojamientoRepository.findByTipo(tipoInmueble, Sort.by(Sort.Direction.ASC, "titulo"));
     }
 
+    public Alojamiento obtenerPorId(Long id) {
+        return alojamientoRepository.findById(id).orElseThrow(() -> new RuntimeException("Error, alojamiento no encontrado en la base de datos."));
+    }
+
   /*
   Esto deberia LISTARSE con un DTO?
 

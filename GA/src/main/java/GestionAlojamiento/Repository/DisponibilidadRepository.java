@@ -14,4 +14,9 @@ public interface DisponibilidadRepository extends JpaRepository<Disponibilidad, 
 
     List<Disponibilidad> findByDisponible();
 
+    boolean existsByFecha(LocalDate nuevaFecha);
+
+    Disponibilidad findByFecha(LocalDate localDate);
+
+    List<Disponibilidad> findByDisponibleBetween(LocalDate inicio, LocalDate fin);
 }
