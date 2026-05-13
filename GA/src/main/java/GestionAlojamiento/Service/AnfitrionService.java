@@ -16,7 +16,7 @@ public class AnfitrionService {
     private final AnfitrionRepository anfitrionRepository;
     private final UsuarioRepository usuarioRepository;
 
-    //------------------------ TEXT ------------------------
+    //------------------------ LISTAR ------------------------
     public List<Anfitrion> listarTodos() {
         return anfitrionRepository.findAll();
     }

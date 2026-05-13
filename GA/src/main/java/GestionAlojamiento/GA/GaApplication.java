@@ -2,12 +2,15 @@ package GestionAlojamiento.GA;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 
 @SpringBootApplication
 public class GaApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(GaApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(GaApplication.class, args);
+    }
 
 }
