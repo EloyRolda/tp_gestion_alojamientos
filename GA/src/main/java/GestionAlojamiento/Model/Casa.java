@@ -20,11 +20,11 @@ public class Casa {
     private Long id;
 
     @Column(name = "tiene_patio", nullable = false)
-    private boolean tiene_patio;
+    private boolean tienePatio;
     @Column(name = "tiene_pileta", nullable = false)
-    private boolean tiene_pileta;
+    private boolean tienePileta;
     @Column(name = "tiene_parrilla", nullable = false)
-    private boolean tiene_parrilla;
+    private boolean tieneParrilla;
 
     @OneToOne
     @MapsId

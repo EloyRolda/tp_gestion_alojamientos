@@ -19,7 +19,7 @@ public class Cliente {
     private Long id;
 
     @Column(name = "metodo_pago", length = 100)
-    private String metodo_pago;
+    private String metodoPago;
 
     @OneToOne //Indica que es una relacion 1 a 1
     @MapsId // Dice que es mapeable

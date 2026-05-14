@@ -12,11 +12,11 @@ import java.util.Optional;
 public interface DisponibilidadRepository extends JpaRepository<Disponibilidad, Long> {
 
 
-    List<Disponibilidad> findByDisponible();
+    List<Disponibilidad> findByDisponibleTrue();
 
     boolean existsByFecha(LocalDate nuevaFecha);
 
     Disponibilidad findByFecha(LocalDate localDate);
 
-    List<Disponibilidad> findByDisponibleBetween(LocalDate inicio, LocalDate fin);
+    List<Disponibilidad> findByFechaBetween(LocalDate inicio, LocalDate fin);
 }

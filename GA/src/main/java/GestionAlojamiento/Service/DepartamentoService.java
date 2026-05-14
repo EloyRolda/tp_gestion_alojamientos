@@ -28,11 +28,11 @@ public class DepartamentoService {
     }
 
     public List<Departamento> listarPorTiene_Ascensor() {
-        return departamentoRepository.findByTiene_ascensor();
+        return departamentoRepository.findByTieneAscensorTrue();
     }
 
     public List<Departamento> listarPorExpensas_Incluidas() {
-        return departamentoRepository.findByExpensas_incluidas();
+        return departamentoRepository.findByExpensasIncluidasTrue();
     }
 
     //------------------------ CREAR/BORRAR ------------------------
@@ -63,14 +63,14 @@ public class DepartamentoService {
     @Transactional
     public Departamento actualizarTiene_ascensor(Long id, boolean nuevoEstado) {
         Departamento departamento = departamentoRepository.findById(id).orElseThrow(() -> new RuntimeException("Error, id no encontrado en la base de datos."));
-        departamento.setTiene_ascensor(nuevoEstado);
+        departamento.setTieneAscensor(nuevoEstado);
         return departamentoRepository.save(departamento);
     }
 
     @Transactional
     public Departamento actualizarExpensas_incluidas(Long id, boolean nuevoEstado) {
         Departamento departamento = departamentoRepository.findById(id).orElseThrow(() -> new RuntimeException("Error, id no encontrado en la base de datos."));
-        departamento.setExpensas_incluidas(nuevoEstado);
+        departamento.setExpensasIncluidas(nuevoEstado);
         return departamentoRepository.save(departamento);
     }
 }

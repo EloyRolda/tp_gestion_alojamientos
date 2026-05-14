@@ -23,33 +23,37 @@ public class Alojamiento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_alojamiento")
     private Long id;
 
     @Column(name = "titulo", length = 150, nullable = false)
     private String titulo;
 
-    @Size(max= 3000, message = "El comentario es muy largo")//Indicamos el size maximo que deseamos guardar
-    @Column(name = "descripcion", columnDefinition = "TEXT") // ColumnDefinition indica que es un campo tipo Text
+    @Size(max = 3000)
+    @Column(name = "descripcion", columnDefinition = "TEXT")
     private String descripcion;
 
     @NotNull
-    @DecimalMin(value = "0.0", inclusive = false, message = "El precio debe ser mayor a 0")
-    //Indicamos el VALOR MINIMO ES 0 Y NO SE ADMITE NEGATIVOS
+    @DecimalMin(value = "0.0", inclusive = false)
     @Column(name = "precio_noche", nullable = false, precision = 10, scale = 2)
-    private BigDecimal precio_noche;
+    private BigDecimal precioNoche;          // ← renombrado
 
-    @Min(value = 1, message = "las noches deben ser 1 o mas de 1") //Indicamos que el valor minimo int es 1.
+    @Min(value = 1)
     @Column(name = "capacidad", nullable = false)
     private Integer capacidad;
 
     @Column(name = "cant_ambientes", nullable = false)
-    private Integer cant_ambientes;
+    private Integer cantAmbientes;          // ← renombrado
+
     @Column(name = "cant_habitaciones", nullable = false)
-    private Integer cant_habitaciones;
+    private Integer cantHabitaciones;       // ← renombrado
+
     @Column(name = "cant_camas", nullable = false)
-    private Integer cant_camas;
+    private Integer cantCamas;              // ← renombrado
+
     @Column(name = "cant_banios", nullable = false)
-    private Integer cant_banios;
+    private Integer cantBanios;             // ← renombrado
+
     @Column(name = "activo", nullable = false)
     private boolean activo;
 
@@ -57,8 +61,7 @@ public class Alojamiento {
     @Column(name = "tipo", nullable = false)
     private TipoInmueble tipoInmueble;
 
-    @ManyToOne
-    @MapsId
+    @ManyToOne                              // ← sacado @MapsId
     @JoinColumn(name = "id_anfitrion")
     private Anfitrion anfitrion;
 
@@ -70,4 +73,3 @@ public class Alojamiento {
     @JoinColumn(name = "id_servicio")
     private Servicio servicio;
 }
-

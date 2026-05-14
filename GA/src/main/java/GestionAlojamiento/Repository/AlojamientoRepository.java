@@ -14,12 +14,10 @@ public interface AlojamientoRepository extends JpaRepository<Alojamiento, Long> 
 
     List<Alojamiento> findByPrecioNocheGreaterThan(double precio, Sort sort);
 
-    List<Alojamiento> findByPrecio_nocheBetween(Double precio_min, Double precio_max, Sort sort);
-
+    List<Alojamiento> findByPrecioNocheBetween(Double precio_min, Double precio_max, Sort sort);
     //findBy Capacidades
-    List<Alojamiento> findAllByCapacidadMin(Integer capacidad, Sort sort);
-
-    List<Alojamiento> findAllByCapacidadMax(Integer capacidad, Sort sort);
+    List<Alojamiento> findAllByCapacidadGreaterThanEqual(Integer capacidad, Sort sort);
+    List<Alojamiento> findAllByCapacidadLessThanEqual(Integer capacidad, Sort sort);
 
     List<Alojamiento> findAllByCapacidadBetween(Integer capacidad_min, Integer capacidad_max, Sort sort);
 
@@ -53,8 +51,8 @@ public interface AlojamientoRepository extends JpaRepository<Alojamiento, Long> 
     List<Alojamiento> findByCantBaniosBetween(Integer cant_min, Integer cant_max, Sort sort);
 
     //findBy Estado
-    List<Alojamiento> findByEstado(boolean estado, Sort sort);
+    List<Alojamiento> findByActivo(boolean activo, Sort sort);
 
-    List<Alojamiento> findByTipo(TipoInmueble tipoInmueble, Sort sort);
+    List<Alojamiento> findByTipoInmueble(TipoInmueble tipo, Sort sort);
 
 }

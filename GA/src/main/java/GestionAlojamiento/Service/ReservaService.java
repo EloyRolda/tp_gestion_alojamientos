@@ -41,11 +41,11 @@ public class ReservaService {
         Alojamiento alojamiento = alojamientoService.obtenerPorId(id_Alojamiento);
         Cliente cliente = clienteRepository.findById(id_Cliente).orElseThrow(() -> new RuntimeException("El Alojamiento no se encuentra en la base de datos."));
 
-        disponibilidadService.ocuparFechas(reserva.getFecha_inicio(), reserva.getFecha_fin());
+        disponibilidadService.ocuparFechas(reserva.getFechaInicio(), reserva.getFechaFin());
 
         reserva.setCliente(cliente);
         reserva.setAlojamiento(alojamiento);
-        reserva.setPrecio_total(calcularPrecio(alojamiento, reserva.getFecha_inicio(), reserva.getFecha_fin()));
+        reserva.setPrecioTotal(calcularPrecio(alojamiento, reserva.getFechaInicio(), reserva.getFechaFin()));
         return reservaRepository.save(reserva);
     }
 
@@ -56,7 +56,7 @@ public class ReservaService {
         }
         //Liberamos las fechas
         Reserva reserva = reservaRepository.findById(id).orElseThrow(() -> new RuntimeException("Error, la reserva no existe"));
-        disponibilidadService.liberarFechas(reserva.getFecha_inicio(), reserva.getFecha_fin());
+        disponibilidadService.liberarFechas(reserva.getFechaInicio(), reserva.getFechaFin());
 
         reservaRepository.deleteById(id);
     }
@@ -67,12 +67,12 @@ public class ReservaService {
     public Reserva actualizarFecha_inicio(Long id_reserva, LocalDate nuevaFecha) {
         Reserva reserva = reservaRepository.findById(id_reserva).orElseThrow(() -> new RuntimeException("Error, la reserva no existe en la base de datos."));
         //checkear fecha validas
-        if (reserva.getFecha_fin().isBefore(nuevaFecha)) {
+        if (reserva.getFechaFin().isBefore(nuevaFecha)) {
             throw new RuntimeException("La fecha debe ser anterior a la fecha de fin");
         }
-        LocalDate antiguaFecha = reserva.getFecha_inicio();
+        LocalDate antiguaFecha = reserva.getFechaInicio();
         disponibilidadService.cambiarDisponibleInicioAFin(antiguaFecha, nuevaFecha);
-        reserva.setFecha_inicio(nuevaFecha);
+        reserva.setFechaInicio(nuevaFecha);
 
         actualizarPrecioReserva(id_reserva);
         return reservaRepository.save(reserva);
@@ -82,11 +82,11 @@ public class ReservaService {
     //Deberia revisar entre fechas y verificar que este disponible
     public Reserva actualizarFecha_fin(Long id_reserva, LocalDate nuevaFecha) {
         Reserva reserva = reservaRepository.findById(id_reserva).orElseThrow(() -> new RuntimeException("Error, la reserva no existe en la base de datos."));
-        if (reserva.getFecha_inicio().isAfter(nuevaFecha)) {
+        if (reserva.getFechaInicio().isAfter(nuevaFecha)) {
             throw new RuntimeException("La fecha debe ser posterior a la fecha de fin");
         }
-        disponibilidadService.cambiarDisponibleInicioAFin(reserva.getFecha_fin(), nuevaFecha);
-        reserva.setFecha_fin(nuevaFecha);
+        disponibilidadService.cambiarDisponibleInicioAFin(reserva.getFechaFin(), nuevaFecha);
+        reserva.setFechaFin(nuevaFecha);
 
         actualizarPrecioReserva(id_reserva);
         return reservaRepository.save(reserva);
@@ -98,18 +98,18 @@ public class ReservaService {
         Reserva reserva = reservaRepository.findById(id_reserva).orElseThrow(() -> new RuntimeException("Reserva inexistente"));
         Alojamiento alojamiento = alojamientoService.obtenerPorId(reserva.getAlojamiento().getId());
 
-        Long totalDiasReserva = reservaRepository.countByFechaBetween(reserva.getFecha_inicio(), reserva.getFecha_fin());
+        Long totalDiasReserva = reservaRepository.countByFechaInicioBetween(reserva.getFechaInicio(), reserva.getFechaFin());
 
-        reserva.setPrecio_total(alojamiento.getPrecio_noche().multiply(BigDecimal.valueOf(totalDiasReserva)));
+        reserva.setPrecioTotal(alojamiento.getPrecioNoche().multiply(BigDecimal.valueOf(totalDiasReserva)));
 
         return reservaRepository.save(reserva);
     }
 
     public BigDecimal calcularPrecio(Alojamiento alojamiento, LocalDate inicio, LocalDate fin) {
 
-        Long totalDiasReserva = reservaRepository.countByFechaBetween(inicio, fin);
+        Long totalDiasReserva = reservaRepository.countByFechaInicioBetween(inicio, fin);
 
-        return alojamiento.getPrecio_noche().multiply(BigDecimal.valueOf(totalDiasReserva));
+        return alojamiento.getPrecioNoche().multiply(BigDecimal.valueOf(totalDiasReserva));
     }
 
 

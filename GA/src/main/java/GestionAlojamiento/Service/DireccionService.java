@@ -17,7 +17,7 @@ public class DireccionService {
 
     //------------------------ LISTAR POR ------------------------
     public List<Direccion> listarDirecciones() {
-        return direccionRepository.findAll(Sort.by(Sort.Direction.ASC, "nombre"));
+        return direccionRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
     }
 
     public List<Direccion> listarPorPais(String paisBusqueda) {
@@ -37,7 +37,7 @@ public class DireccionService {
 
     public List<Direccion> listarPorCP(String cpBusqueda) {
         return direccionRepository.findAll().stream()
-                .filter(direccion -> direccion.getCodigo_postal().equalsIgnoreCase(cpBusqueda)).collect(Collectors.toList());
+                .filter(direccion -> direccion.getCodigoPostal().equalsIgnoreCase(cpBusqueda)).collect(Collectors.toList());
     }
 
     public List<Direccion> listarPorCalle(String calleBusqueda) {
@@ -96,7 +96,7 @@ public class DireccionService {
     @Transactional
     public Direccion actualizarCP(Long id, String nuevoCP) {
         Direccion direccion = direccionRepository.findById(id).orElseThrow(() -> new RuntimeException("Id no registrado en la base de datos."));
-        direccion.setCodigo_postal(nuevoCP.toLowerCase());
+        direccion.setCodigoPostal(nuevoCP.toLowerCase());
         return direccionRepository.save(direccion);
     }
 

@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
-    public Long countByFechaBetween(LocalDate fecha_inicio, LocalDate fecha_fin);
+    public Long countByFechaInicioBetween(LocalDate fecha_inicio, LocalDate fecha_fin);
 
 
 }

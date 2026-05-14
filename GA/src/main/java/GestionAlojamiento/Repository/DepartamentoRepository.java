@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface DepartamentoRepository extends JpaRepository<Departamento, Long> {
 
-    public List<Departamento> findByTiene_ascensor();
+    public List<Departamento> findByTieneAscensorTrue();
 
-    public List<Departamento> findByExpensas_incluidas();
+    public List<Departamento> findByExpensasIncluidasTrue();
 
 
 }

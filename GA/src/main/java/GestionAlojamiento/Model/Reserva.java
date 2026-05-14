@@ -25,14 +25,14 @@ public class Reserva {
 
 
     @Column(name = "fecha_inicio", nullable = false)
-    private LocalDate fecha_inicio;
+    private LocalDate fechaInicio;
 
     @Column(name = "fecha_fin", nullable = false)
-    private LocalDate fecha_fin;
+    private LocalDate fechaFin;
 
     @DecimalMin(value = "0.0", inclusive = true, message = "Valor invalido, el precio no puede ser menor a cero")
     @Column(name = "precio_total", nullable = false, precision = 10, scale = 2)
-    private BigDecimal precio_total;
+    private BigDecimal precioTotal;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false)
@@ -47,7 +47,7 @@ public class Reserva {
     private Alojamiento alojamiento;
 
     /*
-    EN LOGICA DE NEGOCIO HACER LA COMPROVACION -> 'CONSTRAINT chk_fechas CHECK (fecha_fin > fecha_inicio)'
+    EN LOGICA DE NEGOCIO HACER LA COMPROBACION -> 'CONSTRAINT chk_fechas CHECK (fecha_fin > fecha_inicio)'
     */
 
 

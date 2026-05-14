@@ -27,13 +27,13 @@ public class Departamento {
     private Integer piso;
 
     @Column(name = "tiene_ascensor", nullable = false)
-    private boolean tiene_ascensor;
+    private boolean tieneAscensor;
 
     @Column(name = "expensas_incluidas", nullable = false)
-    private boolean expensas_incluidas;
+    private boolean expensasIncluidas;
 
     @OneToOne
     @MapsId
-    @Column(name = "id_alojamiento")
+    @JoinColumn(name = "id_alojamiento")
     private Alojamiento alojamiento;
 }

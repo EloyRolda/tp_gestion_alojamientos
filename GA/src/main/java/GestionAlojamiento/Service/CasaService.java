@@ -26,15 +26,15 @@ public class CasaService {
     }
 
     private List<Casa> listarPorPatio() {
-        return casaRepository.findByTiene_patio();
+        return casaRepository.findByTienePatioTrue();
     }
 
     private List<Casa> listarPorParrilla() {
-        return casaRepository.findByTiene_parrilla();
+        return casaRepository.findByTieneParrillaTrue();
     }
 
     private List<Casa> listarPorPileta() {
-        return casaRepository.findByTiene_Pileta();
+        return casaRepository.findByTienePiletaTrue();
     }
 
     /*
@@ -64,7 +64,7 @@ public class CasaService {
 
         Casa casa = casaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Error, el id de la casa no se encuentra en la base de datos."));
-        casa.setTiene_pileta(nuevoEstado);
+        casa.setTienePileta(nuevoEstado);
         return casaRepository.save(casa);
     }
 
@@ -73,7 +73,7 @@ public class CasaService {
 
         Casa casa = casaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Error, el id de la casa no se encuentra en la base de datos."));
-        casa.setTiene_patio(nuevoEstado);
+        casa.setTienePatio(nuevoEstado);
         return casaRepository.save(casa);
     }
 
@@ -82,7 +82,7 @@ public class CasaService {
 
         Casa casa = casaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Error, el id de la casa no se encuentra en la base de datos."));
-        casa.setTiene_parrilla(nuevoEstado);
+        casa.setTieneParrilla(nuevoEstado);
         return casaRepository.save(casa);
     }
 

@@ -24,7 +24,7 @@ public class ClienteService {
     }
 
     public List<Cliente> listarPorMetodoPago(String metodo_pago) {
-        return clienteRepository.findByMetodo_Pago(metodo_pago.toLowerCase());
+        return clienteRepository.findByMetodoPago(metodo_pago.toLowerCase());
     }
 
     public Cliente obtenerPorId(Long id) {
@@ -41,7 +41,7 @@ public class ClienteService {
         }
         Cliente cliente = new Cliente();
         cliente.setUsuario(usuario);
-        cliente.setMetodo_pago(metodoDePago.toLowerCase());
+        cliente.setMetodoPago(metodoDePago.toLowerCase());
         return clienteRepository.save(cliente);
     }
 
@@ -57,7 +57,7 @@ public class ClienteService {
     @Transactional
     public Cliente actualizarMetodoPago(Long id, String nuevoMetodo) {
         Cliente cliente = clienteRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado en la base de datos"));
-        cliente.setMetodo_pago(nuevoMetodo);
+        cliente.setMetodoPago(nuevoMetodo);
         return clienteRepository.save(cliente);
     }
 }

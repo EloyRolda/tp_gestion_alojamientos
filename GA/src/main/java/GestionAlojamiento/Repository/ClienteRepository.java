@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
-    List<Cliente> findByMetodo_Pago(String metodo_pago);
+    List<Cliente> findByMetodoPago(String metodo_pago);
 }

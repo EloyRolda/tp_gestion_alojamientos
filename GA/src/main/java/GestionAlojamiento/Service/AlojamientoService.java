@@ -47,7 +47,7 @@ public class AlojamientoService {
     }
 
     public List<Alojamiento> listarPorEntrePrecios(double precio_min, double precio_max) {
-        return alojamientoRepository.findByPrecio_nocheBetween(precio_min, precio_max, Sort.by(Sort.Direction.ASC));
+        return alojamientoRepository.findByPrecioNocheBetween(precio_min, precio_max, Sort.by(Sort.Direction.ASC));
     }
 
     //Segun capacidad
@@ -56,11 +56,11 @@ public class AlojamientoService {
     }
 
     public List<Alojamiento> listarPorCapacidadMin(Integer capacidad) {
-        return alojamientoRepository.findAllByCapacidadMin(capacidad, Sort.by(Sort.Direction.ASC));
+        return alojamientoRepository.findAllByCapacidadGreaterThanEqual(capacidad, Sort.by(Sort.Direction.ASC));
     }
 
     public List<Alojamiento> listarPorCapacidadMax(Integer capacidad, Sort sort) {
-        return alojamientoRepository.findAllByCapacidadMax(capacidad, Sort.by(Sort.Direction.ASC));
+        return alojamientoRepository.findAllByCapacidadLessThanEqual(capacidad, Sort.by(Sort.Direction.ASC));
     }
 
     public List<Alojamiento> listarPorEntreCapacidad(Integer capacidad_min, Integer capacidad_max, Sort sort) {
@@ -121,12 +121,12 @@ public class AlojamientoService {
 
     //Segun Activo
     public List<Alojamiento> listarPorEstado(boolean estado) {
-        return alojamientoRepository.findByEstado(estado, Sort.by(Sort.Direction.ASC, "titulo"));
+        return alojamientoRepository.findByActivo(estado, Sort.by(Sort.Direction.ASC, "titulo"));
     }
 
     //Segun tipoInmueble
     public List<Alojamiento> listarPorInmueble(TipoInmueble tipoInmueble) {
-        return alojamientoRepository.findByTipo(tipoInmueble, Sort.by(Sort.Direction.ASC, "titulo"));
+        return alojamientoRepository.findByTipoInmueble(tipoInmueble, Sort.by(Sort.Direction.ASC, "titulo"));
     }
 
     public Alojamiento obtenerPorId(Long id) {
@@ -178,7 +178,7 @@ public class AlojamientoService {
     @Transactional
     public Alojamiento actualizarPrecioNoche(Long id, BigDecimal nuevoPrecio) {
         Alojamiento alojamiento = alojamientoRepository.findById(id).orElseThrow(() -> new RuntimeException("Id no registrado en la base de datos."));
-        alojamiento.setPrecio_noche(nuevoPrecio);
+        alojamiento.setPrecioNoche(nuevoPrecio);
         return alojamientoRepository.save(alojamiento);
     }
 
@@ -192,28 +192,28 @@ public class AlojamientoService {
     @Transactional
     public Alojamiento actualizarCantAmbientes(Long id, Integer nuevaCantidad) {
         Alojamiento alojamiento = alojamientoRepository.findById(id).orElseThrow(() -> new RuntimeException("Id no registrado en la base de datos."));
-        alojamiento.setCant_ambientes(nuevaCantidad);
+        alojamiento.setCantAmbientes(nuevaCantidad);
         return alojamientoRepository.save(alojamiento);
     }
 
     @Transactional
     public Alojamiento actualizarCantHabitaciones(Long id, Integer nuevaCantidad) {
         Alojamiento alojamiento = alojamientoRepository.findById(id).orElseThrow(() -> new RuntimeException("Id no registrado en la base de datos."));
-        alojamiento.setCant_habitaciones(nuevaCantidad);
+        alojamiento.setCantHabitaciones(nuevaCantidad);
         return alojamientoRepository.save(alojamiento);
     }
 
     @Transactional
     public Alojamiento actualizarCantCamas(Long id, Integer nuevaCantidad) {
         Alojamiento alojamiento = alojamientoRepository.findById(id).orElseThrow(() -> new RuntimeException("Id no registrado en la base de datos."));
-        alojamiento.setCant_camas(nuevaCantidad);
+        alojamiento.setCantCamas(nuevaCantidad);
         return alojamientoRepository.save(alojamiento);
     }
 
     @Transactional
     public Alojamiento actualizarCantBanios(Long id, Integer nuevaCantidad) {
         Alojamiento alojamiento = alojamientoRepository.findById(id).orElseThrow(() -> new RuntimeException("Id no registrado en la base de datos."));
-        alojamiento.setCant_banios(nuevaCantidad);
+        alojamiento.setCantBanios(nuevaCantidad);
         return alojamientoRepository.save(alojamiento);
     }
 

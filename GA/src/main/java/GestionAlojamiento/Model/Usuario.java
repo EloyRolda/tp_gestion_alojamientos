@@ -33,7 +33,7 @@ public class Usuario {
     @Column(name = "telefono", length = 30)
     private String telefono;
     @Column(name = "fecha_registro", nullable = false)
-    private LocalDateTime fecha_registro;
+    private LocalDateTime fechaRegistro;
     @Column(name = "activo", nullable = false)
     private boolean activo;
 

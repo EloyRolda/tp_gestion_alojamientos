@@ -32,7 +32,7 @@ public class UsuarioService {
 
     public List<Usuario> listarPorFechaRegistro(LocalDate fechaRegistro) {
         return usuarioRepository.findAll().stream()
-                .filter(a -> a.getFecha_registro().equals(fechaRegistro)).collect(Collectors.toList());
+                .filter(a -> a.getFechaRegistro().equals(fechaRegistro)).collect(Collectors.toList());
     }
 
     public List<Usuario> listarActivos() {

@@ -37,7 +37,7 @@ public class DisponibilidadService {
 
     public List<Disponibilidad> listarPorDisponibilidad() {
 
-        return disponibilidadRepository.findByDisponible();
+        return disponibilidadRepository.findByDisponibleTrue();
     }
 
     //------------------------ CREAR/BORRAR ------------------------
@@ -90,7 +90,7 @@ public class DisponibilidadService {
 
     @Transactional
     public void cambiarDisponibleInicioAFin(LocalDate fecha_inicio, LocalDate fecha_fin) {
-        List<Disponibilidad> rango = disponibilidadRepository.findByDisponibleBetween(fecha_inicio, fecha_fin);
+        List<Disponibilidad> rango = disponibilidadRepository.findByFechaBetween(fecha_inicio, fecha_fin);
 
 
         //Habilita disponibilidad
@@ -111,13 +111,13 @@ public class DisponibilidadService {
 
     @Transactional
     public void liberarFechas(LocalDate fecha_inicio, LocalDate fecha_fin) {
-        List<Disponibilidad> rango = disponibilidadRepository.findByDisponibleBetween(fecha_inicio, fecha_fin);
+        List<Disponibilidad> rango = disponibilidadRepository.findByFechaBetween(fecha_inicio, fecha_fin);
         rango.stream().forEach(a -> a.setDisponible(true));
     }
 
     @Transactional
     public void ocuparFechas(LocalDate fecha_inicio, LocalDate fecha_fin) {
-        List<Disponibilidad> rango = disponibilidadRepository.findByDisponibleBetween(fecha_inicio, fecha_fin);
+        List<Disponibilidad> rango = disponibilidadRepository.findByFechaBetween(fecha_inicio, fecha_fin);
 
         if (rango.stream().anyMatch(a -> !a.isDisponible())) {
             throw new RuntimeException("Uno o varios dias estan ocupados");

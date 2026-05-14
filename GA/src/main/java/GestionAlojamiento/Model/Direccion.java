@@ -22,7 +22,7 @@ public class Direccion {
     @Column(name = "provincia", length = 100)
     private String provincia;
     @Column(name = "codigo_postal", length = 100, nullable = false)
-    private String codigo_postal;
+    private String codigoPostal;
     @Column(name = "ciudad", length = 100, nullable = false)
     private String ciudad;
     @Column(name = "calle", length = 30, nullable = false)

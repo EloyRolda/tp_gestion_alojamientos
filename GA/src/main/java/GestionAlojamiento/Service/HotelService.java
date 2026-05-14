@@ -28,11 +28,11 @@ public class HotelService {
     }
 
     public List<Hotel> listarPorIncluyeDesayuno() {
-        return hotelRepository.findByIncluye_desayuno();
+        return hotelRepository.findByIncluyeDesayunoTrue();
     }
 
     public List<Hotel> listarPorServicioLimpieza() {
-        return hotelRepository.findByServicio_limpieza();
+        return hotelRepository.findByServicioLimpiezaTrue();
     }
 
     //------------------------ CREAR/BORRAR ------------------------
@@ -68,14 +68,14 @@ public class HotelService {
     @Transactional
     public Hotel actualizarIncluyeDesayuno(Long id, boolean nuevoEstado) {
         Hotel hotel = obtenerPorId(id);
-        hotel.setIncluye_desayuno(nuevoEstado);
+        hotel.setIncluyeDesayuno(nuevoEstado);
         return hotelRepository.save(hotel);
     }
 
     @Transactional
     public Hotel actualizarServicioLimpieza(Long id, boolean nuevoEstado) {
         Hotel hotel = obtenerPorId(id);
-        hotel.setServicio_limpieza(nuevoEstado);
+        hotel.setServicioLimpieza(nuevoEstado);
         return hotelRepository.save(hotel);
     }
 }

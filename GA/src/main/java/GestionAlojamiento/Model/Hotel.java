@@ -26,9 +26,9 @@ public class Hotel {
     private Integer estrellas;
 
     @Column(name = "incluye_desayuno", nullable = false)
-    private boolean incluye_desayuno;
+    private boolean incluyeDesayuno;
     @Column(name = "servicio_limpieza", nullable = false)
-    private boolean servicio_limpieza;
+    private boolean servicioLimpieza;
 
     @OneToOne
     @MapsId
