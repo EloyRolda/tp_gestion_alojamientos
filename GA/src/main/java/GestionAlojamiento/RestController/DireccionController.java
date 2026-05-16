@@ -2,6 +2,7 @@ package GestionAlojamiento.RestController;
 
 import GestionAlojamiento.Model.Direccion;
 import GestionAlojamiento.Service.DireccionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +24,10 @@ public class DireccionController {
         return direccionService.listarDirecciones();
     }
 
+
     @PostMapping("/guardar")
     public Direccion guardar(@RequestBody Direccion direccion) {
+
         return direccionService.crear(direccion);
     }
 
