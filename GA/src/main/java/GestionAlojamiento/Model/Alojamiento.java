@@ -36,23 +36,23 @@ public class Alojamiento {
     @NotNull
     @DecimalMin(value = "0.0", inclusive = false)
     @Column(name = "precio_noche", nullable = false, precision = 10, scale = 2)
-    private BigDecimal precioNoche;          // ← renombrado
+    private BigDecimal precioNoche;
 
     @Min(value = 1)
     @Column(name = "capacidad", nullable = false)
     private Integer capacidad;
 
     @Column(name = "cant_ambientes", nullable = false)
-    private Integer cantAmbientes;          // ← renombrado
+    private Integer cantAmbientes;
 
     @Column(name = "cant_habitaciones", nullable = false)
-    private Integer cantHabitaciones;       // ← renombrado
+    private Integer cantHabitaciones;
 
     @Column(name = "cant_camas", nullable = false)
-    private Integer cantCamas;              // ← renombrado
+    private Integer cantCamas;
 
     @Column(name = "cant_banios", nullable = false)
-    private Integer cantBanios;             // ← renombrado
+    private Integer cantBanios;
 
     @Column(name = "activo", nullable = false)
     private boolean activo;
@@ -61,7 +61,7 @@ public class Alojamiento {
     @Column(name = "tipo", nullable = false)
     private TipoInmueble tipoInmueble;
 
-    @ManyToOne                              // ← sacado @MapsId
+    @ManyToOne
     @JoinColumn(name = "id_anfitrion")
     private Anfitrion anfitrion;
 
