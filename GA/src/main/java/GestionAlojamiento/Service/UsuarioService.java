@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,9 +44,10 @@ public class UsuarioService {
     public List<Usuario> listarInactivos() {
         return usuarioRepository.findAll().stream().filter(a -> !a.isActivo()).collect(Collectors.toList());
     }
+
     public Usuario obtenerPorId(Long id) {
 
-        return usuarioRepository.findById(id).orElseThrow(()->new RuntimeException("Usuario no encontrado en la base de datos"));
+        return usuarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado en la base de datos"));
     }
 
     //------------------------ GUARDAR/BORRAR ------------------------
@@ -55,10 +57,13 @@ public class UsuarioService {
         if (usuarioRepository.existsByEmail(usuario.getEmail().toLowerCase())) {
             throw new RuntimeException("Correo registrado en la base de datos por otro usuario.");
         }
+
         //Normalizamos
         usuario.setEmail(usuario.getEmail().toLowerCase());
         usuario.setNombre(usuario.getNombre().toLowerCase());
         usuario.setActivo(true);
+        usuario.setFechaRegistro(LocalDateTime.now());
+
         return usuarioRepository.save(usuario);
     }
 
@@ -70,7 +75,7 @@ public class UsuarioService {
         usuarioRepository.deleteById(id);
     }
 //------------------------ MODIFICAR ------------------------
-
+/* COMENTADO POR INNESESARO, SIEMPRE ACCEDEREMOS A USUARIO MEDIANTE SUS ROLES
     @Transactional
     public Usuario actualizarNombre(Long id, String nuevoNombre) {
         Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Id no registrado en la base de datos."));
@@ -116,5 +121,7 @@ public class UsuarioService {
         usuario.setTipoUsuario(nuevoTipo);
         return usuarioRepository.save(usuario);
     }
+
+ */
 
 }

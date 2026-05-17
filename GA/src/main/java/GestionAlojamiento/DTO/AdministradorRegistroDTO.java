@@ -30,15 +30,11 @@ public class AdministradorRegistroDTO {
     private String password;
 
     @NotBlank(message = "Campo Obligatorio")
-    private String telefono;
+    private String nombre;
 
     @NotBlank(message = "Campo Obligatorio")
-    private LocalDateTime fechaRegistro;
+    private String telefono;
 
     @NotNull(message = "Campo Obligatorio")
     private boolean activo; //Se inicia activo
-
-    @NotBlank(message = "Campo Obligatorio")
-    @Enumerated(EnumType.STRING)
-    private TipoUsuario tipoUsuario; //AUTOMATICAMENTE ADMIN
 }

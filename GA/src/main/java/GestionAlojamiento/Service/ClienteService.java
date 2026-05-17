@@ -1,14 +1,19 @@
 package GestionAlojamiento.Service;
 
+import GestionAlojamiento.DTO.ClienteModificarDTO;
+import GestionAlojamiento.DTO.ClienteRegistroDTO;
 import GestionAlojamiento.Model.Cliente;
+import GestionAlojamiento.Model.Enums.TipoUsuario;
 import GestionAlojamiento.Model.Usuario;
 import GestionAlojamiento.Repository.ClienteRepository;
 import GestionAlojamiento.Repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -16,7 +21,7 @@ import java.util.List;
 public class ClienteService {
 
     private final ClienteRepository clienteRepository;
-    private final UsuarioRepository usuarioRepository;
+    private final UsuarioService usuarioService;
 
     //------------------------ LISTAR POR ------------------------
     public List<Cliente> listarClientes() {
@@ -32,16 +37,20 @@ public class ClienteService {
     }
 
     //------------------------ GUARDAR/BORRAR/CREAR ------------------------
+
     @Transactional
-    public Cliente crear(Long idUsuario, String metodoDePago) {
-        Usuario usuario = usuarioRepository.findById(idUsuario)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado en la base de datos"));
-        if (clienteRepository.existsById(usuario.getId())) {
-            throw new RuntimeException("El usuario ya es un cliente");
-        }
+    public Cliente crear(ClienteRegistroDTO clienteRegistroDTO) {
+        Usuario usuario = new Usuario();
+        usuario.setActivo(true);//valor por defecto
+        usuario.setEmail(clienteRegistroDTO.getEmail());
+        usuario.setNombre(clienteRegistroDTO.getNombre());
+        usuario.setPassword(clienteRegistroDTO.getPassword());
+        usuario.setTelefono(clienteRegistroDTO.getTelefono());
+        usuario.setTipoUsuario(TipoUsuario.CLIENTE);
+
         Cliente cliente = new Cliente();
-        cliente.setUsuario(usuario);
-        cliente.setMetodoPago(metodoDePago.toLowerCase());
+        cliente.setUsuario(usuarioService.crear(usuario));
+        cliente.setMetodoPago(clienteRegistroDTO.getMetodoPago());
         return clienteRepository.save(cliente);
     }
 
@@ -55,9 +64,27 @@ public class ClienteService {
 
     //------------------------ MODIFICAR ------------------------
     @Transactional
-    public Cliente actualizarMetodoPago(Long id, String nuevoMetodo) {
-        Cliente cliente = clienteRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado en la base de datos"));
-        cliente.setMetodoPago(nuevoMetodo);
+    public Cliente actualizar(ClienteModificarDTO clienteModificarDTO) {
+        Cliente cliente = clienteRepository.findById(clienteModificarDTO.getId()).orElseThrow(() -> new RuntimeException("Usuario no encontrado en la base de datos"));
+        Usuario usuario = cliente.getUsuario();
+
+        if (clienteModificarDTO.getEmail() != null) {
+            usuario.setEmail(clienteModificarDTO.getEmail());
+        }
+        if (clienteModificarDTO.getTelefono() != null) {
+            usuario.setTelefono(clienteModificarDTO.getTelefono());
+        }
+        if (clienteModificarDTO.getPassword() != null) {
+            usuario.setPassword(clienteModificarDTO.getPassword());
+        }
+        if (clienteModificarDTO.isActivo() != usuario.isActivo()) {
+            usuario.setActivo(clienteModificarDTO.isActivo());
+        }
+
+        if (clienteModificarDTO.getMetodoPago() != null) {
+            cliente.setMetodoPago(clienteModificarDTO.getMetodoPago());
+        }
+
         return clienteRepository.save(cliente);
     }
 }

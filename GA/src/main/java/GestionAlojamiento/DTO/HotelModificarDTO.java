@@ -4,8 +4,14 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
+@Data
+@RequiredArgsConstructor
+@NoArgsConstructor
 
 public class HotelModificarDTO {
 
@@ -20,7 +26,7 @@ public class HotelModificarDTO {
     @Max(value = 5, message = "Valor maximo de 5 estrellas")
     private Integer estrellas;
 
-    private boolean incluyeLimpieza;
+    private boolean servicioLimpieza;
 
     private boolean incluyeDesayuno;
 
@@ -43,6 +49,10 @@ public class HotelModificarDTO {
 
     @Size(max = 3000)
     private String descripcion;
+
+    @Size(max = 150)
+    private String titulo;
+
 
     @Min(value = 0, message = "Valor Invalido")
     private BigDecimal precioNoche;

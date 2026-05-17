@@ -1,6 +1,7 @@
 package GestionAlojamiento.Model;
 
 import GestionAlojamiento.Model.Enums.TipoUsuario;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
@@ -29,6 +30,7 @@ public class Usuario {
     @Column(name = "email", length = 150, nullable = false, unique = true)
     private String email;
     @Column(name = "password", length = 255, nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     @Column(name = "telefono", length = 30)
     private String telefono;

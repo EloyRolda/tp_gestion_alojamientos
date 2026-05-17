@@ -31,12 +31,8 @@ public class AnfitrionRegistroDTO {
     private String telefono;
 
     @NotBlank(message = "Campo Obligatorio")
-    private LocalDateTime fechaRegistro;
-
+    private String nombre;
     @NotNull(message = "Campo Obligatorio")
     private boolean activo; //Se inicia activo
 
-    @NotBlank(message = "Campo Obligatorio")
-    @Enumerated(EnumType.STRING)
-    private TipoUsuario tipoUsuario; //AUTOMATICAMENTE ADMIN
 }

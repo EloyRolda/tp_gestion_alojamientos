@@ -1,6 +1,9 @@
 package GestionAlojamiento.Service;
 
+import GestionAlojamiento.DTO.HotelModificarDTO;
 import GestionAlojamiento.Model.Alojamiento;
+import GestionAlojamiento.Model.Direccion;
+import GestionAlojamiento.Model.Enums.TipoInmueble;
 import GestionAlojamiento.Model.Hotel;
 import GestionAlojamiento.Repository.AlojamientoRepository;
 import GestionAlojamiento.Repository.HotelRepository;
@@ -16,6 +19,8 @@ public class HotelService {
 
     private final HotelRepository hotelRepository;
     private final AlojamientoRepository alojamientoRepository;
+    private final DireccionService direccionService;
+    private final AlojamientoService alojamientoService;
 
     //------------------------ LISTAR ------------------------
     public List<Hotel> listarTodos() {
@@ -56,26 +61,9 @@ public class HotelService {
     //------------------------ MODIFICAR ------------------------
 
     @Transactional
-    public Hotel actualizarEstrellas(Long id, Integer nuevasEstrellas) {
-        if (nuevasEstrellas < 1 || nuevasEstrellas > 5) {
-            throw new RuntimeException("Las estrellas deben estar entre 1 y 5.");
-        }
-        Hotel hotel = obtenerPorId(id);
-        hotel.setEstrellas(nuevasEstrellas);
-        return hotelRepository.save(hotel);
-    }
+    public Hotel actualizar(HotelModificarDTO hotelModificarDTO) {
 
-    @Transactional
-    public Hotel actualizarIncluyeDesayuno(Long id, boolean nuevoEstado) {
-        Hotel hotel = obtenerPorId(id);
-        hotel.setIncluyeDesayuno(nuevoEstado);
-        return hotelRepository.save(hotel);
-    }
 
-    @Transactional
-    public Hotel actualizarServicioLimpieza(Long id, boolean nuevoEstado) {
-        Hotel hotel = obtenerPorId(id);
-        hotel.setServicioLimpieza(nuevoEstado);
-        return hotelRepository.save(hotel);
+        return hotelRepository.save(null);
     }
 }

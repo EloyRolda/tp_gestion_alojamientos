@@ -1,6 +1,12 @@
 package GestionAlojamiento.Service;
 
+import GestionAlojamiento.DTO.AnfitrionModificarDTO;
+import GestionAlojamiento.DTO.AnfitrionRegistroDTO;
+import GestionAlojamiento.DTO.ClienteRegistroDTO;
+import GestionAlojamiento.Model.Administrador;
 import GestionAlojamiento.Model.Anfitrion;
+import GestionAlojamiento.Model.Cliente;
+import GestionAlojamiento.Model.Enums.TipoUsuario;
 import GestionAlojamiento.Model.Usuario;
 import GestionAlojamiento.Repository.AnfitrionRepository;
 import GestionAlojamiento.Repository.UsuarioRepository;
@@ -14,7 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AnfitrionService {
     private final AnfitrionRepository anfitrionRepository;
-    private final UsuarioRepository usuarioRepository;
+    private final UsuarioService usuarioService;
 
     //------------------------ LISTAR ------------------------
     public List<Anfitrion> listarTodos() {
@@ -28,13 +34,15 @@ public class AnfitrionService {
 
     //------------------------ Borrar/Crear ------------------------
     @Transactional
-    public Anfitrion crear(Long idUsuario) {
-        Usuario usuario = usuarioRepository.findById(idUsuario)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + idUsuario));
+    public Anfitrion crear(AnfitrionRegistroDTO anfitrionRegistroDTO) {
+        Usuario usuario = new Usuario();
 
-        if (anfitrionRepository.existsById(idUsuario)) {
-            throw new RuntimeException("El usuario ya está registrado como anfitrión.");
-        }
+        usuario.setActivo(true);//valor por defecto
+        usuario.setEmail(anfitrionRegistroDTO.getEmail());
+        usuario.setNombre(anfitrionRegistroDTO.getNombre());
+        usuario.setPassword(anfitrionRegistroDTO.getPassword());
+        usuario.setTelefono(anfitrionRegistroDTO.getTelefono());
+        usuario.setTipoUsuario(TipoUsuario.CLIENTE);
 
         Anfitrion anfitrion = new Anfitrion();
         anfitrion.setUsuario(usuario);
@@ -43,10 +51,35 @@ public class AnfitrionService {
     }
 
     @Transactional
-    public void eliminar(Long id) {
+    public void borrarPorId(Long id) {
         if (!anfitrionRepository.existsById(id)) {
             throw new RuntimeException("No se puede eliminar: Anfitrión no encontrado");
         }
         anfitrionRepository.deleteById(id);
     }
+
+    @Transactional
+    public Anfitrion actualizar(AnfitrionModificarDTO anfitrionModificarDTO) {
+
+        Anfitrion anfitrion = obtenerPorId(anfitrionModificarDTO.getId());
+        Usuario usuario = usuarioService.obtenerPorId(anfitrionModificarDTO.getId());
+
+        if (anfitrionModificarDTO.getEmail() != null) {
+            usuario.setEmail(anfitrionModificarDTO.getEmail());
+        }
+        if (anfitrionModificarDTO.getTelefono() != null) {
+            usuario.setTelefono(anfitrionModificarDTO.getTelefono());
+        }
+        if (anfitrionModificarDTO.getPassword() != null) {
+            usuario.setPassword(anfitrionModificarDTO.getPassword());
+        }
+        if (anfitrionModificarDTO.isActivo() != usuario.isActivo()) {
+            usuario.setActivo(anfitrionModificarDTO.isActivo());
+        }
+        anfitrion.setUsuario(usuario);
+
+        return anfitrionRepository.save(anfitrion);
+    }
+
+
 }
