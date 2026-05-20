@@ -21,7 +21,6 @@ import java.util.List;
 public class AdministradorService {
 
     private final AdministradorRepository administradorRepository;
-    private final UsuarioRepository usuarioRepository;
     private final UsuarioService usuarioService;
 
     //------------------------ LISTAR POR ------------------------
@@ -44,7 +43,7 @@ public class AdministradorService {
         if (administradorRepository.existsByMatricula(administradorRegistroDTO.getMatricula())) {
             throw new RuntimeException("La matrícula ya existe.");
         }
-        Usuario usuario = new Usuario();
+        Usuario  usuario = new Usuario();
         usuario.setActivo(true);//valor por defecto
         usuario.setEmail(administradorRegistroDTO.getEmail());
         usuario.setNombre(administradorRegistroDTO.getNombre());

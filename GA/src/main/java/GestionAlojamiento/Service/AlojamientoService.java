@@ -143,11 +143,11 @@ public class AlojamientoService {
 
     //------------------------ GUARDAR/BORRAR ------------------------
     @Transactional
-    public Alojamiento crear(Alojamiento alojamiento, Long id_anfitrion, Long id_direccion, Long id_servicio) {
+    public Alojamiento crear(Alojamiento alojamiento) {
         //Checks
-        alojamiento.setAnfitrion(anfitrionRepository.findById(id_anfitrion).orElseThrow(() -> new RuntimeException("Error, el anfitrion no existe en la base de datos.")));
-        alojamiento.setDireccion(direccionRepository.findById(id_direccion).orElseThrow(() -> new RuntimeException("Error, la direccion no existe en la base de datos.")));
-        alojamiento.setServicio(servicioRepository.findById(id_servicio).orElseThrow(() -> new RuntimeException("Error, el servicio no existe en la base de datos.")));
+        alojamiento.setAnfitrion(anfitrionRepository.findById(alojamiento.getAnfitrion().getId()).orElseThrow(() -> new RuntimeException("Error, el anfitrion no existe en la base de datos.")));
+        alojamiento.setDireccion(direccionRepository.findById(alojamiento.getDireccion().getId()).orElseThrow(() -> new RuntimeException("Error, la direccion no existe en la base de datos.")));
+        alojamiento.setServicio(servicioRepository.findById(alojamiento.getServicio().getId()).orElseThrow(() -> new RuntimeException("Error, el servicio no existe en la base de datos.")));
 
         return alojamientoRepository.save(alojamiento);
     }
