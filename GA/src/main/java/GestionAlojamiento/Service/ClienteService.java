@@ -25,7 +25,7 @@ public class ClienteService {
 
     //------------------------ LISTAR POR ------------------------
     public List<Cliente> listarClientes() {
-        return clienteRepository.findAll(Sort.by(Sort.Direction.ASC, "usuario.nombre"));
+        return clienteRepository.findAll();
     }
 
     public List<Cliente> listarPorMetodoPago(String metodo_pago) {

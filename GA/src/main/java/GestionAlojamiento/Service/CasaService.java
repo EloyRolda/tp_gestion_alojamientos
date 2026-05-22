@@ -2,9 +2,7 @@ package GestionAlojamiento.Service;
 
 import GestionAlojamiento.DTO.CasaModificarDTO;
 import GestionAlojamiento.DTO.CasaRegistroDTO;
-import GestionAlojamiento.Model.Alojamiento;
-import GestionAlojamiento.Model.Casa;
-import GestionAlojamiento.Model.Direccion;
+import GestionAlojamiento.Model.*;
 import GestionAlojamiento.Repository.AlojamientoRepository;
 import GestionAlojamiento.Repository.CasaRepository;
 import jakarta.transaction.Transactional;
@@ -18,8 +16,8 @@ import java.util.List;
 public class CasaService {
 
     private final CasaRepository casaRepository;
-    private final AlojamientoRepository alojamientoRepository;
     private final AnfitrionService anfitrionService;
+    private  final DireccionService direccionService;
 
     //------------------------ LISTAR ------------------------
     public List<Casa> listar() {
@@ -86,7 +84,31 @@ public class CasaService {
         alojamiento.setDescripcion(dto.getDescripcion());
         alojamiento.setPrecioNoche(dto.getPrecioNoche());
 
-        alojamiento.setDireccion(direccion);
+        alojamiento.setDireccion(
+                direccionService.crear(direccion)
+        );
+
+
+        // [SERVICIO]
+
+        Servicio servicio = new Servicio();
+
+        servicio.setTieneCocina(dto.isTieneCocina());
+        servicio.setTieneLavarropa(dto.isTieneLavarropa());
+        servicio.setTieneWifi(dto.isTieneWifi());
+        servicio.setTieneEstacionamiento(dto.isTieneEstacionamiento());
+
+        alojamiento.setServicio(servicio);
+
+
+        // [DISPONIBILIDAD]
+
+        Disponibilidad disponibilidad = new Disponibilidad();
+
+        disponibilidad.setFecha(dto.getFecha());
+        disponibilidad.setDisponible(dto.isDisponible());
+
+        alojamiento.setDisponibilidad(disponibilidad);
 
 
         // [RELACION]
@@ -96,7 +118,6 @@ public class CasaService {
 
         return casaRepository.save(casa);
     }
-
     @Transactional
     public void borrarPorId(Long id) {
         if (!casaRepository.existsById(id)) {
@@ -182,6 +203,58 @@ public class CasaService {
         if (dto.getAltura() != null) {
             casa.getAlojamiento().getDireccion().setAltura(dto.getAltura());
         }
+
+
+        // [SERVICIO]
+
+        if (casa.getAlojamiento().getServicio() == null) {
+
+            Servicio servicio = new Servicio();
+
+            servicio.setTieneCocina(dto.isTieneCocina());
+            servicio.setTieneLavarropa(dto.isTieneLavarropa());
+            servicio.setTieneWifi(dto.isTieneWifi());
+            servicio.setTieneEstacionamiento(dto.isTieneEstacionamiento());
+
+            casa.getAlojamiento().setServicio(servicio);
+
+        } else {
+
+            casa.getAlojamiento().getServicio()
+                    .setTieneCocina(dto.isTieneCocina());
+
+            casa.getAlojamiento().getServicio()
+                    .setTieneLavarropa(dto.isTieneLavarropa());
+
+            casa.getAlojamiento().getServicio()
+                    .setTieneWifi(dto.isTieneWifi());
+
+            casa.getAlojamiento().getServicio()
+                    .setTieneEstacionamiento(dto.isTieneEstacionamiento());
+        }
+
+
+// [DISPONIBILIDAD]
+
+        if (casa.getAlojamiento().getDisponibilidad() == null) {
+
+            Disponibilidad disponibilidad = new Disponibilidad();
+
+            disponibilidad.setFecha(dto.getFecha());
+            disponibilidad.setDisponible(dto.isDisponible());
+
+            casa.getAlojamiento().setDisponibilidad(disponibilidad);
+
+        } else {
+
+            if (dto.getFecha() != null) {
+
+                casa.getAlojamiento().getDisponibilidad().setFecha(dto.getFecha());
+            }
+
+            casa.getAlojamiento().getDisponibilidad().setDisponible(dto.isDisponible());
+        }
+
 
         return casaRepository.save(casa);
     }

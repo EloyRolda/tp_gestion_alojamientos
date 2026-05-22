@@ -27,7 +27,7 @@ public class Disponibilidad {
     private Long id;
 
     @FutureOrPresent(message = "la fecha no puede ser anterior al dia de hoy")
-// FutureOrPresent verifica que sera hoy o despues de hoy.
+    // FutureOrPresent verifica que sera hoy o despues de hoy.
     @Column(name = "fecha", nullable = false)
     private LocalDate fecha;
 

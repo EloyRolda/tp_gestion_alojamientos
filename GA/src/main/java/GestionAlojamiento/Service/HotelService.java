@@ -2,10 +2,8 @@ package GestionAlojamiento.Service;
 
 import GestionAlojamiento.DTO.HotelModificarDTO;
 import GestionAlojamiento.DTO.HotelRegistroDTO;
-import GestionAlojamiento.Model.Alojamiento;
-import GestionAlojamiento.Model.Direccion;
+import GestionAlojamiento.Model.*;
 import GestionAlojamiento.Model.Enums.TipoInmueble;
-import GestionAlojamiento.Model.Hotel;
 import GestionAlojamiento.Repository.AlojamientoRepository;
 import GestionAlojamiento.Repository.HotelRepository;
 import jakarta.transaction.Transactional;
@@ -47,6 +45,7 @@ public class HotelService {
     public Hotel crear(HotelRegistroDTO hotelRegistroDTO) {
 
         Alojamiento alojamiento = new Alojamiento();
+
         alojamiento.setCantAmbientes(hotelRegistroDTO.getCantAmbientes());
         alojamiento.setCantBanios(hotelRegistroDTO.getCantBanios());
         alojamiento.setCantCamas(hotelRegistroDTO.getCantCamas());
@@ -54,27 +53,65 @@ public class HotelService {
         alojamiento.setCapacidad(hotelRegistroDTO.getCapacidad());
         alojamiento.setDescripcion(hotelRegistroDTO.getDescripcion());
         alojamiento.setPrecioNoche(hotelRegistroDTO.getPrecioNoche());
-        alojamiento.setAnfitrion(anfitrionService.obtenerPorId(hotelRegistroDTO.getIdAnfitrion()));
+
+        alojamiento.setAnfitrion(
+                anfitrionService.obtenerPorId(hotelRegistroDTO.getIdAnfitrion())
+        );
+
+
+        // [DIRECCION]
 
         Direccion direccion = new Direccion();
+
         direccion.setPais(hotelRegistroDTO.getPais());
         direccion.setProvincia(hotelRegistroDTO.getProvincia());
         direccion.setCodigoPostal(hotelRegistroDTO.getCodigoPostal());
         direccion.setCiudad(hotelRegistroDTO.getCiudad());
         direccion.setCalle(hotelRegistroDTO.getCalle());
         direccion.setAltura(hotelRegistroDTO.getAltura());
-        alojamiento.setDireccion(direccionService.crear(direccion));
+
+        alojamiento.setDireccion(
+                direccionService.crear(direccion)
+        );
+
+
+        // [SERVICIO]
+
+        Servicio servicio = new Servicio();
+
+        servicio.setTieneCocina(hotelRegistroDTO.isTieneCocina());
+        servicio.setTieneLavarropa(hotelRegistroDTO.isTieneLavarropa());
+        servicio.setTieneWifi(hotelRegistroDTO.isTieneWifi());
+        servicio.setTieneEstacionamiento(hotelRegistroDTO.isTieneEstacionamiento());
+
+        alojamiento.setServicio(servicio);
+
+
+        // [DISPONIBILIDAD]
+
+        Disponibilidad disponibilidad = new Disponibilidad();
+
+        disponibilidad.setFecha(hotelRegistroDTO.getFecha());
+        disponibilidad.setDisponible(hotelRegistroDTO.isDisponible());
+
+        alojamiento.setDisponibilidad(disponibilidad);
+
+
+        // [HOTEL]
 
         Hotel hotel = new Hotel();
 
         hotel.setEstrellas(hotelRegistroDTO.getEstrellas());
         hotel.setIncluyeDesayuno(hotelRegistroDTO.isIncluyeDesayuno());
         hotel.setServicioLimpieza(hotelRegistroDTO.isIncluyeLimpieza());
-        hotel.setAlojamiento(alojamientoService.crear(alojamiento));
+
+        hotel.setAlojamiento(
+                alojamientoService.crear(alojamiento)
+        );
+
 
         return hotelRepository.save(hotel);
     }
-
     @Transactional
     public void borrarPorId(Long id_hotel) {
         if (!hotelRepository.existsById(id_hotel)) {
@@ -89,15 +126,29 @@ public class HotelService {
 
         Hotel hotel = obtenerPorId(dto.getId());
 
+
+        // [HOTEL]
+
         if (dto.getEstrellas() != null) {
             hotel.setEstrellas(dto.getEstrellas());
         }
 
+        hotel.setServicioLimpieza(dto.isServicioLimpieza());
+
+        hotel.setIncluyeDesayuno(dto.isIncluyeDesayuno());
+
+
+        // [ANFITRION]
+
         if (dto.getIdAnfitrion() != null) {
+
             hotel.getAlojamiento().setAnfitrion(
                     anfitrionService.obtenerPorId(dto.getIdAnfitrion())
             );
         }
+
+
+        // [ALOJAMIENTO]
 
         if (dto.getCantAmbientes() != null) {
             hotel.getAlojamiento().setCantAmbientes(dto.getCantAmbientes());
@@ -119,44 +170,132 @@ public class HotelService {
             hotel.getAlojamiento().setCapacidad(dto.getCapacidad());
         }
 
-        if (dto.getDescripcion() != null) {
-            hotel.getAlojamiento().setDescripcion(dto.getDescripcion());
+        if (dto.getDescripcion() != null &&
+                !dto.getDescripcion().isBlank()) {
+
+            hotel.getAlojamiento()
+                    .setDescripcion(dto.getDescripcion());
         }
 
-        if (dto.getTitulo() != null) {
-            hotel.getAlojamiento().setTitulo(dto.getTitulo());
+        if (dto.getTitulo() != null &&
+                !dto.getTitulo().isBlank()) {
+
+            hotel.getAlojamiento()
+                    .setTitulo(dto.getTitulo());
         }
 
         if (dto.getPrecioNoche() != null) {
-            hotel.getAlojamiento().setPrecioNoche(dto.getPrecioNoche());
+
+            hotel.getAlojamiento()
+                    .setPrecioNoche(dto.getPrecioNoche());
         }
 
-        if (dto.getPais() != null) {
-            hotel.getAlojamiento().getDireccion().setPais(dto.getPais());
+
+        // [DIRECCION]
+
+        if (dto.getPais() != null &&
+                !dto.getPais().isBlank()) {
+
+            hotel.getAlojamiento()
+                    .getDireccion()
+                    .setPais(dto.getPais());
         }
 
-        if (dto.getProvincia() != null) {
-            hotel.getAlojamiento().getDireccion().setProvincia(dto.getProvincia());
+        if (dto.getProvincia() != null &&
+                !dto.getProvincia().isBlank()) {
+
+            hotel.getAlojamiento()
+                    .getDireccion()
+                    .setProvincia(dto.getProvincia());
         }
 
-        if (dto.getCodigoPostal() != null) {
-            hotel.getAlojamiento().getDireccion().setCodigoPostal(dto.getCodigoPostal());
+        if (dto.getCodigoPostal() != null &&
+                !dto.getCodigoPostal().isBlank()) {
+
+            hotel.getAlojamiento()
+                    .getDireccion()
+                    .setCodigoPostal(dto.getCodigoPostal());
         }
 
-        if (dto.getCiudad() != null) {
-            hotel.getAlojamiento().getDireccion().setCiudad(dto.getCiudad());
+        if (dto.getCiudad() != null &&
+                !dto.getCiudad().isBlank()) {
+
+            hotel.getAlojamiento()
+                    .getDireccion()
+                    .setCiudad(dto.getCiudad());
         }
 
-        if (dto.getCalle() != null) {
-            hotel.getAlojamiento().getDireccion().setCalle(dto.getCalle());
+        if (dto.getCalle() != null &&
+                !dto.getCalle().isBlank()) {
+
+            hotel.getAlojamiento()
+                    .getDireccion()
+                    .setCalle(dto.getCalle());
         }
 
         if (dto.getAltura() != null) {
-            hotel.getAlojamiento().getDireccion().setAltura(dto.getAltura());
+
+            hotel.getAlojamiento()
+                    .getDireccion()
+                    .setAltura(dto.getAltura());
         }
 
-        hotel.setServicioLimpieza(dto.isServicioLimpieza());
-        hotel.setIncluyeDesayuno(dto.isIncluyeDesayuno());
+
+        // [SERVICIO]
+
+        if (hotel.getAlojamiento().getServicio() == null) {
+
+            Servicio servicio = new Servicio();
+
+            servicio.setTieneCocina(dto.isTieneCocina());
+            servicio.setTieneLavarropa(dto.isTieneLavarropa());
+            servicio.setTieneWifi(dto.isTieneWifi());
+            servicio.setTieneEstacionamiento(dto.isTieneEstacionamiento());
+
+            hotel.getAlojamiento().setServicio(servicio);
+
+        } else {
+
+            hotel.getAlojamiento().getServicio()
+                    .setTieneCocina(dto.isTieneCocina());
+
+            hotel.getAlojamiento().getServicio()
+                    .setTieneLavarropa(dto.isTieneLavarropa());
+
+            hotel.getAlojamiento().getServicio()
+                    .setTieneWifi(dto.isTieneWifi());
+
+            hotel.getAlojamiento().getServicio()
+                    .setTieneEstacionamiento(dto.isTieneEstacionamiento());
+        }
+
+
+        // [DISPONIBILIDAD]
+
+        if (hotel.getAlojamiento().getDisponibilidad() == null) {
+
+            Disponibilidad disponibilidad = new Disponibilidad();
+
+            disponibilidad.setFecha(dto.getFecha());
+            disponibilidad.setDisponible(dto.isDisponible());
+
+            hotel.getAlojamiento()
+                    .setDisponibilidad(disponibilidad);
+
+        } else {
+
+            if (dto.getFecha() != null) {
+
+                hotel.getAlojamiento()
+                        .getDisponibilidad()
+                        .setFecha(dto.getFecha());
+            }
+
+            hotel.getAlojamiento()
+                    .getDisponibilidad()
+                    .setDisponible(dto.isDisponible());
+        }
+
 
         return hotelRepository.save(hotel);
     }

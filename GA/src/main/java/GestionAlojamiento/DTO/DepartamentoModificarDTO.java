@@ -1,5 +1,6 @@
 package GestionAlojamiento.DTO;
 
+import GestionAlojamiento.Model.Alojamiento;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -8,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 //Lombok
 @Data
@@ -65,4 +67,21 @@ public class DepartamentoModificarDTO {
 
     @Min(value = 0, message = "Valor Invalido")
     private Integer altura;
+
+    //[DISPONIBILIDAD]
+    private LocalDate fecha;
+
+    private boolean disponible;
+
+    private Alojamiento alojamiento;
+
+    //[SERVICIO]
+
+    private boolean tieneCocina;
+
+    private boolean tieneLavarropa;
+
+    private boolean tieneWifi;
+
+    private boolean tieneEstacionamiento;
 }

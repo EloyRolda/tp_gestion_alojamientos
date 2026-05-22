@@ -14,6 +14,7 @@ import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -50,7 +51,7 @@ public class AdministradorService {
         usuario.setPassword(administradorRegistroDTO.getPassword());
         usuario.setTelefono(administradorRegistroDTO.getTelefono());
         usuario.setTipoUsuario(TipoUsuario.ADMINISTRADOR);
-
+        usuario.setFechaRegistro(LocalDateTime.now());
         Administrador administrador = new Administrador();
         administrador.setUsuario(usuario);
         administrador.setMatricula(administradorRegistroDTO.getMatricula());
@@ -67,31 +68,37 @@ public class AdministradorService {
 
     //------------------------  Actualizar  ------------------------
     @Transactional
-    public Administrador actualizar(AdministradorModificarDTO administradorModificarDTO) {
-        Administrador administrador = administradorRepository.findById(administradorModificarDTO.getId()).orElseThrow(() -> new RuntimeException("id invalido, no se encuentra en la base de datos"));
+    public Administrador actualizar(AdministradorModificarDTO dto) {
 
-        Usuario usuario = usuarioService.obtenerPorId(administradorModificarDTO.getId());
-        if (administradorModificarDTO.getMatricula() != null) {
-            throw new RuntimeException("Esa matricula pertenese a otro administrador.");
-        }
-        if (administradorModificarDTO.getEmail() != null) {
-            usuario.setEmail(administradorModificarDTO.getEmail());
-        }
-        if (administradorModificarDTO.getTelefono() != null) {
-            usuario.setTelefono(administradorModificarDTO.getTelefono());
-        }
-        if (administradorModificarDTO.getPassword() != null) {
-            usuario.setPassword(administradorModificarDTO.getPassword());
-        }
-        if (administradorModificarDTO.isActivo() != usuario.isActivo()) {
-            usuario.setActivo(administradorModificarDTO.isActivo());
+        Administrador admin = administradorRepository.findById(dto.getId())
+                .orElseThrow(() -> new RuntimeException("ID inválido"));
+
+        Usuario usuario = usuarioService.obtenerPorId(dto.getId());
+
+        if (dto.getMatricula() != null) {
+            boolean existe = administradorRepository
+                    .existsByMatriculaAndIdNot(dto.getMatricula(), dto.getId());
+
+            if (existe) {
+                throw new RuntimeException("La matrícula pertenece a otro administrador.");
+            }
+
+            admin.setMatricula(dto.getMatricula());
         }
 
-        if (administradorModificarDTO.getEmail() != null) {
-            administrador.setMatricula(administradorModificarDTO.getMatricula());
+        if (dto.getEmail() != null) {
+            usuario.setEmail(dto.getEmail());
         }
-        return administradorRepository.save(administrador);
 
+        if (dto.getTelefono() != null) {
+            usuario.setTelefono(dto.getTelefono());
+        }
+        if (dto.getPassword() != null) {
+            usuario.setPassword(dto.getPassword());
+        }
+        usuario.setActivo(dto.isActivo());
+
+        return administradorRepository.save(admin);
     }
 
 }

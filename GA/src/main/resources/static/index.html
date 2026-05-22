@@ -1,23 +1,280 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Index</title>
+    <title>Index API - Gestión Alojamiento</title>
+
+    <style>
+
+        body{
+            background-color: #0f172a;
+            font-family: Arial, sans-serif;
+            color: white;
+            margin: 0;
+            padding: 30px;
+        }
+
+        h1{
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .contenedor{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .card{
+            background-color: #1e293b;
+            border-radius: 10px;
+            padding: 20px;
+            width: 350px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+        }
+
+        .card h2{
+            border-bottom: 1px solid #334155;
+            padding-bottom: 10px;
+        }
+
+        ul{
+            list-style: none;
+            padding: 0;
+        }
+
+        li{
+            margin-bottom: 10px;
+        }
+
+        a{
+            text-decoration: none;
+            color: #93c5fd;
+        }
+
+        a:hover{
+            color: #60a5fa;
+        }
+
+    </style>
+
 </head>
 <body>
 
-    <ul>
-<div>
-<li> <a href="/Administrador/listar">Listar Administradores</a></li>
-<li> <a href="/Administrador/mostrar/1">Mostrar por id</a></li>
-<li> <a href="/Administrador/Registrar">Listar Administradores</a></li>
-<li> <a href="/Administrador/Actualizar">Actualizar Administradores</a></li>
-<li> <a href="/Administrador/Eliminar">Eliminar Administradores</a></li>
+<h1>Endpoints - Gestión de Alojamiento</h1>
+
+<div class="contenedor">
+
+
+    <!-- USUARIOS -->
+
+    <div class="card">
+
+        <h2>Administrador</h2>
+
+        <ul>
+
+            <li><a href="/administrador/lista">Listar Administradores</a></li>
+
+            <li><a href="/administrador/1">Mostrar Administrador</a></li>
+
+            <li><a href="/administrador/crear">Registrar Administrador</a></li>
+
+            <li><a href="/administrador/modificar">Modificar Administrador</a></li>
+
+            <li><a href="/administrador/eliminar/1">Eliminar Administrador</a></li>
+
+        </ul>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Cliente</h2>
+
+        <ul>
+
+            <li><a href="/cliente/lista">Listar Clientes</a></li>
+
+            <li><a href="/cliente/1">Mostrar Cliente</a></li>
+
+            <li><a href="/cliente/crear">Registrar Cliente</a></li>
+
+            <li><a href="/cliente/modificar">Modificar Cliente</a></li>
+
+            <li><a href="/cliente/eliminar/1">Eliminar Cliente</a></li>
+
+        </ul>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Anfitrión</h2>
+
+        <ul>
+
+            <li><a href="/anfitrion/lista">Listar Anfitriones</a></li>
+
+            <li><a href="/anfitrion/1">Mostrar Anfitrión</a></li>
+
+            <li><a href="/anfitrion/crear">Registrar Anfitrión</a></li>
+
+            <li><a href="/anfitrion/modificar">Modificar Anfitrión</a></li>
+
+            <li><a href="/anfitrion/eliminar/1">Eliminar Anfitrión</a></li>
+
+        </ul>
+
+    </div>
+
+
+    <!-- ALOJAMIENTOS -->
+
+    <div class="card">
+
+        <h2>Casa</h2>
+
+        <ul>
+
+            <li><a href="/casa/lista">Listar Casas</a></li>
+
+            <li><a href="/casa/1">Mostrar Casa</a></li>
+
+            <li><a href="/casa/crear">Registrar Casa</a></li>
+
+            <li><a href="/casa/modificar">Modificar Casa</a></li>
+
+            <li><a href="/casa/eliminar/1">Eliminar Casa</a></li>
+
+        </ul>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Departamento</h2>
+
+        <ul>
+
+            <li><a href="/departamento/lista">Listar Departamentos</a></li>
+
+            <li><a href="/departamento/1">Mostrar Departamento</a></li>
+
+            <li><a href="/departamento/crear">Registrar Departamento</a></li>
+
+            <li><a href="/departamento/modificar">Modificar Departamento</a></li>
+
+            <li><a href="/departamento/eliminar/1">Eliminar Departamento</a></li>
+
+        </ul>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Hotel</h2>
+
+        <ul>
+
+            <li><a href="/hotel/lista">Listar Hoteles</a></li>
+
+            <li><a href="/hotel/1">Mostrar Hotel</a></li>
+
+            <li><a href="/hotel/crear">Registrar Hotel</a></li>
+
+            <li><a href="/hotel/modificar">Modificar Hotel</a></li>
+
+            <li><a href="/hotel/eliminar/1">Eliminar Hotel</a></li>
+
+        </ul>
+
+    </div>
+
+
+    <!-- RESERVAS -->
+
+    <div class="card">
+
+        <h2>Reserva</h2>
+
+        <ul>
+
+            <li><a href="/reserva/lista">Listar Reservas</a></li>
+
+            <li><a href="/reserva/1">Mostrar Reserva</a></li>
+
+            <li><a href="/reserva/crear">Registrar Reserva</a></li>
+
+            <li><a href="/reserva/modificar">Modificar Reserva</a></li>
+
+            <li><a href="/reserva/eliminar/1">Eliminar Reserva</a></li>
+
+            <li><a href="/reserva/cliente/1">Reservas por Cliente</a></li>
+
+            <li><a href="/reserva/alojamiento/1">Reservas por Alojamiento</a></li>
+
+        </ul>
+
+    </div>
+
+
+    <!-- REVIEWS -->
+
+    <div class="card">
+
+        <h2>Review</h2>
+
+        <ul>
+
+            <li><a href="/review/lista">Listar Reviews</a></li>
+
+            <li><a href="/review/1">Mostrar Review</a></li>
+
+            <li><a href="/review/crear">Registrar Review</a></li>
+
+            <li><a href="/review/modificar">Modificar Review</a></li>
+
+            <li><a href="/review/eliminar/1">Eliminar Review</a></li>
+
+            <li><a href="/review/cliente/1">Reviews por Cliente</a></li>
+
+            <li><a href="/review/alojamiento/1">Reviews por Alojamiento</a></li>
+
+        </ul>
+
+    </div>
+
+
+    <!-- SERVICIOS -->
+
+    <div class="card">
+
+        <h2>Servicio</h2>
+
+        <ul>
+
+            <li><a href="/servicio/lista">Listar Servicios</a></li>
+
+            <li><a href="/servicio/1">Mostrar Servicio</a></li>
+
+            <li><a href="/servicio/crear">Registrar Servicio</a></li>
+
+            <li><a href="/servicio/modificar">Modificar Servicio</a></li>
+
+            <li><a href="/servicio/eliminar/1">Eliminar Servicio</a></li>
+
+        </ul>
+
+    </div>
+
 
 </div>
 
-
-    </ul>
 </body>
 </html>

@@ -72,4 +72,8 @@ public class Alojamiento {
     @OneToOne
     @JoinColumn(name = "id_servicio")
     private Servicio servicio;
+
+    @OneToOne
+    @JoinColumn(name = "id_disponibilidad")
+    private Disponibilidad disponibilidad;
 }

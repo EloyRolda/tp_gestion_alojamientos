@@ -2,9 +2,7 @@ package GestionAlojamiento.Service;
 
 import GestionAlojamiento.DTO.DepartamentoModificarDTO;
 import GestionAlojamiento.DTO.DepartamentoRegistroDTO;
-import GestionAlojamiento.Model.Alojamiento;
-import GestionAlojamiento.Model.Departamento;
-import GestionAlojamiento.Model.Direccion;
+import GestionAlojamiento.Model.*;
 import GestionAlojamiento.Repository.AlojamientoRepository;
 import GestionAlojamiento.Repository.DepartamentoRepository;
 import jakarta.transaction.Transactional;
@@ -42,7 +40,9 @@ public class DepartamentoService {
     //------------------------ CREAR/BORRAR ------------------------
     @Transactional
     public Departamento crear(DepartamentoRegistroDTO departamentoRegistroDTO) {
+
         Alojamiento alojamiento = new Alojamiento();
+
         alojamiento.setCantAmbientes(departamentoRegistroDTO.getCantAmbientes());
         alojamiento.setCantBanios(departamentoRegistroDTO.getCantBanios());
         alojamiento.setCantCamas(departamentoRegistroDTO.getCantCamas());
@@ -50,23 +50,70 @@ public class DepartamentoService {
         alojamiento.setCapacidad(departamentoRegistroDTO.getCapacidad());
         alojamiento.setDescripcion(departamentoRegistroDTO.getDescripcion());
         alojamiento.setPrecioNoche(departamentoRegistroDTO.getPrecioNoche());
-        alojamiento.setAnfitrion(anfitrionService.obtenerPorId(departamentoRegistroDTO.getIdAnfitrion()));
+
+        alojamiento.setAnfitrion(
+                anfitrionService.obtenerPorId(
+                        departamentoRegistroDTO.getIdAnfitrion()
+                )
+        );
+
+
+        // [DIRECCION]
 
         Direccion direccion = new Direccion();
+
         direccion.setPais(departamentoRegistroDTO.getPais());
         direccion.setProvincia(departamentoRegistroDTO.getProvincia());
         direccion.setCodigoPostal(departamentoRegistroDTO.getCodigoPostal());
         direccion.setCiudad(departamentoRegistroDTO.getCiudad());
         direccion.setCalle(departamentoRegistroDTO.getCalle());
         direccion.setAltura(departamentoRegistroDTO.getAltura());
-        alojamiento.setDireccion(direccionService.crear(direccion));
-        alojamiento.setDireccion(direccion);
+
+        alojamiento.setDireccion(
+                direccionService.crear(direccion)
+        );
+
+
+        // [SERVICIO]
+
+        Servicio servicio = new Servicio();
+
+        servicio.setTieneCocina(departamentoRegistroDTO.isTieneCocina());
+        servicio.setTieneLavarropa(departamentoRegistroDTO.isTieneLavarropa());
+        servicio.setTieneWifi(departamentoRegistroDTO.isTieneWifi());
+        servicio.setTieneEstacionamiento(departamentoRegistroDTO.isTieneEstacionamiento());
+
+        alojamiento.setServicio(servicio);
+
+
+        // [DISPONIBILIDAD]
+
+        Disponibilidad disponibilidad = new Disponibilidad();
+
+        disponibilidad.setFecha(departamentoRegistroDTO.getFecha());
+        disponibilidad.setDisponible(departamentoRegistroDTO.isDisponible());
+
+        alojamiento.setDisponibilidad(disponibilidad);
+
+
+        // [DEPARTAMENTO]
 
         Departamento departamento = new Departamento();
-        departamento.setTieneAscensor(departamentoRegistroDTO.isTieneAscensor());
-        departamento.setExpensasIncluidas(departamentoRegistroDTO.isExpensasIncluidas());
-        departamento.setPiso(departamentoRegistroDTO.getPiso());
+
+        departamento.setTieneAscensor(
+                departamentoRegistroDTO.isTieneAscensor()
+        );
+
+        departamento.setExpensasIncluidas(
+                departamentoRegistroDTO.isExpensasIncluidas()
+        );
+
+        departamento.setPiso(
+                departamentoRegistroDTO.getPiso()
+        );
+
         departamento.setAlojamiento(alojamiento);
+
 
         return departamentoRepository.save(departamento);
     }
@@ -100,10 +147,12 @@ public class DepartamentoService {
         // [ANFITRION]
 
         if (dto.getIdAnfitrion() != null) {
+
             departamento.getAlojamiento().setAnfitrion(
                     anfitrionService.obtenerPorId(dto.getIdAnfitrion())
             );
         }
+
 
         // [ALOJAMIENTO]
 
@@ -127,40 +176,124 @@ public class DepartamentoService {
             departamento.getAlojamiento().setCapacidad(dto.getCapacidad());
         }
 
-        if (dto.getDescripcion() != null) {
-            departamento.getAlojamiento().setDescripcion(dto.getDescripcion());
+        if (dto.getDescripcion() != null &&
+                !dto.getDescripcion().isBlank()) {
+
+            departamento.getAlojamiento()
+                    .setDescripcion(dto.getDescripcion());
         }
 
         if (dto.getPrecioNoche() != null) {
-            departamento.getAlojamiento().setPrecioNoche(dto.getPrecioNoche());
+            departamento.getAlojamiento()
+                    .setPrecioNoche(dto.getPrecioNoche());
         }
 
 
         // [DIRECCION]
 
-        if (dto.getPais() != null) {
-            departamento.getAlojamiento().getDireccion().setPais(dto.getPais());
+        if (dto.getPais() != null &&
+                !dto.getPais().isBlank()) {
+
+            departamento.getAlojamiento()
+                    .getDireccion()
+                    .setPais(dto.getPais());
         }
 
-        if (dto.getProvincia() != null) {
-            departamento.getAlojamiento().getDireccion().setProvincia(dto.getProvincia());
+        if (dto.getProvincia() != null &&
+                !dto.getProvincia().isBlank()) {
+
+            departamento.getAlojamiento()
+                    .getDireccion()
+                    .setProvincia(dto.getProvincia());
         }
 
-        if (dto.getCodigoPostal() != null) {
-            departamento.getAlojamiento().getDireccion().setCodigoPostal(dto.getCodigoPostal());
+        if (dto.getCodigoPostal() != null &&
+                !dto.getCodigoPostal().isBlank()) {
+
+            departamento.getAlojamiento()
+                    .getDireccion()
+                    .setCodigoPostal(dto.getCodigoPostal());
         }
 
-        if (dto.getCiudad() != null) {
-            departamento.getAlojamiento().getDireccion().setCiudad(dto.getCiudad());
+        if (dto.getCiudad() != null &&
+                !dto.getCiudad().isBlank()) {
+
+            departamento.getAlojamiento()
+                    .getDireccion()
+                    .setCiudad(dto.getCiudad());
         }
 
-        if (dto.getCalle() != null) {
-            departamento.getAlojamiento().getDireccion().setCalle(dto.getCalle());
+        if (dto.getCalle() != null &&
+                !dto.getCalle().isBlank()) {
+
+            departamento.getAlojamiento()
+                    .getDireccion()
+                    .setCalle(dto.getCalle());
         }
 
         if (dto.getAltura() != null) {
-            departamento.getAlojamiento().getDireccion().setAltura(dto.getAltura());
+
+            departamento.getAlojamiento()
+                    .getDireccion()
+                    .setAltura(dto.getAltura());
         }
+
+
+        // [SERVICIO]
+
+        if (departamento.getAlojamiento().getServicio() == null) {
+
+            Servicio servicio = new Servicio();
+
+            servicio.setTieneCocina(dto.isTieneCocina());
+            servicio.setTieneLavarropa(dto.isTieneLavarropa());
+            servicio.setTieneWifi(dto.isTieneWifi());
+            servicio.setTieneEstacionamiento(dto.isTieneEstacionamiento());
+
+            departamento.getAlojamiento().setServicio(servicio);
+
+        } else {
+
+            departamento.getAlojamiento().getServicio()
+                    .setTieneCocina(dto.isTieneCocina());
+
+            departamento.getAlojamiento().getServicio()
+                    .setTieneLavarropa(dto.isTieneLavarropa());
+
+            departamento.getAlojamiento().getServicio()
+                    .setTieneWifi(dto.isTieneWifi());
+
+            departamento.getAlojamiento().getServicio()
+                    .setTieneEstacionamiento(dto.isTieneEstacionamiento());
+        }
+
+
+        // [DISPONIBILIDAD]
+
+        if (departamento.getAlojamiento().getDisponibilidad() == null) {
+
+            Disponibilidad disponibilidad = new Disponibilidad();
+
+            disponibilidad.setFecha(dto.getFecha());
+            disponibilidad.setDisponible(dto.isDisponible());
+
+            departamento.getAlojamiento()
+                    .setDisponibilidad(disponibilidad);
+
+        } else {
+
+            if (dto.getFecha() != null) {
+
+                departamento.getAlojamiento()
+                        .getDisponibilidad()
+                        .setFecha(dto.getFecha());
+            }
+
+            departamento.getAlojamiento()
+                    .getDisponibilidad()
+                    .setDisponible(dto.isDisponible());
+        }
+
 
         return departamentoRepository.save(departamento);
     }
