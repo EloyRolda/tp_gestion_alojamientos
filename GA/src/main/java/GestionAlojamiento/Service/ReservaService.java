@@ -1,7 +1,9 @@
 package GestionAlojamiento.Service;
 
+import GestionAlojamiento.DTO.ReservaRegistroDTO;
 import GestionAlojamiento.Model.Alojamiento;
 import GestionAlojamiento.Model.Cliente;
+import GestionAlojamiento.Model.Enums.TipoEstado;
 import GestionAlojamiento.Model.Reserva;
 import GestionAlojamiento.Repository.ClienteRepository;
 import GestionAlojamiento.Repository.ReservaRepository;
@@ -36,16 +38,47 @@ public class ReservaService {
 
     //------------------------ CREAR/BORRAR ------------------------
     @Transactional
-    public Reserva crear(Long id_Alojamiento, Long id_Cliente, Reserva reserva) {
+    public Reserva crear(ReservaRegistroDTO dto) {
 
-        Alojamiento alojamiento = alojamientoService.obtenerPorId(id_Alojamiento);
-        Cliente cliente = clienteRepository.findById(id_Cliente).orElseThrow(() -> new RuntimeException("El Alojamiento no se encuentra en la base de datos."));
+        Alojamiento alojamiento = alojamientoService.obtenerPorId(dto.getIdAlojamiento());
 
-        disponibilidadService.ocuparFechas(reserva.getFechaInicio(), reserva.getFechaFin());
+        Cliente cliente = clienteRepository.findById(dto.getIdCliente()).orElseThrow(() -> new RuntimeException("El cliente no se encuentra en la base de datos."));
+
+
+        // VALIDACIONES
+
+        if (dto.getFechaFin().isBefore(dto.getFechaInicio())) {
+            throw new RuntimeException("La fecha de fin no puede ser anterior a la fecha de inicio.");
+        }
+
+        if (dto.getFechaInicio().isBefore(LocalDate.now())) {
+            throw new RuntimeException("La fecha de inicio no puede ser anterior al dia actual.");
+        }
+
+
+        // DISPONIBILIDAD
+
+        disponibilidadService.ocuparFechas(
+                dto.getFechaInicio(),
+                dto.getFechaFin()
+        );
+
+
+        // RESERVA
+
+        Reserva reserva = new Reserva();
+
+        reserva.setFechaInicio(dto.getFechaInicio());
+        reserva.setFechaFin(dto.getFechaFin());
+
+        reserva.setTipoEstado(dto.getTipoEstado());
 
         reserva.setCliente(cliente);
         reserva.setAlojamiento(alojamiento);
-        reserva.setPrecioTotal(calcularPrecio(alojamiento, reserva.getFechaInicio(), reserva.getFechaFin()));
+
+        reserva.setPrecioTotal(calcularPrecio(alojamiento, dto.getFechaInicio(), dto.getFechaFin()));
+
+
         return reservaRepository.save(reserva);
     }
 

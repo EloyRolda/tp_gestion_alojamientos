@@ -1,5 +1,7 @@
 package GestionAlojamiento.Service;
 
+import GestionAlojamiento.DTO.ReviewModificarDTO;
+import GestionAlojamiento.DTO.ReviewRegistroDTO;
 import GestionAlojamiento.Model.Alojamiento;
 import GestionAlojamiento.Model.Cliente;
 import GestionAlojamiento.Model.Review;
@@ -16,7 +18,7 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
 
-    // Inyectamos los Services en lugar de los Repositories
+
     private final ClienteService clienteService;
     private final AlojamientoService alojamientoService;
 
@@ -32,13 +34,34 @@ public class ReviewService {
 
     //------------------------ CREAR/BORRAR ------------------------
     @Transactional
-    public Review crear(Long id_cliente, Long id_alojamiento, Review review) {
-        // Usamos los métodos 'obtenerPorId' que ya tienen sus propias excepciones
-        Cliente cliente = clienteService.obtenerPorId(id_cliente);
-        Alojamiento alojamiento = alojamientoService.obtenerPorId(id_alojamiento);
+    public Review crear(ReviewRegistroDTO dto) {
+
+        Cliente cliente = clienteService.obtenerPorId(dto.getIdCliente());
+
+        Alojamiento alojamiento = alojamientoService.obtenerPorId(dto.getIdAlojamiento());
+
+
+        // VALIDACIONES
+
+        if (dto.getPuntuacion() < 1 || dto.getPuntuacion() > 5) {
+            throw new RuntimeException("El puntaje debe estar entre 1 y 5.");
+        }
+
+        if (dto.getComentario() == null || dto.getComentario().isBlank()) {
+            throw new RuntimeException("El comentario no puede estar vacio.");
+        }
+
+
+        // REVIEW
+
+        Review review = new Review();
+
+        review.setPuntuacion(dto.getPuntuacion());
+        review.setComentario(dto.getComentario());
 
         review.setCliente(cliente);
         review.setAlojamiento(alojamiento);
+
 
         return reviewRepository.save(review);
     }
@@ -52,21 +75,63 @@ public class ReviewService {
     }
 
     //------------------------ MODIFICAR ------------------------
-
     @Transactional
-    public Review actualizarPuntuacion(Long id, Integer nuevaPuntuacion) {
-        if (nuevaPuntuacion < 1 || nuevaPuntuacion > 5) {
-            throw new RuntimeException("La puntuación debe estar entre 1 y 5.");
+    public Review modificar(ReviewModificarDTO dto) {
+
+        Review review = obtenerPorId(dto.getId());
+
+
+        // [REVIEW]
+
+        if (dto.getPuntuacion() != null) {
+
+            if (dto.getPuntuacion() < 1 || dto.getPuntuacion() > 5) {
+                throw new RuntimeException("El puntaje debe estar entre 1 y 5.");
+            }
+
+            review.setPuntuacion(dto.getPuntuacion());
         }
-        Review review = obtenerPorId(id);
-        review.setPuntuacion(nuevaPuntuacion);
+
+        if (dto.getComentario() != null && !dto.getComentario().isBlank()) {
+            review.setComentario(dto.getComentario());
+        }
+
+
+        // [CLIENTE]
+
+        if (dto.getIdCliente() != null) {
+
+            Cliente cliente = clienteService.obtenerPorId(dto.getIdCliente());
+
+            review.setCliente(cliente);
+        }
+
+
+        // [ALOJAMIENTO]
+
+        if (dto.getIdAlojamiento() != null) {
+
+            Alojamiento alojamiento = alojamientoService.obtenerPorId(dto.getIdAlojamiento());
+
+            review.setAlojamiento(alojamiento);
+        }
+
+
         return reviewRepository.save(review);
     }
 
-    @Transactional
-    public Review actualizarComentario(Long id, String nuevoComentario) {
-        Review review = obtenerPorId(id);
-        review.setComentario(nuevoComentario);
-        return reviewRepository.save(review);
+    public List<Review> listarPorAlojamiento(Long idAlojamiento) {
+
+        Alojamiento alojamiento = alojamientoService.obtenerPorId(idAlojamiento);
+
+        return reviewRepository.findByAlojamiento(alojamiento);
     }
+
+    public List<Review> listarPorCliente(Long idCliente) {
+
+        Cliente cliente = clienteService.obtenerPorId(idCliente);
+
+        return reviewRepository.findByCliente(cliente);
+    }
+
 }

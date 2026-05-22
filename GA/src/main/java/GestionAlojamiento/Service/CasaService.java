@@ -1,6 +1,10 @@
 package GestionAlojamiento.Service;
 
+import GestionAlojamiento.DTO.CasaModificarDTO;
+import GestionAlojamiento.DTO.CasaRegistroDTO;
+import GestionAlojamiento.Model.Alojamiento;
 import GestionAlojamiento.Model.Casa;
+import GestionAlojamiento.Model.Direccion;
 import GestionAlojamiento.Repository.AlojamientoRepository;
 import GestionAlojamiento.Repository.CasaRepository;
 import jakarta.transaction.Transactional;
@@ -15,25 +19,26 @@ public class CasaService {
 
     private final CasaRepository casaRepository;
     private final AlojamientoRepository alojamientoRepository;
+    private final AnfitrionService anfitrionService;
 
     //------------------------ LISTAR ------------------------
-    private List<Casa> listarCasa() {
+    public List<Casa> listar() {
         return casaRepository.findAll();
     }
 
-    private Casa obtenerPorId(Long id) {
+    public Casa obtenerPorId(Long id) {
         return casaRepository.findById(id).orElseThrow(() -> new RuntimeException("Error, el id de la casa no se encuentra en la base de datos."));
     }
 
-    private List<Casa> listarPorPatio() {
+    public List<Casa> listarPorPatio() {
         return casaRepository.findByTienePatioTrue();
     }
 
-    private List<Casa> listarPorParrilla() {
+    public List<Casa> listarPorParrilla() {
         return casaRepository.findByTieneParrillaTrue();
     }
 
-    private List<Casa> listarPorPileta() {
+    public List<Casa> listarPorPileta() {
         return casaRepository.findByTienePiletaTrue();
     }
 
@@ -42,9 +47,52 @@ public class CasaService {
     */
     //------------------------ CREAR/BORRAR ------------------------
     @Transactional
-    public Casa crear(Long id_alojamiento, Casa casa) {
-        casa.setAlojamiento(alojamientoRepository.findById(id_alojamiento)
-                .orElseThrow(() -> new RuntimeException("Error, el id del alojamiento no se encuentra en la base de datos.")));
+    public Casa crear(CasaRegistroDTO dto) {
+
+        Casa casa = new Casa();
+
+        // [CASA]
+
+        casa.setTienePatio(dto.isTienePatio());
+        casa.setTienePileta(dto.isTienePileta());
+        casa.setTieneParrilla(dto.isTieneParrilla());
+
+
+        // [DIRECCION]
+
+        Direccion direccion = new Direccion();
+
+        direccion.setPais(dto.getPais());
+        direccion.setProvincia(dto.getProvincia());
+        direccion.setCodigoPostal(dto.getCodigoPostal());
+        direccion.setCiudad(dto.getCiudad());
+        direccion.setCalle(dto.getCalle());
+        direccion.setAltura(dto.getAltura());
+
+
+        // [ALOJAMIENTO]
+
+        Alojamiento alojamiento = new Alojamiento();
+
+        alojamiento.setAnfitrion(
+                anfitrionService.obtenerPorId(dto.getIdAnfitrion())
+        );
+
+        alojamiento.setCantAmbientes(dto.getCantAmbientes());
+        alojamiento.setCantBanios(dto.getCantBanios());
+        alojamiento.setCantCamas(dto.getCantCamas());
+        alojamiento.setCantHabitaciones(dto.getCantHabitaciones());
+        alojamiento.setCapacidad(dto.getCapacidad());
+        alojamiento.setDescripcion(dto.getDescripcion());
+        alojamiento.setPrecioNoche(dto.getPrecioNoche());
+
+        alojamiento.setDireccion(direccion);
+
+
+        // [RELACION]
+
+        casa.setAlojamiento(alojamiento);
+
 
         return casaRepository.save(casa);
     }
@@ -58,31 +106,83 @@ public class CasaService {
     }
 
     //------------------------ MODIFICAR ------------------------
-
     @Transactional
-    public Casa actualizarTiene_Pileta(Long id, boolean nuevoEstado) {
+    public Casa modificar(CasaModificarDTO dto) {
 
-        Casa casa = casaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Error, el id de la casa no se encuentra en la base de datos."));
-        casa.setTienePileta(nuevoEstado);
-        return casaRepository.save(casa);
-    }
+        Casa casa = obtenerPorId(dto.getIdCasa());
 
-    @Transactional
-    public Casa actualizarTiene_Patio(Long id, boolean nuevoEstado) {
+        // [CASA]
 
-        Casa casa = casaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Error, el id de la casa no se encuentra en la base de datos."));
-        casa.setTienePatio(nuevoEstado);
-        return casaRepository.save(casa);
-    }
+        if (dto.getTienePatio() != null) {
+            casa.setTienePatio(dto.getTienePatio());
+        }
 
-    @Transactional
-    public Casa actualizarTiene_Parrilla(Long id, boolean nuevoEstado) {
+        if (dto.getTienePileta() != null) {
+            casa.setTienePileta(dto.getTienePileta());
+        }
 
-        Casa casa = casaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Error, el id de la casa no se encuentra en la base de datos."));
-        casa.setTieneParrilla(nuevoEstado);
+        if (dto.getTieneParrilla() != null) {
+            casa.setTieneParrilla(dto.getTieneParrilla());
+        }
+
+
+        // [ALOJAMIENTO]
+
+        if (dto.getCantAmbientes() != null) {
+            casa.getAlojamiento().setCantAmbientes(dto.getCantAmbientes());
+        }
+
+        if (dto.getCantBanios() != null) {
+            casa.getAlojamiento().setCantBanios(dto.getCantBanios());
+        }
+
+        if (dto.getCantCamas() != null) {
+            casa.getAlojamiento().setCantCamas(dto.getCantCamas());
+        }
+
+        if (dto.getCantHabitaciones() != null) {
+            casa.getAlojamiento().setCantHabitaciones(dto.getCantHabitaciones());
+        }
+
+        if (dto.getCapacidad() != null) {
+            casa.getAlojamiento().setCapacidad(dto.getCapacidad());
+        }
+
+        if (dto.getDescripcion() != null && !dto.getDescripcion().isBlank()) {
+            casa.getAlojamiento().setDescripcion(dto.getDescripcion());
+        }
+
+        if (dto.getPrecioNoche() != null) {
+            casa.getAlojamiento().setPrecioNoche(dto.getPrecioNoche());
+        }
+
+
+        // [DIRECCION]
+
+        if (dto.getPais() != null && !dto.getPais().isBlank()) {
+            casa.getAlojamiento().getDireccion().setPais(dto.getPais());
+        }
+
+        if (dto.getProvincia() != null && !dto.getProvincia().isBlank()) {
+            casa.getAlojamiento().getDireccion().setProvincia(dto.getProvincia());
+        }
+
+        if (dto.getCodigoPostal() != null && !dto.getCodigoPostal().isBlank()) {
+            casa.getAlojamiento().getDireccion().setCodigoPostal(dto.getCodigoPostal());
+        }
+
+        if (dto.getCiudad() != null && !dto.getCiudad().isBlank()) {
+            casa.getAlojamiento().getDireccion().setCiudad(dto.getCiudad());
+        }
+
+        if (dto.getCalle() != null && !dto.getCalle().isBlank()) {
+            casa.getAlojamiento().getDireccion().setCalle(dto.getCalle());
+        }
+
+        if (dto.getAltura() != null) {
+            casa.getAlojamiento().getDireccion().setAltura(dto.getAltura());
+        }
+
         return casaRepository.save(casa);
     }
 
