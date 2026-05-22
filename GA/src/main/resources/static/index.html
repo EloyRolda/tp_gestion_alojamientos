@@ -46,6 +46,9 @@
 
         li{
             margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         a{
@@ -56,6 +59,20 @@
         a:hover{
             color: #60a5fa;
         }
+
+        .badge {
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 4px;
+            min-width: 46px;
+            text-align: center;
+        }
+
+        .get    { background-color: #166534; color: #86efac; }
+        .post   { background-color: #1e3a5f; color: #93c5fd; }
+        .put    { background-color: #713f12; color: #fde68a; }
+        .delete { background-color: #7f1d1d; color: #fca5a5; }
 
     </style>
 
@@ -74,17 +91,11 @@
         <h2>Administrador</h2>
 
         <ul>
-
-            <li><a href="/administrador/lista">Listar Administradores</a></li>
-
-            <li><a href="/administrador/1">Mostrar Administrador</a></li>
-
-            <li><a href="/administrador/crear">Registrar Administrador</a></li>
-
-            <li><a href="/administrador/modificar">Modificar Administrador</a></li>
-
-            <li><a href="/administrador/eliminar/1">Eliminar Administrador</a></li>
-
+            <li><span class="badge get">GET</span>    <a href="/Administrador/listar">Listar Administradores</a></li>
+            <li><span class="badge get">GET</span>    <a href="/Administrador/mostrar/1">Mostrar Administrador</a></li>
+            <li><span class="badge post">POST</span>  <a href="/Administrador/registrar">Registrar Administrador</a></li>
+            <li><span class="badge put">PUT</span>    <a href="/Administrador/actualizar">Actualizar Administrador</a></li>
+            <li><span class="badge delete">DELETE</span> <a href="/Administrador/eliminar/1">Eliminar Administrador</a></li>
         </ul>
 
     </div>
@@ -95,17 +106,11 @@
         <h2>Cliente</h2>
 
         <ul>
-
-            <li><a href="/cliente/lista">Listar Clientes</a></li>
-
-            <li><a href="/cliente/1">Mostrar Cliente</a></li>
-
-            <li><a href="/cliente/crear">Registrar Cliente</a></li>
-
-            <li><a href="/cliente/modificar">Modificar Cliente</a></li>
-
-            <li><a href="/cliente/eliminar/1">Eliminar Cliente</a></li>
-
+            <li><span class="badge get">GET</span>    <a href="/cliente/listar">Listar Clientes</a></li>
+            <li><span class="badge get">GET</span>    <a href="/cliente/mostrar/1">Mostrar Cliente</a></li>
+            <li><span class="badge post">POST</span>  <a href="/cliente/registrar">Registrar Cliente</a></li>
+            <li><span class="badge put">PUT</span>    <a href="/cliente/actualizar">Actualizar Cliente</a></li>
+            <li><span class="badge delete">DELETE</span> <a href="/cliente/borrar/1">Borrar Cliente</a></li>
         </ul>
 
     </div>
@@ -116,17 +121,11 @@
         <h2>Anfitrión</h2>
 
         <ul>
-
-            <li><a href="/anfitrion/lista">Listar Anfitriones</a></li>
-
-            <li><a href="/anfitrion/1">Mostrar Anfitrión</a></li>
-
-            <li><a href="/anfitrion/crear">Registrar Anfitrión</a></li>
-
-            <li><a href="/anfitrion/modificar">Modificar Anfitrión</a></li>
-
-            <li><a href="/anfitrion/eliminar/1">Eliminar Anfitrión</a></li>
-
+            <li><span class="badge get">GET</span>    <a href="/Anfitrion/listar">Listar Anfitriones</a></li>
+            <li><span class="badge get">GET</span>    <a href="/Anfitrion/mostrar/1">Mostrar Anfitrión</a></li>
+            <li><span class="badge post">POST</span>  <a href="/Anfitrion/registro">Registrar Anfitrión</a></li>
+            <li><span class="badge put">PUT</span>    <a href="/Anfitrion/actualizar">Actualizar Anfitrión</a></li>
+            <li><span class="badge delete">DELETE</span> <a href="/Anfitrion/borrar/1">Borrar Anfitrión</a></li>
         </ul>
 
     </div>
@@ -139,17 +138,10 @@
         <h2>Casa</h2>
 
         <ul>
-
-            <li><a href="/casa/lista">Listar Casas</a></li>
-
-            <li><a href="/casa/1">Mostrar Casa</a></li>
-
-            <li><a href="/casa/crear">Registrar Casa</a></li>
-
-            <li><a href="/casa/modificar">Modificar Casa</a></li>
-
-            <li><a href="/casa/eliminar/1">Eliminar Casa</a></li>
-
+            <li><span class="badge get">GET</span>    <a href="/Casa/listar">Listar Casas</a></li>
+            <li><span class="badge get">GET</span>    <a href="/Casa/mostrar/1">Mostrar Casa</a></li>
+            <li><span class="badge post">POST</span>  <a href="/Casa/registrar">Registrar Casa</a></li>
+            <li><span class="badge put">PUT</span>    <a href="/Casa/actualizar">Actualizar Casa</a></li>
         </ul>
 
     </div>
@@ -160,17 +152,11 @@
         <h2>Departamento</h2>
 
         <ul>
-
-            <li><a href="/departamento/lista">Listar Departamentos</a></li>
-
-            <li><a href="/departamento/1">Mostrar Departamento</a></li>
-
-            <li><a href="/departamento/crear">Registrar Departamento</a></li>
-
-            <li><a href="/departamento/modificar">Modificar Departamento</a></li>
-
-            <li><a href="/departamento/eliminar/1">Eliminar Departamento</a></li>
-
+            <li><span class="badge get">GET</span>    <a href="/Departamento/listar">Listar Departamentos</a></li>
+            <li><span class="badge get">GET</span>    <a href="/Departamento/mostrar/1">Mostrar Departamento</a></li>
+            <li><span class="badge post">POST</span>  <a href="/Departamento/registrar">Registrar Departamento</a></li>
+            <li><span class="badge put">PUT</span>    <a href="/Departamento/actualizar">Actualizar Departamento</a></li>
+            <li><span class="badge delete">DELETE</span> <a href="/Departamento/borrar/1">Borrar Departamento</a></li>
         </ul>
 
     </div>
@@ -181,17 +167,10 @@
         <h2>Hotel</h2>
 
         <ul>
-
-            <li><a href="/hotel/lista">Listar Hoteles</a></li>
-
-            <li><a href="/hotel/1">Mostrar Hotel</a></li>
-
-            <li><a href="/hotel/crear">Registrar Hotel</a></li>
-
-            <li><a href="/hotel/modificar">Modificar Hotel</a></li>
-
-            <li><a href="/hotel/eliminar/1">Eliminar Hotel</a></li>
-
+            <li><span class="badge get">GET</span>    <a href="/Hotel/listar">Listar Hoteles</a></li>
+            <li><span class="badge get">GET</span>    <a href="/Hotel/mostrar/1">Mostrar Hotel</a></li>
+            <li><span class="badge post">POST</span>  <a href="/Hotel/Registrar">Registrar Hotel</a></li>
+            <li><span class="badge put">PUT</span>    <a href="/Hotel/actualizar">Actualizar Hotel</a></li>
         </ul>
 
     </div>
@@ -204,21 +183,9 @@
         <h2>Reserva</h2>
 
         <ul>
-
-            <li><a href="/reserva/lista">Listar Reservas</a></li>
-
-            <li><a href="/reserva/1">Mostrar Reserva</a></li>
-
-            <li><a href="/reserva/crear">Registrar Reserva</a></li>
-
-            <li><a href="/reserva/modificar">Modificar Reserva</a></li>
-
-            <li><a href="/reserva/eliminar/1">Eliminar Reserva</a></li>
-
-            <li><a href="/reserva/cliente/1">Reservas por Cliente</a></li>
-
-            <li><a href="/reserva/alojamiento/1">Reservas por Alojamiento</a></li>
-
+            <li><span class="badge get">GET</span>    <a href="/reserva/listar">Listar Reservas</a></li>
+            <li><span class="badge get">GET</span>    <a href="/reserva/mostrar/1">Mostrar Reserva</a></li>
+            <li><span class="badge post">POST</span>  <a href="/reserva/registrar">Registrar Reserva</a></li>
         </ul>
 
     </div>
@@ -231,44 +198,13 @@
         <h2>Review</h2>
 
         <ul>
-
-            <li><a href="/review/lista">Listar Reviews</a></li>
-
-            <li><a href="/review/1">Mostrar Review</a></li>
-
-            <li><a href="/review/crear">Registrar Review</a></li>
-
-            <li><a href="/review/modificar">Modificar Review</a></li>
-
-            <li><a href="/review/eliminar/1">Eliminar Review</a></li>
-
-            <li><a href="/review/cliente/1">Reviews por Cliente</a></li>
-
-            <li><a href="/review/alojamiento/1">Reviews por Alojamiento</a></li>
-
-        </ul>
-
-    </div>
-
-
-    <!-- SERVICIOS -->
-
-    <div class="card">
-
-        <h2>Servicio</h2>
-
-        <ul>
-
-            <li><a href="/servicio/lista">Listar Servicios</a></li>
-
-            <li><a href="/servicio/1">Mostrar Servicio</a></li>
-
-            <li><a href="/servicio/crear">Registrar Servicio</a></li>
-
-            <li><a href="/servicio/modificar">Modificar Servicio</a></li>
-
-            <li><a href="/servicio/eliminar/1">Eliminar Servicio</a></li>
-
+            <li><span class="badge get">GET</span>    <a href="/review/listar">Listar Reviews</a></li>
+            <li><span class="badge get">GET</span>    <a href="/review/mostrar/1">Mostrar Review</a></li>
+            <li><span class="badge post">POST</span>  <a href="/review/crear">Crear Review</a></li>
+            <li><span class="badge put">PUT</span>    <a href="/review/modificar">Modificar Review</a></li>
+            <li><span class="badge delete">DELETE</span> <a href="/review/eliminar/1">Eliminar Review</a></li>
+            <li><span class="badge get">GET</span>    <a href="/review/cliente/1">Reviews por Cliente</a></li>
+            <li><span class="badge get">GET</span>    <a href="/review/alojamiento/1">Reviews por Alojamiento</a></li>
         </ul>
 
     </div>
