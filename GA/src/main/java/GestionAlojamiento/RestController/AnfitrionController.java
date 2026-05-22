@@ -30,12 +30,12 @@ public class AnfitrionController {
     }
 
     @PostMapping("/registro")
-    public Anfitrion registro(AnfitrionRegistroDTO anfitrionRegistroDTO) {
+    public Anfitrion registro(@RequestBody AnfitrionRegistroDTO anfitrionRegistroDTO) {
         return anfitrionService.crear(anfitrionRegistroDTO);
     }
 
     @PutMapping("/actualizar")
-    public Anfitrion actualizar(AnfitrionModificarDTO anfitrionModificarDTO) {
+    public Anfitrion actualizar(@RequestBody AnfitrionModificarDTO anfitrionModificarDTO) {
         return anfitrionService.actualizar(anfitrionModificarDTO);
     }
 

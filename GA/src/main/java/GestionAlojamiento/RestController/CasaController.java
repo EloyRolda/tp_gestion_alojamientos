@@ -30,12 +30,12 @@ public class CasaController {
     }
 
     @PostMapping("/registrar")
-    public Casa registrar(CasaRegistroDTO casaRegistroDTO) {
+    public Casa registrar(@RequestBody CasaRegistroDTO casaRegistroDTO) {
         return casaService.crear(casaRegistroDTO);
     }
 
     @PutMapping("/actualizar")
-    public Casa actualizar(CasaModificarDTO casaModificarDTO) {
+    public Casa actualizar(@RequestBody CasaModificarDTO casaModificarDTO) {
         return casaService.modificar(casaModificarDTO);
     }
 

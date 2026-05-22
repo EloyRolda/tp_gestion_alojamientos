@@ -54,6 +54,10 @@ public class CasaRegistroDTO {
     @Size(max = 3000)
     private String descripcion;
 
+    @NotBlank(message = "Campo obligatorio")
+    @Size(max = 150)
+    private String titulo;
+
     @NotNull(message = "Campo obligatorio")
     @Min(value = 0, message = "Valor Invalido")
     private BigDecimal precioNoche;

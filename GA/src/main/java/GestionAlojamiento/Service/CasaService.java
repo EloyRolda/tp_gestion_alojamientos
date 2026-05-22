@@ -3,6 +3,7 @@ package GestionAlojamiento.Service;
 import GestionAlojamiento.DTO.CasaModificarDTO;
 import GestionAlojamiento.DTO.CasaRegistroDTO;
 import GestionAlojamiento.Model.*;
+import GestionAlojamiento.Model.Enums.TipoInmueble;
 import GestionAlojamiento.Repository.AlojamientoRepository;
 import GestionAlojamiento.Repository.CasaRepository;
 import jakarta.transaction.Transactional;
@@ -17,7 +18,9 @@ public class CasaService {
 
     private final CasaRepository casaRepository;
     private final AnfitrionService anfitrionService;
-    private  final DireccionService direccionService;
+    private final DireccionService direccionService;
+    private final DisponibilidadService disponibilidadService;
+    private final ServicioService servicioService;
 
     //------------------------ LISTAR ------------------------
     public List<Casa> listar() {
@@ -76,6 +79,7 @@ public class CasaService {
                 anfitrionService.obtenerPorId(dto.getIdAnfitrion())
         );
 
+        alojamiento.setTitulo(dto.getTitulo());
         alojamiento.setCantAmbientes(dto.getCantAmbientes());
         alojamiento.setCantBanios(dto.getCantBanios());
         alojamiento.setCantCamas(dto.getCantCamas());
@@ -83,7 +87,7 @@ public class CasaService {
         alojamiento.setCapacidad(dto.getCapacidad());
         alojamiento.setDescripcion(dto.getDescripcion());
         alojamiento.setPrecioNoche(dto.getPrecioNoche());
-
+        alojamiento.setTipoInmueble(TipoInmueble.CASA);
         alojamiento.setDireccion(
                 direccionService.crear(direccion)
         );
@@ -97,7 +101,7 @@ public class CasaService {
         servicio.setTieneLavarropa(dto.isTieneLavarropa());
         servicio.setTieneWifi(dto.isTieneWifi());
         servicio.setTieneEstacionamiento(dto.isTieneEstacionamiento());
-
+        servicioService.crear(servicio);
         alojamiento.setServicio(servicio);
 
 
@@ -107,6 +111,7 @@ public class CasaService {
 
         disponibilidad.setFecha(dto.getFecha());
         disponibilidad.setDisponible(dto.isDisponible());
+        disponibilidadService.crear(disponibilidad);//Nota revisar comprovaciones
 
         alojamiento.setDisponibilidad(disponibilidad);
 
@@ -118,6 +123,7 @@ public class CasaService {
 
         return casaRepository.save(casa);
     }
+
     @Transactional
     public void borrarPorId(Long id) {
         if (!casaRepository.existsById(id)) {
@@ -133,7 +139,6 @@ public class CasaService {
         Casa casa = obtenerPorId(dto.getIdCasa());
 
         // [CASA]
-
         if (dto.getTienePatio() != null) {
             casa.setTienePatio(dto.getTienePatio());
         }
@@ -146,115 +151,94 @@ public class CasaService {
             casa.setTieneParrilla(dto.getTieneParrilla());
         }
 
-
         // [ALOJAMIENTO]
+        Alojamiento alojamiento = casa.getAlojamiento();
 
         if (dto.getCantAmbientes() != null) {
-            casa.getAlojamiento().setCantAmbientes(dto.getCantAmbientes());
+            alojamiento.setCantAmbientes(dto.getCantAmbientes());
         }
 
         if (dto.getCantBanios() != null) {
-            casa.getAlojamiento().setCantBanios(dto.getCantBanios());
+            alojamiento.setCantBanios(dto.getCantBanios());
         }
 
         if (dto.getCantCamas() != null) {
-            casa.getAlojamiento().setCantCamas(dto.getCantCamas());
+            alojamiento.setCantCamas(dto.getCantCamas());
         }
 
         if (dto.getCantHabitaciones() != null) {
-            casa.getAlojamiento().setCantHabitaciones(dto.getCantHabitaciones());
+            alojamiento.setCantHabitaciones(dto.getCantHabitaciones());
         }
 
         if (dto.getCapacidad() != null) {
-            casa.getAlojamiento().setCapacidad(dto.getCapacidad());
+            alojamiento.setCapacidad(dto.getCapacidad());
         }
 
         if (dto.getDescripcion() != null && !dto.getDescripcion().isBlank()) {
-            casa.getAlojamiento().setDescripcion(dto.getDescripcion());
+            alojamiento.setDescripcion(dto.getDescripcion());
         }
 
         if (dto.getPrecioNoche() != null) {
-            casa.getAlojamiento().setPrecioNoche(dto.getPrecioNoche());
+            alojamiento.setPrecioNoche(dto.getPrecioNoche());
         }
 
-
         // [DIRECCION]
-
         if (dto.getPais() != null && !dto.getPais().isBlank()) {
-            casa.getAlojamiento().getDireccion().setPais(dto.getPais());
+            alojamiento.getDireccion().setPais(dto.getPais());
         }
 
         if (dto.getProvincia() != null && !dto.getProvincia().isBlank()) {
-            casa.getAlojamiento().getDireccion().setProvincia(dto.getProvincia());
+            alojamiento.getDireccion().setProvincia(dto.getProvincia());
         }
 
         if (dto.getCodigoPostal() != null && !dto.getCodigoPostal().isBlank()) {
-            casa.getAlojamiento().getDireccion().setCodigoPostal(dto.getCodigoPostal());
+            alojamiento.getDireccion().setCodigoPostal(dto.getCodigoPostal());
         }
 
         if (dto.getCiudad() != null && !dto.getCiudad().isBlank()) {
-            casa.getAlojamiento().getDireccion().setCiudad(dto.getCiudad());
+            alojamiento.getDireccion().setCiudad(dto.getCiudad());
         }
 
         if (dto.getCalle() != null && !dto.getCalle().isBlank()) {
-            casa.getAlojamiento().getDireccion().setCalle(dto.getCalle());
+            alojamiento.getDireccion().setCalle(dto.getCalle());
         }
 
         if (dto.getAltura() != null) {
-            casa.getAlojamiento().getDireccion().setAltura(dto.getAltura());
+            alojamiento.getDireccion().setAltura(dto.getAltura());
         }
-
 
         // [SERVICIO]
+        Servicio servicio = alojamiento.getServicio();
 
-        if (casa.getAlojamiento().getServicio() == null) {
-
-            Servicio servicio = new Servicio();
-
-            servicio.setTieneCocina(dto.isTieneCocina());
-            servicio.setTieneLavarropa(dto.isTieneLavarropa());
-            servicio.setTieneWifi(dto.isTieneWifi());
-            servicio.setTieneEstacionamiento(dto.isTieneEstacionamiento());
-
-            casa.getAlojamiento().setServicio(servicio);
-
-        } else {
-
-            casa.getAlojamiento().getServicio()
-                    .setTieneCocina(dto.isTieneCocina());
-
-            casa.getAlojamiento().getServicio()
-                    .setTieneLavarropa(dto.isTieneLavarropa());
-
-            casa.getAlojamiento().getServicio()
-                    .setTieneWifi(dto.isTieneWifi());
-
-            casa.getAlojamiento().getServicio()
-                    .setTieneEstacionamiento(dto.isTieneEstacionamiento());
+        if (servicio == null) {
+            servicio = new Servicio();
+            alojamiento.setServicio(servicio);
         }
 
+        servicio.setTieneCocina(dto.isTieneCocina());
+        servicio.setTieneLavarropa(dto.isTieneLavarropa());
+        servicio.setTieneWifi(dto.isTieneWifi());
+        servicio.setTieneEstacionamiento(dto.isTieneEstacionamiento());
 
-// [DISPONIBILIDAD]
+        // [DISPONIBILIDAD]
+        Disponibilidad actual = alojamiento.getDisponibilidad();
 
-        if (casa.getAlojamiento().getDisponibilidad() == null) {
+        if (dto.getFecha() != null || actual == null) {
 
-            Disponibilidad disponibilidad = new Disponibilidad();
+            Disponibilidad updated;
 
-            disponibilidad.setFecha(dto.getFecha());
-            disponibilidad.setDisponible(dto.isDisponible());
-
-            casa.getAlojamiento().setDisponibilidad(disponibilidad);
-
-        } else {
-
-            if (dto.getFecha() != null) {
-
-                casa.getAlojamiento().getDisponibilidad().setFecha(dto.getFecha());
+            if (actual == null) {
+                actual = new Disponibilidad();
             }
 
-            casa.getAlojamiento().getDisponibilidad().setDisponible(dto.isDisponible());
-        }
+            actual.setFecha(dto.getFecha());
+            actual.setDisponible(dto.isDisponible());
 
+
+            updated = disponibilidadService.crearOActualizar(actual);
+
+            alojamiento.setDisponibilidad(updated);
+        }
 
         return casaRepository.save(casa);
     }

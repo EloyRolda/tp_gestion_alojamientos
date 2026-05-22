@@ -42,11 +42,7 @@ public class DisponibilidadService {
 
     //------------------------ CREAR/BORRAR ------------------------
     @Transactional
-    public Disponibilidad crear(Long id_alojamiento, Disponibilidad disponibilidad) {
-        Alojamiento alojamiento = alojamientoRepository.findById(id_alojamiento)
-                .orElseThrow(() -> new RuntimeException("Error, id de alojamiento no encontrado."));
-
-        disponibilidad.setAlojamiento(alojamiento);
+    public Disponibilidad crear(Disponibilidad disponibilidad) {
         return disponibilidadRepository.save(disponibilidad);
     }
 
@@ -123,6 +119,11 @@ public class DisponibilidadService {
             throw new RuntimeException("Uno o varios dias estan ocupados");
         }
 
+    }
+
+    @Transactional
+    public Disponibilidad crearOActualizar(Disponibilidad disponibilidad) {
+        return disponibilidadRepository.save(disponibilidad);
     }
 
 }

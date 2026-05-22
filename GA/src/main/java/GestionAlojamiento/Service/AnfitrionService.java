@@ -42,7 +42,9 @@ public class AnfitrionService {
         usuario.setNombre(anfitrionRegistroDTO.getNombre());
         usuario.setPassword(anfitrionRegistroDTO.getPassword());
         usuario.setTelefono(anfitrionRegistroDTO.getTelefono());
-        usuario.setTipoUsuario(TipoUsuario.CLIENTE);
+        usuario.setTipoUsuario(TipoUsuario.ANFITRION);
+
+        usuarioService.crear(usuario);
 
         Anfitrion anfitrion = new Anfitrion();
         anfitrion.setUsuario(usuario);
