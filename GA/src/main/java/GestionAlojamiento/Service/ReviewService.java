@@ -10,6 +10,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -55,13 +56,11 @@ public class ReviewService {
         // REVIEW
 
         Review review = new Review();
-
         review.setPuntuacion(dto.getPuntuacion());
         review.setComentario(dto.getComentario());
-
         review.setCliente(cliente);
         review.setAlojamiento(alojamiento);
-
+        review.setFecha(LocalDateTime.now());
 
         return reviewRepository.save(review);
     }

@@ -39,6 +39,9 @@ public class HotelController {
         return hotelService.actualizar(hotelModificarDTO);  //Terminar
     }
 
-
+    @DeleteMapping("/borrar/{id}")
+    public void borrarPorId(@PathVariable Long id){
+        hotelService.borrarPorId(id);
+    }
 
 }

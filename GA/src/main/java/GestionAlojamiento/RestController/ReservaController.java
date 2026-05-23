@@ -1,5 +1,6 @@
 package GestionAlojamiento.RestController;
 
+import GestionAlojamiento.DTO.ReservaModificarDTO;
 import GestionAlojamiento.DTO.ReservaRegistroDTO;
 import GestionAlojamiento.Model.Reserva;
 import GestionAlojamiento.Service.ReservaService;
@@ -27,8 +28,19 @@ public class ReservaController {
     }
 
     @PostMapping("/registrar")
-    public Reserva registrar(ReservaRegistroDTO reservaRegistroDTO) {
+    public Reserva registrar(@RequestBody ReservaRegistroDTO reservaRegistroDTO) {
         return reservaService.crear(reservaRegistroDTO);
+    }
+
+
+    @PutMapping("/modificar")
+    public Reserva modificar(@RequestBody ReservaModificarDTO reservaModificarDTO) {
+        return reservaService.actualizar(reservaModificarDTO);
+    }
+
+    @DeleteMapping("/borrar/{id}")
+    public void borrarPorId(@PathVariable Long id) {
+        reservaService.borrarPorId(id);
     }
 
 }

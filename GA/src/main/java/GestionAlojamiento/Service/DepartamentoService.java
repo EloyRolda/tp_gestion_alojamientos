@@ -3,6 +3,7 @@ package GestionAlojamiento.Service;
 import GestionAlojamiento.DTO.DepartamentoModificarDTO;
 import GestionAlojamiento.DTO.DepartamentoRegistroDTO;
 import GestionAlojamiento.Model.*;
+import GestionAlojamiento.Model.Enums.TipoInmueble;
 import GestionAlojamiento.Repository.AlojamientoRepository;
 import GestionAlojamiento.Repository.DepartamentoRepository;
 import jakarta.transaction.Transactional;
@@ -19,6 +20,9 @@ public class DepartamentoService {
     private final DepartamentoRepository departamentoRepository;
     private final AnfitrionService anfitrionService;
     private final DireccionService direccionService;
+    private final ServicioService servicioService;
+    private final DisponibilidadService disponibilidadService;
+    private final AlojamientoService alojamientoService;
 
     //------------------------ LISTAR ------------------------
     public List<Departamento> listarTodos() {
@@ -42,7 +46,7 @@ public class DepartamentoService {
     public Departamento crear(DepartamentoRegistroDTO departamentoRegistroDTO) {
 
         Alojamiento alojamiento = new Alojamiento();
-
+        alojamiento.setTitulo(departamentoRegistroDTO.getTitulo());
         alojamiento.setCantAmbientes(departamentoRegistroDTO.getCantAmbientes());
         alojamiento.setCantBanios(departamentoRegistroDTO.getCantBanios());
         alojamiento.setCantCamas(departamentoRegistroDTO.getCantCamas());
@@ -50,12 +54,8 @@ public class DepartamentoService {
         alojamiento.setCapacidad(departamentoRegistroDTO.getCapacidad());
         alojamiento.setDescripcion(departamentoRegistroDTO.getDescripcion());
         alojamiento.setPrecioNoche(departamentoRegistroDTO.getPrecioNoche());
-
-        alojamiento.setAnfitrion(
-                anfitrionService.obtenerPorId(
-                        departamentoRegistroDTO.getIdAnfitrion()
-                )
-        );
+        alojamiento.setTipoInmueble(TipoInmueble.DEPARTAMENTO);
+        alojamiento.setAnfitrion(anfitrionService.obtenerPorId(departamentoRegistroDTO.getIdAnfitrion()));
 
 
         // [DIRECCION]
@@ -69,9 +69,7 @@ public class DepartamentoService {
         direccion.setCalle(departamentoRegistroDTO.getCalle());
         direccion.setAltura(departamentoRegistroDTO.getAltura());
 
-        alojamiento.setDireccion(
-                direccionService.crear(direccion)
-        );
+        alojamiento.setDireccion(direccionService.crear(direccion));
 
 
         // [SERVICIO]
@@ -83,7 +81,7 @@ public class DepartamentoService {
         servicio.setTieneWifi(departamentoRegistroDTO.isTieneWifi());
         servicio.setTieneEstacionamiento(departamentoRegistroDTO.isTieneEstacionamiento());
 
-        alojamiento.setServicio(servicio);
+        alojamiento.setServicio(servicioService.crear(servicio));
 
 
         // [DISPONIBILIDAD]
@@ -93,26 +91,20 @@ public class DepartamentoService {
         disponibilidad.setFecha(departamentoRegistroDTO.getFecha());
         disponibilidad.setDisponible(departamentoRegistroDTO.isDisponible());
 
-        alojamiento.setDisponibilidad(disponibilidad);
+        alojamiento.setDisponibilidad(disponibilidadService.crear(disponibilidad));
 
 
         // [DEPARTAMENTO]
 
         Departamento departamento = new Departamento();
 
-        departamento.setTieneAscensor(
-                departamentoRegistroDTO.isTieneAscensor()
-        );
+        departamento.setTieneAscensor(departamentoRegistroDTO.isTieneAscensor());
 
-        departamento.setExpensasIncluidas(
-                departamentoRegistroDTO.isExpensasIncluidas()
-        );
+        departamento.setExpensasIncluidas(departamentoRegistroDTO.isExpensasIncluidas());
 
-        departamento.setPiso(
-                departamentoRegistroDTO.getPiso()
-        );
+        departamento.setPiso(departamentoRegistroDTO.getPiso());
 
-        departamento.setAlojamiento(alojamiento);
+        departamento.setAlojamiento(alojamientoService.crear(alojamiento));
 
 
         return departamentoRepository.save(departamento);

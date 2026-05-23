@@ -32,6 +32,8 @@ public class HotelRegistroDTO {
     private boolean incluyeDesayuno;
 
     //[ALOJAMIENTO]
+    @NotBlank(message = "Campo obligatorio")
+    private String titulo;
     @NotNull(message = "Campo obligatorio")
     @Min(value = 1, message = "Valor Invalido")
     private Integer cantAmbientes;

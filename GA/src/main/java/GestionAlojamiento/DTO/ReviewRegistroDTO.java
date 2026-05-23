@@ -22,9 +22,6 @@ public class ReviewRegistroDTO {
     @NotBlank(message = "Campo Obligatorio")
     private String comentario;
 
-    @NotBlank(message = "Campo Obligatorio")
-    private LocalDateTime fecha; //Automaticamente registrado.
-
     @NotNull(message = "Campo Obligatorio")
     private Long idCliente;
 

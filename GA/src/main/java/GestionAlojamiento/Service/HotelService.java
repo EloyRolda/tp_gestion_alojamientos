@@ -21,6 +21,8 @@ public class HotelService {
     private final DireccionService direccionService;
     private final AlojamientoService alojamientoService;
     private final AnfitrionService anfitrionService;
+    private final ServicioService servicioService;
+    private final DisponibilidadService disponibilidadService;
 
     //------------------------ LISTAR ------------------------
     public List<Hotel> listarTodos() {
@@ -53,10 +55,9 @@ public class HotelService {
         alojamiento.setCapacidad(hotelRegistroDTO.getCapacidad());
         alojamiento.setDescripcion(hotelRegistroDTO.getDescripcion());
         alojamiento.setPrecioNoche(hotelRegistroDTO.getPrecioNoche());
-
-        alojamiento.setAnfitrion(
-                anfitrionService.obtenerPorId(hotelRegistroDTO.getIdAnfitrion())
-        );
+        alojamiento.setTitulo(hotelRegistroDTO.getTitulo());
+        alojamiento.setAnfitrion(anfitrionService.obtenerPorId(hotelRegistroDTO.getIdAnfitrion()));
+        alojamiento.setTipoInmueble(TipoInmueble.HOTEL);
 
 
         // [DIRECCION]
@@ -70,9 +71,7 @@ public class HotelService {
         direccion.setCalle(hotelRegistroDTO.getCalle());
         direccion.setAltura(hotelRegistroDTO.getAltura());
 
-        alojamiento.setDireccion(
-                direccionService.crear(direccion)
-        );
+        alojamiento.setDireccion(direccionService.crear(direccion));
 
 
         // [SERVICIO]
@@ -84,7 +83,7 @@ public class HotelService {
         servicio.setTieneWifi(hotelRegistroDTO.isTieneWifi());
         servicio.setTieneEstacionamiento(hotelRegistroDTO.isTieneEstacionamiento());
 
-        alojamiento.setServicio(servicio);
+        alojamiento.setServicio(servicioService.crear(servicio));
 
 
         // [DISPONIBILIDAD]
@@ -94,7 +93,7 @@ public class HotelService {
         disponibilidad.setFecha(hotelRegistroDTO.getFecha());
         disponibilidad.setDisponible(hotelRegistroDTO.isDisponible());
 
-        alojamiento.setDisponibilidad(disponibilidad);
+        alojamiento.setDisponibilidad(disponibilidadService.crear(disponibilidad));
 
 
         // [HOTEL]
@@ -105,13 +104,11 @@ public class HotelService {
         hotel.setIncluyeDesayuno(hotelRegistroDTO.isIncluyeDesayuno());
         hotel.setServicioLimpieza(hotelRegistroDTO.isIncluyeLimpieza());
 
-        hotel.setAlojamiento(
-                alojamientoService.crear(alojamiento)
-        );
-
+        hotel.setAlojamiento(alojamientoService.crear(alojamiento));
 
         return hotelRepository.save(hotel);
     }
+
     @Transactional
     public void borrarPorId(Long id_hotel) {
         if (!hotelRepository.existsById(id_hotel)) {
@@ -142,9 +139,7 @@ public class HotelService {
 
         if (dto.getIdAnfitrion() != null) {
 
-            hotel.getAlojamiento().setAnfitrion(
-                    anfitrionService.obtenerPorId(dto.getIdAnfitrion())
-            );
+            hotel.getAlojamiento().setAnfitrion(anfitrionService.obtenerPorId(dto.getIdAnfitrion()));
         }
 
 

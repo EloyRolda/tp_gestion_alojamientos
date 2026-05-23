@@ -46,9 +46,7 @@ public class ReviewController {
 
     @DeleteMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Long id) {
-
         reviewService.borrarPorId(id);
-
         return "La review fue eliminada correctamente.";
     }
 
@@ -57,7 +55,7 @@ public class ReviewController {
         return reviewService.listarPorAlojamiento(idAlojamiento);
     }
 
-    @GetMapping("/cliente/{id}")
+    @GetMapping("/cliente/{idCliente}")
     public List<Review> mostrarPorIdCliente(@PathVariable Long idCliente) {
         return reviewService.listarPorCliente(idCliente);
     }

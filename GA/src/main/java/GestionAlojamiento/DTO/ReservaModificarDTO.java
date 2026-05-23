@@ -6,10 +6,15 @@ import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ReservaModificarDTO {
 
     @NotNull(message = "Campo Obligatorio")
@@ -17,9 +22,6 @@ public class ReservaModificarDTO {
 
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
-
-    @DecimalMin(value = "0.0", inclusive = true, message = "Valor invalido, el precio no puede ser menor a cero")
-    private BigDecimal precioTotal;
 
     @Enumerated(EnumType.STRING)
     private TipoEstado tipoEstado;//POR DEFECTO PENDIENTE

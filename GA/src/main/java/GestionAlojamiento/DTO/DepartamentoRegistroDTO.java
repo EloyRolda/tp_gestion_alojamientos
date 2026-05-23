@@ -29,6 +29,8 @@ public class DepartamentoRegistroDTO {
 
     private boolean expensasIncluidas;
 
+    @NotBlank(message = "Campo obligatorio")
+    private String titulo;
     //[ALOJAMIENTO]
     @NotNull(message = "Campo obligatorio")
     @Min(value = 1, message = "Valor Invalido")

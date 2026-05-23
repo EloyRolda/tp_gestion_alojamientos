@@ -88,9 +88,7 @@ public class CasaService {
         alojamiento.setDescripcion(dto.getDescripcion());
         alojamiento.setPrecioNoche(dto.getPrecioNoche());
         alojamiento.setTipoInmueble(TipoInmueble.CASA);
-        alojamiento.setDireccion(
-                direccionService.crear(direccion)
-        );
+        alojamiento.setDireccion(direccionService.crear(direccion));
 
 
         // [SERVICIO]

@@ -39,4 +39,9 @@ public class CasaController {
         return casaService.modificar(casaModificarDTO);
     }
 
+    @DeleteMapping("/borrar/{id}")
+    public void borrarPorId(@PathVariable Long id) {
+        casaService.borrarPorId(id);
+    }
+
 }
