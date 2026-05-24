@@ -19,15 +19,15 @@ public class Servicio {
     private Long id;
 
     @Column(name = "tiene_cocina", nullable = false)
-    private boolean tieneCocina;
+    private Boolean tieneCocina;
 
     @Column(name = "tiene_lavarropa", nullable = false)
-    private boolean tieneLavarropa;
+    private Boolean tieneLavarropa;
 
     @Column(name = "tiene_wifi", nullable = false)
-    private boolean tieneWifi;
+    private Boolean tieneWifi;
 
     @Column(name = "tiene_estacionamiento", nullable = false)
-    private boolean tieneEstacionamiento;
+    private Boolean tieneEstacionamiento;
 
 }

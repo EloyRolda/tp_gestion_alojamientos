@@ -17,7 +17,7 @@ public class Departamento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
+    //A fines practicos no contemplamos plantas negativas.
     @Column(name = "piso", nullable = false)
     private Integer piso;
 
@@ -32,8 +32,3 @@ public class Departamento {
     @JoinColumn(name = "id_alojamiento")
     private Alojamiento alojamiento;
 }
-   /*
-    @Min(value = 0, "No se puede registrar un piso negativo")
-    **Nota: Esta estoy en duda dado que puede haber pb y pisos negativos dependiendo el complejo;
-    lo dejo comentado para tener constancia** -Eloy
-    */

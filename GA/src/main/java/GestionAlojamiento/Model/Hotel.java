@@ -26,9 +26,10 @@ public class Hotel {
     private Integer estrellas;
 
     @Column(name = "incluye_desayuno", nullable = false)
-    private boolean incluyeDesayuno;
+    private Boolean incluyeDesayuno;
+
     @Column(name = "servicio_limpieza", nullable = false)
-    private boolean servicioLimpieza;
+    private Boolean incluyeLimpieza;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @MapsId

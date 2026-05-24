@@ -54,8 +54,8 @@ public class Alojamiento {
     @Column(name = "cant_banios", nullable = false)
     private Integer cantBanios;
 
-    @Column(name = "activo", nullable = false)
-    private boolean activo;
+    @Column(name = "activo")
+    private Boolean activo;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", nullable = false)

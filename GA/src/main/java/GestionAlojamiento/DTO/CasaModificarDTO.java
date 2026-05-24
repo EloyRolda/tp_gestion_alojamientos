@@ -1,6 +1,7 @@
 package GestionAlojamiento.DTO;
 
 import GestionAlojamiento.Model.Alojamiento;
+import GestionAlojamiento.Model.Enums.TipoInmueble;
 import jakarta.persistence.Column;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -49,12 +50,15 @@ public class CasaModificarDTO {
     @Min(value = 1)
     private Integer capacidad;
 
+    @Size(max = 150)
+    private String titulo;
     @Size(max = 3000)
     private String descripcion;
 
     @Min(value = 0, message = "Valor Invalido")
     private BigDecimal precioNoche;
 
+    private Boolean activo;
     //[DIRECCION]
 
     private String pais;
@@ -70,22 +74,15 @@ public class CasaModificarDTO {
     @Min(value = 0, message = "Valor Invalido")
     private Integer altura;
 
-    //[DISPONIBILIDAD]
-    private LocalDate fecha;
-
-    private boolean disponible;
-
-    private Alojamiento alojamiento;
-
     //[SERVICIO]
 
-    private boolean tieneCocina;
+    private Boolean tieneCocina;
 
-    private boolean tieneLavarropa;
+    private Boolean tieneLavarropa;
 
-    private boolean tieneWifi;
+    private Boolean tieneWifi;
 
-    private boolean tieneEstacionamiento;
+    private Boolean tieneEstacionamiento;
 
-
+    private Long anfitrion_id;
 }

@@ -29,6 +29,6 @@ public class Direccion {
     @Column(name = "calle", length = 30, nullable = false)
     private String calle;
     @Column(name = "altura", nullable = false)
-    int altura;
+    Integer altura;
 
 }

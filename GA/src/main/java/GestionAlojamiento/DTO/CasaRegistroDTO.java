@@ -83,13 +83,6 @@ public class CasaRegistroDTO {
     @Min(value = 0, message = "Valor Invalido")
     private Integer altura;
 
-    //[DISPONIBILIDAD]
-    private LocalDate fecha;
-
-    private boolean disponible;
-
-    private Alojamiento alojamiento;
-
     //[SERVICIO]
 
     private boolean tieneCocina;

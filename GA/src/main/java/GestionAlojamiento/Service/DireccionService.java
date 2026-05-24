@@ -36,26 +36,26 @@ public class DireccionService {
         return direccionRepository.findById(id).orElseThrow(() -> new IdNoEncontradoException("ID no encontrado en la base de datos: " + id));
     }
 
-    /// Modifica el objeto Direccion SIN TOCAR LA BASE DE DATOS y devuelve el objeto modificado
-    public Direccion modificarObjeto(Direccion direccion, Integer altura, String calle, String ciudad, String codigo_postal, String pais, String provincia) {
-        if (altura != null) {
-            direccion.setAltura(altura);
+    /// Modifica el objeto Direccion ORIGNAL con los parametros cargados en CAMBIO SIN TOCAR LA BASE DE DATOS y devuelve el objeto modificado
+    public Direccion modificarObjeto(Direccion original, Direccion cambios) {
+        if (cambios.getAltura() != null) {
+            original.setAltura(cambios.getAltura());
         }
-        if (calle != null) {
-            direccion.setCalle(calle);
+        if (cambios.getCalle() != null) {
+            original.setCalle(cambios.getCalle());
         }
-        if (ciudad != null) {
-            direccion.setCiudad(ciudad);
+        if (cambios.getCiudad() != null) {
+            original.setCiudad(cambios.getCiudad());
         }
-        if (codigo_postal != null) {
-            direccion.setCiudad(ciudad);
+        if (cambios.getCodigoPostal() != null) {
+            original.setCodigoPostal(cambios.getCodigoPostal());
         }
-        if (pais != null) {
-            direccion.setPais(pais);
+        if (cambios.getPais() != null) {
+            original.setPais(cambios.getPais());
         }
-        if (provincia != null) {
-            direccion.setProvincia(provincia);
+        if (cambios.getProvincia() != null) {
+            original.setProvincia(cambios.getProvincia());
         }
-        return direccion;
+        return original;
     }
 }

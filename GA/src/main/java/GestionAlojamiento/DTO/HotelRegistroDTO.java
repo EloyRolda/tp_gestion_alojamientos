@@ -33,7 +33,9 @@ public class HotelRegistroDTO {
 
     //[ALOJAMIENTO]
     @NotBlank(message = "Campo obligatorio")
+    @Size(max = 150)
     private String titulo;
+
     @NotNull(message = "Campo obligatorio")
     @Min(value = 1, message = "Valor Invalido")
     private Integer cantAmbientes;
@@ -70,7 +72,6 @@ public class HotelRegistroDTO {
     private String provincia;
 
     @NotBlank(message = "Campo obligatorio")
-    @Min(value = 0, message = "Valor Invalido")
     private String codigoPostal;
 
     @NotBlank(message = "Campo obligatorio")
@@ -83,21 +84,9 @@ public class HotelRegistroDTO {
     @Min(value = 0, message = "Valor Invalido")
     private Integer altura;
 
-    //[DISPONIBILIDAD]
-    private LocalDate fecha;
-
-    private boolean disponible;
-
-    private Alojamiento alojamiento;
-
     //[SERVICIO]
-
     private boolean tieneCocina;
-
     private boolean tieneLavarropa;
-
     private boolean tieneWifi;
-
     private boolean tieneEstacionamiento;
-
 }

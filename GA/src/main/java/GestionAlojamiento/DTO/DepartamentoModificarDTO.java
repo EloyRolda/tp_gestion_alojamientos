@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-//Lombok
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,16 +19,16 @@ public class DepartamentoModificarDTO {
     @NotNull(message = "Campo Obligatorio")
     private Long id;
 
-
     @Min(value = 1, message = "Id invalido")
-    private Long idAnfitrion;
+    private Long anfitrion_id;
 
     private Integer piso;
 
-    private boolean tieneAscensor;
+    private Boolean tieneAscensor;
 
-    private boolean expensasIncluidas;
+    private Boolean expensasIncluidas;
 
+    private Boolean activo;
 
     //[ALOJAMIENTO]
     @Min(value = 1, message = "Valor Invalido")
@@ -47,6 +46,9 @@ public class DepartamentoModificarDTO {
     @Min(value = 1)
     private Integer capacidad;
 
+    @Size(max = 150)
+    private String titulo;
+
     @Size(max = 3000)
     private String descripcion;
 
@@ -54,34 +56,18 @@ public class DepartamentoModificarDTO {
     private BigDecimal precioNoche;
 
     //[DIRECCION]
-
     private String pais;
-
     private String provincia;
-
     private String codigoPostal;
-
     private String ciudad;
-
     private String calle;
 
     @Min(value = 0, message = "Valor Invalido")
     private Integer altura;
 
-    //[DISPONIBILIDAD]
-    private LocalDate fecha;
-
-    private boolean disponible;
-
-    private Alojamiento alojamiento;
-
     //[SERVICIO]
-
-    private boolean tieneCocina;
-
-    private boolean tieneLavarropa;
-
-    private boolean tieneWifi;
-
-    private boolean tieneEstacionamiento;
+    private Boolean tieneCocina;
+    private Boolean tieneLavarropa;
+    private Boolean tieneWifi;
+    private Boolean tieneEstacionamiento;
 }

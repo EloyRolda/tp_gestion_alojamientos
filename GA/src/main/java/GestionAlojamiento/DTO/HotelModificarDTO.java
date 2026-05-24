@@ -1,6 +1,5 @@
 package GestionAlojamiento.DTO;
 
-import GestionAlojamiento.Model.Alojamiento;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -8,10 +7,8 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
@@ -19,21 +16,19 @@ import java.time.LocalDate;
 
 public class HotelModificarDTO {
 
-
     @NotNull(message = "Campo Obligatorio")
     private Long id;
 
     @Min(value = 1, message = "Id invalido")
-    private Long idAnfitrion;
+    private Long anfitrion_id;
 
     @Min(value = 0, message = "Valor minimo de 0 estrellas")
     @Max(value = 5, message = "Valor maximo de 5 estrellas")
     private Integer estrellas;
 
-    private boolean servicioLimpieza;
-
-    private boolean incluyeDesayuno;
-
+    private Boolean incluyeLimpieza;
+    private Boolean incluyeDesayuno;
+    private Boolean activo;
 
     //[ALOJAMIENTO]
     @Min(value = 1, message = "Valor Invalido")
@@ -51,45 +46,28 @@ public class HotelModificarDTO {
     @Min(value = 1)
     private Integer capacidad;
 
-    @Size(max = 3000)
-    private String descripcion;
-
     @Size(max = 150)
     private String titulo;
 
+    @Size(max = 3000)
+    private String descripcion;
 
     @Min(value = 0, message = "Valor Invalido")
     private BigDecimal precioNoche;
 
     //[DIRECCION]
-
     private String pais;
-
     private String provincia;
-
     private String codigoPostal;
-
     private String ciudad;
-
     private String calle;
 
     @Min(value = 0, message = "Valor Invalido")
     private Integer altura;
 
-    //[DISPONIBILIDAD]
-    private LocalDate fecha;
-
-    private boolean disponible;
-
-    private Alojamiento alojamiento;
-
     //[SERVICIO]
-
-    private boolean tieneCocina;
-
-    private boolean tieneLavarropa;
-
-    private boolean tieneWifi;
-
-    private boolean tieneEstacionamiento;
+    private Boolean tieneCocina;
+    private Boolean tieneLavarropa;
+    private Boolean tieneWifi;
+    private Boolean tieneEstacionamiento;
 }

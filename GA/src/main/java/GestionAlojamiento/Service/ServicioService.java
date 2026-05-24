@@ -23,26 +23,26 @@ public class ServicioService {
     }
 
 
-    /// Modifica el objeto SERVICIO SIN TOCAR LA BASE DE DATOS y devuelve el objeto modificado
-    public Servicio modificarObjeto(Servicio servicio, boolean tiene_cocina, boolean tiene_estacionamiento, boolean tiene_lavarropa, boolean tiene_wifi) {
+    /// Modifica el objeto SERVICIO ORIGNAL con los parametros cargados en CAMBIO SIN TOCAR LA BASE DE DATOS y devuelve el objeto modificado
+    public Servicio modificarObjeto(Servicio original, Servicio cambios) {
 
-        if (tiene_cocina != servicio.isTieneCocina()) {
-            servicio.setTieneCocina(tiene_cocina);
+        if (cambios.getTieneCocina() != null) {
+            original.setTieneCocina(cambios.getTieneCocina());
         }
 
-        if (tiene_estacionamiento != servicio.isTieneEstacionamiento()) {
-            servicio.setTieneEstacionamiento(tiene_estacionamiento);
+        if (cambios.getTieneEstacionamiento() != null) {
+            original.setTieneEstacionamiento(cambios.getTieneEstacionamiento());
         }
 
-        if (tiene_lavarropa != servicio.isTieneLavarropa()) {
-            servicio.setTieneLavarropa(tiene_lavarropa);
+        if (cambios.getTieneLavarropa() != null) {
+            original.setTieneLavarropa(cambios.getTieneLavarropa());
         }
 
-        if (tiene_wifi != servicio.isTieneWifi()) {
-            servicio.setTieneWifi(tiene_wifi);
+        if (cambios.getTieneWifi() != null) {
+            original.setTieneWifi(cambios.getTieneWifi());
         }
 
-        return servicio;
+        return original;
     }
 
 }
