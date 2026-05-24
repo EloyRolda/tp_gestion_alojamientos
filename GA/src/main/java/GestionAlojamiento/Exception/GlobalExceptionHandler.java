@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    //No tomar como validas SON DE PRUEBA
-    @ExceptionHandler(IdNotFoundException.class)
-    public ResponseEntity<?> manejarIdNoEncontrado(IdNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+
+    @ExceptionHandler(IdNoEncontradoException.class)
+    public ResponseEntity<?> manejarIdNoEncontrado(IdNoEncontradoException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
     @ExceptionHandler(ParametroInvalidoException.class)
@@ -21,9 +21,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(401).body(e.getMessage());
     }
 
-    @ExceptionHandler(TestException.class)
-    public ResponseEntity<?> TestExeptionHandler(TestException e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-    }
+
 
 }

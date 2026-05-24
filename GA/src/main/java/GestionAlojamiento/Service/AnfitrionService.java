@@ -3,6 +3,7 @@ package GestionAlojamiento.Service;
 import GestionAlojamiento.DTO.AnfitrionModificarDTO;
 import GestionAlojamiento.DTO.AnfitrionRegistroDTO;
 import GestionAlojamiento.DTO.ClienteRegistroDTO;
+import GestionAlojamiento.Exception.IdNoEncontradoException;
 import GestionAlojamiento.Model.Administrador;
 import GestionAlojamiento.Model.Anfitrion;
 import GestionAlojamiento.Model.Cliente;
@@ -29,7 +30,7 @@ public class AnfitrionService {
 
     public Anfitrion obtenerPorId(Long id) {
         return anfitrionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Anfitrión no encontrado con ID: " + id));
+                .orElseThrow(() -> new IdNoEncontradoException("Error, el anfitrion no existe en la base de datos: " + id));
     }
 
     //------------------------ Borrar/Crear ------------------------
