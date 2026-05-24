@@ -26,7 +26,7 @@ public class ReservaService {
     private final ReservaRepository reservaRepository;
     private final ClienteRepository clienteRepository;
     private final AlojamientoService alojamientoService;
-    private final DisponibilidadService disponibilidadService;
+
 
     //------------------------ LISTAR ------------------------
 
@@ -58,9 +58,6 @@ public class ReservaService {
         }
 
 
-        // DISPONIBILIDAD
-
-        disponibilidadService.ocuparFechas(dto.getFechaInicio(), dto.getFechaFin());
 
 
         // RESERVA
@@ -87,8 +84,6 @@ public class ReservaService {
         }
         //Liberamos las fechas
         Reserva reserva = reservaRepository.findById(id).orElseThrow(() -> new RuntimeException("Error, la reserva no existe"));
-        disponibilidadService.liberarFechas(reserva.getFechaInicio(), reserva.getFechaFin());
-
         reservaRepository.deleteById(id);
     }
 
@@ -122,13 +117,7 @@ public class ReservaService {
             throw new RuntimeException("La fecha inicio no puede ser anterior al dia actual");
         }
 
-        // LIBERAR FECHAS VIEJAS
 
-        disponibilidadService.liberarFechas(reserva.getFechaInicio(), reserva.getFechaFin());
-
-        // OCUPAR NUEVAS FECHAS
-
-        disponibilidadService.ocuparFechas(fechaInicio, fechaFin);
 
         // SETEAR FECHAS
 

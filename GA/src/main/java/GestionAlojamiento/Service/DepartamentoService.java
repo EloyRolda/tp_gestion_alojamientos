@@ -21,7 +21,7 @@ public class DepartamentoService {
     private final AnfitrionService anfitrionService;
     private final DireccionService direccionService;
     private final ServicioService servicioService;
-    private final DisponibilidadService disponibilidadService;
+
     private final AlojamientoService alojamientoService;
 
     //------------------------ LISTAR ------------------------
@@ -84,14 +84,6 @@ public class DepartamentoService {
         alojamiento.setServicio(servicioService.crear(servicio));
 
 
-        // [DISPONIBILIDAD]
-
-        Disponibilidad disponibilidad = new Disponibilidad();
-
-        disponibilidad.setFecha(departamentoRegistroDTO.getFecha());
-        disponibilidad.setDisponible(departamentoRegistroDTO.isDisponible());
-
-        alojamiento.setDisponibilidad(disponibilidadService.crear(disponibilidad));
 
 
         // [DEPARTAMENTO]
@@ -259,32 +251,6 @@ public class DepartamentoService {
                     .setTieneEstacionamiento(dto.isTieneEstacionamiento());
         }
 
-
-        // [DISPONIBILIDAD]
-
-        if (departamento.getAlojamiento().getDisponibilidad() == null) {
-
-            Disponibilidad disponibilidad = new Disponibilidad();
-
-            disponibilidad.setFecha(dto.getFecha());
-            disponibilidad.setDisponible(dto.isDisponible());
-
-            departamento.getAlojamiento()
-                    .setDisponibilidad(disponibilidad);
-
-        } else {
-
-            if (dto.getFecha() != null) {
-
-                departamento.getAlojamiento()
-                        .getDisponibilidad()
-                        .setFecha(dto.getFecha());
-            }
-
-            departamento.getAlojamiento()
-                    .getDisponibilidad()
-                    .setDisponible(dto.isDisponible());
-        }
 
 
         return departamentoRepository.save(departamento);

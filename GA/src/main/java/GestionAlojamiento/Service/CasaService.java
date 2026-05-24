@@ -19,7 +19,6 @@ public class CasaService {
     private final CasaRepository casaRepository;
     private final AnfitrionService anfitrionService;
     private final DireccionService direccionService;
-    private final DisponibilidadService disponibilidadService;
     private final ServicioService servicioService;
 
     //------------------------ LISTAR ------------------------
@@ -103,15 +102,6 @@ public class CasaService {
         alojamiento.setServicio(servicio);
 
 
-        // [DISPONIBILIDAD]
-
-        Disponibilidad disponibilidad = new Disponibilidad();
-
-        disponibilidad.setFecha(dto.getFecha());
-        disponibilidad.setDisponible(dto.isDisponible());
-        disponibilidadService.crear(disponibilidad);//Nota revisar comprovaciones
-
-        alojamiento.setDisponibilidad(disponibilidad);
 
 
         // [RELACION]
@@ -218,25 +208,6 @@ public class CasaService {
         servicio.setTieneWifi(dto.isTieneWifi());
         servicio.setTieneEstacionamiento(dto.isTieneEstacionamiento());
 
-        // [DISPONIBILIDAD]
-        Disponibilidad actual = alojamiento.getDisponibilidad();
-
-        if (dto.getFecha() != null || actual == null) {
-
-            Disponibilidad updated;
-
-            if (actual == null) {
-                actual = new Disponibilidad();
-            }
-
-            actual.setFecha(dto.getFecha());
-            actual.setDisponible(dto.isDisponible());
-
-
-            updated = disponibilidadService.crearOActualizar(actual);
-
-            alojamiento.setDisponibilidad(updated);
-        }
 
         return casaRepository.save(casa);
     }

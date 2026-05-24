@@ -73,7 +73,4 @@ public class Alojamiento {
     @JoinColumn(name = "id_servicio")
     private Servicio servicio;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "id_disponibilidad")
-    private Disponibilidad disponibilidad;
 }
