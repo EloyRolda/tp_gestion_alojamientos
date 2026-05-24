@@ -1,6 +1,5 @@
 package GestionAlojamiento.Model;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,8 +17,8 @@ public class Anfitrion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne //Relacion
-    @MapsId //Que mape
-    @JoinColumn(name = "id_usuario") // A quien hace referencia
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @MapsId
+    @JoinColumn(name = "id_usuario")
     private Usuario usuario;
 }

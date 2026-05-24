@@ -30,7 +30,7 @@ public class Hotel {
     @Column(name = "servicio_limpieza", nullable = false)
     private boolean servicioLimpieza;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @MapsId
     @JoinColumn(name = "id_alojamiento")
     private Alojamiento alojamiento;

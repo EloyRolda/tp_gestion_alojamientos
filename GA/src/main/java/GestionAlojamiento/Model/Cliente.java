@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
 
 //Lombok
 @Data
@@ -21,8 +20,8 @@ public class Cliente {
     @Column(name = "metodo_pago", length = 100)
     private String metodoPago;
 
-    @OneToOne //Indica que es una relacion 1 a 1
-    @MapsId // Dice que es mapeable
-    @JoinColumn(name = "id_usuario") // Indica a que columna se ingresa
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @MapsId
+    @JoinColumn(name = "id_usuario")
     private Usuario usuario;
 }

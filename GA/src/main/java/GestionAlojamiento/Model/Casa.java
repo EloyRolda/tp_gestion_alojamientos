@@ -26,7 +26,7 @@ public class Casa {
     @Column(name = "tiene_parrilla", nullable = false)
     private boolean tieneParrilla;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @MapsId
     @JoinColumn(name = "id_alojamiento")
     private Alojamiento alojamiento;

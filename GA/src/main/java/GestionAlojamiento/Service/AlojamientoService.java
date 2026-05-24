@@ -21,28 +21,23 @@ import java.util.stream.Collectors;
 public class AlojamientoService {
 
     private final AlojamientoRepository alojamientoRepository;
-    private final AnfitrionRepository anfitrionRepository;
-    private final DireccionRepository direccionRepository;
-    private final ServicioRepository servicioRepository;
 
     private final AnfitrionService anfitrionService;
     private final DireccionService direccionService;
     private final ServicioService servicioService;
 
 
-    //------------------------ LISTAR ------------------------
-    /*
-     * Nota: Deberia Ordenarse por valor o por cantidad de lo que se lista? -> Preguntar  al profe? -Eloy
-     */
+    /// Devuelve una lista de todos los alojamientos registrados
     public List<Alojamiento> listarTodos() {
         return alojamientoRepository.findAll(Sort.by(Sort.Direction.ASC, "titulo"));
     }
 
+    /// Devuelve un Objeto Alojamiento en base al id
     public Alojamiento obtenerPorId(Long id) {
         return alojamientoRepository.findById(id).orElseThrow(() -> new RuntimeException("Error, alojamiento no encontrado en la base de datos."));
     }
 
-    //------------------------ GUARDAR/BORRAR ------------------------
+    /// Obtiene un Objeto Alojamiento y lo guarda con sus respectivas referencias a anfitrion, direccion y servicio.
     @Transactional
     public Alojamiento crear(Alojamiento alojamiento) {
         //Checks
@@ -53,13 +48,12 @@ public class AlojamientoService {
         return alojamientoRepository.save(alojamiento);
     }
 
-    @Transactional
-    public void borrar(Long id_alojamiento) {
-        if (!alojamientoRepository.existsById(id_alojamiento)) {
-            throw new IdNoEncontradoException("ID no encontrado en la base de datos.");
-        }
-        alojamientoRepository.deleteById(id_alojamiento);
-    }
+
     //Como seguridad extra se podria agregar que los valores respeten ciertos valores no sean menores que 0, ej en habitaciones haciendo doble check de seguridad -Eloy
+    /// Modifica el objeto SERVICE SIN TOCAR LA BASE DE DATOS LLAMANDO A DISPONIBILIDAD, SERVICIO Y DIRECCION y devuelve el objeto modificado
+
+
+
+
 
 }

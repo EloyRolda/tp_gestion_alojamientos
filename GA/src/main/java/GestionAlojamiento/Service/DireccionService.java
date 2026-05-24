@@ -31,7 +31,31 @@ public class DireccionService {
         direccionRepository.deleteById(id);
     }
 
+    /// Busca en la base de datos y devuelve el Objeto Direccion obtenido
     public Direccion obtenerPorId(Long id) {
         return direccionRepository.findById(id).orElseThrow(() -> new IdNoEncontradoException("ID no encontrado en la base de datos: " + id));
+    }
+
+    /// Modifica el objeto Direccion SIN TOCAR LA BASE DE DATOS y devuelve el objeto modificado
+    public Direccion modificarObjeto(Direccion direccion, Integer altura, String calle, String ciudad, String codigo_postal, String pais, String provincia) {
+        if (altura != null) {
+            direccion.setAltura(altura);
+        }
+        if (calle != null) {
+            direccion.setCalle(calle);
+        }
+        if (ciudad != null) {
+            direccion.setCiudad(ciudad);
+        }
+        if (codigo_postal != null) {
+            direccion.setCiudad(ciudad);
+        }
+        if (pais != null) {
+            direccion.setPais(pais);
+        }
+        if (provincia != null) {
+            direccion.setProvincia(provincia);
+        }
+        return direccion;
     }
 }

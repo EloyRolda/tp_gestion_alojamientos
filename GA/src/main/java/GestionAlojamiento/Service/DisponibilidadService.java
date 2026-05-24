@@ -27,7 +27,9 @@ public class DisponibilidadService {
     }
 
     @Transactional
-    public Disponibilidad crear(Disponibilidad disponibilidad) {return disponibilidadRepository.save(disponibilidad);}
+    public Disponibilidad crear(Disponibilidad disponibilidad) {
+        return disponibilidadRepository.save(disponibilidad);
+    }
 
     @Transactional
     public void borrarPorId(Long id_disponibilidad) {
@@ -55,6 +57,15 @@ public class DisponibilidadService {
     @Transactional
     public Disponibilidad crearOActualizar(Disponibilidad disponibilidad) {
         return disponibilidadRepository.save(disponibilidad);
+    }
+
+    /// Modifica el objeto DISPONIBILIDAD SIN TOCAR LA BASE DE DATOS y devuelve el objeto modificado
+    public Disponibilidad modificarObjeto(Disponibilidad disponibilidad, boolean disponible, LocalDate fecha) {
+        disponibilidad.setDisponible(disponible);
+        if (fecha != null) {
+
+        }
+        return disponibilidad;
     }
 
 }

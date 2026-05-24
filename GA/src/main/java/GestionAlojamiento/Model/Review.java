@@ -17,10 +17,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 //JPA
 @Entity
-@Table(name = "review", uniqueConstraints = {
-        @UniqueConstraint(name = "uq_review_cliente_aloj", columnNames = {"id_cliente", "id_alojamiento"})
-})// Los usuarios/cliente pueden dejar solamente una por alojamiento
-
+@Table(name = "review", uniqueConstraints = {@UniqueConstraint(name = "uq_review_cliente_aloj", columnNames = {"id_cliente", "id_alojamiento"})})// Los usuarios/cliente pueden dejar solamente una review por alojamiento
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

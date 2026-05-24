@@ -50,6 +50,5 @@ public class Reserva {
     EN LOGICA DE NEGOCIO HACER LA COMPROBACION -> 'CONSTRAINT chk_fechas CHECK (fecha_fin > fecha_inicio)'
     */
 
-
 }
 

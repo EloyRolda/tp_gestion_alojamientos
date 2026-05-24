@@ -34,9 +34,5 @@ public class Disponibilidad {
     @Column(name = "disponible", nullable = false)
     private boolean disponible;
 
-    @OneToOne
-    @JoinColumn(name = "id_alojamiento")
-    private Alojamiento alojamiento;
-
 
 }

@@ -5,10 +5,11 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-@Data // Esto es para que lombok asigne los gets y sets automaticamente
-@NoArgsConstructor //Genera constructor "vacio"
-@AllArgsConstructor //Genera constructor con todos los atributos pasables
+//Lombok
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+//JPA
 @Entity
 @Table(name = "direccion")
 public class Direccion {

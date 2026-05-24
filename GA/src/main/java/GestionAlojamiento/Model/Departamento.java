@@ -1,7 +1,6 @@
 package GestionAlojamiento.Model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,18 +9,14 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-//
+//JPA
 @Entity
 @Table(name = "departamento")
 public class Departamento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    /*
-    @Min(value = 0, "No se puede registrar un piso negativo")
-    **Nota: Esta estoy en duda dado que puede haber pb y pisos negativos dependiendo el complejo;
-    lo dejo comentado para tener constancia** -Eloy
-    */
+
 
     @Column(name = "piso", nullable = false)
     private Integer piso;
@@ -32,8 +27,13 @@ public class Departamento {
     @Column(name = "expensas_incluidas", nullable = false)
     private boolean expensasIncluidas;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @MapsId
     @JoinColumn(name = "id_alojamiento")
     private Alojamiento alojamiento;
 }
+   /*
+    @Min(value = 0, "No se puede registrar un piso negativo")
+    **Nota: Esta estoy en duda dado que puede haber pb y pisos negativos dependiendo el complejo;
+    lo dejo comentado para tener constancia** -Eloy
+    */

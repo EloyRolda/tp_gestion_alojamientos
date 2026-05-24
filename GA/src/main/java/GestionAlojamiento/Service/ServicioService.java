@@ -21,4 +21,28 @@ public class ServicioService {
     public Servicio crear(Servicio servicio) {
         return servicioRepository.save(servicio);
     }
+
+
+    /// Modifica el objeto SERVICIO SIN TOCAR LA BASE DE DATOS y devuelve el objeto modificado
+    public Servicio modificarObjeto(Servicio servicio, boolean tiene_cocina, boolean tiene_estacionamiento, boolean tiene_lavarropa, boolean tiene_wifi) {
+
+        if (tiene_cocina != servicio.isTieneCocina()) {
+            servicio.setTieneCocina(tiene_cocina);
+        }
+
+        if (tiene_estacionamiento != servicio.isTieneEstacionamiento()) {
+            servicio.setTieneEstacionamiento(tiene_estacionamiento);
+        }
+
+        if (tiene_lavarropa != servicio.isTieneLavarropa()) {
+            servicio.setTieneLavarropa(tiene_lavarropa);
+        }
+
+        if (tiene_wifi != servicio.isTieneWifi()) {
+            servicio.setTieneWifi(tiene_wifi);
+        }
+
+        return servicio;
+    }
+
 }
