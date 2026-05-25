@@ -30,7 +30,9 @@ public class HotelService {
     }
 
     //---------------------------------------- CREAR ----------------------------------------
+
     @Transactional
+    ///CREA EN LA BASE DE DATOS UN NUEVO HOTEL RECIBIENDO UN HOTELREGISTRO DTO.
     public Hotel crear(HotelRegistroDTO dto) {
 
         Hotel hotel = new Hotel();
@@ -75,7 +77,7 @@ public class HotelService {
 
     //---------------------------------------- MAPEOS DTO [PRIVADOS] ----------------------------------------
 
-    /// Mapea los valores de MODIFICAR DTO a un HOTEL.
+    /// Mapea los valores de MODIFICAR DTO a un ALOJAMIENTO CON DIRECCION, Y SERVICIO
     private Alojamiento mapearAlojamiento(HotelModificarDTO dto) {
 
         Direccion direccion = new Direccion(
@@ -119,7 +121,7 @@ public class HotelService {
         return alojamiento;
     }
 
-    /// Mapea los valores de REGISTRO DTO a un HOTEL.
+    /// Mapea los valores de REGISTRO DTO a un ALOJAMIENTO CON DIRECCION, Y SERVICIO.
     private Alojamiento mapearAlojamiento(HotelRegistroDTO dto) {
 
         Direccion direccion = new Direccion(

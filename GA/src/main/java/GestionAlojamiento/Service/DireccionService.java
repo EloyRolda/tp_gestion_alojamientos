@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 public class DireccionService {
     private final DireccionRepository direccionRepository;
 
+    ///Obtiene un OBJETO DIRECCION y lo crea en la base de datos
     @Transactional
     public Direccion crear(Direccion direccion) {
         //Normalizado a lowercase
@@ -22,7 +23,7 @@ public class DireccionService {
         //Fin normalizado
         return direccionRepository.save(direccion);
     }
-
+    ///Obtiene un ID direccion y lo elimina de la base de datos
     @Transactional
     public void borrarPorId(Long id) {
         if (!direccionRepository.existsById(id)) {

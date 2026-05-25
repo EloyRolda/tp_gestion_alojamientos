@@ -21,8 +21,6 @@ import java.util.stream.Collectors;
 public class AlojamientoService {
 
     private final AlojamientoRepository alojamientoRepository;
-
-    private final AnfitrionService anfitrionService;
     private final DireccionService direccionService;
     private final ServicioService servicioService;
 
@@ -36,18 +34,6 @@ public class AlojamientoService {
     public Alojamiento obtenerPorId(Long id) {
         return alojamientoRepository.findById(id).orElseThrow(() -> new RuntimeException("Error, alojamiento no encontrado en la base de datos."));
     }
-
-    /// Obtiene un Objeto Alojamiento y lo guarda con sus respectivas referencias a anfitrion, direccion y servicio.
-    @Transactional
-    public Alojamiento crear(Alojamiento alojamiento) {
-        //Checks
-        alojamiento.setAnfitrion(anfitrionService.obtenerPorId(alojamiento.getId()));
-        alojamiento.setDireccion(direccionService.obtenerPorId(alojamiento.getDireccion().getId()));
-        alojamiento.setServicio(servicioService.obtenerPorId(alojamiento.getServicio().getId()));
-
-        return alojamientoRepository.save(alojamiento);
-    }
-
 
     //Como seguridad extra se podria agregar que los valores respeten ciertos valores no sean menores que 0, ej en habitaciones haciendo doble check de seguridad -Eloy
 
