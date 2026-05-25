@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "cliente")
 public class Cliente {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_usuario")
     private Long id;
 
     @Column(name = "metodo_pago", length = 100)

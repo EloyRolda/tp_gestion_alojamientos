@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 
 public class Hotel {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_alojamiento")
     private Long id;
 
     @Min(value = 0, message = "Valor minimo de 0 estrellas")

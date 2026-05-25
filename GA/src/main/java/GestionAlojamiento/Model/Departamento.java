@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "departamento")
 public class Departamento {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_alojamiento")
     private Long id;
 
     //A fines practicos no contemplamos plantas negativas.

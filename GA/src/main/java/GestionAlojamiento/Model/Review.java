@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_review")
     private Long id;
 
     @Max(value = 5, message = "El valor maximo es 5")
