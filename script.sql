@@ -116,18 +116,6 @@ CREATE TABLE hotel (
         ON DELETE CASCADE
 );
 
--- Fechas disponibles de cada alojamiento
-CREATE TABLE disponibilidad (
-    id_disponibilidad INT     PRIMARY KEY AUTO_INCREMENT,
-    fecha             DATE    NOT NULL,
-    disponible        BOOLEAN NOT NULL DEFAULT TRUE,
-    id_alojamiento    INT     NOT NULL,
-    CONSTRAINT fk_disp_alojamiento
-        FOREIGN KEY (id_alojamiento) REFERENCES alojamiento(id_alojamiento)
-        ON DELETE CASCADE,
-    CONSTRAINT uq_disp_fecha UNIQUE (id_alojamiento, fecha)
-);
-
 -- Reservas de clientes sobre alojamientos
 CREATE TABLE reserva (
     id_reserva     INT     PRIMARY KEY AUTO_INCREMENT,
