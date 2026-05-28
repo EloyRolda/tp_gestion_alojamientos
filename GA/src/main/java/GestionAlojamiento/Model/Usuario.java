@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(name = "nombre", length = 100, nullable = false)
     private String nombre;
@@ -37,7 +37,7 @@ public class Usuario {
     @Column(name = "fecha_registro", nullable = false)
     private LocalDateTime fechaRegistro;
     @Column(name = "activo", nullable = false)
-    private boolean activo;
+    private Boolean activo;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", nullable = false)
