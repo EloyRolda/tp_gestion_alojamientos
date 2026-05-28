@@ -16,6 +16,7 @@ public class Servicio {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_servicio")
     private Long id;
 
     @Column(name = "tiene_cocina", nullable = false)

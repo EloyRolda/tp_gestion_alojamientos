@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class Casa {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_alojamiento")
     private Long id;
 
     @Column(name = "tiene_patio", nullable = false)

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,6 +49,21 @@ public class UsuarioService {
     public Usuario obtenerPorId(Long id) {
 
         return usuarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado en la base de datos"));
+    }
+
+    public Optional<Usuario> buscarPorEmail(String email) {
+        return usuarioRepository.findByEmail(email.toLowerCase());
+    }
+
+    public Usuario autenticar(String email, String password) {
+        Usuario usuario = buscarPorEmail(email)
+                .orElseThrow(() -> new RuntimeException("Email o contraseña incorrectos."));
+
+        if (!usuario.isActivo() || !usuario.getPassword().equals(password)) {
+            throw new RuntimeException("Email o contraseña incorrectos.");
+        }
+
+        return usuario;
     }
 
     //------------------------ GUARDAR/BORRAR ------------------------

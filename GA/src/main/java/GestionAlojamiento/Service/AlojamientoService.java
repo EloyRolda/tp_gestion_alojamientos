@@ -1,20 +1,12 @@
 package GestionAlojamiento.Service;
 
-import GestionAlojamiento.Exception.IdNoEncontradoException;
 import GestionAlojamiento.Model.Alojamiento;
-import GestionAlojamiento.Model.Enums.TipoInmueble;
 import GestionAlojamiento.Repository.AlojamientoRepository;
-import GestionAlojamiento.Repository.AnfitrionRepository;
-import GestionAlojamiento.Repository.DireccionRepository;
-import GestionAlojamiento.Repository.ServicioRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +20,11 @@ public class AlojamientoService {
     /// Devuelve una lista de todos los alojamientos registrados
     public List<Alojamiento> listarTodos() {
         return alojamientoRepository.findAll(Sort.by(Sort.Direction.ASC, "titulo"));
+    }
+
+    /// Devuelve una lista de alojamientos activos para el frontend publico
+    public List<Alojamiento> listarActivos() {
+        return alojamientoRepository.findByActivoTrueOrderByTituloAsc();
     }
 
     /// Devuelve un Objeto Alojamiento en base al id

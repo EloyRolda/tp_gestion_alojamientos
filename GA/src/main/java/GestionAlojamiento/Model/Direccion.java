@@ -16,6 +16,7 @@ public class Direccion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_direccion")
     Long id;
 
     @Column(name = "pais", length = 100, nullable = false)
