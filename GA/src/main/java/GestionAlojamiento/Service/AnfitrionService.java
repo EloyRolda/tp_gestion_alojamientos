@@ -7,14 +7,17 @@ import GestionAlojamiento.Exception.IdNoEncontradoException;
 import GestionAlojamiento.Model.Administrador;
 import GestionAlojamiento.Model.Anfitrion;
 import GestionAlojamiento.Model.Cliente;
+import GestionAlojamiento.Model.Enums.TipoEstado;
 import GestionAlojamiento.Model.Enums.TipoUsuario;
 import GestionAlojamiento.Model.Usuario;
 import GestionAlojamiento.Repository.AnfitrionRepository;
 import GestionAlojamiento.Repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -23,7 +26,7 @@ public class AnfitrionService {
     private final AnfitrionRepository anfitrionRepository;
     private final UsuarioService usuarioService;
 
-    //------------------------ LISTAR ------------------------
+    //---------------------------------------- LISTAR ----------------------------------------
     public List<Anfitrion> listarTodos() {
         return anfitrionRepository.findAll();
     }
@@ -33,7 +36,7 @@ public class AnfitrionService {
                 .orElseThrow(() -> new IdNoEncontradoException("Error, el anfitrion no existe en la base de datos: " + id));
     }
 
-    //------------------------ Borrar/Crear ------------------------
+    //---------------------------------------- CREAR ----------------------------------------
     @Transactional
     public Anfitrion crear(AnfitrionRegistroDTO anfitrionRegistroDTO) {
         Usuario usuario = new Usuario();
@@ -53,36 +56,58 @@ public class AnfitrionService {
         return anfitrionRepository.save(anfitrion);
     }
 
+    //---------------------------------------- BORRAR ----------------------------------------
     @Transactional
     public void borrarPorId(Long id) {
         if (!anfitrionRepository.existsById(id)) {
-            throw new RuntimeException("No se puede eliminar: Anfitrión no encontrado");
+            throw new IdNoEncontradoException("Anfitrion no encontrado");
         }
         anfitrionRepository.deleteById(id);
     }
 
+    //---------------------------------------- MODIFICAR ----------------------------------------
     @Transactional
     public Anfitrion actualizar(AnfitrionModificarDTO anfitrionModificarDTO) {
 
         Anfitrion anfitrion = obtenerPorId(anfitrionModificarDTO.getId());
         Usuario usuario = usuarioService.obtenerPorId(anfitrionModificarDTO.getId());
 
-        if (anfitrionModificarDTO.getEmail() != null) {
-            usuario.setEmail(anfitrionModificarDTO.getEmail());
-        }
-        if (anfitrionModificarDTO.getTelefono() != null) {
-            usuario.setTelefono(anfitrionModificarDTO.getTelefono());
-        }
-        if (anfitrionModificarDTO.getPassword() != null) {
-            usuario.setPassword(anfitrionModificarDTO.getPassword());
-        }
-        if (anfitrionModificarDTO.isActivo() != usuario.isActivo()) {
-            usuario.setActivo(anfitrionModificarDTO.isActivo());
-        }
+        usuario = usuarioService.modificarObjeto(usuario, mapearUsuario(anfitrionModificarDTO));
         anfitrion.setUsuario(usuario);
 
         return anfitrionRepository.save(anfitrion);
     }
 
+    //---------------------------------------- MAPEOS DTO [PRIVADOS] ----------------------------------------
+
+    /// Mapea el DTO de MODIFICAR a un USUARIO y lo RETORNA
+    public Usuario mapearUsuario(AnfitrionRegistroDTO anfitrionRegistroDTO) {
+        Usuario usuario = new Usuario(
+                null,
+                anfitrionRegistroDTO.getNombre(),
+                anfitrionRegistroDTO.getEmail(),
+                anfitrionRegistroDTO.getPassword(),
+                anfitrionRegistroDTO.getTelefono(),
+                LocalDateTime.now(),
+                true,
+                TipoUsuario.ANFITRION
+        );
+        return usuario;
+    }
+
+    /// Mapea el DTO de MODIFICAR a un USUARIO y lo RETORNA
+    public Usuario mapearUsuario(AnfitrionModificarDTO anfitrionModificarDTO) {
+        Usuario usuario = new Usuario(
+                anfitrionModificarDTO.getId(),
+                anfitrionModificarDTO.getNombre(),
+                anfitrionModificarDTO.getEmail(),
+                anfitrionModificarDTO.getPassword(),
+                anfitrionModificarDTO.getTelefono(),
+                null,   //Fecha registro
+                anfitrionModificarDTO.getActivo(),
+                TipoUsuario.ANFITRION
+        );
+        return usuario;
+    }
 
 }

@@ -37,6 +37,6 @@ public class ClienteRegistroDTO {
 
 
     @NotNull(message = "Campo Obligatorio")
-    private boolean activo;//Se inicia activo
+    private Boolean activo;//Se inicia activo
 
 }

@@ -23,9 +23,11 @@ public class AnfitrionModificarDTO {
     @Email(message = "El formato de correo es invalido")
     private String email;
 
+    private String nombre;
+
     private String password;
 
     private String telefono;
 
-    private boolean activo; //Se inicia activo
+    private Boolean activo; //Se inicia activo
 }

@@ -22,6 +22,7 @@ public class ClienteModificarDTO {
 
     private String metodoPago;
     //[USUARIO]
+    private String nombre;
     @Email(message = "El formato de correo es invalido")
     private String email;
 
@@ -29,6 +30,6 @@ public class ClienteModificarDTO {
 
     private String telefono;
 
-    private boolean activo; //Se inicia activo
+    private Boolean activo; //Se inicia activo
 
 }
