@@ -21,8 +21,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) {
 
-        Usuario user = repo.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("No encontrado"));
+        Usuario user = repo.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("No encontrado"));
 
         String rol = switch (user.getTipoUsuario()) {
             case ADMINISTRADOR -> "ROLE_ADMIN";

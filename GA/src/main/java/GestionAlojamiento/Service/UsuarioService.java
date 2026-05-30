@@ -1,9 +1,14 @@
 package GestionAlojamiento.Service;
 
+import GestionAlojamiento.DTO.LoginDTO;
+import GestionAlojamiento.DTO.UsuarioRegistroDTO;
 import GestionAlojamiento.Exception.IdNoEncontradoException;
+import GestionAlojamiento.Exception.ParametroInvalidoException;
 import GestionAlojamiento.Exception.RecursoDuplicadoException;
+import GestionAlojamiento.Exception.UnautorizedExeption;
 import GestionAlojamiento.Model.Usuario;
 import GestionAlojamiento.Repository.UsuarioRepository;
+import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,10 +22,22 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
+    //Logueo
+    public Usuario login(LoginDTO login) {
+        Usuario usuario = obtenerPorCorreo(login.getEmail());
+        if (!passwordEncoder.matches(login.getPassword(), usuario.getPassword())) {
+            throw new UnautorizedExeption("Contraseña incorrecta.");
+        }
+        return usuario;
+    }
+
     //------------------------ LISTAR POR ------------------------
     public Usuario obtenerPorId(Long id) {
-
         return usuarioRepository.findById(id).orElseThrow(() -> new IdNoEncontradoException("Usuario no encontrado en la base de datos"));
+    }
+
+    public Usuario obtenerPorCorreo(String correo) {
+        return usuarioRepository.findByEmail(correo).orElseThrow(() -> new UnautorizedExeption("Usuario no encontrado en la base de datos"));
     }
 
     //------------------------ GUARDAR/BORRAR ------------------------
@@ -37,6 +54,24 @@ public class UsuarioService {
         } else {
             throw new RecursoDuplicadoException("Correo registrado en la base de datos por otro usuario.");
         }
+        return usuarioRepository.save(usuario);
+    }
+
+    @Transactional
+    public Usuario crear(UsuarioRegistroDTO usuarioRegistroDTO) {
+
+        if (usuarioRepository.existsByEmail(usuarioRegistroDTO.getEmail().toLowerCase())) {
+            throw new RecursoDuplicadoException("Correo registrado en la base de datos por otro usuario.");
+        }
+        Usuario usuario = new Usuario();
+        usuario.setNombre(usuarioRegistroDTO.getNombre().toLowerCase());
+        usuario.setEmail(usuarioRegistroDTO.getEmail().toLowerCase());
+        usuario.setPassword(passwordEncoder.encode(usuarioRegistroDTO.getPassword()));
+        usuario.setTelefono(usuarioRegistroDTO.getTelefono());
+        usuario.setActivo(true);
+        usuario.setFechaRegistro(LocalDateTime.now());
+        usuario.setTipoUsuario(usuarioRegistroDTO.getTipoUsuario());
+
         return usuarioRepository.save(usuario);
     }
 

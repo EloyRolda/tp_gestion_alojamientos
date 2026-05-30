@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index API - Gestión Alojamiento</title>
+
+    <style>
+
+        body{
+            background-color: #0f172a;
+            font-family: Arial, sans-serif;
+            color: white;
+            margin: 0;
+            padding: 30px;
+        }
+
+        h1{
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .swagger-link {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .swagger-link a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #1e293b;
+            color: #86efac;
+            text-decoration: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            border: 1px solid #166534;
+            transition: background-color 0.2s;
+        }
+
+        .swagger-link a:hover {
+            background-color: #166534;
+            color: #fff;
+        }
+
+        .contenedor{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .card{
+            background-color: #1e293b;
+            border-radius: 10px;
+            padding: 20px;
+            width: 350px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+        }
+
+        .card h2{
+            border-bottom: 1px solid #334155;
+            padding-bottom: 10px;
+        }
+
+        ul{
+            list-style: none;
+            padding: 0;
+        }
+
+        li{
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        a{
+            text-decoration: none;
+            color: #93c5fd;
+        }
+
+        a:hover{
+            color: #60a5fa;
+        }
+
+        .badge {
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 4px;
+            min-width: 46px;
+            text-align: center;
+        }
+
+        .get    { background-color: #166534; color: #86efac; }
+        .post   { background-color: #1e3a5f; color: #93c5fd; }
+        .put    { background-color: #713f12; color: #fde68a; }
+        .delete { background-color: #7f1d1d; color: #fca5a5; }
+
+    </style>
+
+</head>
+<body>
+
+<h1>Endpoints - Gestión de Alojamiento</h1>
+
+<div class="swagger-link">
+    <a href="/swagger-ui/index.html" target="_blank">
+        📄 Swagger / OpenAPI
+    </a>
+</div>
+
+<div class="contenedor">
+
+
+    <!-- USUARIOS -->
+
+    <div class="card">
+
+        <h2>Administrador</h2>
+
+        <ul>
+            <li><span class="badge get">GET</span>       <a href="/Administrador/listar">Listar Administradores</a></li>
+            <li><span class="badge get">GET</span>       <a href="/Administrador/mostrar/1">Mostrar Administrador</a></li>
+            <li><span class="badge post">POST</span>     <a href="/Administrador/registrar">Registrar Administrador</a></li>
+            <li><span class="badge put">PUT</span>       <a href="/Administrador/actualizar">Actualizar Administrador</a></li>
+            <li><span class="badge delete">DELETE</span> <a href="/Administrador/eliminar/1">Eliminar Administrador</a></li>
+        </ul>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Cliente</h2>
+
+        <ul>
+            <li><span class="badge get">GET</span>       <a href="/Cliente/listar">Listar Clientes</a></li>
+            <li><span class="badge get">GET</span>       <a href="/Cliente/mostrar/1">Mostrar Cliente</a></li>
+            <li><span class="badge post">POST</span>     <a href="/Cliente/registrar">Registrar Cliente</a></li>
+            <li><span class="badge put">PUT</span>       <a href="/Cliente/actualizar">Actualizar Cliente</a></li>
+            <li><span class="badge delete">DELETE</span> <a href="/Cliente/eliminar/1">Eliminar Cliente</a></li>
+        </ul>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Anfitrión</h2>
+
+        <ul>
+            <li><span class="badge get">GET</span>       <a href="/Anfitrion/listar">Listar Anfitriones</a></li>
+            <li><span class="badge get">GET</span>       <a href="/Anfitrion/mostrar/1">Mostrar Anfitrión</a></li>
+            <li><span class="badge post">POST</span>     <a href="/Anfitrion/registrar">Registrar Anfitrión</a></li>
+            <li><span class="badge put">PUT</span>       <a href="/Anfitrion/actualizar">Actualizar Anfitrión</a></li>
+            <li><span class="badge delete">DELETE</span> <a href="/Anfitrion/eliminar/1">Eliminar Anfitrión</a></li>
+        </ul>
+
+    </div>
+
+
+    <!-- ALOJAMIENTOS -->
+
+    <div class="card">
+
+        <h2>Casa</h2>
+
+        <ul>
+            <li><span class="badge get">GET</span>       <a href="/Casa/listar">Listar Casas</a></li>
+            <li><span class="badge get">GET</span>       <a href="/Casa/mostrar/1">Mostrar Casa</a></li>
+            <li><span class="badge post">POST</span>     <a href="/Casa/registrar">Registrar Casa</a></li>
+            <li><span class="badge put">PUT</span>       <a href="/Casa/actualizar">Actualizar Casa</a></li>
+            <li><span class="badge delete">DELETE</span> <a href="/Casa/eliminar/1">Eliminar Casa</a></li>
+        </ul>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Departamento</h2>
+
+        <ul>
+            <li><span class="badge get">GET</span>       <a href="/Departamento/listar">Listar Departamentos</a></li>
+            <li><span class="badge get">GET</span>       <a href="/Departamento/mostrar/1">Mostrar Departamento</a></li>
+            <li><span class="badge post">POST</span>     <a href="/Departamento/registrar">Registrar Departamento</a></li>
+            <li><span class="badge put">PUT</span>       <a href="/Departamento/actualizar">Actualizar Departamento</a></li>
+            <li><span class="badge delete">DELETE</span> <a href="/Departamento/eliminar/1">Eliminar Departamento</a></li>
+        </ul>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Hotel</h2>
+
+        <ul>
+            <li><span class="badge get">GET</span>       <a href="/Hotel/listar">Listar Hoteles</a></li>
+            <li><span class="badge get">GET</span>       <a href="/Hotel/mostrar/1">Mostrar Hotel</a></li>
+            <li><span class="badge post">POST</span>     <a href="/Hotel/registrar">Registrar Hotel</a></li>
+            <li><span class="badge put">PUT</span>       <a href="/Hotel/actualizar">Actualizar Hotel</a></li>
+            <li><span class="badge delete">DELETE</span> <a href="/Hotel/eliminar/1">Eliminar Hotel</a></li>
+        </ul>
+
+    </div>
+
+
+    <!-- RESERVAS -->
+
+    <div class="card">
+
+        <h2>Reserva</h2>
+
+        <ul>
+            <li><span class="badge get">GET</span>       <a href="/Reserva/listar">Listar Reservas</a></li>
+            <li><span class="badge get">GET</span>       <a href="/Reserva/mostrar/1">Mostrar Reserva</a></li>
+            <li><span class="badge post">POST</span>     <a href="/Reserva/registrar">Registrar Reserva</a></li>
+            <li><span class="badge put">PUT</span>       <a href="/Reserva/actualizar">Actualizar Reserva</a></li>
+            <li><span class="badge delete">DELETE</span> <a href="/Reserva/eliminar/1">Eliminar Reserva</a></li>
+        </ul>
+
+    </div>
+
+
+    <!-- REVIEWS -->
+
+    <div class="card">
+
+        <h2>Review</h2>
+
+        <ul>
+            <li><span class="badge get">GET</span>       <a href="/Review/listar">Listar Reviews</a></li>
+            <li><span class="badge get">GET</span>       <a href="/Review/mostrar/1">Mostrar Review</a></li>
+            <li><span class="badge get">GET</span>       <a href="/Review/cliente/1">Reviews por Cliente</a></li>
+            <li><span class="badge get">GET</span>       <a href="/Review/alojamiento/1">Reviews por Alojamiento</a></li>
+            <li><span class="badge post">POST</span>     <a href="/Review/registrar">Registrar Review</a></li>
+            <li><span class="badge put">PUT</span>       <a href="/Review/actualizar">Actualizar Review</a></li>
+            <li><span class="badge delete">DELETE</span> <a href="/Review/eliminar/1">Eliminar Review</a></li>
+        </ul>
+
+    </div>
+
+
+</div>
+
+</body>
+</html>

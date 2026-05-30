@@ -1,5 +1,6 @@
 package GestionAlojamiento.Exception;
 
+import jakarta.validation.executable.ValidateOnExecution;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -23,8 +24,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(RecursoDuplicadoException.class)
-    public ResponseEntity<?> manejarDuplicado(RecursoDuplicadoException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    public ResponseEntity<?> manejarDuplicado(RecursoDuplicadoException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -33,4 +34,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mensaje);
     }
 
+    @ExceptionHandler(UnautorizedExeption.class)
+    public ResponseEntity<?> manejarUnautorizedExeption(UnautorizedExeption e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+    }
 }

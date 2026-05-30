@@ -3,248 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Index API - Gestión Alojamiento</title>
-
+    <title>Gestión Alojamiento</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,600;1,400&display=swap');
 
-        body{
-            background-color: #0f172a;
-            font-family: Arial, sans-serif;
-            color: white;
-            margin: 0;
-            padding: 30px;
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0a0f1e;
+            --surface: #111827;
+            --border: #1e2d45;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.2);
+            --text: #e2e8f0;
+            --muted: #64748b;
         }
 
-        h1{
+        body {
+            background: var(--bg);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            width: 700px; height: 700px;
+            background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%);
+            top: -300px; left: -200px;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%);
+            bottom: -200px; right: -100px;
+            pointer-events: none;
+        }
+
+        .hero {
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 48px;
+            animation: fadeUp 0.5s ease both;
         }
 
-        .swagger-link {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .swagger-link a {
+        .logo-icon {
+            width: 64px; height: 64px;
+            background: linear-gradient(135deg, var(--accent), #6366f1);
+            border-radius: 18px;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            background-color: #1e293b;
-            color: #86efac;
-            text-decoration: none;
-            padding: 8px 18px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
-            border: 1px solid #166534;
-            transition: background-color 0.2s;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 20px;
         }
 
-        .swagger-link a:hover {
-            background-color: #166534;
-            color: #fff;
+        /* ✏️ TÍTULO — modificá este texto */
+        .site-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            margin-bottom: 10px;
         }
 
-        .contenedor{
+        /* ✏️ SUBTÍTULO — modificá este texto */
+        .site-subtitle {
+            color: var(--muted);
+            font-size: 16px;
+            max-width: 360px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .cards {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 16px;
+            justify-content: center;
+            max-width: 720px;
+            width: 100%;
+            animation: fadeUp 0.5s 0.1s ease both;
         }
 
-        .card{
-            background-color: #1e293b;
-            border-radius: 10px;
-            padding: 20px;
-            width: 350px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
-        }
-
-        .card h2{
-            border-bottom: 1px solid #334155;
-            padding-bottom: 10px;
-        }
-
-        ul{
-            list-style: none;
-            padding: 0;
-        }
-
-        li{
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        a{
-            text-decoration: none;
-            color: #93c5fd;
-        }
-
-        a:hover{
-            color: #60a5fa;
-        }
-
-        .badge {
-            font-size: 10px;
-            font-weight: bold;
-            padding: 2px 6px;
-            border-radius: 4px;
-            min-width: 46px;
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 24px 28px;
+            width: 200px;
             text-align: center;
+            text-decoration: none;
+            color: var(--text);
+            transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
         }
 
-        .get    { background-color: #166534; color: #86efac; }
-        .post   { background-color: #1e3a5f; color: #93c5fd; }
-        .put    { background-color: #713f12; color: #fde68a; }
-        .delete { background-color: #7f1d1d; color: #fca5a5; }
+        .card:hover {
+            border-color: var(--accent);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px var(--accent-glow);
+        }
 
+        .card-icon {
+            font-size: 26px;
+        }
+
+        .card-label {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+        }
+
+        .card-desc {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .card.primary {
+            border-color: rgba(59,130,246,0.3);
+            background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(99,102,241,0.08));
+        }
+
+        .footer {
+            margin-top: 48px;
+            color: var(--muted);
+            font-size: 13px;
+            text-align: center;
+            animation: fadeUp 0.5s 0.2s ease both;
+        }
+
+        /* ✏️ LINK DE GITHUB — reemplazá el href con tu repo */
+        .github-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 13px;
+            margin-top: 8px;
+            transition: color 0.2s;
+        }
+
+        .github-link:hover { color: var(--text); }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
     </style>
-
 </head>
 <body>
 
-<h1>Endpoints - Gestión de Alojamiento</h1>
-
-<div class="swagger-link">
-    <a href="/swagger-ui/index.html" target="_blank">
-        📄 Swagger / OpenAPI
-    </a>
+<div class="hero">
+    <div class="logo-icon">🏠</div>
+    <!-- ✏️ Cambiá el título y subtítulo acá -->
+    <h1 class="site-title">Gestión Alojamiento</h1>
+    <p class="site-subtitle">API REST para administración de alojamientos, reservas y usuarios.</p>
 </div>
 
-<div class="contenedor">
+<div class="cards">
 
+    <a href="/login.html" class="card primary">
+        <div class="card-icon">🔑</div>
+        <div class="card-label">Iniciar sesión</div>
+        <div class="card-desc">Accedé a tu cuenta</div>
+    </a>
 
-    <!-- USUARIOS -->
+    <a href="/registrarse.html" class="card">
+        <div class="card-icon">✨</div>
+        <div class="card-label">Registrarse</div>
+        <div class="card-desc">Creá una cuenta nueva</div>
+    </a>
 
-    <div class="card">
+    <a href="/swagger-ui/index.html" target="_blank" class="card">
+        <div class="card-icon">📄</div>
+        <div class="card-label">Swagger</div>
+        <div class="card-desc">Explorá los endpoints</div>
+    </a>
 
-        <h2>Administrador</h2>
+    <!-- ✏️ Reemplazá el href con la URL de tu repositorio -->
+    <a href="https://github.com/ValentinaJimen3z/tp_gestion_alojamientos" target="_blank" class="card">
+        <div class="card-icon">🐙</div>
+        <div class="card-label">GitHub</div>
+        <div class="card-desc">Ver código fuente</div>
+    </a>
 
-        <ul>
-            <li><span class="badge get">GET</span>       <a href="/Administrador/listar">Listar Administradores</a></li>
-            <li><span class="badge get">GET</span>       <a href="/Administrador/mostrar/1">Mostrar Administrador</a></li>
-            <li><span class="badge post">POST</span>     <a href="/Administrador/registrar">Registrar Administrador</a></li>
-            <li><span class="badge put">PUT</span>       <a href="/Administrador/actualizar">Actualizar Administrador</a></li>
-            <li><span class="badge delete">DELETE</span> <a href="/Administrador/eliminar/1">Eliminar Administrador</a></li>
-        </ul>
+</div>
 
-    </div>
-
-
-    <div class="card">
-
-        <h2>Cliente</h2>
-
-        <ul>
-            <li><span class="badge get">GET</span>       <a href="/Cliente/listar">Listar Clientes</a></li>
-            <li><span class="badge get">GET</span>       <a href="/Cliente/mostrar/1">Mostrar Cliente</a></li>
-            <li><span class="badge post">POST</span>     <a href="/Cliente/registrar">Registrar Cliente</a></li>
-            <li><span class="badge put">PUT</span>       <a href="/Cliente/actualizar">Actualizar Cliente</a></li>
-            <li><span class="badge delete">DELETE</span> <a href="/Cliente/eliminar/1">Eliminar Cliente</a></li>
-        </ul>
-
-    </div>
-
-
-    <div class="card">
-
-        <h2>Anfitrión</h2>
-
-        <ul>
-            <li><span class="badge get">GET</span>       <a href="/Anfitrion/listar">Listar Anfitriones</a></li>
-            <li><span class="badge get">GET</span>       <a href="/Anfitrion/mostrar/1">Mostrar Anfitrión</a></li>
-            <li><span class="badge post">POST</span>     <a href="/Anfitrion/registrar">Registrar Anfitrión</a></li>
-            <li><span class="badge put">PUT</span>       <a href="/Anfitrion/actualizar">Actualizar Anfitrión</a></li>
-            <li><span class="badge delete">DELETE</span> <a href="/Anfitrion/eliminar/1">Eliminar Anfitrión</a></li>
-        </ul>
-
-    </div>
-
-
-    <!-- ALOJAMIENTOS -->
-
-    <div class="card">
-
-        <h2>Casa</h2>
-
-        <ul>
-            <li><span class="badge get">GET</span>       <a href="/Casa/listar">Listar Casas</a></li>
-            <li><span class="badge get">GET</span>       <a href="/Casa/mostrar/1">Mostrar Casa</a></li>
-            <li><span class="badge post">POST</span>     <a href="/Casa/registrar">Registrar Casa</a></li>
-            <li><span class="badge put">PUT</span>       <a href="/Casa/actualizar">Actualizar Casa</a></li>
-            <li><span class="badge delete">DELETE</span> <a href="/Casa/eliminar/1">Eliminar Casa</a></li>
-        </ul>
-
-    </div>
-
-
-    <div class="card">
-
-        <h2>Departamento</h2>
-
-        <ul>
-            <li><span class="badge get">GET</span>       <a href="/Departamento/listar">Listar Departamentos</a></li>
-            <li><span class="badge get">GET</span>       <a href="/Departamento/mostrar/1">Mostrar Departamento</a></li>
-            <li><span class="badge post">POST</span>     <a href="/Departamento/registrar">Registrar Departamento</a></li>
-            <li><span class="badge put">PUT</span>       <a href="/Departamento/actualizar">Actualizar Departamento</a></li>
-            <li><span class="badge delete">DELETE</span> <a href="/Departamento/eliminar/1">Eliminar Departamento</a></li>
-        </ul>
-
-    </div>
-
-
-    <div class="card">
-
-        <h2>Hotel</h2>
-
-        <ul>
-            <li><span class="badge get">GET</span>       <a href="/Hotel/listar">Listar Hoteles</a></li>
-            <li><span class="badge get">GET</span>       <a href="/Hotel/mostrar/1">Mostrar Hotel</a></li>
-            <li><span class="badge post">POST</span>     <a href="/Hotel/registrar">Registrar Hotel</a></li>
-            <li><span class="badge put">PUT</span>       <a href="/Hotel/actualizar">Actualizar Hotel</a></li>
-            <li><span class="badge delete">DELETE</span> <a href="/Hotel/eliminar/1">Eliminar Hotel</a></li>
-        </ul>
-
-    </div>
-
-
-    <!-- RESERVAS -->
-
-    <div class="card">
-
-        <h2>Reserva</h2>
-
-        <ul>
-            <li><span class="badge get">GET</span>       <a href="/Reserva/listar">Listar Reservas</a></li>
-            <li><span class="badge get">GET</span>       <a href="/Reserva/mostrar/1">Mostrar Reserva</a></li>
-            <li><span class="badge post">POST</span>     <a href="/Reserva/registrar">Registrar Reserva</a></li>
-            <li><span class="badge put">PUT</span>       <a href="/Reserva/actualizar">Actualizar Reserva</a></li>
-            <li><span class="badge delete">DELETE</span> <a href="/Reserva/eliminar/1">Eliminar Reserva</a></li>
-        </ul>
-
-    </div>
-
-
-    <!-- REVIEWS -->
-
-    <div class="card">
-
-        <h2>Review</h2>
-
-        <ul>
-            <li><span class="badge get">GET</span>       <a href="/Review/listar">Listar Reviews</a></li>
-            <li><span class="badge get">GET</span>       <a href="/Review/mostrar/1">Mostrar Review</a></li>
-            <li><span class="badge get">GET</span>       <a href="/Review/cliente/1">Reviews por Cliente</a></li>
-            <li><span class="badge get">GET</span>       <a href="/Review/alojamiento/1">Reviews por Alojamiento</a></li>
-            <li><span class="badge post">POST</span>     <a href="/Review/registrar">Registrar Review</a></li>
-            <li><span class="badge put">PUT</span>       <a href="/Review/actualizar">Actualizar Review</a></li>
-            <li><span class="badge delete">DELETE</span> <a href="/Review/eliminar/1">Eliminar Review</a></li>
-        </ul>
-
-    </div>
-
-
+<div class="footer">
+    <div>API REST · Spring Boot · Java</div>
+    <!-- ✏️ Reemplazá el href con la URL de tu repositorio -->
+    <a href="https://github.com/ValentinaJimen3z/tp_gestion_alojamientos" target="_blank" class="github-link">
+        ⭐ github.com/tu-usuario/tu-repo
+    </a>
 </div>
 
 </body>
