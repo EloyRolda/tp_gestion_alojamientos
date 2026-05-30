@@ -6,6 +6,7 @@ import GestionAlojamiento.Exception.IdNoEncontradoException;
 import GestionAlojamiento.Exception.ParametroInvalidoException;
 import GestionAlojamiento.Model.Alojamiento;
 import GestionAlojamiento.Model.Cliente;
+import GestionAlojamiento.Model.Enums.TipoEstado;
 import GestionAlojamiento.Model.Reserva;
 import GestionAlojamiento.Repository.ReservaRepository;
 import jakarta.transaction.Transactional;
@@ -184,5 +185,10 @@ public class ReservaService {
         return alojamiento.getPrecioNoche().multiply(BigDecimal.valueOf(totalDiasReserva));
     }
 
+
+    ///VERIFICA SI EL CLIENTE TUVO UNA RESERVA CONFIRMADA QUE YA PASO Y DEVUELVE V O F
+    public boolean tuvisteReservaConfirmada(Long clienteId, Long alojamientoId) {
+        return reservaRepository.existsByClienteIdAndAlojamientoIdAndTipoEstadoAndFechaFinBefore(clienteId, alojamientoId, TipoEstado.CONFIRMADA, LocalDate.now());
+    }
 
 }

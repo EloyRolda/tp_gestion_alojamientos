@@ -2,6 +2,8 @@ package GestionAlojamiento.Service;
 
 import GestionAlojamiento.DTO.ReviewModificarDTO;
 import GestionAlojamiento.DTO.ReviewRegistroDTO;
+import GestionAlojamiento.Exception.IdNoEncontradoException;
+import GestionAlojamiento.Exception.ParametroInvalidoException;
 import GestionAlojamiento.Model.Alojamiento;
 import GestionAlojamiento.Model.Cliente;
 import GestionAlojamiento.Model.Review;
@@ -18,43 +20,53 @@ import java.util.List;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
-
-
     private final ClienteService clienteService;
+    private final ReservaService reservaService;
     private final AlojamientoService alojamientoService;
 
-    //------------------------ LISTAR ------------------------
+    //---------------------------------------- LISTAR ----------------------------------------
     public List<Review> listarTodas() {
         return reviewRepository.findAll();
     }
 
-    public Review obtenerPorId(Long id) {
-        return reviewRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Error, id de review no encontrado."));
+    public List<Review> listarPorAlojamiento(Long idAlojamiento) {
+
+        Alojamiento alojamiento = alojamientoService.obtenerPorId(idAlojamiento);
+
+        return reviewRepository.findByAlojamiento(alojamiento);
     }
 
-    //------------------------ CREAR/BORRAR ------------------------
+    public List<Review> listarPorCliente(Long idCliente) {
+
+        Cliente cliente = clienteService.obtenerPorId(idCliente);
+
+        return reviewRepository.findByCliente(cliente);
+    }
+
+    public Review obtenerPorId(Long id) {
+        return reviewRepository.findById(id)
+                .orElseThrow(() -> new IdNoEncontradoException("Error, id de review no encontrado."));
+    }
+
+    //---------------------------------------- CREAR ----------------------------------------
     @Transactional
     public Review crear(ReviewRegistroDTO dto) {
 
         Cliente cliente = clienteService.obtenerPorId(dto.getIdCliente());
-
         Alojamiento alojamiento = alojamientoService.obtenerPorId(dto.getIdAlojamiento());
 
+        if (!reservaService.tuvisteReservaConfirmada(cliente.getId(), alojamiento.getId())) {
+            throw new ParametroInvalidoException("Solo puede dejar reseña si tuvo una reserva confirmada y ya finalizó.");
+        }
 
         // VALIDACIONES
-
-        if (dto.getPuntuacion() < 1 || dto.getPuntuacion() > 5) {
-            throw new RuntimeException("El puntaje debe estar entre 1 y 5.");
-        }
+        validarPuntuacion(dto.getPuntuacion());
 
         if (dto.getComentario() == null || dto.getComentario().isBlank()) {
-            throw new RuntimeException("El comentario no puede estar vacio.");
+            throw new ParametroInvalidoException("El comentario no puede estar vacio.");
         }
 
-
         // REVIEW
-
         Review review = new Review();
         review.setPuntuacion(dto.getPuntuacion());
         review.setComentario(dto.getComentario());
@@ -65,15 +77,17 @@ public class ReviewService {
         return reviewRepository.save(review);
     }
 
+    //---------------------------------------- BORRAR ----------------------------------------
     @Transactional
     public void borrarPorId(Long id_review) {
         if (!reviewRepository.existsById(id_review)) {
-            throw new RuntimeException("Error, el id de la review no existe.");
+            throw new IdNoEncontradoException("Error, el id de la review no existe.");
         }
         reviewRepository.deleteById(id_review);
     }
 
-    //------------------------ MODIFICAR ------------------------
+
+    //---------------------------------------- MODIFICAR ----------------------------------------
     @Transactional
     public Review modificar(ReviewModificarDTO dto) {
 
@@ -84,10 +98,7 @@ public class ReviewService {
 
         if (dto.getPuntuacion() != null) {
 
-            if (dto.getPuntuacion() < 1 || dto.getPuntuacion() > 5) {
-                throw new RuntimeException("El puntaje debe estar entre 1 y 5.");
-            }
-
+            validarPuntuacion(dto.getPuntuacion());
             review.setPuntuacion(dto.getPuntuacion());
         }
 
@@ -119,18 +130,11 @@ public class ReviewService {
         return reviewRepository.save(review);
     }
 
-    public List<Review> listarPorAlojamiento(Long idAlojamiento) {
-
-        Alojamiento alojamiento = alojamientoService.obtenerPorId(idAlojamiento);
-
-        return reviewRepository.findByAlojamiento(alojamiento);
-    }
-
-    public List<Review> listarPorCliente(Long idCliente) {
-
-        Cliente cliente = clienteService.obtenerPorId(idCliente);
-
-        return reviewRepository.findByCliente(cliente);
+    //Extra
+    private void validarPuntuacion(int puntuacion) {
+        if (puntuacion < 1 || puntuacion > 5) {
+            throw new ParametroInvalidoException("El puntaje debe estar entre 1 y 5.");
+        }
     }
 
 }
