@@ -12,7 +12,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/Anfitrion")
 public class AnfitrionController {
-
     private final AnfitrionService anfitrionService;
 
     @GetMapping("/listar")

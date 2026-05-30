@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 
 public class Administrador {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_administrador")
     private Long id;
 
     @Column(name = "matricula", length = 100, nullable = false)

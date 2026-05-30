@@ -11,6 +11,8 @@ import GestionAlojamiento.Repository.AdministradorRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,6 +27,7 @@ public class AdministradorService {
 
     //------------------------ LISTAR POR ------------------------
     public List<Administrador> listarTodos() {
+
         return administradorRepository.findAll(Sort.by(Sort.Direction.ASC, "usuario.nombre"));
     }
 
@@ -67,13 +70,16 @@ public class AdministradorService {
         Administrador admin = administradorRepository.findById(dto.getId()).orElseThrow(() -> new IdNoEncontradoException("ID inválido"));
 
         if (dto.getMatricula() != null) {
-            boolean existe = administradorRepository.existsByMatriculaAndIdNot(dto.getMatricula(), dto.getId());
+            if (!admin.getMatricula().equalsIgnoreCase(dto.getMatricula())) {
+                boolean existe = administradorRepository.existsByMatriculaAndIdNot(dto.getMatricula(), dto.getId());
 
-            if (existe) {
-                throw new RecursoDuplicadoException("La matrícula pertenece a otro administrador.");
+                if (existe) {
+                    throw new RecursoDuplicadoException("La matrícula pertenece a otro administrador.");
+                }
+                admin.setMatricula(dto.getMatricula());
             }
 
-            admin.setMatricula(dto.getMatricula());
+
         }
 
         admin.setUsuario(usuarioService.modificarObjeto(admin.getUsuario(), mapearUsuario(dto)));

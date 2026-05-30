@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_usuario")
     private Long id;
 
     @Column(name = "nombre", length = 100, nullable = false)
@@ -29,13 +30,17 @@ public class Usuario {
     @Email(message = "El formato de correo es invalido")
     @Column(name = "email", length = 150, nullable = false, unique = true)
     private String email;
+
     @Column(name = "password", length = 255, nullable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
+
     @Column(name = "telefono", length = 30)
     private String telefono;
+
     @Column(name = "fecha_registro", nullable = false)
     private LocalDateTime fechaRegistro;
+
     @Column(name = "activo", nullable = false)
     private Boolean activo;
 

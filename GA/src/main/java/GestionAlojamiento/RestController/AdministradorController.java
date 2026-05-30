@@ -5,10 +5,16 @@ import GestionAlojamiento.DTO.AdministradorModificarDTO;
 import GestionAlojamiento.DTO.AdministradorRegistroDTO;
 import GestionAlojamiento.Model.Administrador;
 import GestionAlojamiento.Service.AdministradorService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/Administrador")
@@ -19,7 +25,9 @@ public class AdministradorController {
 
     @GetMapping("/listar")
     public List<Administrador> listar() {
+
         return administradorService.listarTodos();
+
     }
 
     @GetMapping("/mostrar/{id}")

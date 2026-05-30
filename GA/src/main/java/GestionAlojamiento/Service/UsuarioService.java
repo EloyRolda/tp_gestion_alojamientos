@@ -6,6 +6,7 @@ import GestionAlojamiento.Model.Usuario;
 import GestionAlojamiento.Repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
     //------------------------ LISTAR POR ------------------------
     public Usuario obtenerPorId(Long id) {
@@ -31,6 +33,7 @@ public class UsuarioService {
             usuario.setNombre(usuario.getNombre().toLowerCase());
             usuario.setActivo(true);
             usuario.setFechaRegistro(LocalDateTime.now());
+            usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         } else {
             throw new RecursoDuplicadoException("Correo registrado en la base de datos por otro usuario.");
         }
@@ -69,7 +72,7 @@ public class UsuarioService {
         }
 
         if (cambios.getPassword() != null) {
-            original.setPassword(cambios.getPassword());
+            original.setPassword(passwordEncoder.encode(cambios.getPassword()));
         }
 
         if (cambios.getTelefono() != null) {

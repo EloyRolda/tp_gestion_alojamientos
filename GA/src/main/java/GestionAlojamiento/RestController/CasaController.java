@@ -5,6 +5,8 @@ import GestionAlojamiento.DTO.CasaRegistroDTO;
 import GestionAlojamiento.Model.Casa;
 import GestionAlojamiento.Service.CasaService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,5 +41,6 @@ public class CasaController {
     public void borrarPorId(@PathVariable Long id) {
         casaService.borrarPorId(id);
     }
+
 
 }

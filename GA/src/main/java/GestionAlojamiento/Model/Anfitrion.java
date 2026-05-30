@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "anfitrion")
 public class Anfitrion {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_anfitrion")
     private Long id;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
