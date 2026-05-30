@@ -5,20 +5,17 @@ import GestionAlojamiento.DTO.AdministradorModificarDTO;
 import GestionAlojamiento.DTO.AdministradorRegistroDTO;
 import GestionAlojamiento.Model.Administrador;
 import GestionAlojamiento.Service.AdministradorService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/Administrador")
+
 public class AdministradorController {
 
     private final AdministradorService administradorService;
-
-    public AdministradorController(AdministradorService administradorService) {
-        this.administradorService = administradorService;
-    }
-
 
     @GetMapping("/listar")
     public List<Administrador> listar() {

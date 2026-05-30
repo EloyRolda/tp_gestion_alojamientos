@@ -27,7 +27,7 @@ public class DepartamentoService {
     }
 
     public Departamento obtenerPorId(Long id) {
-        return departamentoRepository.findById(id).orElseThrow(() -> new RuntimeException("Error, id no encontrado en la base de datos."));
+        return departamentoRepository.findById(id).orElseThrow(() -> new IdNoEncontradoException("Error, id no encontrado en la base de datos."));
     }
 
     //---------------------------------------- CREAR ----------------------------------------

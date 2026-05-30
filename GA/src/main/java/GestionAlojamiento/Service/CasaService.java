@@ -5,7 +5,6 @@ import GestionAlojamiento.DTO.CasaRegistroDTO;
 import GestionAlojamiento.Exception.IdNoEncontradoException;
 import GestionAlojamiento.Model.*;
 import GestionAlojamiento.Model.Enums.TipoInmueble;
-import GestionAlojamiento.Repository.AlojamientoRepository;
 import GestionAlojamiento.Repository.CasaRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,7 @@ public class CasaService {
     }
 
     public Casa obtenerPorId(Long id) {
-        return casaRepository.findById(id).orElseThrow(() -> new RuntimeException("Error, el id de la casa no se encuentra en la base de datos."));
+        return casaRepository.findById(id).orElseThrow(() -> new IdNoEncontradoException("Error, el id de la casa no se encuentra en la base de datos."));
     }
 
     //---------------------------------------- CREAR ----------------------------------------

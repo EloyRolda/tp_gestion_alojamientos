@@ -4,20 +4,16 @@ import GestionAlojamiento.DTO.ClienteModificarDTO;
 import GestionAlojamiento.DTO.ClienteRegistroDTO;
 import GestionAlojamiento.Model.Cliente;
 import GestionAlojamiento.Service.ClienteService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/cliente")
 public class ClienteController {
 
     private final ClienteService clienteService;
-
-    public ClienteController(ClienteService clienteService) {
-        this.clienteService = clienteService;
-    }
-
 
     @GetMapping("/listar")
     public List<Cliente> listar() {
@@ -27,11 +23,6 @@ public class ClienteController {
     @GetMapping("/mostrar/{id}")
     public Cliente mostrar(@PathVariable Long id) {
         return clienteService.obtenerPorId(id);
-    }
-
-    @DeleteMapping("/borrar/{id}")
-    public void borrar(@PathVariable Long id) {
-        clienteService.borrarPorId(id);
     }
 
     @PostMapping("/registrar")
@@ -44,5 +35,9 @@ public class ClienteController {
         return clienteService.actualizar(clienteModificarDTO);
     }
 
+    @DeleteMapping("/eliminar/{id}")
+    public void borrar(@PathVariable Long id) {
+        clienteService.borrarPorId(id);
+    }
 
 }

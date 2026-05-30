@@ -26,7 +26,7 @@ public class HotelService {
     }
 
     public Hotel obtenerPorId(Long id) {
-        return hotelRepository.findById(id).orElseThrow(() -> new RuntimeException("Error, id de hotel no encontrado en la base de datos."));
+        return hotelRepository.findById(id).orElseThrow(() -> new IdNoEncontradoException("Error, id de hotel no encontrado en la base de datos."));
     }
 
     //---------------------------------------- CREAR ----------------------------------------

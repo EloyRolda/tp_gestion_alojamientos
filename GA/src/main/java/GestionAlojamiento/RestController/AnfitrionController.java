@@ -1,23 +1,19 @@
 package GestionAlojamiento.RestController;
 
-
 import GestionAlojamiento.DTO.AnfitrionModificarDTO;
 import GestionAlojamiento.DTO.AnfitrionRegistroDTO;
 import GestionAlojamiento.Model.Anfitrion;
 import GestionAlojamiento.Service.AnfitrionService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/Anfitrion")
 public class AnfitrionController {
 
     private final AnfitrionService anfitrionService;
-
-    public AnfitrionController(AnfitrionService anfitrionService) {
-        this.anfitrionService = anfitrionService;
-    }
 
     @GetMapping("/listar")
     public List<Anfitrion> listar() {
@@ -29,7 +25,7 @@ public class AnfitrionController {
         return anfitrionService.obtenerPorId(id);
     }
 
-    @PostMapping("/registro")
+    @PostMapping("/registrar")
     public Anfitrion registro(@RequestBody AnfitrionRegistroDTO anfitrionRegistroDTO) {
         return anfitrionService.crear(anfitrionRegistroDTO);
     }
@@ -39,7 +35,7 @@ public class AnfitrionController {
         return anfitrionService.actualizar(anfitrionModificarDTO);
     }
 
-    @DeleteMapping("/borrar/{id}")
+    @DeleteMapping("/eliminar/{id}")
     public void borrarPorId(@PathVariable Long id) {
         anfitrionService.borrarPorId(id);
     }

@@ -1,7 +1,5 @@
 package GestionAlojamiento.DTO;
 
-import GestionAlojamiento.Model.Alojamiento;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -9,9 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 //Lombok
 @Data
@@ -83,13 +79,6 @@ public class DepartamentoRegistroDTO {
     @NotNull(message = "Campo obligatorio")
     @Min(value = 0, message = "Valor Invalido")
     private Integer altura;
-
-    //[DISPONIBILIDAD]
-    private LocalDate fecha;
-
-    private boolean disponible;
-
-    private Alojamiento alojamiento;
 
     //[SERVICIO]
 

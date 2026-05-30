@@ -3,21 +3,17 @@ package GestionAlojamiento.RestController;
 import GestionAlojamiento.DTO.CasaModificarDTO;
 import GestionAlojamiento.DTO.CasaRegistroDTO;
 import GestionAlojamiento.Model.Casa;
-import GestionAlojamiento.Repository.CasaRepository;
 import GestionAlojamiento.Service.CasaService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/Casa")
 public class CasaController {
 
     private final CasaService casaService;
-
-    public CasaController(CasaService casaService) {
-        this.casaService = casaService;
-    }
 
     @GetMapping("/listar")
     public List<Casa> listar() {
@@ -39,7 +35,7 @@ public class CasaController {
         return casaService.modificar(casaModificarDTO);
     }
 
-    @DeleteMapping("/borrar/{id}")
+    @DeleteMapping("/eliminar/{id}")
     public void borrarPorId(@PathVariable Long id) {
         casaService.borrarPorId(id);
     }

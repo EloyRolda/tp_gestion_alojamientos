@@ -1,6 +1,5 @@
 package GestionAlojamiento.Model;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,6 +28,6 @@ public class Direccion {
     @Column(name = "calle", length = 30, nullable = false)
     private String calle;
     @Column(name = "altura", nullable = false)
-    Integer altura;
+    private Integer altura;
 
 }

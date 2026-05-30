@@ -17,9 +17,6 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-
-
-
     @GetMapping("/listar")
     public List<Review> listar() {
         return reviewService.listarTodas();
@@ -30,19 +27,14 @@ public class ReviewController {
         return reviewService.obtenerPorId(id);
     }
 
-    @PostMapping("/crear")
+    @PostMapping("/registrar")
     public Review crear(@RequestBody @Valid ReviewRegistroDTO reviewRegistroDTO) {
         return reviewService.crear(reviewRegistroDTO);
     }
-
-
-
-
-    @PutMapping("/modificar")
+    @PutMapping("/actualizar")
     public Review modificar(@RequestBody @Valid ReviewModificarDTO dto) {
         return reviewService.modificar(dto);
     }
-
 
     @DeleteMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Long id) {

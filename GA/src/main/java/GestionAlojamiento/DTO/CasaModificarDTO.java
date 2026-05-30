@@ -1,11 +1,5 @@
 package GestionAlojamiento.DTO;
 
-import GestionAlojamiento.Model.Alojamiento;
-import GestionAlojamiento.Model.Enums.TipoInmueble;
-import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -14,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+
 
 //Lombok
 @Data

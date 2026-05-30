@@ -5,19 +5,16 @@ import GestionAlojamiento.DTO.HotelModificarDTO;
 import GestionAlojamiento.DTO.HotelRegistroDTO;
 import GestionAlojamiento.Model.Hotel;
 import GestionAlojamiento.Service.HotelService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/Hotel")
 public class HotelController {
 
     private final HotelService hotelService;
-
-    public HotelController(HotelService hotelService) {
-        this.hotelService = hotelService;
-    }
 
     @GetMapping("/listar")
     public List<Hotel> listar() {
@@ -29,17 +26,17 @@ public class HotelController {
         return hotelService.obtenerPorId(id);
     }
 
-    @PostMapping("/Registrar")
+    @PostMapping("/registrar")
     public Hotel registrar(@RequestBody HotelRegistroDTO hotelRegistroDTO) {
-        return hotelService.crear(hotelRegistroDTO);        //Terminar
+        return hotelService.crear(hotelRegistroDTO);
     }
 
     @PutMapping("/actualizar")
     public Hotel actualizar(@RequestBody HotelModificarDTO hotelModificarDTO){
-        return hotelService.actualizar(hotelModificarDTO);  //Terminar
+        return hotelService.actualizar(hotelModificarDTO);
     }
 
-    @DeleteMapping("/borrar/{id}")
+    @DeleteMapping("/eliminar/{id}")
     public void borrarPorId(@PathVariable Long id){
         hotelService.borrarPorId(id);
     }

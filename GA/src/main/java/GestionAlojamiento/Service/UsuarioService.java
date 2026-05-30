@@ -1,21 +1,14 @@
 package GestionAlojamiento.Service;
 
-
 import GestionAlojamiento.Exception.IdNoEncontradoException;
 import GestionAlojamiento.Exception.RecursoDuplicadoException;
-import GestionAlojamiento.Model.Cliente;
-import GestionAlojamiento.Model.Enums.TipoUsuario;
 import GestionAlojamiento.Model.Usuario;
 import GestionAlojamiento.Repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +32,7 @@ public class UsuarioService {
             usuario.setActivo(true);
             usuario.setFechaRegistro(LocalDateTime.now());
         } else {
-            throw new RuntimeException("Correo registrado en la base de datos por otro usuario.");
+            throw new RecursoDuplicadoException("Correo registrado en la base de datos por otro usuario.");
         }
         return usuarioRepository.save(usuario);
     }
@@ -47,13 +40,9 @@ public class UsuarioService {
     @Transactional
     ///desabilita un usuario de la base de datos.
     public void borrarPorId(Long id) {
-        if (!usuarioRepository.existsById(id)) {
-            throw new RuntimeException("No se puede eliminar, el id no concuerda con la base de datos");
-        }
-        Usuario u = usuarioRepository.findById(id).orElseThrow(() -> new IdNoEncontradoException("ID no encontrado en la base de datos" + id));
+        Usuario u = usuarioRepository.findById(id).orElseThrow(() -> new IdNoEncontradoException("ID NO ENCONTRADO"));
         u.setActivo(false);
         usuarioRepository.save(u);
-
         //usuarioRepository.deleteById(id);
     }
 //---------------------------------------- MODIFICAR ----------------------------------------

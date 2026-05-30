@@ -1,19 +1,15 @@
 package GestionAlojamiento.Service;
 
-
 import GestionAlojamiento.DTO.AdministradorModificarDTO;
 import GestionAlojamiento.DTO.AdministradorRegistroDTO;
-import GestionAlojamiento.DTO.ClienteModificarDTO;
-import GestionAlojamiento.DTO.ClienteRegistroDTO;
 import GestionAlojamiento.Exception.IdNoEncontradoException;
+import GestionAlojamiento.Exception.RecursoDuplicadoException;
 import GestionAlojamiento.Model.Administrador;
 import GestionAlojamiento.Model.Enums.TipoUsuario;
 import GestionAlojamiento.Model.Usuario;
 import GestionAlojamiento.Repository.AdministradorRepository;
-import GestionAlojamiento.Repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +38,7 @@ public class AdministradorService {
     public Administrador crear(AdministradorRegistroDTO administradorRegistroDTO) {
 
         if (administradorRepository.existsByMatricula(administradorRegistroDTO.getMatricula())) {
-            throw new RuntimeException("La matrícula ya existe.");
+            throw new RecursoDuplicadoException("La matrícula ya existe.");
         }
         Usuario usuario = mapearUsuario(administradorRegistroDTO);
 
@@ -59,7 +55,7 @@ public class AdministradorService {
     @Transactional
     public void borrarPorId(Long idAdmin) {
         if (!administradorRepository.existsById(idAdmin)) {
-            throw new RuntimeException("id invalido, no se encuentra en la base de datos.");
+            throw new IdNoEncontradoException("id invalido, no se encuentra en la base de datos.");
         }
         administradorRepository.deleteById(idAdmin);
     }
@@ -68,13 +64,13 @@ public class AdministradorService {
     @Transactional
     public Administrador actualizar(AdministradorModificarDTO dto) {
 
-        Administrador admin = administradorRepository.findById(dto.getId()).orElseThrow(() -> new RuntimeException("ID inválido"));
+        Administrador admin = administradorRepository.findById(dto.getId()).orElseThrow(() -> new IdNoEncontradoException("ID inválido"));
 
         if (dto.getMatricula() != null) {
             boolean existe = administradorRepository.existsByMatriculaAndIdNot(dto.getMatricula(), dto.getId());
 
             if (existe) {
-                throw new RuntimeException("La matrícula pertenece a otro administrador.");
+                throw new RecursoDuplicadoException("La matrícula pertenece a otro administrador.");
             }
 
             admin.setMatricula(dto.getMatricula());

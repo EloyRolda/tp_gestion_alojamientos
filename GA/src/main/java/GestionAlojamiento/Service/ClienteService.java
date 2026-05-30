@@ -1,7 +1,6 @@
 package GestionAlojamiento.Service;
 
-import GestionAlojamiento.DTO.AnfitrionModificarDTO;
-import GestionAlojamiento.DTO.AnfitrionRegistroDTO;
+
 import GestionAlojamiento.DTO.ClienteModificarDTO;
 import GestionAlojamiento.DTO.ClienteRegistroDTO;
 import GestionAlojamiento.Exception.IdNoEncontradoException;
@@ -9,15 +8,11 @@ import GestionAlojamiento.Model.Cliente;
 import GestionAlojamiento.Model.Enums.TipoUsuario;
 import GestionAlojamiento.Model.Usuario;
 import GestionAlojamiento.Repository.ClienteRepository;
-import GestionAlojamiento.Repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -34,7 +29,7 @@ public class ClienteService {
 
 
     public Cliente obtenerPorId(Long id) {
-        return clienteRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado en la base de datos"));
+        return clienteRepository.findById(id).orElseThrow(() -> new IdNoEncontradoException("Usuario no encontrado en la base de datos"));
     }
 
 
@@ -60,7 +55,7 @@ public class ClienteService {
     @Transactional
     public void borrarPorId(Long id) {
         if (!clienteRepository.existsById(id)) {
-            throw new RuntimeException("Usuario no encontrado en la base de datos");
+            throw new IdNoEncontradoException("Usuario no encontrado en la base de datos");
         }
         clienteRepository.deleteById(id);
     }
@@ -76,13 +71,13 @@ public class ClienteService {
         if (clienteModificarDTO.getMetodoPago() != null) {
             cliente.setMetodoPago(clienteModificarDTO.getMetodoPago());
         }
-
+        cliente.setUsuario(usuario);
         return clienteRepository.save(cliente);
     }
 //---------------------------------------- MAPEOS DTO [PRIVADOS] ----------------------------------------
 
     /// Mapea el DTO de MODIFICAR a un USUARIO y lo RETORNA
-    public Usuario mapearUsuario(ClienteRegistroDTO clienteRegistroDTO) {
+    private Usuario mapearUsuario(ClienteRegistroDTO clienteRegistroDTO) {
         Usuario usuario = new Usuario(
                 null,
                 clienteRegistroDTO.getNombre(),
@@ -97,7 +92,7 @@ public class ClienteService {
     }
 
     /// Mapea el DTO de MODIFICAR a un USUARIO y lo RETORNA
-    public Usuario mapearUsuario(ClienteModificarDTO clienteModificarDTO) {
+    private Usuario mapearUsuario(ClienteModificarDTO clienteModificarDTO) {
         Usuario usuario = new Usuario(
                 clienteModificarDTO.getId(),
                 clienteModificarDTO.getNombre(),

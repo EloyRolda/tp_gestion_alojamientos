@@ -4,18 +4,15 @@ import GestionAlojamiento.DTO.ReservaModificarDTO;
 import GestionAlojamiento.DTO.ReservaRegistroDTO;
 import GestionAlojamiento.Model.Reserva;
 import GestionAlojamiento.Service.ReservaService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/reserva")
 public class ReservaController {
     private final ReservaService reservaService;
-
-    public ReservaController(ReservaService reservaService) {
-        this.reservaService = reservaService;
-    }
 
     @GetMapping("/listar")
     public List<Reserva> listar() {
@@ -32,13 +29,12 @@ public class ReservaController {
         return reservaService.crear(reservaRegistroDTO);
     }
 
-
-    @PutMapping("/modificar")
+    @PutMapping("/actualizar")
     public Reserva modificar(@RequestBody ReservaModificarDTO reservaModificarDTO) {
         return reservaService.actualizar(reservaModificarDTO);
     }
 
-    @DeleteMapping("/borrar/{id}")
+    @DeleteMapping("/eliminar/{id}")
     public void borrarPorId(@PathVariable Long id) {
         reservaService.borrarPorId(id);
     }

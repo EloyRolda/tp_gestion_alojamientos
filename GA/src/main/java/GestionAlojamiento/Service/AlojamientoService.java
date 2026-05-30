@@ -2,19 +2,12 @@ package GestionAlojamiento.Service;
 
 import GestionAlojamiento.Exception.IdNoEncontradoException;
 import GestionAlojamiento.Model.Alojamiento;
-import GestionAlojamiento.Model.Enums.TipoInmueble;
 import GestionAlojamiento.Repository.AlojamientoRepository;
-import GestionAlojamiento.Repository.AnfitrionRepository;
-import GestionAlojamiento.Repository.DireccionRepository;
-import GestionAlojamiento.Repository.ServicioRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +25,7 @@ public class AlojamientoService {
 
     /// Devuelve un Objeto Alojamiento en base al id
     public Alojamiento obtenerPorId(Long id) {
-        return alojamientoRepository.findById(id).orElseThrow(() -> new RuntimeException("Error, alojamiento no encontrado en la base de datos."));
+        return alojamientoRepository.findById(id).orElseThrow(() -> new IdNoEncontradoException("Error, alojamiento no encontrado en la base de datos."));
     }
 
     //Como seguridad extra se podria agregar que los valores respeten ciertos valores no sean menores que 0, ej en habitaciones haciendo doble check de seguridad -Eloy
