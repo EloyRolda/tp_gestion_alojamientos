@@ -1,6 +1,6 @@
 package GestionAlojamiento.Config;
 
-import GestionAlojamiento.Model.Enums.TipoUsuario;
+
 import GestionAlojamiento.Model.Usuario;
 import GestionAlojamiento.Repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
