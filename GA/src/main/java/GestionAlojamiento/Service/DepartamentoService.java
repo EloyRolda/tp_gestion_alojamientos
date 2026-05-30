@@ -17,11 +17,10 @@ import java.util.List;
 public class DepartamentoService {
 
     private final DepartamentoRepository departamentoRepository;
-    private final AnfitrionService anfitrionService;
+    private final UsuarioService usuarioService;
     private final AlojamientoService alojamientoService;
 
     //---------------------------------------- LISTAR ----------------------------------------
-
     public List<Departamento> listarTodos() {
         return departamentoRepository.findAll();
     }
@@ -40,13 +39,15 @@ public class DepartamentoService {
         departamento.setPiso(dto.getPiso());
 
         departamento.setAlojamiento(mapearAlojamiento(dto));
+
         return departamentoRepository.save(departamento);
     }
+
     //---------------------------------------- BORRAR ----------------------------------------
     @Transactional
     public void borrarPorId(Long id_departamento) {
         if (!departamentoRepository.existsById(id_departamento)) {
-            throw new IdNoEncontradoException("Error, el id de HOTEL no se encuentra en la base de datos:" + id_departamento);
+            throw new IdNoEncontradoException("Error, el id de DEPARTAMENTO no se encuentra en la base de datos:" + id_departamento);
         }
         departamentoRepository.deleteById(id_departamento);
     }
@@ -57,12 +58,9 @@ public class DepartamentoService {
 
         Departamento departamento = obtenerPorId(dto.getId());
 
-        // [DEPARTAMENTO]
-
         if (dto.getPiso() != null) {
             departamento.setPiso(dto.getPiso());
         }
-
         if (dto.getTieneAscensor() != null) {
             departamento.setTieneAscensor(dto.getTieneAscensor());
         }
@@ -72,18 +70,15 @@ public class DepartamentoService {
 
         departamento.setAlojamiento(alojamientoService.modificarObjeto(departamento.getAlojamiento(), mapearAlojamiento(dto)));
 
-
         return departamentoRepository.save(departamento);
     }
 
-
     //---------------------------------------- MAPEOS DTO [PRIVADOS] ----------------------------------------
 
-    /// Mapea los valores de MODIFICAR DTO a un HOTEL.
     private Alojamiento mapearAlojamiento(DepartamentoModificarDTO dto) {
 
         Direccion direccion = new Direccion(
-                null,                   // id
+                null,
                 dto.getPais(),
                 dto.getProvincia(),
                 dto.getCodigoPostal(),
@@ -93,19 +88,20 @@ public class DepartamentoService {
         );
 
         Servicio servicio = new Servicio(
-                null,                   // id
+                null,
                 dto.getTieneCocina(),
                 dto.getTieneLavarropa(),
                 dto.getTieneWifi(),
                 dto.getTieneEstacionamiento()
         );
 
-        Anfitrion anfitrion = null;
+        Usuario anfitrion = null;
         if (dto.getAnfitrion_id() != null) {
-            anfitrion = anfitrionService.obtenerPorId(dto.getAnfitrion_id());
+            anfitrion = usuarioService.obtenerAnfitrionPorId(dto.getAnfitrion_id());
         }
-        Alojamiento alojamiento = new Alojamiento(
-                null,                   // id
+
+        return new Alojamiento(
+                null,
                 dto.getTitulo(),
                 dto.getDescripcion(),
                 dto.getPrecioNoche(),
@@ -120,10 +116,8 @@ public class DepartamentoService {
                 direccion,
                 servicio
         );
-        return alojamiento;
     }
 
-    /// Mapea los valores de REGISTRO DTO a un HOTEL.
     private Alojamiento mapearAlojamiento(DepartamentoRegistroDTO dto) {
 
         Direccion direccion = new Direccion(
@@ -154,14 +148,11 @@ public class DepartamentoService {
                 dto.getCantHabitaciones(),
                 dto.getCantCamas(),
                 dto.getCantBanios(),
-                true,                   // activo por defecto al crear
+                true,
                 TipoInmueble.DEPARTAMENTO,
-                anfitrionService.obtenerPorId(dto.getIdAnfitrion()),
+                usuarioService.obtenerAnfitrionPorId(dto.getIdAnfitrion()),
                 direccion,
                 servicio
         );
-
     }
-
-
 }

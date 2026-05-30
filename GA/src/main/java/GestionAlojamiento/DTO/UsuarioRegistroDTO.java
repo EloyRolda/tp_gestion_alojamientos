@@ -32,4 +32,9 @@ public class UsuarioRegistroDTO {
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Campo Obligatorio")
     private TipoUsuario tipoUsuario;
+
+    // Opcionales por rol
+    private String metodoPago;  // CLIENTE
+    private String matricula;   // ADMINISTRADOR
+
 }

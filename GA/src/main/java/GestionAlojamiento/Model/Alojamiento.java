@@ -63,7 +63,7 @@ public class Alojamiento {
 
     @ManyToOne
     @JoinColumn(name = "id_anfitrion")
-    private Anfitrion anfitrion;
+    private Usuario anfitrion;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "id_direccion")

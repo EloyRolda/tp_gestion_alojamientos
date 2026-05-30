@@ -5,15 +5,13 @@ import GestionAlojamiento.DTO.ReservaRegistroDTO;
 import GestionAlojamiento.Exception.IdNoEncontradoException;
 import GestionAlojamiento.Exception.ParametroInvalidoException;
 import GestionAlojamiento.Model.Alojamiento;
-import GestionAlojamiento.Model.Cliente;
 import GestionAlojamiento.Model.Enums.TipoEstado;
 import GestionAlojamiento.Model.Reserva;
+import GestionAlojamiento.Model.Usuario;
 import GestionAlojamiento.Repository.ReservaRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.stereotype.Service;
-
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -25,7 +23,7 @@ import java.util.List;
 public class ReservaService {
 
     private final ReservaRepository reservaRepository;
-    private final ClienteService clienteService;
+    private final UsuarioService usuarioService;
     private final AlojamientoService alojamientoService;
 
 
@@ -54,7 +52,7 @@ public class ReservaService {
             throw new ParametroInvalidoException("La fecha de inicio no puede ser anterior al dia actual.");
         }
 
-        if (!alojamiento.getAnfitrion().getUsuario().getActivo()) {
+        if (!alojamiento.getAnfitrion().getActivo()) {
             throw new ParametroInvalidoException("El anfitrión está inactivo");
         }
 
@@ -62,15 +60,13 @@ public class ReservaService {
             throw new ParametroInvalidoException("El alojamiento está inactivo");
         }
 
-        Cliente cliente = clienteService.obtenerPorId(dto.getIdCliente());
+        Usuario cliente = usuarioService.obtenerClientePorId(dto.getIdCliente());
 
-        if (!cliente.getUsuario().getActivo()) {
+        if (!cliente.getActivo()) {
             throw new ParametroInvalidoException("El cliente está inactivo");
         }
 
-
         // RESERVA
-
         Reserva reserva = new Reserva();
         reserva.setFechaInicio(dto.getFechaInicio());
         reserva.setFechaFin(dto.getFechaFin());
@@ -132,9 +128,9 @@ public class ReservaService {
 
         // CLIENTE
         if (dto.getIdCliente() != null) {
-            Cliente cliente = clienteService.obtenerPorId(dto.getIdCliente());
+            Usuario cliente = usuarioService.obtenerClientePorId(dto.getIdCliente());
 
-            if (!cliente.getUsuario().getActivo()) {
+            if (!cliente.getActivo()) {
                 throw new ParametroInvalidoException("El cliente está inactivo");
             }
 
@@ -150,7 +146,7 @@ public class ReservaService {
             if (!alojamiento.getActivo()) {
                 throw new ParametroInvalidoException("El alojamiento está inactivo");
             }
-            if (!alojamiento.getAnfitrion().getUsuario().getActivo()) {
+            if (!alojamiento.getAnfitrion().getActivo()) {
                 throw new ParametroInvalidoException("El anfitrión está inactivo");
             }
             reserva.setAlojamiento(alojamiento);

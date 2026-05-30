@@ -41,15 +41,12 @@ public class Reserva {
 
     @ManyToOne
     @JoinColumn(name = "id_cliente", nullable = false)
-    private Cliente cliente;
+    private Usuario cliente;
 
     @ManyToOne
     @JoinColumn(name = "id_alojamiento", nullable = false)
     private Alojamiento alojamiento;
 
-    /*
-    EN LOGICA DE NEGOCIO HACER LA COMPROBACION -> 'CONSTRAINT chk_fechas CHECK (fecha_fin > fecha_inicio)'
-    */
 
 }
 

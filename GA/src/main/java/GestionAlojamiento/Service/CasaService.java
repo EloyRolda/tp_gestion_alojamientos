@@ -17,7 +17,7 @@ import java.util.List;
 public class CasaService {
 
     private final CasaRepository casaRepository;
-    private final AnfitrionService anfitrionService;
+    private final UsuarioService usuarioService;
     private final AlojamientoService alojamientoService;
 
     //---------------------------------------- LISTAR ----------------------------------------
@@ -51,25 +51,20 @@ public class CasaService {
         }
         casaRepository.deleteById(id_casa);
     }
-    //---------------------------------------- MODIFICAR ----------------------------------------
 
-    /// Recibe un DTO y modifica todos los campos que esten llenos en base al ID
+    //---------------------------------------- MODIFICAR ----------------------------------------
     @Transactional
     public Casa modificar(CasaModificarDTO dto) {
 
-        // [ALOJAMIENTO]
         Alojamiento dtoAlojamiento = mapearAlojamiento(dto);
 
-        // [CASA]
         Casa casa = obtenerPorId(dto.getIdCasa());
         if (dto.getTienePatio() != null) {
             casa.setTienePatio(dto.getTienePatio());
         }
-
         if (dto.getTienePileta() != null) {
             casa.setTienePileta(dto.getTienePileta());
         }
-
         if (dto.getTieneParrilla() != null) {
             casa.setTieneParrilla(dto.getTieneParrilla());
         }
@@ -78,13 +73,13 @@ public class CasaService {
 
         return casaRepository.save(casa);
     }
+
     //---------------------------------------- MAPEOS DTO [PRIVADOS] ----------------------------------------
 
-    /// Mapea los valores de MODIFICAR DTO a un ALOJAMIENTO.
     private Alojamiento mapearAlojamiento(CasaModificarDTO dto) {
 
         Direccion direccion = new Direccion(
-                null,                   // id
+                null,
                 dto.getPais(),
                 dto.getProvincia(),
                 dto.getCodigoPostal(),
@@ -94,19 +89,20 @@ public class CasaService {
         );
 
         Servicio servicio = new Servicio(
-                null,                   // id
+                null,
                 dto.getTieneCocina(),
                 dto.getTieneLavarropa(),
                 dto.getTieneWifi(),
                 dto.getTieneEstacionamiento()
         );
 
-        Anfitrion anfitrion = null;
+        Usuario anfitrion = null;
         if (dto.getAnfitrion_id() != null) {
-            anfitrion = anfitrionService.obtenerPorId(dto.getAnfitrion_id());
+            anfitrion = usuarioService.obtenerAnfitrionPorId(dto.getAnfitrion_id());
         }
-        Alojamiento alojamiento = new Alojamiento(
-                null,                   // id
+
+        return new Alojamiento(
+                null,
                 dto.getTitulo(),
                 dto.getDescripcion(),
                 dto.getPrecioNoche(),
@@ -121,10 +117,8 @@ public class CasaService {
                 direccion,
                 servicio
         );
-        return alojamiento;
     }
 
-    /// Mapea los valores de REGISTRO DTO a un ALOJAMIENTO.
     private Alojamiento mapearAlojamiento(CasaRegistroDTO dto) {
 
         Direccion direccion = new Direccion(
@@ -155,9 +149,9 @@ public class CasaService {
                 dto.getCantHabitaciones(),
                 dto.getCantCamas(),
                 dto.getCantBanios(),
-                true,                   // activo por defecto al crear
+                true,
                 TipoInmueble.CASA,
-                anfitrionService.obtenerPorId(dto.getIdAnfitrion()),
+                usuarioService.obtenerAnfitrionPorId(dto.getIdAnfitrion()),
                 direccion,
                 servicio
         );

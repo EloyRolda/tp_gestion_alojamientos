@@ -48,5 +48,13 @@ public class Usuario {
     @Column(name = "tipo", nullable = false)
     private TipoUsuario tipoUsuario;
 
+    //Extras
+    @Column(name = "metodoPago", nullable = true)
+    private String metodo_pago;
+
+    @Column(name = "matricula", nullable = true)
+    private String matricula;
+
+
 }
 

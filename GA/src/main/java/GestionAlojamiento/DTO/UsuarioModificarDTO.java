@@ -1,30 +1,26 @@
 package GestionAlojamiento.DTO;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+public class UsuarioModificarDTO {
 
-public class AdministradorModificarDTO {
-
-    @NotNull(message = "Campo Obligatorio")
     private Long id;
+    private String nombre;
+    private String telefono;
 
-    private String matricula;
-
-    //[Usuario]
     @Email(message = "El formato de correo es invalido")
     private String email;
 
     private String password;
-    private String nombre;
+    private Boolean activo;
 
-    private String telefono;
-
-    private Boolean activo; //Se inicia activo
+    // Campos opcionales  rol
+    private String metodoPago;  // CLIENTE
+    private String matricula;   // ADMINISTRADOR
 }

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Reserva</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap');
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { --bg: #0a0f1e; --surface: #111827; --border: #1e2d45; --accent: #3b82f6; --accent-glow: rgba(59,130,246,0.2); --text: #e2e8f0; --muted: #64748b; --error: #f87171; --success: #4ade80; }
+        body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+        body::before { content: ''; position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%); top: -150px; right: -150px; pointer-events: none; }
+        .container { width: 100%; max-width: 480px; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 14px; margin-bottom: 28px; transition: color 0.2s; }
+        .back-link:hover { color: var(--text); }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 36px 32px; animation: fadeUp 0.4s ease both; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+        .logo { text-align: center; margin-bottom: 28px; }
+        .logo-icon { width: 48px; height: 48px; background: linear-gradient(135deg, #6366f1, var(--accent)); border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 14px; }
+        h1 { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 4px; }
+        .subtitle { color: var(--muted); font-size: 14px; }
+        .field { margin-bottom: 18px; }
+        label { display: block; font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.6px; }
+        input[type="date"], input[type="number"], select { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; appearance: none; }
+        input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.5; }
+        select option { background: var(--surface); }
+        .msg { border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 18px; display: none; }
+        .msg.error { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: var(--error); }
+        .msg.success { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); color: var(--success); }
+        .btn { width: 100%; background: linear-gradient(135deg, #6366f1, var(--accent)); border: none; border-radius: 10px; padding: 14px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.1s; margin-top: 4px; }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .hint { font-size: 11px; color: var(--muted); margin-top: 5px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="/home.html" class="back-link">← Volver al panel</a>
+    <div class="card">
+        <div class="logo">
+            <div class="logo-icon">📅</div>
+            <h1>Crear Reserva</h1>
+            <p class="subtitle">Completá los datos para reservar un alojamiento</p>
+        </div>
+
+        <div class="msg" id="msg"></div>
+
+        <div class="field">
+            <label for="idAlojamiento">ID del Alojamiento</label>
+            <input type="number" id="idAlojamiento" placeholder="Ej: 5" min="1">
+            <p class="hint">El ID lo encontrás al listar los alojamientos disponibles</p>
+        </div>
+
+        <div class="field">
+            <label for="fechaInicio">Fecha de inicio</label>
+            <input type="date" id="fechaInicio">
+        </div>
+
+        <div class="field">
+            <label for="fechaFin">Fecha de fin</label>
+            <input type="date" id="fechaFin">
+        </div>
+
+        <div class="field">
+            <label for="tipoEstado">Estado</label>
+            <select id="tipoEstado">
+                <option value="PENDIENTE" selected>Pendiente</option>
+                <option value="CONFIRMADA">Confirmada</option>
+                <option value="CANCELADA">Cancelada</option>
+            </select>
+        </div>
+
+        <button class="btn" id="submitBtn" onclick="enviar()">Confirmar reserva</button>
+    </div>
+</div>
+
+<script>
+    let idCliente = null;
+    fetch('/Usuario/me', { credentials: 'include' }).then(r => r.json()).then(u => { idCliente = u.id; }).catch(() => {});
+
+    async function enviar() {
+        const btn = document.getElementById('submitBtn');
+        const msg = document.getElementById('msg');
+        msg.style.display = 'none';
+
+        const datos = {
+            idCliente,
+            idAlojamiento: parseInt(document.getElementById('idAlojamiento').value),
+            fechaInicio:   document.getElementById('fechaInicio').value,
+            fechaFin:      document.getElementById('fechaFin').value,
+            tipoEstado:    document.getElementById('tipoEstado').value,
+        };
+
+        btn.disabled = true; btn.textContent = 'Reservando...';
+        try {
+            const resp = await fetch('/Reserva/registrar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos) });
+            const texto = await resp.text();
+            msg.className = resp.ok ? 'msg success' : 'msg error';
+            msg.textContent = resp.ok ? '¡Reserva creada correctamente!' : 'Error: ' + texto;
+        } catch {
+            msg.className = 'msg error'; msg.textContent = 'No se pudo conectar con el servidor.';
+        }
+        msg.style.display = 'block'; btn.disabled = false; btn.textContent = 'Confirmar reserva';
+    }
+</script>
+</body>
+</html>

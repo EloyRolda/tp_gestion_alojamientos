@@ -5,8 +5,8 @@ import GestionAlojamiento.DTO.ReviewRegistroDTO;
 import GestionAlojamiento.Exception.IdNoEncontradoException;
 import GestionAlojamiento.Exception.ParametroInvalidoException;
 import GestionAlojamiento.Model.Alojamiento;
-import GestionAlojamiento.Model.Cliente;
 import GestionAlojamiento.Model.Review;
+import GestionAlojamiento.Model.Usuario;
 import GestionAlojamiento.Repository.ReviewRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import java.util.List;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
-    private final ClienteService clienteService;
+    private final UsuarioService usuarioService;
     private final ReservaService reservaService;
     private final AlojamientoService alojamientoService;
 
@@ -38,7 +38,7 @@ public class ReviewService {
 
     public List<Review> listarPorCliente(Long idCliente) {
 
-        Cliente cliente = clienteService.obtenerPorId(idCliente);
+        Usuario cliente = usuarioService.obtenerClientePorId(idCliente);
 
         return reviewRepository.findByCliente(cliente);
     }
@@ -52,7 +52,7 @@ public class ReviewService {
     @Transactional
     public Review crear(ReviewRegistroDTO dto) {
 
-        Cliente cliente = clienteService.obtenerPorId(dto.getIdCliente());
+        Usuario cliente = usuarioService.obtenerClientePorId(dto.getIdCliente());
         Alojamiento alojamiento = alojamientoService.obtenerPorId(dto.getIdAlojamiento());
 
         if (!reservaService.tuvisteReservaConfirmada(cliente.getId(), alojamiento.getId())) {
@@ -93,11 +93,8 @@ public class ReviewService {
 
         Review review = obtenerPorId(dto.getId());
 
-
         // [REVIEW]
-
         if (dto.getPuntuacion() != null) {
-
             validarPuntuacion(dto.getPuntuacion());
             review.setPuntuacion(dto.getPuntuacion());
         }
@@ -106,26 +103,17 @@ public class ReviewService {
             review.setComentario(dto.getComentario());
         }
 
-
         // [CLIENTE]
-
         if (dto.getIdCliente() != null) {
-
-            Cliente cliente = clienteService.obtenerPorId(dto.getIdCliente());
-
+            Usuario cliente = usuarioService.obtenerClientePorId(dto.getIdCliente());
             review.setCliente(cliente);
         }
 
-
         // [ALOJAMIENTO]
-
         if (dto.getIdAlojamiento() != null) {
-
             Alojamiento alojamiento = alojamientoService.obtenerPorId(dto.getIdAlojamiento());
-
             review.setAlojamiento(alojamiento);
         }
-
 
         return reviewRepository.save(review);
     }

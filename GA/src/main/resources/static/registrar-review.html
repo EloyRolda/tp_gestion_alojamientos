@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dejar Review</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap');
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { --bg: #0a0f1e; --surface: #111827; --border: #1e2d45; --accent: #3b82f6; --accent-glow: rgba(59,130,246,0.2); --text: #e2e8f0; --muted: #64748b; --error: #f87171; --success: #4ade80; --star: #fbbf24; }
+        body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+        body::before { content: ''; position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, rgba(251,191,36,0.05) 0%, transparent 70%); top: -150px; left: -150px; pointer-events: none; }
+        .container { width: 100%; max-width: 480px; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 14px; margin-bottom: 28px; transition: color 0.2s; }
+        .back-link:hover { color: var(--text); }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 36px 32px; animation: fadeUp 0.4s ease both; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+        .logo { text-align: center; margin-bottom: 28px; }
+        .logo-icon { width: 48px; height: 48px; background: linear-gradient(135deg, #d97706, #f59e0b); border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 14px; }
+        h1 { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 4px; }
+        .subtitle { color: var(--muted); font-size: 14px; }
+        .field { margin-bottom: 20px; }
+        label { display: block; font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.6px; }
+        input[type="number"], textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+        input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+        input::placeholder, textarea::placeholder { color: var(--muted); }
+        textarea { resize: vertical; min-height: 110px; }
+        /* Estrellas interactivas */
+        .stars-row { display: flex; gap: 8px; }
+        .star-opt input[type="radio"] { display: none; }
+        .star-opt label {
+            font-size: 28px; cursor: pointer; color: var(--border);
+            transition: color 0.15s, transform 0.1s;
+            display: block; line-height: 1;
+            text-transform: none; letter-spacing: 0;
+        }
+        .star-opt input[type="radio"]:checked ~ .star-opt label,
+        .star-opt label:hover { color: var(--star); }
+        /* CSS-only star fill trick */
+        .stars-row:has(.star-opt:nth-child(1) input:checked) .star-opt:nth-child(1) label { color: var(--star); }
+        .stars-row:has(.star-opt:nth-child(2) input:checked) .star-opt:nth-child(1) label,
+        .stars-row:has(.star-opt:nth-child(2) input:checked) .star-opt:nth-child(2) label { color: var(--star); }
+        .stars-row:has(.star-opt:nth-child(3) input:checked) .star-opt:nth-child(1) label,
+        .stars-row:has(.star-opt:nth-child(3) input:checked) .star-opt:nth-child(2) label,
+        .stars-row:has(.star-opt:nth-child(3) input:checked) .star-opt:nth-child(3) label { color: var(--star); }
+        .stars-row:has(.star-opt:nth-child(4) input:checked) .star-opt:nth-child(1) label,
+        .stars-row:has(.star-opt:nth-child(4) input:checked) .star-opt:nth-child(2) label,
+        .stars-row:has(.star-opt:nth-child(4) input:checked) .star-opt:nth-child(3) label,
+        .stars-row:has(.star-opt:nth-child(4) input:checked) .star-opt:nth-child(4) label { color: var(--star); }
+        .stars-row:has(.star-opt:nth-child(5) input:checked) .star-opt label { color: var(--star); }
+        .stars-row:has(.star-opt:nth-child(6) input:checked) .star-opt label { color: var(--star); }
+        .star-opt label:hover { transform: scale(1.2); }
+        .hint { font-size: 11px; color: var(--muted); margin-top: 5px; }
+        .msg { border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 18px; display: none; }
+        .msg.error { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: var(--error); }
+        .msg.success { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); color: var(--success); }
+        .btn { width: 100%; background: linear-gradient(135deg, #d97706, #f59e0b); border: none; border-radius: 10px; padding: 14px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.1s; margin-top: 4px; }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="/home.html" class="back-link">← Volver al panel</a>
+    <div class="card">
+        <div class="logo">
+            <div class="logo-icon">⭐</div>
+            <h1>Dejar una Review</h1>
+            <p class="subtitle">Contá tu experiencia en el alojamiento</p>
+        </div>
+
+        <div class="msg" id="msg"></div>
+
+        <div class="field">
+            <label for="idAlojamiento">ID del Alojamiento</label>
+            <input type="number" id="idAlojamiento" placeholder="Ej: 3" min="1">
+            <p class="hint">El ID lo encontrás al listar los alojamientos</p>
+        </div>
+
+        <div class="field">
+            <label>Puntuación</label>
+            <div class="stars-row" id="starsRow">
+                <div class="star-opt"><input type="radio" name="puntuacion" id="p1" value="1"><label for="p1">★</label></div>
+                <div class="star-opt"><input type="radio" name="puntuacion" id="p2" value="2"><label for="p2">★</label></div>
+                <div class="star-opt"><input type="radio" name="puntuacion" id="p3" value="3"><label for="p3">★</label></div>
+                <div class="star-opt"><input type="radio" name="puntuacion" id="p4" value="4"><label for="p4">★</label></div>
+                <div class="star-opt"><input type="radio" name="puntuacion" id="p5" value="5"><label for="p5">★</label></div>
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="comentario">Comentario</label>
+            <textarea id="comentario" placeholder="Contá tu experiencia..."></textarea>
+        </div>
+
+        <button class="btn" id="submitBtn" onclick="enviar()">Publicar review</button>
+    </div>
+</div>
+
+<script>
+    let idCliente = null;
+    fetch('/Usuario/me', { credentials: 'include' }).then(r => r.json()).then(u => { idCliente = u.id; }).catch(() => {});
+
+    async function enviar() {
+        const btn = document.getElementById('submitBtn');
+        const msg = document.getElementById('msg');
+        msg.style.display = 'none';
+
+        const puntuacionEl = document.querySelector('input[name="puntuacion"]:checked');
+        if (!puntuacionEl) {
+            msg.className = 'msg error'; msg.textContent = 'Por favor seleccioná una puntuación.';
+            msg.style.display = 'block'; return;
+        }
+
+        const datos = {
+            idCliente,
+            idAlojamiento: parseInt(document.getElementById('idAlojamiento').value),
+            puntuacion:    parseInt(puntuacionEl.value),
+            comentario:    document.getElementById('comentario').value,
+        };
+
+        btn.disabled = true; btn.textContent = 'Publicando...';
+        try {
+            const resp = await fetch('/Review/registrar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos) });
+            const texto = await resp.text();
+            msg.className = resp.ok ? 'msg success' : 'msg error';
+            msg.textContent = resp.ok ? '¡Review publicada correctamente!' : 'Error: ' + texto;
+        } catch {
+            msg.className = 'msg error'; msg.textContent = 'No se pudo conectar con el servidor.';
+        }
+        msg.style.display = 'block'; btn.disabled = false; btn.textContent = 'Publicar review';
+    }
+</script>
+</body>
+</html>
