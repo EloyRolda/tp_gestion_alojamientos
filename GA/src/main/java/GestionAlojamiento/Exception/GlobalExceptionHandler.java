@@ -18,9 +18,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ParametroInvalidoException.class)
     public ResponseEntity<?> manejarParametroInvalido(ParametroInvalidoException e) {
-        return ResponseEntity.status(401).body(e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
+    @ExceptionHandler(RecursoDuplicadoException.class)
+    public ResponseEntity<?> manejarDuplicado(RecursoDuplicadoException ex) {
 
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ex.getMessage());
+    }
 
 }

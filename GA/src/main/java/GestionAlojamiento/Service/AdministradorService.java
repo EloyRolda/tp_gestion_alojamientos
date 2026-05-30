@@ -3,6 +3,9 @@ package GestionAlojamiento.Service;
 
 import GestionAlojamiento.DTO.AdministradorModificarDTO;
 import GestionAlojamiento.DTO.AdministradorRegistroDTO;
+import GestionAlojamiento.DTO.ClienteModificarDTO;
+import GestionAlojamiento.DTO.ClienteRegistroDTO;
+import GestionAlojamiento.Exception.IdNoEncontradoException;
 import GestionAlojamiento.Model.Administrador;
 import GestionAlojamiento.Model.Enums.TipoUsuario;
 import GestionAlojamiento.Model.Usuario;
@@ -29,35 +32,30 @@ public class AdministradorService {
         return administradorRepository.findAll(Sort.by(Sort.Direction.ASC, "usuario.nombre"));
     }
 
-    public Administrador obtenerPorId(Long id){
-        return administradorRepository.findById(id).orElseThrow(()->new RuntimeException("Error, id no se encuentra en la base de datos"));
+    public Administrador obtenerPorId(Long id) {
+        return administradorRepository.findById(id).orElseThrow(() -> new IdNoEncontradoException("Error, id no se encuentra en la base de datos"));
     }
 
-    public List<Administrador> listarPorMatricula() {
-        return administradorRepository.findAll(Sort.by(Sort.Direction.ASC, "matricula"));
-    }
 
-    //------------------------ CREAR/BORRAR ------------------------
+    //---------------------------------------- CREAR ----------------------------------------
     @Transactional
     public Administrador crear(AdministradorRegistroDTO administradorRegistroDTO) {
 
         if (administradorRepository.existsByMatricula(administradorRegistroDTO.getMatricula())) {
             throw new RuntimeException("La matrícula ya existe.");
         }
-        Usuario  usuario = new Usuario();
-        usuario.setActivo(true);//valor por defecto
-        usuario.setEmail(administradorRegistroDTO.getEmail());
-        usuario.setNombre(administradorRegistroDTO.getNombre());
-        usuario.setPassword(administradorRegistroDTO.getPassword());
-        usuario.setTelefono(administradorRegistroDTO.getTelefono());
-        usuario.setTipoUsuario(TipoUsuario.ADMINISTRADOR);
-        usuario.setFechaRegistro(LocalDateTime.now());
+        Usuario usuario = mapearUsuario(administradorRegistroDTO);
+
+        usuarioService.crear(usuario);
+
         Administrador administrador = new Administrador();
         administrador.setUsuario(usuario);
         administrador.setMatricula(administradorRegistroDTO.getMatricula());
+
         return administradorRepository.save(administrador);
     }
 
+    //---------------------------------------- BORRAR ----------------------------------------
     @Transactional
     public void borrarPorId(Long idAdmin) {
         if (!administradorRepository.existsById(idAdmin)) {
@@ -66,18 +64,14 @@ public class AdministradorService {
         administradorRepository.deleteById(idAdmin);
     }
 
-    //------------------------  Actualizar  ------------------------
+    //---------------------------------------- MODIFICAR ----------------------------------------
     @Transactional
     public Administrador actualizar(AdministradorModificarDTO dto) {
 
-        Administrador admin = administradorRepository.findById(dto.getId())
-                .orElseThrow(() -> new RuntimeException("ID inválido"));
-
-        Usuario usuario = usuarioService.obtenerPorId(dto.getId());
+        Administrador admin = administradorRepository.findById(dto.getId()).orElseThrow(() -> new RuntimeException("ID inválido"));
 
         if (dto.getMatricula() != null) {
-            boolean existe = administradorRepository
-                    .existsByMatriculaAndIdNot(dto.getMatricula(), dto.getId());
+            boolean existe = administradorRepository.existsByMatriculaAndIdNot(dto.getMatricula(), dto.getId());
 
             if (existe) {
                 throw new RuntimeException("La matrícula pertenece a otro administrador.");
@@ -86,19 +80,39 @@ public class AdministradorService {
             admin.setMatricula(dto.getMatricula());
         }
 
-        if (dto.getEmail() != null) {
-            usuario.setEmail(dto.getEmail());
-        }
-
-        if (dto.getTelefono() != null) {
-            usuario.setTelefono(dto.getTelefono());
-        }
-        if (dto.getPassword() != null) {
-            usuario.setPassword(dto.getPassword());
-        }
-        usuario.setActivo(dto.isActivo());
+        admin.setUsuario(usuarioService.modificarObjeto(admin.getUsuario(), mapearUsuario(dto)));
 
         return administradorRepository.save(admin);
     }
+//---------------------------------------- MAPEOS DTO [PRIVADOS] ----------------------------------------
 
+    /// Mapea el DTO de MODIFICAR a un USUARIO y lo RETORNA
+    private Usuario mapearUsuario(AdministradorRegistroDTO administradorRegistroDTO) {
+        Usuario usuario = new Usuario(
+                null,
+                administradorRegistroDTO.getNombre(),
+                administradorRegistroDTO.getEmail(),
+                administradorRegistroDTO.getPassword(),
+                administradorRegistroDTO.getTelefono(),
+                LocalDateTime.now(),
+                true,
+                TipoUsuario.ADMINISTRADOR
+        );
+        return usuario;
+    }
+
+    /// Mapea el DTO de MODIFICAR a un USUARIO y lo RETORNA
+    private Usuario mapearUsuario(AdministradorModificarDTO administradorModificarDTO) {
+        Usuario usuario = new Usuario(
+                administradorModificarDTO.getId(),
+                administradorModificarDTO.getNombre(),
+                administradorModificarDTO.getEmail(),
+                administradorModificarDTO.getPassword(),
+                administradorModificarDTO.getTelefono(),
+                null,   //Fecha registro
+                administradorModificarDTO.getActivo(),
+                TipoUsuario.ADMINISTRADOR
+        );
+        return usuario;
+    }
 }

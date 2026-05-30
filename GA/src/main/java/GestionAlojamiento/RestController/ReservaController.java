@@ -24,7 +24,7 @@ public class ReservaController {
 
     @GetMapping("/mostrar/{id}")
     public Reserva mostrarPorId(@PathVariable Long id) {
-        return reservaService.mostarPorId(id);
+        return reservaService.mostrarPorId(id);
     }
 
     @PostMapping("/registrar")

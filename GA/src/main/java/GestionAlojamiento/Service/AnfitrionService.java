@@ -2,18 +2,12 @@ package GestionAlojamiento.Service;
 
 import GestionAlojamiento.DTO.AnfitrionModificarDTO;
 import GestionAlojamiento.DTO.AnfitrionRegistroDTO;
-import GestionAlojamiento.DTO.ClienteRegistroDTO;
 import GestionAlojamiento.Exception.IdNoEncontradoException;
-import GestionAlojamiento.Model.Administrador;
 import GestionAlojamiento.Model.Anfitrion;
-import GestionAlojamiento.Model.Cliente;
-import GestionAlojamiento.Model.Enums.TipoEstado;
 import GestionAlojamiento.Model.Enums.TipoUsuario;
 import GestionAlojamiento.Model.Usuario;
 import GestionAlojamiento.Repository.AnfitrionRepository;
-import GestionAlojamiento.Repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -70,7 +64,7 @@ public class AnfitrionService {
     public Anfitrion actualizar(AnfitrionModificarDTO anfitrionModificarDTO) {
 
         Anfitrion anfitrion = obtenerPorId(anfitrionModificarDTO.getId());
-        Usuario usuario = usuarioService.obtenerPorId(anfitrionModificarDTO.getId());
+        Usuario usuario = anfitrion.getUsuario();
 
         usuario = usuarioService.modificarObjeto(usuario, mapearUsuario(anfitrionModificarDTO));
         anfitrion.setUsuario(usuario);
@@ -81,7 +75,7 @@ public class AnfitrionService {
     //---------------------------------------- MAPEOS DTO [PRIVADOS] ----------------------------------------
 
     /// Mapea el DTO de MODIFICAR a un USUARIO y lo RETORNA
-    public Usuario mapearUsuario(AnfitrionRegistroDTO anfitrionRegistroDTO) {
+    private Usuario mapearUsuario(AnfitrionRegistroDTO anfitrionRegistroDTO) {
         Usuario usuario = new Usuario(
                 null,
                 anfitrionRegistroDTO.getNombre(),
@@ -96,7 +90,7 @@ public class AnfitrionService {
     }
 
     /// Mapea el DTO de MODIFICAR a un USUARIO y lo RETORNA
-    public Usuario mapearUsuario(AnfitrionModificarDTO anfitrionModificarDTO) {
+    private Usuario mapearUsuario(AnfitrionModificarDTO anfitrionModificarDTO) {
         Usuario usuario = new Usuario(
                 anfitrionModificarDTO.getId(),
                 anfitrionModificarDTO.getNombre(),

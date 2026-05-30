@@ -22,8 +22,9 @@ public class AdministradorModificarDTO {
     private String email;
 
     private String password;
+    private String nombre;
 
     private String telefono;
 
-    private boolean activo; //Se inicia activo
+    private Boolean activo; //Se inicia activo
 }

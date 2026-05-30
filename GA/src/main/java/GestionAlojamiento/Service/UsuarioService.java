@@ -2,6 +2,7 @@ package GestionAlojamiento.Service;
 
 
 import GestionAlojamiento.Exception.IdNoEncontradoException;
+import GestionAlojamiento.Exception.RecursoDuplicadoException;
 import GestionAlojamiento.Model.Cliente;
 import GestionAlojamiento.Model.Enums.TipoUsuario;
 import GestionAlojamiento.Model.Usuario;
@@ -22,8 +23,6 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
 
     //------------------------ LISTAR POR ------------------------
-
-
     public Usuario obtenerPorId(Long id) {
 
         return usuarioRepository.findById(id).orElseThrow(() -> new IdNoEncontradoException("Usuario no encontrado en la base de datos"));
@@ -74,7 +73,7 @@ public class UsuarioService {
                     .orElse(null);
 
             if (usuarioExistente != null && !usuarioExistente.getId().equals(original.getId())) {
-                throw new RuntimeException("Correo existente en la base de datos.");
+                throw new RecursoDuplicadoException("Correo existente en la base de datos.");
             }
 
             original.setEmail(cambios.getEmail());

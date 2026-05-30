@@ -2,11 +2,11 @@ package GestionAlojamiento.Service;
 
 import GestionAlojamiento.DTO.ReservaModificarDTO;
 import GestionAlojamiento.DTO.ReservaRegistroDTO;
+import GestionAlojamiento.Exception.IdNoEncontradoException;
+import GestionAlojamiento.Exception.ParametroInvalidoException;
 import GestionAlojamiento.Model.Alojamiento;
 import GestionAlojamiento.Model.Cliente;
-import GestionAlojamiento.Model.Enums.TipoEstado;
 import GestionAlojamiento.Model.Reserva;
-import GestionAlojamiento.Repository.ClienteRepository;
 import GestionAlojamiento.Repository.ReservaRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import java.util.List;
 public class ReservaService {
 
     private final ReservaRepository reservaRepository;
-    private final ClienteRepository clienteRepository;
+    private final ClienteService clienteService;
     private final AlojamientoService alojamientoService;
 
 
@@ -34,68 +34,77 @@ public class ReservaService {
         return reservaRepository.findAll();
     }
 
-    public Reserva mostarPorId(Long id) {
-        return reservaRepository.findById(id).orElseThrow(() -> new RuntimeException("Error, la reserva no se encuentra en la base de datos"));
+    public Reserva mostrarPorId(Long id) {
+        return reservaRepository.findById(id).orElseThrow(() -> new IdNoEncontradoException("Error, la reserva no se encuentra en la base de datos"));
     }
 
     //------------------------ CREAR/BORRAR ------------------------
     @Transactional
+    ///Crea una reserva en la base de datos con el DTO establecido, verifica que esten todos los integrantes pertinentes.
     public Reserva crear(ReservaRegistroDTO dto) {
 
         Alojamiento alojamiento = alojamientoService.obtenerPorId(dto.getIdAlojamiento());
 
-        Cliente cliente = clienteRepository.findById(dto.getIdCliente()).orElseThrow(() -> new RuntimeException("El cliente no se encuentra en la base de datos."));
-
-
-        // VALIDACIONES
-
-        if (dto.getFechaFin().isBefore(dto.getFechaInicio())) {
-            throw new RuntimeException("La fecha de fin no puede ser anterior a la fecha de inicio.");
+        if (!dto.getFechaFin().isAfter(dto.getFechaInicio())) {
+            throw new ParametroInvalidoException("La fecha de fin no puede ser anterior a la fecha de inicio.");
         }
 
         if (dto.getFechaInicio().isBefore(LocalDate.now())) {
-            throw new RuntimeException("La fecha de inicio no puede ser anterior al dia actual.");
+            throw new ParametroInvalidoException("La fecha de inicio no puede ser anterior al dia actual.");
         }
 
+        if (!alojamiento.getAnfitrion().getUsuario().getActivo()) {
+            throw new ParametroInvalidoException("El anfitrión está inactivo");
+        }
 
+        if (!alojamiento.getActivo()) {
+            throw new ParametroInvalidoException("El alojamiento está inactivo");
+        }
+
+        Cliente cliente = clienteService.obtenerPorId(dto.getIdCliente());
+
+        if (!cliente.getUsuario().getActivo()) {
+            throw new ParametroInvalidoException("El cliente está inactivo");
+        }
 
 
         // RESERVA
 
         Reserva reserva = new Reserva();
-
         reserva.setFechaInicio(dto.getFechaInicio());
         reserva.setFechaFin(dto.getFechaFin());
-
         reserva.setTipoEstado(dto.getTipoEstado());
-
         reserva.setCliente(cliente);
         reserva.setAlojamiento(alojamiento);
-
         reserva.setPrecioTotal(calcularPrecio(alojamiento, dto.getFechaInicio(), dto.getFechaFin()));
 
+        boolean solapada = reservaRepository.existsByAlojamientoIdAndFechaInicioLessThanAndFechaFinGreaterThan(alojamiento.getId(), dto.getFechaFin(), dto.getFechaInicio());
+
+        if (solapada) {
+            throw new ParametroInvalidoException("Ya existe una reserva en esas fechas");
+        }
         return reservaRepository.save(reserva);
     }
 
     @Transactional
+    ///Borra de la base de datos la reserva
     public void borrarPorId(Long id) {
         if (!reservaRepository.existsById(id)) {
-            throw new RuntimeException("Error, la reserva no existe");
+            throw new IdNoEncontradoException("Error, la reserva no existe");
         }
         //Liberamos las fechas
-        Reserva reserva = reservaRepository.findById(id).orElseThrow(() -> new RuntimeException("Error, la reserva no existe"));
         reservaRepository.deleteById(id);
     }
 
     //------------------------ MODIFICAR ------------------------
 
+    /// Valida el dto recibido y llena los campos pertinentes
     @Transactional
     public Reserva actualizar(ReservaModificarDTO dto) {
 
-        Reserva reserva = reservaRepository.findById(dto.getId()).orElseThrow(() -> new RuntimeException("Reserva inexistente"));
+        Reserva reserva = reservaRepository.findById(dto.getId()).orElseThrow(() -> new IdNoEncontradoException("Reserva inexistente"));
 
         // FECHAS NUEVAS
-
         LocalDate fechaInicio = reserva.getFechaInicio();
         LocalDate fechaFin = reserva.getFechaFin();
 
@@ -107,51 +116,68 @@ public class ReservaService {
             fechaFin = dto.getFechaFin();
         }
 
-        // VALIDACIONES
-
-        if (fechaFin.isBefore(fechaInicio)) {
-            throw new RuntimeException("La fecha fin no puede ser anterior a la fecha inicio");
+        // VALIDACIONES FECHAS
+        if (!fechaFin.isAfter(fechaInicio)) {
+            throw new ParametroInvalidoException("La fecha fin no puede ser anterior a la fecha inicio");
         }
 
         if (fechaInicio.isBefore(LocalDate.now())) {
-            throw new RuntimeException("La fecha inicio no puede ser anterior al dia actual");
+            throw new ParametroInvalidoException("La fecha inicio no puede ser anterior al dia actual");
         }
 
-
-
         // SETEAR FECHAS
-
         reserva.setFechaInicio(fechaInicio);
         reserva.setFechaFin(fechaFin);
 
-        // ESTADO
+        // CLIENTE
+        if (dto.getIdCliente() != null) {
+            Cliente cliente = clienteService.obtenerPorId(dto.getIdCliente());
 
+            if (!cliente.getUsuario().getActivo()) {
+                throw new ParametroInvalidoException("El cliente está inactivo");
+            }
+
+            reserva.setCliente(cliente);
+        }
         if (dto.getTipoEstado() != null) {
             reserva.setTipoEstado(dto.getTipoEstado());
         }
-
-        // CLIENTE
-
-        if (dto.getIdCliente() != null) {
-            Cliente cliente = clienteRepository.findById(dto.getIdCliente()).orElseThrow(() -> new RuntimeException("Cliente inexistente"));
-            reserva.setCliente(cliente);
-        }
-
         // ALOJAMIENTO
-
         if (dto.getIdAlojamiento() != null) {
             Alojamiento alojamiento = alojamientoService.obtenerPorId(dto.getIdAlojamiento());
+
+            if (!alojamiento.getActivo()) {
+                throw new ParametroInvalidoException("El alojamiento está inactivo");
+            }
+            if (!alojamiento.getAnfitrion().getUsuario().getActivo()) {
+                throw new ParametroInvalidoException("El anfitrión está inactivo");
+            }
             reserva.setAlojamiento(alojamiento);
         }
 
-        // PRECIO
+        // SOLAPAMIENTO
+        boolean solapada = reservaRepository
+                .existsByAlojamientoIdAndIdNotAndFechaInicioLessThanAndFechaFinGreaterThan(
+                        reserva.getAlojamiento().getId(),
+                        reserva.getId(),
+                        fechaFin,
+                        fechaInicio
+                );
 
-        reserva.setPrecioTotal(calcularPrecio(reserva.getAlojamiento(), fechaInicio, fechaFin));
+        if (solapada) {
+            throw new ParametroInvalidoException("Ya existe una reserva en esas fechas");
+        }
+
+        //precio
+        reserva.setPrecioTotal(
+                calcularPrecio(reserva.getAlojamiento(), fechaInicio, fechaFin)
+        );
 
         return reservaRepository.save(reserva);
     }
 
-    public BigDecimal calcularPrecio(Alojamiento alojamiento, LocalDate inicio, LocalDate fin) {
+    /// Toma el precio de un alojamiento por dia, y devuelve el precio final basado en la fecha de inicio y la fecha fin
+    private BigDecimal calcularPrecio(Alojamiento alojamiento, LocalDate inicio, LocalDate fin) {
 
         long totalDiasReserva = ChronoUnit.DAYS.between(inicio, fin);//ChronoUnit es para calcular tiempo entre fechas
 
