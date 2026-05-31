@@ -3,6 +3,7 @@ package GestionAlojamiento.RestController;
 import GestionAlojamiento.DTO.CasaModificarDTO;
 import GestionAlojamiento.DTO.CasaRegistroDTO;
 import GestionAlojamiento.Model.Casa;
+import GestionAlojamiento.Model.Hotel;
 import GestionAlojamiento.Service.CasaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -25,6 +26,13 @@ public class CasaController {
     @GetMapping("/mostrar/{id}")
     public Casa mostrarPorId(@PathVariable Long id) {
         return casaService.obtenerPorId(id);
+    }
+
+    /// Permite ver todos los hoteles registrados
+    @GetMapping("/listar/propios")
+    public List<Casa> listarPropios() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return casaService.listarPorAnfitrion(auth.getName());
     }
 
     @PostMapping("/registrar")

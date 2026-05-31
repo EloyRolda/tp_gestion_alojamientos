@@ -7,27 +7,31 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap');
 
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         :root {
-            --bg:           #0a0f1e;
-            --surface:      #111827;
-            --surface2:     #1a2435;
-            --border:       #1e2d45;
-            --accent:       #3b82f6;
-            --accent-glow:  rgba(59,130,246,0.15);
-            --text:         #e2e8f0;
-            --muted:        #64748b;
-            --get:          #166534;
-            --get-text:     #86efac;
-            --post:         #1e3a5f;
-            --post-text:    #93c5fd;
-            --put:          #713f12;
-            --put-text:     #fde68a;
-            --delete:       #7f1d1d;
-            --delete-text:  #fca5a5;
-            --locked:       #1e293b;
-            --locked-text:  #475569;
+            --bg: #0a0f1e;
+            --surface: #111827;
+            --surface2: #1a2435;
+            --border: #1e2d45;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+            --text: #e2e8f0;
+            --muted: #64748b;
+            --get: #166534;
+            --get-text: #86efac;
+            --post: #1e3a5f;
+            --post-text: #93c5fd;
+            --put: #713f12;
+            --put-text: #fde68a;
+            --delete: #7f1d1d;
+            --delete-text: #fca5a5;
+            --locked: #1e293b;
+            --locked-text: #475569;
         }
 
         body {
@@ -58,7 +62,8 @@
         }
 
         .logo-icon {
-            width: 38px; height: 38px;
+            width: 38px;
+            height: 38px;
             background: linear-gradient(135deg, var(--accent), #6366f1);
             border-radius: 10px;
             display: flex;
@@ -100,9 +105,23 @@
             margin-top: 3px;
         }
 
-        .role-ADMIN      { background: rgba(99,102,241,0.2); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.3); }
-        .role-ANFITRION  { background: rgba(251,191,36,0.15); color: #fde68a; border: 1px solid rgba(251,191,36,0.25); }
-        .role-CLIENTE    { background: rgba(52,211,153,0.15); color: #6ee7b7; border: 1px solid rgba(52,211,153,0.25); }
+        .role-ADMIN {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .role-ANFITRION {
+            background: rgba(251, 191, 36, 0.15);
+            color: #fde68a;
+            border: 1px solid rgba(251, 191, 36, 0.25);
+        }
+
+        .role-CLIENTE {
+            background: rgba(52, 211, 153, 0.15);
+            color: #6ee7b7;
+            border: 1px solid rgba(52, 211, 153, 0.25);
+        }
 
         .btn-logout {
             background: transparent;
@@ -159,7 +178,10 @@
             transition: background 0.2s;
         }
 
-        .swagger-btn:hover { background: var(--get); color: #fff; }
+        .swagger-btn:hover {
+            background: var(--get);
+            color: #fff;
+        }
 
         /* ── SECCIONES ── */
         .section-title {
@@ -188,7 +210,9 @@
             transition: border-color 0.2s;
         }
 
-        .card:hover { border-color: #2d3f5c; }
+        .card:hover {
+            border-color: #2d3f5c;
+        }
 
         .card-header {
             padding: 16px 20px;
@@ -198,19 +222,28 @@
             gap: 10px;
         }
 
-        .card-icon { font-size: 18px; }
+        .card-icon {
+            font-size: 18px;
+        }
 
         .card-title {
             font-size: 15px;
             font-weight: 600;
         }
 
-        .card-body { padding: 12px 20px 16px; }
+        .card-body {
+            padding: 12px 20px 16px;
+        }
 
         /* ── ENDPOINT ROW ── */
-        ul { list-style: none; padding: 0; }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
 
-        li { margin-bottom: 8px; }
+        li {
+            margin-bottom: 8px;
+        }
 
         .endpoint-row {
             display: flex;
@@ -230,10 +263,25 @@
             flex-shrink: 0;
         }
 
-        .get    { background: var(--get);    color: var(--get-text); }
-        .post   { background: var(--post);   color: var(--post-text); }
-        .put    { background: var(--put);    color: var(--put-text); }
-        .delete { background: var(--delete); color: var(--delete-text); }
+        .get {
+            background: var(--get);
+            color: var(--get-text);
+        }
+
+        .post {
+            background: var(--post);
+            color: var(--post-text);
+        }
+
+        .put {
+            background: var(--put);
+            color: var(--put-text);
+        }
+
+        .delete {
+            background: var(--delete);
+            color: var(--delete-text);
+        }
 
         .endpoint-link {
             font-size: 13px;
@@ -242,7 +290,9 @@
             transition: color 0.15s;
         }
 
-        .endpoint-link:hover { color: #60a5fa; }
+        .endpoint-link:hover {
+            color: #60a5fa;
+        }
 
         /* ── BLOQUEADO ── */
         .endpoint-row.locked .endpoint-link {
@@ -270,34 +320,59 @@
             font-weight: 600;
         }
 
-        .tag-admin    { background: rgba(99,102,241,0.15); color: #a5b4fc; }
-        .tag-anfitrion { background: rgba(251,191,36,0.1); color: #fde68a; }
-        .tag-cliente  { background: rgba(52,211,153,0.1); color: #6ee7b7; }
-        .tag-all      { background: rgba(100,116,139,0.15); color: #94a3b8; }
+        .tag-admin {
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+        }
+
+        .tag-anfitrion {
+            background: rgba(251, 191, 36, 0.1);
+            color: #fde68a;
+        }
+
+        .tag-cliente {
+            background: rgba(52, 211, 153, 0.1);
+            color: #6ee7b7;
+        }
+
+        .tag-all {
+            background: rgba(100, 116, 139, 0.15);
+            color: #94a3b8;
+        }
 
         /* ── LOADING ── */
         #loadingOverlay {
-            position: fixed; inset: 0;
+            position: fixed;
+            inset: 0;
             background: var(--bg);
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             z-index: 100;
             transition: opacity 0.3s;
         }
 
         .spinner {
-            width: 32px; height: 32px;
+            width: 32px;
+            height: 32px;
             border: 3px solid var(--border);
             border-top-color: var(--accent);
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 <body>
 
-<div id="loadingOverlay"><div class="spinner"></div></div>
+<div id="loadingOverlay">
+    <div class="spinner"></div>
+</div>
 
 <!-- HEADER -->
 <header>
@@ -361,8 +436,7 @@
                         </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN">
-                            <span class="badge post">POST</span>
+                        <div class="endpoint-row" data-roles="ADMIN"><span class="badge post">POST</span>
                             <a class="endpoint-link" href="/Usuario/registrar/administrador">Registrar admin</a>
                             <span class="access-tag tag-admin">ADMIN</span>
                         </div>
@@ -370,7 +444,7 @@
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN">
                             <span class="badge delete">DELETE</span>
-                            <a class="endpoint-link" href="/Usuario/eliminar/1">Eliminar usuario</a>
+                            <a class="endpoint-link" href="/eliminar-usuario.html">Eliminar usuario</a>
                             <span class="access-tag tag-admin">ADMIN</span>
                         </div>
                     </li>
@@ -409,39 +483,133 @@
 
         <div class="card">
             <div class="card-header"><span class="card-icon">🏠</span><span class="card-title">Casa</span></div>
-            <div class="card-body"><ul>
-                <li><div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span class="badge get">GET</span><a class="endpoint-link" href="/Casa/listar">Listar</a><span class="access-tag tag-all">TODOS</span></div></li>
-                <li><div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span class="badge get">GET</span><a class="endpoint-link" href="/Casa/mostrar/1">Mostrar por ID</a><span class="access-tag tag-all">TODOS</span></div></li>
-                <li><div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span class="badge post">POST</span><a class="endpoint-link" href="/registrar-casa.html">Registrar</a><span class="access-tag tag-anfitrion">ADMIN/ANF</span></div></li>
-                <li><div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span class="badge put">PUT</span><a class="endpoint-link" href="/Casa/actualizar">Actualizar</a><span class="access-tag tag-anfitrion">ADMIN/ANF</span></div></li>
-                <li><div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span class="badge delete">DELETE</span><a class="endpoint-link" href="/Casa/eliminar/1">Eliminar</a><span class="access-tag tag-anfitrion">ADMIN/ANF</span></div></li>
-            </ul></div>
+            <div class="card-body">
+                <ul>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION">
+                            <span class="badge get">GET</span>
+                            <a class="endpoint-link" href="/Casa/listar/propios">
+                                Listar mis casas
+                            </a>
+                            <span class="access-tag tag-anfitrion">PROPIOS</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span
+                                class="badge get">GET</span><a class="endpoint-link" href="/Casa/listar">Listar</a><span
+                                class="access-tag tag-all">TODOS</span></div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span
+                                class="badge get">GET</span><a class="endpoint-link" href="/Casa/mostrar/1">Mostrar por
+                            ID</a><span class="access-tag tag-all">TODOS</span></div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span class="badge post">POST</span><a
+                                class="endpoint-link" href="/registrar-casa.html">Registrar</a><span
+                                class="access-tag tag-anfitrion">ADMIN/ANF</span></div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span class="badge put">PUT</span><a
+                                class="endpoint-link" href="/actualizar-casa.html">Actualizar</a><span
+                                class="access-tag tag-anfitrion">ADMIN/ANF</span></div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span
+                                class="badge delete">DELETE</span><a class="endpoint-link"
+                                                                     href="/eliminar-alojamiento.html">Eliminar</a><span
+                                class="access-tag tag-anfitrion">ADMIN/ANF</span></div>
+                    </li>
+                </ul>
+            </div>
         </div>
 
         <div class="card">
             <div class="card-header"><span class="card-icon">🏨</span><span class="card-title">Hotel</span></div>
-            <div class="card-body"><ul>
-                <li><div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span class="badge get">GET</span><a class="endpoint-link" href="/Hotel/listar">Listar</a><span class="access-tag tag-all">TODOS</span></div></li>
-                <li><div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span class="badge get">GET</span><a class="endpoint-link" href="/Hotel/mostrar/1">Mostrar por ID</a><span class="access-tag tag-all">TODOS</span></div></li>
-                <li><div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span class="badge post">POST</span>
-                    <a class="endpoint-link" href="/registrar-hotel.html">Registrar</a>
-                    <span class="access-tag tag-anfitrion">ADMIN/ANF</span></div></li>
-                <li><div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span class="badge put">PUT</span><a class="endpoint-link" href="/Hotel/actualizar">Actualizar</a><span class="access-tag tag-anfitrion">ADMIN/ANF</span></div></li>
-                <li><div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span class="badge delete">DELETE</span><a class="endpoint-link" href="/Hotel/eliminar/1">Eliminar</a><span class="access-tag tag-anfitrion">ADMIN/ANF</span></div></li>
-            </ul></div>
+            <div class="card-body">
+                <ul>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION">
+                            <span class="badge get">GET</span>
+                            <a class="endpoint-link" href="/Hotel/listar/propios">
+                                Listar mis hoteles
+                            </a>
+                            <span class="access-tag tag-anfitrion">PROPIOS</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span
+                                class="badge get">GET</span><a class="endpoint-link"
+                                                               href="/Hotel/listar">Listar</a><span
+                                class="access-tag tag-all">TODOS</span></div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span
+                                class="badge get">GET</span><a class="endpoint-link" href="/Hotel/mostrar/1">Mostrar por
+                            ID</a><span class="access-tag tag-all">TODOS</span></div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span class="badge post">POST</span>
+                            <a class="endpoint-link" href="/registrar-hotel.html">Registrar</a>
+                            <span class="access-tag tag-anfitrion">ADMIN/ANF</span></div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span class="badge put">PUT</span><a
+                                class="endpoint-link" href="/actualizar-hotel.html">Actualizar</a><span
+                                class="access-tag tag-anfitrion">ADMIN/ANF</span></div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span
+                                class="badge delete">DELETE</span><a class="endpoint-link"
+                                                                     href="/eliminar-alojamiento.html">Eliminar</a><span
+                                class="access-tag tag-anfitrion">ADMIN/ANF</span></div>
+                    </li>
+                </ul>
+            </div>
         </div>
 
         <div class="card">
             <div class="card-header"><span class="card-icon">🏢</span><span class="card-title">Departamento</span></div>
-            <div class="card-body"><ul>
-                <li><div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span class="badge get">GET</span><a class="endpoint-link" href="/Departamento/listar">Listar</a><span class="access-tag tag-all">TODOS</span></div></li>
-                <li><div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span class="badge get">GET</span><a class="endpoint-link" href="/Departamento/mostrar/1">Mostrar por ID</a><span class="access-tag tag-all">TODOS</span></div></li>
-                <li><div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span class="badge post">POST</span>
-                    <a class="endpoint-link" href="/registrar-departamento.html">Registrar</a>
-                    <span class="access-tag tag-anfitrion">ADMIN/ANF</span></div></li>
-                <li><div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span class="badge put">PUT</span><a class="endpoint-link" href="/Departamento/actualizar">Actualizar</a><span class="access-tag tag-anfitrion">ADMIN/ANF</span></div></li>
-                <li><div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span class="badge delete">DELETE</span><a class="endpoint-link" href="/Departamento/eliminar/1">Eliminar</a><span class="access-tag tag-anfitrion">ADMIN/ANF</span></div></li>
-            </ul></div>
+            <div class="card-body">
+                <ul>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION">
+                            <span class="badge get">GET</span>
+                            <a class="endpoint-link" href="/Departamento/listar/propios">
+                                Listar mis departamentos
+                            </a>
+                            <span class="access-tag tag-anfitrion">PROPIOS</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span
+                                class="badge get">GET</span><a class="endpoint-link"
+                                                               href="/Departamento/listar">Listar</a><span
+                                class="access-tag tag-all">TODOS</span></div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span
+                                class="badge get">GET</span><a class="endpoint-link" href="/Departamento/mostrar/1">Mostrar
+                            por ID</a><span class="access-tag tag-all">TODOS</span></div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span class="badge post">POST</span>
+                            <a class="endpoint-link" href="/registrar-departamento.html">Registrar</a>
+                            <span class="access-tag tag-anfitrion">ADMIN/ANF</span></div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span class="badge put">PUT</span><a
+                                class="endpoint-link" href="/actualizar-departamento.html">Actualizar</a><span
+                                class="access-tag tag-anfitrion">ADMIN/ANF</span></div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span
+                                class="badge delete">DELETE</span><a class="endpoint-link"
+                                                                     href="/eliminar-alojamiento.html">Eliminar</a><span
+                                class="access-tag tag-anfitrion">ADMIN/ANF</span></div>
+                    </li>
+                </ul>
+            </div>
         </div>
 
     </div>
@@ -452,33 +620,91 @@
 
         <div class="card">
             <div class="card-header"><span class="card-icon">🔑</span><span class="card-title">Mi cuenta</span></div>
-            <div class="card-body"><ul>
-                <li><div class="endpoint-row" data-roles="ADMIN,CLIENTE,ANFITRION"><span class="badge get">GET</span><a class="endpoint-link" href="/Usuario/mostrar/1">Ver mi perfil</a><span class="access-tag tag-all">TODOS</span></div></li>
-                <li><div class="endpoint-row" data-roles="ADMIN,CLIENTE,ANFITRION"><span class="badge put">PUT</span><a class="endpoint-link" href="/Usuario/actualizar">Actualizar perfil</a><span class="access-tag tag-all">TODOS</span></div></li>
-            </ul></div>
+            <div class="card-body">
+                <ul>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE,ANFITRION"><span
+                                class="badge get">GET</span><a class="endpoint-link" href="/mi-perfil.html">Ver mi
+                            perfil</a><span class="access-tag tag-all">TODOS</span></div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE,ANFITRION"><span
+                                class="badge put">PUT</span><a class="endpoint-link" href="/actualizar-perfil.html">Actualizar
+                            perfil</a><span class="access-tag tag-all">TODOS</span></div>
+                    </li>
+                </ul>
+            </div>
         </div>
 
         <div class="card">
             <div class="card-header"><span class="card-icon">📅</span><span class="card-title">Reservas</span></div>
-            <div class="card-body"><ul>
-                <li><div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span class="badge get">GET</span><a class="endpoint-link" href="/Reserva/mostrar/1">Ver reserva</a><span class="access-tag tag-all">TODOS</span></div></li>
-                <li><div class="endpoint-row" data-roles="ADMIN,CLIENTE"><span class="badge post">POST</span><a class="endpoint-link" href="/Reserva/registrar">Crear reserva</a><span class="access-tag tag-cliente">ADMIN/CLI</span></div></li>
-                <li><div class="endpoint-row" data-roles="ADMIN,CLIENTE"><span class="badge put">PUT</span><a class="endpoint-link" href="/Reserva/actualizar">Actualizar reserva</a><span class="access-tag tag-cliente">ADMIN/CLI</span></div></li>
-                <li><div class="endpoint-row" data-roles="ADMIN,CLIENTE"><span class="badge delete">DELETE</span><a class="endpoint-link" href="/Reserva/eliminar/1">Cancelar reserva</a><span class="access-tag tag-cliente">ADMIN/CLI</span></div></li>
-            </ul></div>
+            <div class="card-body">
+                <ul>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span
+                                class="badge get">GET</span><a class="endpoint-link" href="/Reserva/mostrar/1">Ver
+                            reserva</a><span class="access-tag tag-all">TODOS</span></div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE"><span class="badge post">POST</span><a
+                                class="endpoint-link" href="/registrar-reserva.html">Crear reserva</a><span
+                                class="access-tag tag-cliente">ADMIN/CLI</span></div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE"><span class="badge put">PUT</span><a
+                                class="endpoint-link" href="/actualizar-reserva.html">Actualizar reserva</a><span
+                                class="access-tag tag-cliente">ADMIN/CLI</span></div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE"><span class="badge delete">DELETE</span><a
+                                class="endpoint-link" href="/cancelar-reserva.html">Cancelar reserva</a><span
+                                class="access-tag tag-cliente">ADMIN/CLI</span></div>
+                    </li>
+                </ul>
+            </div>
         </div>
 
         <div class="card">
             <div class="card-header"><span class="card-icon">⭐</span><span class="card-title">Reviews</span></div>
-            <div class="card-body"><ul>
-                <li><div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span class="badge get">GET</span><a class="endpoint-link" href="/Review/listar">Listar todas</a><span class="access-tag tag-all">TODOS</span></div></li>
-                <li><div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span class="badge get">GET</span><a class="endpoint-link" href="/Review/mostrar/1">Ver review</a><span class="access-tag tag-all">TODOS</span></div></li>
-                <li><div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span class="badge get">GET</span><a class="endpoint-link" href="/Review/alojamiento/1">Reviews de alojamiento</a><span class="access-tag tag-all">TODOS</span></div></li>
-                <li><div class="endpoint-row" data-roles="ADMIN,CLIENTE"><span class="badge get">GET</span><a class="endpoint-link" href="/Review/cliente/1">Mis reviews</a><span class="access-tag tag-cliente">ADMIN/CLI</span></div></li>
-                <li><div class="endpoint-row" data-roles="ADMIN,CLIENTE"><span class="badge post">POST</span><a class="endpoint-link" href="/Review/registrar">Dejar review</a><span class="access-tag tag-cliente">ADMIN/CLI</span></div></li>
-                <li><div class="endpoint-row" data-roles="ADMIN,CLIENTE"><span class="badge put">PUT</span><a class="endpoint-link" href="/Review/actualizar">Editar review</a><span class="access-tag tag-cliente">ADMIN/CLI</span></div></li>
-                <li><div class="endpoint-row" data-roles="ADMIN,CLIENTE"><span class="badge delete">DELETE</span><a class="endpoint-link" href="/Review/eliminar/1">Eliminar review</a><span class="access-tag tag-cliente">ADMIN/CLI</span></div></li>
-            </ul></div>
+            <div class="card-body">
+                <ul>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span
+                                class="badge get">GET</span><a class="endpoint-link" href="/Review/listar">Listar
+                            todas</a><span class="access-tag tag-all">TODOS</span></div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span
+                                class="badge get">GET</span><a class="endpoint-link" href="/Review/mostrar/1">Ver
+                            review</a><span class="access-tag tag-all">TODOS</span></div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span
+                                class="badge get">GET</span><a class="endpoint-link" href="/Review/alojamiento/1">Reviews
+                            de alojamiento</a><span class="access-tag tag-all">TODOS</span></div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE"><span class="badge get">GET</span><a
+                                class="endpoint-link" href="/Review/cliente/1">Mis reviews</a><span
+                                class="access-tag tag-cliente">ADMIN/CLI</span></div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE"><span class="badge post">POST</span><a
+                                class="endpoint-link" href="/registrar-review.html">Dejar review</a><span
+                                class="access-tag tag-cliente">ADMIN/CLI</span></div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE"><span class="badge put">PUT</span><a
+                                class="endpoint-link" href="/editar-review.html">Editar review</a><span
+                                class="access-tag tag-cliente">ADMIN/CLI</span></div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE"><span class="badge delete">DELETE</span><a
+                                class="endpoint-link" href="/eliminar-review.html">Eliminar review</a><span
+                                class="access-tag tag-cliente">ADMIN/CLI</span></div>
+                    </li>
+                </ul>
+            </div>
         </div>
 
     </div>
@@ -493,7 +719,7 @@
 
     async function cargarUsuario() {
         try {
-            const resp = await fetch('/Usuario/me', { credentials: 'include' });
+            const resp = await fetch('/Usuario/me', {credentials: 'include'});
             if (resp.ok) {
                 const user = await resp.json();
                 mostrarUsuario(user.nombre, user.tipoUsuario, user.id);
@@ -516,8 +742,8 @@
     function mostrarUsuario(nombre, rol, id) {
         document.getElementById('userName').textContent = nombre;
         const badge = document.getElementById('userRoleBadge');
-        const labels = { ADMINISTRADOR: 'Admin', ANFITRION: 'Anfitrión', CLIENTE: 'Cliente' };
-        const clases = { ADMINISTRADOR: 'role-ADMIN', ANFITRION: 'role-ANFITRION', CLIENTE: 'role-CLIENTE' };
+        const labels = {ADMINISTRADOR: 'Admin', ANFITRION: 'Anfitrión', CLIENTE: 'Cliente'};
+        const clases = {ADMINISTRADOR: 'role-ADMIN', ANFITRION: 'role-ANFITRION', CLIENTE: 'role-CLIENTE'};
         if (rol) {
             badge.textContent = labels[rol] || rol;
             badge.className = 'user-role ' + (clases[rol] || '');
@@ -527,8 +753,8 @@
         window._userRol = rol;
 
         if (id) {
-            const perfilLink = document.querySelector('a.endpoint-link[href="/Usuario/mostrar/1"]');
-            if (perfilLink) perfilLink.href = '/Usuario/mostrar/' + id;
+            const perfilLink = document.querySelector('a.endpoint-link[href="/mi-perfil.html"]');
+            if (perfilLink) perfilLink.href = '/mi-perfil.html';
         }
     }
 

@@ -28,7 +28,10 @@ public class DepartamentoService {
     public Departamento obtenerPorId(Long id) {
         return departamentoRepository.findById(id).orElseThrow(() -> new IdNoEncontradoException("Error, id no encontrado en la base de datos."));
     }
-
+    /// Recibe un id de un anfitrion y devuelve una lista de los hoteles que posee.
+    public List<Departamento> listarPorAnfitrion(String correoAnfitrion) {
+        return departamentoRepository.findByAlojamientoAnfitrionEmail(correoAnfitrion);
+    }
     //---------------------------------------- CREAR ----------------------------------------
     @Transactional
     public Departamento crear(DepartamentoRegistroDTO dto) {

@@ -29,6 +29,11 @@ public class CasaService {
         return casaRepository.findById(id).orElseThrow(() -> new IdNoEncontradoException("Error, el id de la casa no se encuentra en la base de datos."));
     }
 
+    /// Recibe un id de un anfitrion y devuelve una lista de casas que posee.
+    public List<Casa> listarPorAnfitrion(String correoAnfitrion) {
+        return casaRepository.findByAlojamientoAnfitrionEmail(correoAnfitrion);
+    }
+
     //---------------------------------------- CREAR ----------------------------------------
     @Transactional
     public Casa crear(CasaRegistroDTO dto) {

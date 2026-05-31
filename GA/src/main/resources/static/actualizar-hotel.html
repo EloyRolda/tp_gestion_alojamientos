@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualizar Hotel</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap');
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { --bg: #0a0f1e; --surface: #111827; --border: #1e2d45; --accent: #3b82f6; --accent-glow: rgba(59,130,246,0.2); --text: #e2e8f0; --muted: #64748b; --error: #f87171; --success: #4ade80; }
+        body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); min-height: 100vh; padding: 40px 20px; }
+        body::before { content: ''; position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%); top: -150px; right: -150px; pointer-events: none; }
+        .container { max-width: 720px; margin: 0 auto; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 14px; margin-bottom: 28px; transition: color 0.2s; }
+        .back-link:hover { color: var(--text); }
+        .page-title { font-family: 'Playfair Display', serif; font-size: 28px; margin-bottom: 6px; }
+        .page-sub { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px 32px; margin-bottom: 16px; }
+        .section-title { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .field { margin-bottom: 4px; }
+        .field.full { grid-column: 1 / -1; }
+        label { display: block; font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.6px; }
+        input[type="text"], input[type="number"], textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 9px; padding: 11px 14px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+        input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+        input::placeholder, textarea::placeholder { color: var(--muted); }
+        textarea { resize: vertical; min-height: 100px; }
+        .checks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+        .check-item input[type="checkbox"] { display: none; }
+        .check-item label { display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--border); border-radius: 9px; padding: 10px 14px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--muted); text-transform: none; letter-spacing: 0; transition: border-color 0.2s, color 0.2s; }
+        .check-item input[type="checkbox"]:checked + label { border-color: var(--accent); color: var(--text); box-shadow: 0 0 0 3px var(--accent-glow); }
+        .check-item label:hover { border-color: #2d4f7a; color: var(--text); }
+        .check-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); transition: background 0.2s; flex-shrink: 0; }
+        .check-item input[type="checkbox"]:checked + label .check-dot { background: var(--accent); }
+        /* Stars rating */
+        .stars-row { display: flex; gap: 6px; }
+        .star-opt input[type="radio"] { display: none; }
+        .star-opt label { font-size: 26px; cursor: pointer; color: var(--border); transition: color 0.15s, transform 0.1s; display: block; line-height: 1; text-transform: none; letter-spacing: 0; }
+        .star-opt label:hover { transform: scale(1.15); }
+        .stars-row:has(.star-opt:nth-child(1) input:checked) .star-opt:nth-child(1) label { color: #fbbf24; }
+        .stars-row:has(.star-opt:nth-child(2) input:checked) .star-opt:nth-child(-n+2) label { color: #fbbf24; }
+        .stars-row:has(.star-opt:nth-child(3) input:checked) .star-opt:nth-child(-n+3) label { color: #fbbf24; }
+        .stars-row:has(.star-opt:nth-child(4) input:checked) .star-opt:nth-child(-n+4) label { color: #fbbf24; }
+        .stars-row:has(.star-opt:nth-child(5) input:checked) .star-opt label { color: #fbbf24; }
+        .hint { font-size: 11px; color: var(--muted); margin-top: 5px; }
+        .msg { border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 20px; display: none; }
+        .msg.error { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: var(--error); }
+        .msg.success { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); color: var(--success); }
+        .btn { width: 100%; background: linear-gradient(135deg, #6366f1, var(--accent)); border: none; border-radius: 10px; padding: 14px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.1s; margin-top: 8px; }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="/home.html" class="back-link">← Volver al panel</a>
+    <div class="page-title">🏨 Actualizar Hotel</div>
+    <p class="page-sub">Modificá solo los campos que querés cambiar</p>
+
+    <div class="msg" id="msg"></div>
+
+    <!-- ID -->
+    <div class="card">
+        <div class="section-title">Identificación</div>
+        <div class="field">
+            <label for="id">ID del Hotel *</label>
+            <input type="number" id="id" placeholder="Ej: 5" min="1" required>
+            <p class="hint">Campo obligatorio — el resto es opcional</p>
+        </div>
+    </div>
+
+    <!-- Info general -->
+    <div class="card">
+        <div class="section-title">Información general</div>
+        <div class="grid">
+            <div class="field full">
+                <label for="titulo">Título</label>
+                <input type="text" id="titulo" placeholder="Ej: Grand Hotel Riviera">
+            </div>
+            <div class="field full">
+                <label for="descripcion">Descripción</label>
+                <textarea id="descripcion" placeholder="Describí el hotel..."></textarea>
+            </div>
+            <div class="field">
+                <label for="precioNoche">Precio por noche ($)</label>
+                <input type="number" id="precioNoche" placeholder="0" min="0">
+            </div>
+            <div class="field">
+                <label for="capacidad">Capacidad</label>
+                <input type="number" id="capacidad" placeholder="Personas" min="1">
+            </div>
+            <div class="field">
+                <label for="cantAmbientes">Ambientes</label>
+                <input type="number" id="cantAmbientes" placeholder="1" min="1">
+            </div>
+            <div class="field">
+                <label for="cantHabitaciones">Habitaciones</label>
+                <input type="number" id="cantHabitaciones" placeholder="0" min="0">
+            </div>
+            <div class="field">
+                <label for="cantCamas">Camas</label>
+                <input type="number" id="cantCamas" placeholder="0" min="0">
+            </div>
+            <div class="field">
+                <label for="cantBanios">Baños</label>
+                <input type="number" id="cantBanios" placeholder="0" min="0">
+            </div>
+        </div>
+    </div>
+
+    <!-- Características del hotel -->
+    <div class="card">
+        <div class="section-title">Categoría</div>
+        <label style="margin-bottom:12px;">Estrellas</label>
+        <div class="stars-row">
+            <div class="star-opt"><input type="radio" name="estrellas" id="e0" value="0"><label for="e0">☆</label></div>
+            <div class="star-opt"><input type="radio" name="estrellas" id="e1" value="1"><label for="e1">★</label></div>
+            <div class="star-opt"><input type="radio" name="estrellas" id="e2" value="2"><label for="e2">★</label></div>
+            <div class="star-opt"><input type="radio" name="estrellas" id="e3" value="3"><label for="e3">★</label></div>
+            <div class="star-opt"><input type="radio" name="estrellas" id="e4" value="4"><label for="e4">★</label></div>
+            <div class="star-opt"><input type="radio" name="estrellas" id="e5" value="5"><label for="e5">★</label></div>
+        </div>
+        <div style="margin-top:20px;" class="checks-grid">
+            <div class="check-item"><input type="checkbox" id="incluyeDesayuno"><label for="incluyeDesayuno"><span class="check-dot"></span>Desayuno incluido</label></div>
+            <div class="check-item"><input type="checkbox" id="incluyeLimpieza"><label for="incluyeLimpieza"><span class="check-dot"></span>Limpieza incluida</label></div>
+        </div>
+    </div>
+
+    <!-- Servicios -->
+    <div class="card">
+        <div class="section-title">Servicios incluidos</div>
+        <div class="checks-grid">
+            <div class="check-item"><input type="checkbox" id="tieneCocina"><label for="tieneCocina"><span class="check-dot"></span>Cocina</label></div>
+            <div class="check-item"><input type="checkbox" id="tieneLavarropa"><label for="tieneLavarropa"><span class="check-dot"></span>Lavarropas</label></div>
+            <div class="check-item"><input type="checkbox" id="tieneWifi"><label for="tieneWifi"><span class="check-dot"></span>Wi-Fi</label></div>
+            <div class="check-item"><input type="checkbox" id="tieneEstacionamiento"><label for="tieneEstacionamiento"><span class="check-dot"></span>Estacionamiento</label></div>
+        </div>
+    </div>
+
+    <!-- Dirección -->
+    <div class="card">
+        <div class="section-title">Dirección</div>
+        <div class="grid">
+            <div class="field"><label for="pais">País</label><input type="text" id="pais" placeholder="Argentina"></div>
+            <div class="field"><label for="provincia">Provincia</label><input type="text" id="provincia" placeholder="Buenos Aires"></div>
+            <div class="field"><label for="ciudad">Ciudad</label><input type="text" id="ciudad" placeholder="Mar del Plata"></div>
+            <div class="field"><label for="codigoPostal">Código Postal</label><input type="text" id="codigoPostal" placeholder="7600"></div>
+            <div class="field"><label for="calle">Calle</label><input type="text" id="calle" placeholder="Av. Colón"></div>
+            <div class="field"><label for="altura">Altura</label><input type="number" id="altura" placeholder="1234" min="0"></div>
+        </div>
+    </div>
+
+    <!-- Administración -->
+    <div class="card">
+        <div class="section-title">Administración</div>
+        <div class="grid">
+            <div class="field">
+                <label for="anfitrion_id">ID del Anfitrión</label>
+                <input type="number" id="anfitrion_id" placeholder="Ej: 2" min="1">
+            </div>
+        </div>
+        <div style="margin-top:16px;">
+            <div class="check-item" style="display:inline-block;">
+                <input type="checkbox" id="activo">
+                <label for="activo"><span class="check-dot"></span>Alojamiento activo</label>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn" id="submitBtn" onclick="enviar()">Guardar cambios</button>
+</div>
+
+<script>
+    function val(id) { return document.getElementById(id).value.trim(); }
+    function num(id) { const v = val(id); return v !== '' ? Number(v) : null; }
+    function chk(id) { return document.getElementById(id).checked; }
+
+    async function enviar() {
+        const btn = document.getElementById('submitBtn');
+        const msg = document.getElementById('msg');
+        msg.style.display = 'none';
+
+        const id = num('id');
+        if (!id || id < 1) {
+            msg.className = 'msg error'; msg.textContent = 'El ID del hotel es obligatorio.';
+            msg.style.display = 'block'; return;
+        }
+
+        const datos = { id };
+        const titulo = val('titulo'); if (titulo) datos.titulo = titulo;
+        const descripcion = val('descripcion'); if (descripcion) datos.descripcion = descripcion;
+        const p = num('precioNoche'); if (p !== null && val('precioNoche') !== '') datos.precioNoche = p;
+        const cap = num('capacidad'); if (cap !== null && val('capacidad') !== '') datos.capacidad = cap;
+        const amb = num('cantAmbientes'); if (amb !== null && val('cantAmbientes') !== '') datos.cantAmbientes = amb;
+        const hab = num('cantHabitaciones'); if (hab !== null && val('cantHabitaciones') !== '') datos.cantHabitaciones = hab;
+        const cam = num('cantCamas'); if (cam !== null && val('cantCamas') !== '') datos.cantCamas = cam;
+        const ban = num('cantBanios'); if (ban !== null && val('cantBanios') !== '') datos.cantBanios = ban;
+        const pais = val('pais'); if (pais) datos.pais = pais;
+        const provincia = val('provincia'); if (provincia) datos.provincia = provincia;
+        const ciudad = val('ciudad'); if (ciudad) datos.ciudad = ciudad;
+        const cp = val('codigoPostal'); if (cp) datos.codigoPostal = cp;
+        const calle = val('calle'); if (calle) datos.calle = calle;
+        const alt = num('altura'); if (alt !== null && val('altura') !== '') datos.altura = alt;
+        const anf = num('anfitrion_id'); if (anf !== null && val('anfitrion_id') !== '') datos.anfitrion_id = anf;
+
+        const estrellasEl = document.querySelector('input[name="estrellas"]:checked');
+        if (estrellasEl) datos.estrellas = Number(estrellasEl.value);
+
+        ['incluyeDesayuno','incluyeLimpieza','tieneCocina','tieneLavarropa','tieneWifi','tieneEstacionamiento'].forEach(k => {
+            if (chk(k)) datos[k] = true;
+        });
+        datos.activo = chk('activo');
+
+        btn.disabled = true; btn.textContent = 'Guardando...';
+        try {
+            const resp = await fetch('/Hotel/actualizar', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(datos)
+            });
+            const texto = await resp.text();
+            msg.className = resp.ok ? 'msg success' : 'msg error';
+            msg.textContent = resp.ok ? '✓ Hotel actualizado correctamente.' : 'Error: ' + texto;
+        } catch {
+            msg.className = 'msg error'; msg.textContent = 'No se pudo conectar con el servidor.';
+        }
+        msg.style.display = 'block'; btn.disabled = false; btn.textContent = 'Guardar cambios';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+</script>
+</body>
+</html>

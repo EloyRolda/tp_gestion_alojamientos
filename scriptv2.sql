@@ -1,9 +1,10 @@
 use db_gestion_alojamientos;
-drop database db_gestion_alojamientos;
+
+select * from usuario;
 -- ADMINISTRADOR
 INSERT INTO usuario (nombre, email, password, telefono, fecha_registro, activo, tipo) VALUES
 ('Roberto Admin', 'admin@correo.com', '$2b$12$5BRMRwZBw.7Oqjz4ExSqrOqGqqd1og/PtBSyzEq4X2EjZt0bS77U6', '2230000000', NOW(), TRUE, 'ADMINISTRADOR');
-
+select * from usuario;
 INSERT INTO administrador (id_usuario, matricula) VALUES
 (1, 'MAT-001');
 

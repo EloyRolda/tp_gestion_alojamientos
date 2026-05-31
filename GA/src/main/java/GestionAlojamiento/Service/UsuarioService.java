@@ -9,6 +9,7 @@ import GestionAlojamiento.Exception.UnautorizedExeption;
 import GestionAlojamiento.Model.Enums.TipoUsuario;
 import GestionAlojamiento.Model.Usuario;
 import GestionAlojamiento.Repository.UsuarioRepository;
+import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -108,7 +109,7 @@ public class UsuarioService {
     //---------------------------------------- MODIFICAR ----------------------------------------
     @Transactional
     public Usuario actualizar(UsuarioModificarDTO dto) {
-
+        
         Usuario usuario = obtenerPorId(dto.getId());
 
         if (dto.getNombre() != null) {
@@ -171,5 +172,13 @@ public class UsuarioService {
             throw new ParametroInvalidoException("El usuario indicado no es un cliente.");
         }
         return u;
+    }
+
+
+
+
+    @Transactional
+    public Usuario crear(Usuario usuario) {
+        return usuarioRepository.save(usuario);
     }
 }
