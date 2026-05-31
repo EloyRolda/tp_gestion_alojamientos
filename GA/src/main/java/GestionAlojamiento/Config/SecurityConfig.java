@@ -39,27 +39,50 @@ public class SecurityConfig {
                         // ── CUALQUIER AUTENTICADO ─────────────────────────────
                         .requestMatchers("/Usuario/me").authenticated()
 
-                        // ── PÁGINAS ESTÁTICAS AUTENTICADAS ────────────────────
+                        // ── PÁGINAS ESTÁTICAS — TODOS LOS ROLES ──────────────
                         .requestMatchers(
                                 "/home.html",
+                                "/mi-perfil.html",
+                                "/actualizar-perfil.html",
                                 "/registrar-reserva.html",
-                                "/registrar-review.html"
+                                "/actualizar-reserva.html",
+                                "/cancelar-reserva.html",
+                                "/registrar-review.html",
+                                "/editar-review.html",
+                                "/eliminar-review.html",
+                                "/listar-alojamientos.html",
+                                "/listar-review.html"
                         ).hasAnyRole("ADMIN", "CLIENTE", "ANFITRION")
 
+                        // ── PÁGINAS ESTÁTICAS — ADMIN y ANFITRION ────────────
                         .requestMatchers(
                                 "/registrar-casa.html",
                                 "/registrar-hotel.html",
-                                "/registrar-departamento.html"
+                                "/registrar-departamento.html",
+                                "/actualizar-casa.html",
+                                "/actualizar-hotel.html",
+                                "/actualizar-departamento.html",
+                                "/eliminar-alojamiento.html"
                         ).hasAnyRole("ADMIN", "ANFITRION")
 
-                        // ── SOLO ADMIN ────────────────────────────────────────
+                        // ── PÁGINAS ESTÁTICAS — SOLO ADMIN ───────────────────
+                        .requestMatchers(
+                                "/listar-usuarios.html",
+                                "/listar-reservas.html",
+                                "/admin-editar-usuario.html",
+                                "/eliminar-usuario.html"
+                        ).hasRole("ADMIN")
+
+                        // ── SOLO ADMIN — ENDPOINTS ────────────────────────────
                         .requestMatchers(
                                 "/Usuario/listar",
                                 "/Usuario/listar/clientes",
                                 "/Usuario/listar/anfitriones",
                                 "/Usuario/listar/administradores",
                                 "/Usuario/eliminar/**",
-                                "/Usuario/registrar/administrador"
+                                "/Usuario/registrar/administrador",
+                                "/Usuario/actualizar/admin",
+                                "/Reserva/listar"
                         ).hasRole("ADMIN")
 
                         // ── ADMIN y el propio usuario ──────────────────────────
@@ -68,13 +91,21 @@ public class SecurityConfig {
                                 "/Usuario/actualizar"
                         ).hasAnyRole("ADMIN", "CLIENTE", "ANFITRION")
 
-                        // ── ALOJAMIENTOS ──────────────────────────────────────
+                        // ── ALOJAMIENTOS — LISTAR (todos los roles) ───────────
                         .requestMatchers(
                                 "/Casa/listar",           "/Casa/mostrar/**",
                                 "/Hotel/listar",          "/Hotel/mostrar/**",
                                 "/Departamento/listar",   "/Departamento/mostrar/**"
                         ).hasAnyRole("ADMIN", "ANFITRION", "CLIENTE")
 
+                        // ── ALOJAMIENTOS — PROPIOS (admin + anfitrion) ────────
+                        .requestMatchers(
+                                "/Casa/listar/propios",
+                                "/Hotel/listar/propios",
+                                "/Departamento/listar/propios"
+                        ).hasAnyRole("ADMIN", "ANFITRION")
+
+                        // ── ALOJAMIENTOS — REGISTRAR / MODIFICAR ─────────────
                         .requestMatchers(
                                 "/Casa/registrar",
                                 "/Hotel/registrar",
@@ -88,7 +119,7 @@ public class SecurityConfig {
                         ).hasAnyRole("ADMIN", "ANFITRION")
 
                         // ── RESERVAS ──────────────────────────────────────────
-                        .requestMatchers("/Reserva/listar").hasRole("ADMIN")
+                        .requestMatchers("/Reserva/listar/propios").hasAnyRole("ADMIN", "CLIENTE")
                         .requestMatchers("/Reserva/mostrar/**").hasAnyRole("ADMIN", "ANFITRION", "CLIENTE")
                         .requestMatchers("/Reserva/registrar").hasAnyRole("ADMIN", "CLIENTE")
                         .requestMatchers(

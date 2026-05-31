@@ -106,6 +106,11 @@ public class UsuarioController {
 
         return ResponseEntity.ok(usuarioService.actualizar(dto));
     }
+    ///Permite al admin editar el id de un usuario mediante un DTO
+    @PutMapping("/actualizar/admin")
+    public ResponseEntity<Usuario> actualizarPorAdmin(@Valid @RequestBody UsuarioModificarDTO dto) {
+        return ResponseEntity.ok(usuarioService.actualizar(dto));
+    }
 
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<?> eliminar(@PathVariable Long id) {

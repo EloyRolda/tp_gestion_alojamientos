@@ -263,25 +263,10 @@
             flex-shrink: 0;
         }
 
-        .get {
-            background: var(--get);
-            color: var(--get-text);
-        }
-
-        .post {
-            background: var(--post);
-            color: var(--post-text);
-        }
-
-        .put {
-            background: var(--put);
-            color: var(--put-text);
-        }
-
-        .delete {
-            background: var(--delete);
-            color: var(--delete-text);
-        }
+        .get  { background: var(--get);    color: var(--get-text); }
+        .post { background: var(--post);   color: var(--post-text); }
+        .put  { background: var(--put);    color: var(--put-text); }
+        .delete { background: var(--delete); color: var(--delete-text); }
 
         .endpoint-link {
             font-size: 13px;
@@ -320,25 +305,10 @@
             font-weight: 600;
         }
 
-        .tag-admin {
-            background: rgba(99, 102, 241, 0.15);
-            color: #a5b4fc;
-        }
-
-        .tag-anfitrion {
-            background: rgba(251, 191, 36, 0.1);
-            color: #fde68a;
-        }
-
-        .tag-cliente {
-            background: rgba(52, 211, 153, 0.1);
-            color: #6ee7b7;
-        }
-
-        .tag-all {
-            background: rgba(100, 116, 139, 0.15);
-            color: #94a3b8;
-        }
+        .tag-admin    { background: rgba(99, 102, 241, 0.15); color: #a5b4fc; }
+        .tag-anfitrion { background: rgba(251, 191, 36, 0.1);  color: #fde68a; }
+        .tag-cliente  { background: rgba(52, 211, 153, 0.1);   color: #6ee7b7; }
+        .tag-all      { background: rgba(100, 116, 139, 0.15); color: #94a3b8; }
 
         /* ── LOADING ── */
         #loadingOverlay {
@@ -361,11 +331,7 @@
             animation: spin 0.7s linear infinite;
         }
 
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -410,7 +376,7 @@
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/Usuario/listar">Listar todos</a>
+                            <a class="endpoint-link" href="/listar-usuarios.html">Listar (vista)</a>
                             <span class="access-tag tag-admin">ADMIN</span>
                         </div>
                     </li>
@@ -436,8 +402,16 @@
                         </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN"><span class="badge post">POST</span>
+                        <div class="endpoint-row" data-roles="ADMIN">
+                            <span class="badge post">POST</span>
                             <a class="endpoint-link" href="/Usuario/registrar/administrador">Registrar admin</a>
+                            <span class="access-tag tag-admin">ADMIN</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN">
+                            <span class="badge put">PUT</span>
+                            <a class="endpoint-link" href="/admin-editar-usuario.html">Editar usuario</a>
                             <span class="access-tag tag-admin">ADMIN</span>
                         </div>
                     </li>
@@ -462,7 +436,14 @@
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/Reserva/listar">Listar todas</a>
+                            <a class="endpoint-link" href="/listar-reservas.html">Listar (vista)</a>
+                            <span class="access-tag tag-admin">ADMIN</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN">
+                            <span class="badge get">GET</span>
+                            <a class="endpoint-link" href="/Reserva/listar">Listar JSON</a>
                             <span class="access-tag tag-admin">ADMIN</span>
                         </div>
                     </li>
@@ -475,6 +456,7 @@
     <!-- ═══════════════ SECCIÓN COMPARTIDA ═══════════════ -->
     <div class="section-title">🏘️ Alojamientos — ADMIN y ANFITRIÓN</div>
     <div style="margin-bottom:20px; display:flex; gap:12px; flex-wrap:wrap;">
+        <a href="/listar-alojamientos.html" class="swagger-btn">📋 Ver todos los alojamientos</a>
         <a href="/registrar-casa.html" class="swagger-btn">🏠 Registrar Casa</a>
         <a href="/registrar-hotel.html" class="swagger-btn">🏨 Registrar Hotel</a>
         <a href="/registrar-departamento.html" class="swagger-btn">🏢 Registrar Departamento</a>
@@ -482,131 +464,159 @@
     <div class="cards-grid">
 
         <div class="card">
-            <div class="card-header"><span class="card-icon">🏠</span><span class="card-title">Casa</span></div>
+            <div class="card-header">
+                <span class="card-icon">🏠</span>
+                <span class="card-title">Casa</span>
+            </div>
             <div class="card-body">
                 <ul>
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN,ANFITRION">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/Casa/listar/propios">
-                                Listar mis casas
-                            </a>
+                            <a class="endpoint-link" href="/Casa/listar/propios">Listar mis casas</a>
                             <span class="access-tag tag-anfitrion">PROPIOS</span>
                         </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span
-                                class="badge get">GET</span><a class="endpoint-link" href="/Casa/listar">Listar</a><span
-                                class="access-tag tag-all">TODOS</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE">
+                            <span class="badge get">GET</span>
+                            <a class="endpoint-link" href="/Casa/listar">Listar</a>
+                            <span class="access-tag tag-all">TODOS</span>
+                        </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span
-                                class="badge get">GET</span><a class="endpoint-link" href="/Casa/mostrar/1">Mostrar por
-                            ID</a><span class="access-tag tag-all">TODOS</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE">
+                            <span class="badge get">GET</span>
+                            <a class="endpoint-link" href="/Casa/mostrar/1">Mostrar por ID</a>
+                            <span class="access-tag tag-all">TODOS</span>
+                        </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span class="badge post">POST</span><a
-                                class="endpoint-link" href="/registrar-casa.html">Registrar</a><span
-                                class="access-tag tag-anfitrion">ADMIN/ANF</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION">
+                            <span class="badge post">POST</span>
+                            <a class="endpoint-link" href="/registrar-casa.html">Registrar</a>
+                            <span class="access-tag tag-anfitrion">ADMIN/ANF</span>
+                        </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span class="badge put">PUT</span><a
-                                class="endpoint-link" href="/actualizar-casa.html">Actualizar</a><span
-                                class="access-tag tag-anfitrion">ADMIN/ANF</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION">
+                            <span class="badge put">PUT</span>
+                            <a class="endpoint-link" href="/actualizar-casa.html">Actualizar</a>
+                            <span class="access-tag tag-anfitrion">ADMIN/ANF</span>
+                        </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span
-                                class="badge delete">DELETE</span><a class="endpoint-link"
-                                                                     href="/eliminar-alojamiento.html">Eliminar</a><span
-                                class="access-tag tag-anfitrion">ADMIN/ANF</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION">
+                            <span class="badge delete">DELETE</span>
+                            <a class="endpoint-link" href="/eliminar-alojamiento.html">Eliminar</a>
+                            <span class="access-tag tag-anfitrion">ADMIN/ANF</span>
+                        </div>
                     </li>
                 </ul>
             </div>
         </div>
 
         <div class="card">
-            <div class="card-header"><span class="card-icon">🏨</span><span class="card-title">Hotel</span></div>
+            <div class="card-header">
+                <span class="card-icon">🏨</span>
+                <span class="card-title">Hotel</span>
+            </div>
             <div class="card-body">
                 <ul>
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN,ANFITRION">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/Hotel/listar/propios">
-                                Listar mis hoteles
-                            </a>
+                            <a class="endpoint-link" href="/Hotel/listar/propios">Listar mis hoteles</a>
                             <span class="access-tag tag-anfitrion">PROPIOS</span>
                         </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span
-                                class="badge get">GET</span><a class="endpoint-link"
-                                                               href="/Hotel/listar">Listar</a><span
-                                class="access-tag tag-all">TODOS</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE">
+                            <span class="badge get">GET</span>
+                            <a class="endpoint-link" href="/Hotel/listar">Listar</a>
+                            <span class="access-tag tag-all">TODOS</span>
+                        </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span
-                                class="badge get">GET</span><a class="endpoint-link" href="/Hotel/mostrar/1">Mostrar por
-                            ID</a><span class="access-tag tag-all">TODOS</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE">
+                            <span class="badge get">GET</span>
+                            <a class="endpoint-link" href="/Hotel/mostrar/1">Mostrar por ID</a>
+                            <span class="access-tag tag-all">TODOS</span>
+                        </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span class="badge post">POST</span>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION">
+                            <span class="badge post">POST</span>
                             <a class="endpoint-link" href="/registrar-hotel.html">Registrar</a>
-                            <span class="access-tag tag-anfitrion">ADMIN/ANF</span></div>
+                            <span class="access-tag tag-anfitrion">ADMIN/ANF</span>
+                        </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span class="badge put">PUT</span><a
-                                class="endpoint-link" href="/actualizar-hotel.html">Actualizar</a><span
-                                class="access-tag tag-anfitrion">ADMIN/ANF</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION">
+                            <span class="badge put">PUT</span>
+                            <a class="endpoint-link" href="/actualizar-hotel.html">Actualizar</a>
+                            <span class="access-tag tag-anfitrion">ADMIN/ANF</span>
+                        </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span
-                                class="badge delete">DELETE</span><a class="endpoint-link"
-                                                                     href="/eliminar-alojamiento.html">Eliminar</a><span
-                                class="access-tag tag-anfitrion">ADMIN/ANF</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION">
+                            <span class="badge delete">DELETE</span>
+                            <a class="endpoint-link" href="/eliminar-alojamiento.html">Eliminar</a>
+                            <span class="access-tag tag-anfitrion">ADMIN/ANF</span>
+                        </div>
                     </li>
                 </ul>
             </div>
         </div>
 
         <div class="card">
-            <div class="card-header"><span class="card-icon">🏢</span><span class="card-title">Departamento</span></div>
+            <div class="card-header">
+                <span class="card-icon">🏢</span>
+                <span class="card-title">Departamento</span>
+            </div>
             <div class="card-body">
                 <ul>
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN,ANFITRION">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/Departamento/listar/propios">
-                                Listar mis departamentos
-                            </a>
+                            <a class="endpoint-link" href="/Departamento/listar/propios">Listar mis departamentos</a>
                             <span class="access-tag tag-anfitrion">PROPIOS</span>
                         </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span
-                                class="badge get">GET</span><a class="endpoint-link"
-                                                               href="/Departamento/listar">Listar</a><span
-                                class="access-tag tag-all">TODOS</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE">
+                            <span class="badge get">GET</span>
+                            <a class="endpoint-link" href="/Departamento/listar">Listar</a>
+                            <span class="access-tag tag-all">TODOS</span>
+                        </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span
-                                class="badge get">GET</span><a class="endpoint-link" href="/Departamento/mostrar/1">Mostrar
-                            por ID</a><span class="access-tag tag-all">TODOS</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE">
+                            <span class="badge get">GET</span>
+                            <a class="endpoint-link" href="/Departamento/mostrar/1">Mostrar por ID</a>
+                            <span class="access-tag tag-all">TODOS</span>
+                        </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span class="badge post">POST</span>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION">
+                            <span class="badge post">POST</span>
                             <a class="endpoint-link" href="/registrar-departamento.html">Registrar</a>
-                            <span class="access-tag tag-anfitrion">ADMIN/ANF</span></div>
+                            <span class="access-tag tag-anfitrion">ADMIN/ANF</span>
+                        </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span class="badge put">PUT</span><a
-                                class="endpoint-link" href="/actualizar-departamento.html">Actualizar</a><span
-                                class="access-tag tag-anfitrion">ADMIN/ANF</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION">
+                            <span class="badge put">PUT</span>
+                            <a class="endpoint-link" href="/actualizar-departamento.html">Actualizar</a>
+                            <span class="access-tag tag-anfitrion">ADMIN/ANF</span>
+                        </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION"><span
-                                class="badge delete">DELETE</span><a class="endpoint-link"
-                                                                     href="/eliminar-alojamiento.html">Eliminar</a><span
-                                class="access-tag tag-anfitrion">ADMIN/ANF</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION">
+                            <span class="badge delete">DELETE</span>
+                            <a class="endpoint-link" href="/eliminar-alojamiento.html">Eliminar</a>
+                            <span class="access-tag tag-anfitrion">ADMIN/ANF</span>
+                        </div>
                     </li>
                 </ul>
             </div>
@@ -619,98 +629,145 @@
     <div class="cards-grid">
 
         <div class="card">
-            <div class="card-header"><span class="card-icon">🔑</span><span class="card-title">Mi cuenta</span></div>
+            <div class="card-header">
+                <span class="card-icon">🔑</span>
+                <span class="card-title">Mi cuenta</span>
+            </div>
             <div class="card-body">
                 <ul>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE,ANFITRION"><span
-                                class="badge get">GET</span><a class="endpoint-link" href="/mi-perfil.html">Ver mi
-                            perfil</a><span class="access-tag tag-all">TODOS</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE,ANFITRION">
+                            <span class="badge get">GET</span>
+                            <a class="endpoint-link" href="/mi-perfil.html">Ver mi perfil</a>
+                            <span class="access-tag tag-all">TODOS</span>
+                        </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE,ANFITRION"><span
-                                class="badge put">PUT</span><a class="endpoint-link" href="/actualizar-perfil.html">Actualizar
-                            perfil</a><span class="access-tag tag-all">TODOS</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE,ANFITRION">
+                            <span class="badge put">PUT</span>
+                            <a class="endpoint-link" href="/actualizar-perfil.html">Actualizar perfil</a>
+                            <span class="access-tag tag-all">TODOS</span>
+                        </div>
                     </li>
                 </ul>
             </div>
         </div>
 
         <div class="card">
-            <div class="card-header"><span class="card-icon">📅</span><span class="card-title">Reservas</span></div>
+            <div class="card-header">
+                <span class="card-icon">📅</span>
+                <span class="card-title">Reservas</span>
+            </div>
             <div class="card-body">
                 <ul>
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN,CLIENTE">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/Reserva/listar/propios">
-                                Mis reservas
-                            </a>
+                            <a class="endpoint-link" href="/listar-reservas.html">Listar (vista)</a>
+                            <span class="access-tag tag-cliente">ADMIN/CLI</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE">
+                            <span class="badge get">GET</span>
+                            <a class="endpoint-link" href="/Reserva/listar/propios">Mis reservas</a>
                             <span class="access-tag tag-cliente">PROPIOS</span>
                         </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span
-                                class="badge get">GET</span><a class="endpoint-link" href="/Reserva/mostrar/1">Ver
-                            reserva</a><span class="access-tag tag-all">TODOS</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE">
+                            <span class="badge get">GET</span>
+                            <a class="endpoint-link" href="/Reserva/mostrar/1">Ver reserva</a>
+                            <span class="access-tag tag-all">TODOS</span>
+                        </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE"><span class="badge post">POST</span><a
-                                class="endpoint-link" href="/registrar-reserva.html">Crear reserva</a><span
-                                class="access-tag tag-cliente">ADMIN/CLI</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE">
+                            <span class="badge post">POST</span>
+                            <a class="endpoint-link" href="/registrar-reserva.html">Crear reserva</a>
+                            <span class="access-tag tag-cliente">ADMIN/CLI</span>
+                        </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE"><span class="badge put">PUT</span><a
-                                class="endpoint-link" href="/actualizar-reserva.html">Actualizar reserva</a><span
-                                class="access-tag tag-cliente">ADMIN/CLI</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE">
+                            <span class="badge put">PUT</span>
+                            <a class="endpoint-link" href="/actualizar-reserva.html">Actualizar reserva</a>
+                            <span class="access-tag tag-cliente">ADMIN/CLI</span>
+                        </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE"><span class="badge delete">DELETE</span><a
-                                class="endpoint-link" href="/cancelar-reserva.html">Cancelar reserva</a><span
-                                class="access-tag tag-cliente">ADMIN/CLI</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE">
+                            <span class="badge delete">DELETE</span>
+                            <a class="endpoint-link" href="/cancelar-reserva.html">Cancelar reserva</a>
+                            <span class="access-tag tag-cliente">ADMIN/CLI</span>
+                        </div>
                     </li>
                 </ul>
             </div>
         </div>
 
         <div class="card">
-            <div class="card-header"><span class="card-icon">⭐</span><span class="card-title">Reviews</span></div>
+            <div class="card-header">
+                <span class="card-icon">⭐</span>
+                <span class="card-title">Reviews</span>
+            </div>
             <div class="card-body">
                 <ul>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span
-                                class="badge get">GET</span><a class="endpoint-link" href="/Review/listar">Listar
-                            todas</a><span class="access-tag tag-all">TODOS</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE">
+                            <span class="badge get">GET</span>
+                            <a class="endpoint-link" href="/listar-review.html">Listar (vista)</a>
+                            <span class="access-tag tag-all">TODOS</span>
+                        </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span
-                                class="badge get">GET</span><a class="endpoint-link" href="/Review/mostrar/1">Ver
-                            review</a><span class="access-tag tag-all">TODOS</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE">
+                            <span class="badge get">GET</span>
+                            <a class="endpoint-link" href="/Review/listar">Listar JSON</a>
+                            <span class="access-tag tag-all">TODOS</span>
+                        </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE"><span
-                                class="badge get">GET</span><a class="endpoint-link" href="/Review/alojamiento/1">Reviews
-                            de alojamiento</a><span class="access-tag tag-all">TODOS</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE">
+                            <span class="badge get">GET</span>
+                            <a class="endpoint-link" href="/Review/mostrar/1">Ver review</a>
+                            <span class="access-tag tag-all">TODOS</span>
+                        </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE"><span class="badge get">GET</span><a
-                                class="endpoint-link" href="/Review/cliente/1">Mis reviews</a><span
-                                class="access-tag tag-cliente">ADMIN/CLI</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE">
+                            <span class="badge get">GET</span>
+                            <a class="endpoint-link" href="/Review/alojamiento/1">Reviews de alojamiento</a>
+                            <span class="access-tag tag-all">TODOS</span>
+                        </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE"><span class="badge post">POST</span><a
-                                class="endpoint-link" href="/registrar-review.html">Dejar review</a><span
-                                class="access-tag tag-cliente">ADMIN/CLI</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE">
+                            <span class="badge get">GET</span>
+                            <a class="endpoint-link" href="/Review/cliente/1">Mis reviews</a>
+                            <span class="access-tag tag-cliente">ADMIN/CLI</span>
+                        </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE"><span class="badge put">PUT</span><a
-                                class="endpoint-link" href="/editar-review.html">Editar review</a><span
-                                class="access-tag tag-cliente">ADMIN/CLI</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE">
+                            <span class="badge post">POST</span>
+                            <a class="endpoint-link" href="/registrar-review.html">Dejar review</a>
+                            <span class="access-tag tag-cliente">ADMIN/CLI</span>
+                        </div>
                     </li>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE"><span class="badge delete">DELETE</span><a
-                                class="endpoint-link" href="/eliminar-review.html">Eliminar review</a><span
-                                class="access-tag tag-cliente">ADMIN/CLI</span></div>
+                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE">
+                            <span class="badge put">PUT</span>
+                            <a class="endpoint-link" href="/editar-review.html">Editar review</a>
+                            <span class="access-tag tag-cliente">ADMIN/CLI</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="ADMIN,CLIENTE">
+                            <span class="badge delete">DELETE</span>
+                            <a class="endpoint-link" href="/eliminar-review.html">Eliminar review</a>
+                            <span class="access-tag tag-cliente">ADMIN/CLI</span>
+                        </div>
                     </li>
                 </ul>
             </div>
@@ -720,12 +777,6 @@
 </main>
 
 <script>
-    // Obtiene info del usuario logueado llamando al propio endpoint /Usuario/mostrar
-    // Spring Security nos da el email del autenticado via /login
-    // Usamos /api/me o simplemente llamamos a un endpoint que devuelva el usuario actual.
-    // Como no hay un /me, obtenemos el email del formulario de Spring Security
-    // y pedimos el usuario por email. La forma más simple: fetch al endpoint de info.
-
     async function cargarUsuario() {
         try {
             const resp = await fetch('/Usuario/me', {credentials: 'include'});
@@ -760,23 +811,16 @@
             badge.style.display = 'none';
         }
         window._userRol = rol;
-
-        if (id) {
-            const perfilLink = document.querySelector('a.endpoint-link[href="/mi-perfil.html"]');
-            if (perfilLink) perfilLink.href = '/mi-perfil.html';
-        }
     }
 
     function aplicarBloqueos() {
-        const rol = window._userRol; // ADMINISTRADOR | ANFITRION | CLIENTE | null
-        // Normalizar: ADMINISTRADOR → ADMIN
+        const rol = window._userRol;
         const rolNorm = rol === 'ADMINISTRADOR' ? 'ADMIN' : rol;
 
         document.querySelectorAll('.endpoint-row[data-roles]').forEach(row => {
             const roles = row.dataset.roles.split(',');
             if (rolNorm && !roles.includes(rolNorm)) {
                 row.classList.add('locked');
-                // Agregar candado si no hay
                 if (!row.querySelector('.lock-icon')) {
                     const lock = document.createElement('span');
                     lock.className = 'lock-icon';

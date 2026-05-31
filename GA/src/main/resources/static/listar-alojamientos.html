@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alojamientos — Gestión Alojamiento</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap');
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0a0f1e; --surface: #111827; --surface2: #0f1929;
+            --border: #1e2d45; --accent: #3b82f6; --accent-glow: rgba(59,130,246,0.15);
+            --text: #e2e8f0; --muted: #64748b; --error: #f87171; --success: #4ade80;
+        }
+        body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); min-height: 100vh; }
+
+        header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .logo-icon { width: 38px; height: 38px; background: linear-gradient(135deg, var(--accent), #6366f1); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .app-title { font-family: 'Playfair Display', serif; font-size: 18px; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 13px; border: 1px solid var(--border); padding: 7px 14px; border-radius: 8px; transition: all 0.2s; }
+        .back-link:hover { color: var(--text); border-color: #2d3f5c; }
+
+        main { padding: 32px; max-width: 1400px; margin: 0 auto; }
+        .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+        .page-title { font-family: 'Playfair Display', serif; font-size: 24px; }
+        .page-title span { color: var(--muted); font-size: 16px; font-family: 'DM Sans', sans-serif; font-weight: 400; margin-left: 10px; }
+
+        .tabs { display: flex; gap: 6px; margin-bottom: 24px; flex-wrap: wrap; }
+        .tab { padding: 8px 18px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+        .tab:hover { border-color: #2d3f5c; color: var(--text); }
+        .tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+        .toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .search-wrap { position: relative; flex: 1; min-width: 220px; max-width: 360px; }
+        .search-wrap input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 9px; padding: 10px 14px 10px 36px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; transition: border-color 0.2s; }
+        .search-wrap input:focus { border-color: var(--accent); }
+        .search-wrap::before { content: '🔍'; position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 13px; pointer-events: none; }
+        .count-badge { font-size: 12px; color: var(--muted); }
+
+        .msg { border-radius: 8px; padding: 12px 16px; font-size: 13px; margin-bottom: 16px; display: none; }
+        .msg.error { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: var(--error); }
+
+        .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        thead tr { background: var(--surface); border-bottom: 1px solid var(--border); }
+        th { padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+        tbody tr { border-bottom: 1px solid var(--border); background: var(--surface2); transition: background 0.15s; }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: #131f30; }
+        td { padding: 13px 16px; vertical-align: middle; }
+
+        .cell-name { font-weight: 600; color: var(--text); max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cell-muted { color: var(--muted); }
+        .cell-price { color: #4ade80; font-weight: 600; }
+
+        .badge-tipo { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+        .tipo-CASA         { background: rgba(251,191,36,0.12); color: #fde68a; }
+        .tipo-HOTEL        { background: rgba(99,102,241,0.15); color: #a5b4fc; }
+        .tipo-DEPARTAMENTO { background: rgba(59,130,246,0.15); color: #93c5fd; }
+
+        .badge-estado { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+        .estado-activo   { background: rgba(74,222,128,0.12); color: #4ade80; }
+        .estado-inactivo { background: rgba(248,113,113,0.12); color: #f87171; }
+
+        .stars { color: #fbbf24; font-size: 12px; }
+
+        .extras { display: flex; flex-wrap: wrap; gap: 4px; }
+        .chip { font-size: 10px; padding: 2px 7px; border-radius: 4px; background: rgba(100,116,139,0.15); color: var(--muted); }
+        .chip.on { background: rgba(74,222,128,0.1); color: #4ade80; }
+
+        .actions { display: flex; gap: 6px; }
+        .btn-action { border: none; border-radius: 6px; padding: 5px 10px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: opacity 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+        .btn-edit   { background: rgba(59,130,246,0.15); color: #60a5fa; }
+        .btn-edit:hover { background: rgba(59,130,246,0.25); }
+        .btn-delete { background: rgba(248,113,113,0.12); color: #f87171; }
+        .btn-delete:hover { background: rgba(248,113,113,0.22); }
+
+        .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
+        .empty-icon { font-size: 40px; margin-bottom: 12px; }
+
+        #loadingOverlay { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 100; transition: opacity 0.3s; }
+        .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 200; }
+        .modal-bg.open { display: flex; }
+        .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px 28px 24px; max-width: 380px; width: 90%; animation: fadeUp 0.25s ease both; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+        .modal h3 { font-family: 'Playfair Display', serif; font-size: 18px; margin-bottom: 8px; }
+        .modal p { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+        .btn-cancel-modal { background: transparent; border: 1px solid var(--border); border-radius: 8px; padding: 8px 16px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; }
+        .btn-confirm-delete { background: rgba(248,113,113,0.15); border: 1px solid rgba(248,113,113,0.3); border-radius: 8px; padding: 8px 16px; color: var(--error); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .btn-confirm-delete:hover { background: rgba(248,113,113,0.25); }
+    </style>
+</head>
+<body>
+
+<div id="loadingOverlay"><div class="spinner"></div></div>
+
+<header>
+    <div class="header-left">
+        <div class="logo-icon">🏠</div>
+        <span class="app-title">Gestión Alojamiento</span>
+    </div>
+    <a href="/home.html" class="back-link">← Panel</a>
+</header>
+
+<main>
+    <div class="page-header">
+        <h1 class="page-title">Alojamientos <span id="pageSubtitle"></span></h1>
+    </div>
+
+    <div class="tabs">
+        <a class="tab" href="?tipo=casas"         id="tab-casas">🏠 Casas</a>
+        <a class="tab" href="?tipo=hoteles"        id="tab-hoteles">🏨 Hoteles</a>
+        <a class="tab" href="?tipo=departamentos"  id="tab-departamentos">🏢 Departamentos</a>
+    </div>
+
+    <div class="msg error" id="msgError"></div>
+
+    <div class="toolbar">
+        <div class="search-wrap">
+            <input type="text" id="searchInput" placeholder="Buscar por título o anfitrión..." oninput="filtrar()">
+        </div>
+        <span class="count-badge" id="countBadge"></span>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Título</th>
+                <th>Tipo</th>
+                <th>Precio / noche</th>
+                <th>Capacidad</th>
+                <th>Hab. / Camas</th>
+                <th>Dirección</th>
+                <th>Anfitrión</th>
+                <th>Estado</th>
+                <th>Extras</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+        <div class="empty" id="emptyState" style="display:none">
+            <div class="empty-icon">🏘️</div>
+            <div>No se encontraron alojamientos</div>
+        </div>
+    </div>
+</main>
+
+<div class="modal-bg" id="modalBg">
+    <div class="modal">
+        <h3>Eliminar alojamiento</h3>
+        <p id="modalText">¿Estás seguro? Esta acción no se puede deshacer.</p>
+        <div class="modal-actions">
+            <button class="btn-cancel-modal" onclick="cerrarModal()">Cancelar</button>
+            <button class="btn-confirm-delete" id="btnConfirmDelete" onclick="confirmarEliminar()">Eliminar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const CONFIG = {
+        casas:        { url: '/Casa/listar',         deleteUrl: id => `/Casa/eliminar/${id}`,        editUrl: '/actualizar-casa.html',         label: '🏠 Casas' },
+        hoteles:      { url: '/Hotel/listar',        deleteUrl: id => `/Hotel/eliminar/${id}`,       editUrl: '/actualizar-hotel.html',        label: '🏨 Hoteles' },
+        departamentos:{ url: '/Departamento/listar', deleteUrl: id => `/Departamento/eliminar/${id}`,editUrl: '/actualizar-departamento.html', label: '🏢 Departamentos' }
+    };
+
+    let datos = [];
+    let pendingDeleteId = null;
+
+    const tipo = new URLSearchParams(location.search).get('tipo') || 'casas';
+    const cfg  = CONFIG[tipo] || CONFIG.casas;
+
+    const tabEl = document.getElementById('tab-' + tipo);
+    if (tabEl) tabEl.classList.add('active');
+    document.getElementById('pageSubtitle').textContent = '— ' + cfg.label;
+
+    // Normaliza casa/hotel/depto al objeto alojamiento base
+    function normalizar(item) {
+        const a = item.alojamiento || item;
+        const extra = {};
+        // Casa
+        if (item.tienePatio    !== undefined) extra.patio    = item.tienePatio;
+        if (item.tienePileta   !== undefined) extra.pileta   = item.tienePileta;
+        if (item.tieneParrilla !== undefined) extra.parrilla = item.tieneParrilla;
+        // Hotel
+        if (item.estrellas        !== undefined) extra.estrellas  = item.estrellas;
+        if (item.incluyeDesayuno  !== undefined) extra.desayuno   = item.incluyeDesayuno;
+        if (item.incluyeLimpieza  !== undefined) extra.limpieza   = item.incluyeLimpieza;
+        // Depto
+        if (item.piso             !== undefined) extra.piso       = item.piso;
+        if (item.tieneAscensor    !== undefined) extra.ascensor   = item.tieneAscensor;
+        if (item.expensasIncluidas!== undefined) extra.expensas   = item.expensasIncluidas;
+        return { ...a, id: item.id, extra };
+    }
+
+    async function cargar() {
+        try {
+            const resp = await fetch(cfg.url, { credentials: 'include' });
+            if (!resp.ok) throw new Error('Error ' + resp.status);
+            const raw = await resp.json();
+            datos = raw.map(normalizar);
+            renderizar(datos);
+        } catch (e) {
+            mostrarError('No se pudieron cargar los alojamientos: ' + e.message);
+        } finally { ocultarLoading(); }
+    }
+
+    function extrasHTML(extra, tipo) {
+        const chips = [];
+        if (tipo === 'casas') {
+            chips.push(`<span class="chip ${extra.patio    ? 'on' : ''}">Patio</span>`);
+            chips.push(`<span class="chip ${extra.pileta   ? 'on' : ''}">Pileta</span>`);
+            chips.push(`<span class="chip ${extra.parrilla ? 'on' : ''}">Parrilla</span>`);
+        } else if (tipo === 'hoteles') {
+            chips.push(`<span class="chip">${'★'.repeat(extra.estrellas || 0)}</span>`);
+            chips.push(`<span class="chip ${extra.desayuno ? 'on' : ''}">Desayuno</span>`);
+            chips.push(`<span class="chip ${extra.limpieza ? 'on' : ''}">Limpieza</span>`);
+        } else {
+            chips.push(`<span class="chip">Piso ${extra.piso ?? '—'}</span>`);
+            chips.push(`<span class="chip ${extra.ascensor  ? 'on' : ''}">Ascensor</span>`);
+            chips.push(`<span class="chip ${extra.expensas  ? 'on' : ''}">Expensas inc.</span>`);
+        }
+        return `<div class="extras">${chips.join('')}</div>`;
+    }
+
+    function renderizar(lista) {
+        const tbody = document.getElementById('tbody');
+        const empty = document.getElementById('emptyState');
+        document.getElementById('countBadge').textContent = lista.length + ' registro' + (lista.length !== 1 ? 's' : '');
+
+        if (lista.length === 0) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+        empty.style.display = 'none';
+
+        tbody.innerHTML = lista.map(a => {
+            const dir = a.direccion
+                ? `${a.direccion.calle || ''} ${a.direccion.numero || ''}, ${a.direccion.ciudad || ''}`
+                : '—';
+            const anfitrion = a.anfitrion ? a.anfitrion.nombre : '—';
+            const precio = a.precioNoche ? `$${parseFloat(a.precioNoche).toLocaleString('es-AR')}` : '—';
+            const tipoLabel = a.tipoInmueble || tipo.slice(0,-1).toUpperCase();
+
+            return `<tr>
+                <td class="cell-muted">${a.id}</td>
+                <td class="cell-name" title="${a.titulo || ''}">${a.titulo || '—'}</td>
+                <td><span class="badge-tipo tipo-${tipoLabel}">${tipoLabel}</span></td>
+                <td class="cell-price">${precio}</td>
+                <td class="cell-muted">${a.capacidad ?? '—'}</td>
+                <td class="cell-muted">${a.cantHabitaciones ?? '—'} hab / ${a.cantCamas ?? '—'} camas</td>
+                <td class="cell-muted" style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${dir}">${dir}</td>
+                <td class="cell-muted">${anfitrion}</td>
+                <td><span class="badge-estado ${a.activo ? 'estado-activo' : 'estado-inactivo'}">${a.activo ? 'Activo' : 'Inactivo'}</span></td>
+                <td>${extrasHTML(a.extra, tipo)}</td>
+                <td>
+                    <div class="actions">
+                        <a class="btn-action btn-edit" href="${cfg.editUrl}">✏️ Editar</a>
+                        <button class="btn-action btn-delete" onclick="abrirModal(${a.id}, '${(a.titulo||'').replace(/'/g,"\\'")}')">🗑️ Eliminar</button>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    function filtrar() {
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        const filtrados = datos.filter(a =>
+            (a.titulo || '').toLowerCase().includes(q) ||
+            (a.anfitrion?.nombre || '').toLowerCase().includes(q)
+        );
+        renderizar(filtrados);
+    }
+
+    function abrirModal(id, titulo) {
+        pendingDeleteId = id;
+        document.getElementById('modalText').textContent = `¿Eliminar "${titulo}"? Esta acción no se puede deshacer.`;
+        document.getElementById('modalBg').classList.add('open');
+    }
+    function cerrarModal() { document.getElementById('modalBg').classList.remove('open'); pendingDeleteId = null; }
+
+    async function confirmarEliminar() {
+        if (!pendingDeleteId) return;
+        const btn = document.getElementById('btnConfirmDelete');
+        btn.textContent = 'Eliminando...'; btn.disabled = true;
+        try {
+            const resp = await fetch(cfg.deleteUrl(pendingDeleteId), { method: 'DELETE', credentials: 'include' });
+            if (resp.ok) {
+                datos = datos.filter(a => a.id !== pendingDeleteId);
+                renderizar(datos);
+                cerrarModal();
+            } else {
+                mostrarError('No se pudo eliminar. Verificá que seas el propietario.');
+                cerrarModal();
+            }
+        } catch { mostrarError('Error de conexión.'); cerrarModal(); }
+        btn.textContent = 'Eliminar'; btn.disabled = false;
+    }
+
+    function mostrarError(msg) { const el = document.getElementById('msgError'); el.textContent = msg; el.style.display = 'block'; }
+    function ocultarLoading() { const ov = document.getElementById('loadingOverlay'); ov.style.opacity = '0'; setTimeout(() => ov.style.display = 'none', 300); }
+
+    cargar();
+</script>
+</body>
+</html>

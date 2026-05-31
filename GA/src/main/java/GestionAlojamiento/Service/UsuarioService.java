@@ -153,7 +153,6 @@ public class UsuarioService {
         if (dto.getMatricula() != null) {
             usuario.setMatricula(dto.getMatricula());
         }
-
         return usuarioRepository.save(usuario);
     }
 

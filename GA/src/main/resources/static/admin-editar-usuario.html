@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Usuario — Admin</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap');
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0a0f1e; --surface: #111827; --surface2: #0f1929;
+            --border: #1e2d45; --accent: #3b82f6; --accent-glow: rgba(59,130,246,0.2);
+            --text: #e2e8f0; --muted: #64748b; --error: #f87171; --success: #4ade80;
+            --warn: #fbbf24;
+        }
+        body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+        body::before { content: ''; position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%); top: -150px; right: -150px; pointer-events: none; }
+
+        .container { width: 100%; max-width: 520px; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 14px; margin-bottom: 28px; transition: color 0.2s; }
+        .back-link:hover { color: var(--text); }
+
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 36px 32px; animation: fadeUp 0.4s ease both; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+        .logo { text-align: center; margin-bottom: 28px; }
+        .logo-icon { width: 48px; height: 48px; background: linear-gradient(135deg, #f59e0b, #ef4444); border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 14px; }
+        h1 { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 4px; }
+        .subtitle { color: var(--muted); font-size: 14px; }
+
+        .search-row { display: flex; gap: 10px; }
+        .search-row input { flex: 1; }
+
+        .user-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 22px; display: none; animation: fadeUp 0.3s ease both; }
+        .user-card.visible { display: flex; align-items: center; gap: 14px; }
+        .user-avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, var(--accent)); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+        .user-info { flex: 1; min-width: 0; }
+        .user-info strong { display: block; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-info span { font-size: 12px; color: var(--muted); }
+        .badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+        .badge.CLIENTE       { background: rgba(59,130,246,0.15);  color: #60a5fa; }
+        .badge.ANFITRION     { background: rgba(74,222,128,0.15);  color: #4ade80; }
+        .badge.ADMINISTRADOR { background: rgba(251,191,36,0.15);  color: #fbbf24; }
+
+        .form-section { display: none; animation: fadeUp 0.3s ease both; }
+        .form-section.visible { display: block; }
+
+        .field { margin-bottom: 18px; }
+        label { display: block; font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.6px; }
+        input[type="text"], input[type="email"], input[type="password"] {
+            width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+            padding: 12px 14px; color: var(--text); font-family: 'DM Sans', sans-serif;
+            font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+        input::placeholder { color: var(--muted); }
+        .hint { font-size: 11px; color: var(--muted); margin-top: 5px; }
+
+        .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; }
+        .toggle-row span { font-size: 14px; }
+        .toggle { position: relative; width: 44px; height: 24px; }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; inset: 0; background: var(--border); border-radius: 24px; cursor: pointer; transition: background 0.2s; }
+        .slider:before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform 0.2s; }
+        .toggle input:checked + .slider { background: var(--accent); }
+        .toggle input:checked + .slider:before { transform: translateX(20px); }
+
+        .divider { border: none; border-top: 1px solid var(--border); margin: 22px 0; }
+        .section-label { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+
+        .msg { border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 18px; display: none; }
+        .msg.error   { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: var(--error); }
+        .msg.success { background: rgba(74,222,128,0.1);  border: 1px solid rgba(74,222,128,0.3);  color: var(--success); }
+
+        .btn { width: 100%; border: none; border-radius: 10px; padding: 14px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.1s; margin-top: 4px; }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .btn-search { background: var(--accent); }
+        .btn-save   { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="/listar-usuarios.html" class="back-link">← Volver a usuarios</a>
+    <div class="card">
+        <div class="logo">
+            <div class="logo-icon">🛡️</div>
+            <h1>Editar Usuario</h1>
+            <p class="subtitle" id="subtitleText">Búsqueda por correo electrónico</p>
+        </div>
+
+        <!-- BÚSQUEDA -->
+        <div class="field" id="searchField">
+            <label for="buscarEmail">Correo del usuario</label>
+            <div class="search-row">
+                <input type="email" id="buscarEmail" placeholder="usuario@correo.com" onkeydown="if(event.key==='Enter') buscar()">
+                <button class="btn btn-search" id="btnBuscar" style="width:auto;padding:12px 20px;margin-top:0" onclick="buscar()">Buscar</button>
+            </div>
+        </div>
+
+        <div class="msg" id="msgBusqueda"></div>
+
+        <!-- PERFIL ENCONTRADO -->
+        <div class="user-card" id="userCard">
+            <div class="user-avatar" id="userAvatar"></div>
+            <div class="user-info">
+                <strong id="userNombre"></strong>
+                <span id="userEmailDisplay"></span>
+            </div>
+            <span class="badge" id="userRol"></span>
+        </div>
+
+        <!-- FORMULARIO DE EDICIÓN -->
+        <div class="form-section" id="formSection">
+            <div class="msg" id="msgGuardar"></div>
+
+            <div class="section-label">Datos personales</div>
+            <div class="field">
+                <label for="nombre">Nombre</label>
+                <input type="text" id="nombre" placeholder="Nombre completo">
+            </div>
+            <div class="field">
+                <label for="telefono">Teléfono</label>
+                <input type="text" id="telefono" placeholder="Ej: +54 9 11 1234-5678">
+            </div>
+            <div class="field">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="nuevo@correo.com">
+            </div>
+
+            <hr class="divider">
+            <div class="section-label">Seguridad</div>
+            <div class="field">
+                <label for="password">Nueva contraseña</label>
+                <input type="password" id="password" placeholder="Dejá vacío para no cambiarla">
+                <p class="hint">Mínimo 6 caracteres</p>
+            </div>
+
+            <hr class="divider">
+            <div class="section-label">Cuenta</div>
+            <div class="field">
+                <div class="toggle-row">
+                    <span>Cuenta activa</span>
+                    <label class="toggle">
+                        <input type="checkbox" id="activo" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <hr class="divider">
+            <div class="section-label">Rol específico</div>
+            <div class="field" id="fieldMetodoPago">
+                <label for="metodoPago">Método de pago <span style="color:var(--muted);font-size:10px">(CLIENTE)</span></label>
+                <input type="text" id="metodoPago" placeholder="Ej: EFECTIVO, MASTERCARD">
+            </div>
+            <div class="field" id="fieldMatricula">
+                <label for="matricula">Matrícula <span style="color:var(--muted);font-size:10px">(ANFITRION / ADMIN)</span></label>
+                <input type="text" id="matricula" placeholder="Ej: MT-001">
+            </div>
+
+            <button class="btn btn-save" id="btnGuardar" onclick="guardar()">Guardar cambios</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let usuarioActual = null;
+
+    // ── Al cargar: si viene ?email=... desde listar-usuarios, buscar automáticamente ──
+    window.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(location.search);
+        const emailParam = params.get('email');
+        if (emailParam) {
+            document.getElementById('buscarEmail').value = emailParam;
+            buscar();
+        }
+    });
+
+    async function buscar() {
+        const email = document.getElementById('buscarEmail').value.trim();
+        const msg   = document.getElementById('msgBusqueda');
+        const btn   = document.getElementById('btnBuscar');
+        msg.style.display = 'none';
+
+        if (!email) {
+            showMsg(msg, 'error', 'Ingresá un correo para buscar.');
+            return;
+        }
+
+        btn.disabled = true; btn.textContent = 'Buscando...';
+
+        try {
+            const resp = await fetch('/Usuario/listar', { credentials: 'include' });
+            if (!resp.ok) throw new Error('No autorizado o error del servidor.');
+
+            const lista = await resp.json();
+            const usuario = lista.find(u => u.email.toLowerCase() === email.toLowerCase());
+
+            if (!usuario) {
+                showMsg(msg, 'error', 'No se encontró ningún usuario con ese correo.');
+                ocultarFormulario();
+            } else {
+                usuarioActual = usuario;
+                mostrarUsuario(usuario);
+            }
+        } catch (e) {
+            showMsg(msg, 'error', e.message || 'No se pudo conectar con el servidor.');
+            ocultarFormulario();
+        }
+
+        btn.disabled = false; btn.textContent = 'Buscar';
+    }
+
+    function mostrarUsuario(u) {
+        document.getElementById('userAvatar').textContent = u.nombre ? u.nombre[0].toUpperCase() : '?';
+        document.getElementById('userNombre').textContent = u.nombre;
+        document.getElementById('userEmailDisplay').textContent = u.email;
+
+        const rolBadge = document.getElementById('userRol');
+        rolBadge.textContent = u.tipoUsuario;
+        rolBadge.className   = 'badge ' + u.tipoUsuario;
+
+        document.getElementById('userCard').className = 'user-card visible';
+
+        // Pre-cargar campos con los datos actuales del usuario
+        document.getElementById('nombre').value    = u.nombre    || '';
+        document.getElementById('telefono').value  = u.telefono  || '';
+        document.getElementById('email').value     = u.email     || '';
+        document.getElementById('password').value  = '';
+        document.getElementById('activo').checked  = u.activo;
+        document.getElementById('metodoPago').value = u.metodo_pago || u.metodoPago || '';
+        document.getElementById('matricula').value  = u.matricula  || '';
+
+        // Mostrar/ocultar campos según rol
+        document.getElementById('fieldMetodoPago').style.display = u.tipoUsuario === 'CLIENTE'  ? 'block' : 'none';
+        document.getElementById('fieldMatricula').style.display  = u.tipoUsuario !== 'CLIENTE'  ? 'block' : 'none';
+
+        document.getElementById('formSection').className = 'form-section visible';
+        document.getElementById('msgGuardar').style.display = 'none';
+
+        // Actualizar subtítulo
+        document.getElementById('subtitleText').textContent = 'Editando: ' + u.email;
+    }
+
+    function ocultarFormulario() {
+        usuarioActual = null;
+        document.getElementById('userCard').className    = 'user-card';
+        document.getElementById('formSection').className = 'form-section';
+        document.getElementById('subtitleText').textContent = 'Búsqueda por correo electrónico';
+    }
+
+    async function guardar() {
+        if (!usuarioActual) return;
+
+        const btn = document.getElementById('btnGuardar');
+        const msg = document.getElementById('msgGuardar');
+        msg.style.display = 'none';
+
+        const nombre     = document.getElementById('nombre').value.trim();
+        const telefono   = document.getElementById('telefono').value.trim();
+        const email      = document.getElementById('email').value.trim();
+        const password   = document.getElementById('password').value;
+        const activo     = document.getElementById('activo').checked;
+        const metodoPago = document.getElementById('metodoPago').value.trim();
+        const matricula  = document.getElementById('matricula').value.trim();
+
+        // Siempre incluir el ID del usuario que se está editando
+        const datos = { id: usuarioActual.id, activo };
+
+        if (nombre)    datos.nombre    = nombre;
+        if (telefono)  datos.telefono  = telefono;
+        if (email)     datos.email     = email;
+        if (password)  datos.password  = password;
+        if (metodoPago) datos.metodoPago = metodoPago;
+        if (matricula)  datos.matricula  = matricula;
+
+        btn.disabled = true; btn.textContent = 'Guardando...';
+
+        try {
+            // Usa /actualizar/admin para que el backend respete el ID del body
+            // y no lo pise con el del usuario logueado
+            const resp = await fetch('/Usuario/actualizar/admin', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(datos)
+            });
+
+            if (resp.ok) {
+                const actualizado = await resp.json();
+                usuarioActual = actualizado;
+                mostrarUsuario(actualizado);
+                showMsg(msg, 'success', '¡Usuario actualizado correctamente!');
+            } else {
+                const texto = await resp.text();
+                showMsg(msg, 'error', 'Error: ' + texto);
+            }
+        } catch {
+            showMsg(msg, 'error', 'No se pudo conectar con el servidor.');
+        }
+
+        btn.disabled = false; btn.textContent = 'Guardar cambios';
+    }
+
+    function showMsg(el, tipo, texto) {
+        el.className = 'msg ' + tipo;
+        el.textContent = texto;
+        el.style.display = 'block';
+    }
+</script>
+</body>
+</html>
