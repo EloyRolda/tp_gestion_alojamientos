@@ -42,7 +42,6 @@
             padding: 0;
         }
 
-        /* ── HEADER ── */
         header {
             background: var(--surface);
             border-bottom: 1px solid var(--border);
@@ -142,7 +141,6 @@
             color: var(--delete-text);
         }
 
-        /* ── MAIN ── */
         main {
             padding: 32px;
             max-width: 1400px;
@@ -183,7 +181,6 @@
             color: #fff;
         }
 
-        /* ── SECCIONES ── */
         .section-title {
             font-size: 11px;
             font-weight: 700;
@@ -201,7 +198,6 @@
             gap: 16px;
         }
 
-        /* ── CARD ── */
         .card {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -235,7 +231,6 @@
             padding: 12px 20px 16px;
         }
 
-        /* ── ENDPOINT ROW ── */
         ul {
             list-style: none;
             padding: 0;
@@ -263,10 +258,25 @@
             flex-shrink: 0;
         }
 
-        .get  { background: var(--get);    color: var(--get-text); }
-        .post { background: var(--post);   color: var(--post-text); }
-        .put  { background: var(--put);    color: var(--put-text); }
-        .delete { background: var(--delete); color: var(--delete-text); }
+        .get {
+            background: var(--get);
+            color: var(--get-text);
+        }
+
+        .post {
+            background: var(--post);
+            color: var(--post-text);
+        }
+
+        .put {
+            background: var(--put);
+            color: var(--put-text);
+        }
+
+        .delete {
+            background: var(--delete);
+            color: var(--delete-text);
+        }
 
         .endpoint-link {
             font-size: 13px;
@@ -279,7 +289,6 @@
             color: #60a5fa;
         }
 
-        /* ── BLOQUEADO ── */
         .endpoint-row.locked .endpoint-link {
             color: var(--locked-text);
             cursor: not-allowed;
@@ -305,12 +314,26 @@
             font-weight: 600;
         }
 
-        .tag-admin    { background: rgba(99, 102, 241, 0.15); color: #a5b4fc; }
-        .tag-anfitrion { background: rgba(251, 191, 36, 0.1);  color: #fde68a; }
-        .tag-cliente  { background: rgba(52, 211, 153, 0.1);   color: #6ee7b7; }
-        .tag-all      { background: rgba(100, 116, 139, 0.15); color: #94a3b8; }
+        .tag-admin {
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+        }
 
-        /* ── LOADING ── */
+        .tag-anfitrion {
+            background: rgba(251, 191, 36, 0.1);
+            color: #fde68a;
+        }
+
+        .tag-cliente {
+            background: rgba(52, 211, 153, 0.1);
+            color: #6ee7b7;
+        }
+
+        .tag-all {
+            background: rgba(100, 116, 139, 0.15);
+            color: #94a3b8;
+        }
+
         #loadingOverlay {
             position: fixed;
             inset: 0;
@@ -331,7 +354,11 @@
             animation: spin 0.7s linear infinite;
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 <body>
@@ -340,7 +367,6 @@
     <div class="spinner"></div>
 </div>
 
-<!-- HEADER -->
 <header>
     <div class="header-left">
         <div class="logo-icon">🏠</div>
@@ -355,7 +381,6 @@
     </div>
 </header>
 
-<!-- MAIN -->
 <main id="mainContent" style="display:none">
     <div class="page-header">
         <h1 class="page-title">Panel de Endpoints</h1>
@@ -383,28 +408,28 @@
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/Usuario/listar/clientes">Listar clientes</a>
+                            <a class="endpoint-link" href="/Usuario/listar/clientes">Listar clientes [JSON]</a>
                             <span class="access-tag tag-admin">ADMIN</span>
                         </div>
                     </li>
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/Usuario/listar/anfitriones">Listar anfitriones</a>
+                            <a class="endpoint-link" href="/Usuario/listar/anfitriones">Listar anfitriones [JSON]</a>
                             <span class="access-tag tag-admin">ADMIN</span>
                         </div>
                     </li>
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/Usuario/listar/administradores">Listar admins</a>
+                            <a class="endpoint-link" href="/Usuario/listar/administradores">Listar admins [JSON]</a>
                             <span class="access-tag tag-admin">ADMIN</span>
                         </div>
                     </li>
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN">
                             <span class="badge post">POST</span>
-                            <a class="endpoint-link" href="/Usuario/registrar/administrador">Registrar admin</a>
+                            <a class="endpoint-link" href="/Usuario/registrar/administrador">Registrar admin [JSON]</a>
                             <span class="access-tag tag-admin">ADMIN</span>
                         </div>
                     </li>
@@ -431,8 +456,13 @@
                 <span class="card-icon">📋</span>
                 <span class="card-title">Reservas (admin)</span>
             </div>
+
             <div class="card-body">
                 <ul>
+
+
+                    <
+
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN">
                             <span class="badge get">GET</span>
@@ -473,21 +503,21 @@
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN,ANFITRION">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/Casa/listar/propios">Listar mis casas</a>
+                            <a class="endpoint-link" href="/Casa/listar/propios">Listar mis casas [JSON]</a>
                             <span class="access-tag tag-anfitrion">PROPIOS</span>
                         </div>
                     </li>
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/Casa/listar">Listar</a>
+                            <a class="endpoint-link" href="/Casa/listar">Listar [JSON]</a>
                             <span class="access-tag tag-all">TODOS</span>
                         </div>
                     </li>
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/Casa/mostrar/1">Mostrar por ID</a>
+                            <a class="endpoint-link" href="/Casa/mostrar/1">Mostrar por ID [JSON]</a>
                             <span class="access-tag tag-all">TODOS</span>
                         </div>
                     </li>
@@ -526,21 +556,21 @@
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN,ANFITRION">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/Hotel/listar/propios">Listar mis hoteles</a>
+                            <a class="endpoint-link" href="/Hotel/listar/propios">Listar mis hoteles [JSON]</a>
                             <span class="access-tag tag-anfitrion">PROPIOS</span>
                         </div>
                     </li>
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/Hotel/listar">Listar</a>
+                            <a class="endpoint-link" href="/Hotel/listar">Listar [JSON]</a>
                             <span class="access-tag tag-all">TODOS</span>
                         </div>
                     </li>
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/Hotel/mostrar/1">Mostrar por ID</a>
+                            <a class="endpoint-link" href="/Hotel/mostrar/1">Mostrar por ID [JSON]</a>
                             <span class="access-tag tag-all">TODOS</span>
                         </div>
                     </li>
@@ -579,21 +609,22 @@
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN,ANFITRION">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/Departamento/listar/propios">Listar mis departamentos</a>
+                            <a class="endpoint-link" href="/Departamento/listar/propios">Listar mis departamentos
+                                [JSON]</a>
                             <span class="access-tag tag-anfitrion">PROPIOS</span>
                         </div>
                     </li>
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/Departamento/listar">Listar</a>
+                            <a class="endpoint-link" href="/Departamento/listar">Listar [JSON]</a>
                             <span class="access-tag tag-all">TODOS</span>
                         </div>
                     </li>
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/Departamento/mostrar/1">Mostrar por ID</a>
+                            <a class="endpoint-link" href="/Departamento/mostrar/1">Mostrar por ID [JSON]</a>
                             <span class="access-tag tag-all">TODOS</span>
                         </div>
                     </li>
@@ -663,21 +694,21 @@
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN,CLIENTE">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/listar-reservas.html">Listar (vista)</a>
-                            <span class="access-tag tag-cliente">ADMIN/CLI</span>
+                            <a class="endpoint-link" href="/mis-reservas.html">Mis reservas (vista)</a>
+                            <span class="access-tag tag-cliente">CLIENTE</span>
                         </div>
                     </li>
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN,CLIENTE">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/Reserva/listar/propios">Mis reservas</a>
+                            <a class="endpoint-link" href="/Reserva/listar/propios">Mis reservas [JSON]</a>
                             <span class="access-tag tag-cliente">PROPIOS</span>
                         </div>
                     </li>
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/Reserva/mostrar/1">Ver reserva</a>
+                            <a class="endpoint-link" href="/Reserva/mostrar/1">Ver reserva [JSON]</a>
                             <span class="access-tag tag-all">TODOS</span>
                         </div>
                     </li>
@@ -714,10 +745,17 @@
             <div class="card-body">
                 <ul>
                     <li>
-                        <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE">
+                        <div class="endpoint-row" data-roles="ADMIN">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/listar-review.html">Listar (vista)</a>
-                            <span class="access-tag tag-all">TODOS</span>
+                            <a class="endpoint-link" href="/listar-review.html">Listar TODAS (vista)</a>
+                            <span class="access-tag tag-admin">SOLO ADMIN</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="endpoint-row" data-roles="CLIENTE">
+                            <span class="badge get">GET</span>
+                            <a class="endpoint-link" href="/mis-reviews.html">Mis reviews (vista)</a>
+                            <span class="access-tag tag-cliente">CLIENTE</span>
                         </div>
                     </li>
                     <li>
@@ -730,21 +768,21 @@
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/Review/mostrar/1">Ver review</a>
+                            <a class="endpoint-link" href="/Review/mostrar/1">Ver review [JSON]</a>
                             <span class="access-tag tag-all">TODOS</span>
                         </div>
                     </li>
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN,ANFITRION,CLIENTE">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/Review/alojamiento/1">Reviews de alojamiento</a>
+                            <a class="endpoint-link" href="/Review/alojamiento/1">Reviews de alojamiento [JSON]</a>
                             <span class="access-tag tag-all">TODOS</span>
                         </div>
                     </li>
                     <li>
                         <div class="endpoint-row" data-roles="ADMIN,CLIENTE">
                             <span class="badge get">GET</span>
-                            <a class="endpoint-link" href="/Review/cliente/1">Mis reviews</a>
+                            <a class="endpoint-link" href="/Review/cliente/1">Mis reviews [JSON]</a>
                             <span class="access-tag tag-cliente">ADMIN/CLI</span>
                         </div>
                     </li>
@@ -774,6 +812,8 @@
         </div>
 
     </div>
+
+
 </main>
 
 <script>

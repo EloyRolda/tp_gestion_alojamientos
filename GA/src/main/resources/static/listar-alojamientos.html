@@ -166,13 +166,14 @@
 
 <script>
     const CONFIG = {
-        casas:        { url: '/Casa/listar',         deleteUrl: id => `/Casa/eliminar/${id}`,        editUrl: '/actualizar-casa.html',         label: '🏠 Casas' },
+        casas:        { url: '/Casa/listar',         deleteUrl: id => `/Casa/eliminar/${id}`,        editUrl: id => `/actualizar-casa.html?id=${id}`,         label: '🏠 Casas' },
         hoteles:      { url: '/Hotel/listar',        deleteUrl: id => `/Hotel/eliminar/${id}`,       editUrl: '/actualizar-hotel.html',        label: '🏨 Hoteles' },
         departamentos:{ url: '/Departamento/listar', deleteUrl: id => `/Departamento/eliminar/${id}`,editUrl: '/actualizar-departamento.html', label: '🏢 Departamentos' }
     };
 
     let datos = [];
     let pendingDeleteId = null;
+    let usuarioActual = null;
 
     const tipo = new URLSearchParams(location.search).get('tipo') || 'casas';
     const cfg  = CONFIG[tipo] || CONFIG.casas;
@@ -181,19 +182,15 @@
     if (tabEl) tabEl.classList.add('active');
     document.getElementById('pageSubtitle').textContent = '— ' + cfg.label;
 
-    // Normaliza casa/hotel/depto al objeto alojamiento base
     function normalizar(item) {
         const a = item.alojamiento || item;
         const extra = {};
-        // Casa
         if (item.tienePatio    !== undefined) extra.patio    = item.tienePatio;
         if (item.tienePileta   !== undefined) extra.pileta   = item.tienePileta;
         if (item.tieneParrilla !== undefined) extra.parrilla = item.tieneParrilla;
-        // Hotel
         if (item.estrellas        !== undefined) extra.estrellas  = item.estrellas;
         if (item.incluyeDesayuno  !== undefined) extra.desayuno   = item.incluyeDesayuno;
         if (item.incluyeLimpieza  !== undefined) extra.limpieza   = item.incluyeLimpieza;
-        // Depto
         if (item.piso             !== undefined) extra.piso       = item.piso;
         if (item.tieneAscensor    !== undefined) extra.ascensor   = item.tieneAscensor;
         if (item.expensasIncluidas!== undefined) extra.expensas   = item.expensasIncluidas;
@@ -202,6 +199,9 @@
 
     async function cargar() {
         try {
+            const meResp = await fetch('/Usuario/me', { credentials: 'include' });
+            if (meResp.ok) usuarioActual = await meResp.json();
+
             const resp = await fetch(cfg.url, { credentials: 'include' });
             if (!resp.ok) throw new Error('Error ' + resp.status);
             const raw = await resp.json();
@@ -246,6 +246,9 @@
             const precio = a.precioNoche ? `$${parseFloat(a.precioNoche).toLocaleString('es-AR')}` : '—';
             const tipoLabel = a.tipoInmueble || tipo.slice(0,-1).toUpperCase();
 
+            const puedeEditar = usuarioActual && (usuarioActual.tipoUsuario === 'ADMINISTRADOR' ||
+                (usuarioActual.tipoUsuario === 'ANFITRION' && a.anfitrion?.id === usuarioActual.id));
+
             return `<tr>
                 <td class="cell-muted">${a.id}</td>
                 <td class="cell-name" title="${a.titulo || ''}">${a.titulo || '—'}</td>
@@ -259,8 +262,10 @@
                 <td>${extrasHTML(a.extra, tipo)}</td>
                 <td>
                     <div class="actions">
-                        <a class="btn-action btn-edit" href="${cfg.editUrl}">✏️ Editar</a>
-                        <button class="btn-action btn-delete" onclick="abrirModal(${a.id}, '${(a.titulo||'').replace(/'/g,"\\'")}')">🗑️ Eliminar</button>
+                        <a class="btn-action btn-edit" href="/detalle-alojamiento.html?id=${a.id}&tipo=${tipo}" style="background:rgba(59,130,246,0.15);color:#60a5fa;">🔍 Ver</a>
+                        ${puedeEditar ?
+                `<a class="btn-action btn-edit" href="${cfg.editUrl}?id=${a.id}">✏️ Editar</a>
+                            <button class="btn-action btn-delete" onclick="abrirModal(${a.id}, '${(a.titulo||'').replace(/'/g,"\\'")}')">🗑️ Eliminar</button>` : ''}
                     </div>
                 </td>
             </tr>`;

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle Alojamiento</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap');
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0a0f1e;
+            --surface: #111827;
+            --surface2: #1a2435;
+            --border: #1e2d45;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+            --text: #e2e8f0;
+            --muted: #64748b;
+            --error: #f87171;
+            --delete: #7f1d1d;
+            --delete-text: #fca5a5;
+        }
+
+        body {
+            background: var(--bg);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ── HEADER ── */
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 32px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 10;
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .logo-icon {
+            width: 38px; height: 38px;
+            background: linear-gradient(135deg, var(--accent), #6366f1);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+        }
+        .app-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; }
+        .btn-back {
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px; padding: 8px 14px;
+            color: var(--muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px; cursor: pointer;
+            text-decoration: none; display: inline-block;
+            transition: all 0.2s;
+        }
+        .btn-back:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* ── MAIN ── */
+        main { padding: 32px; max-width: 900px; margin: 0 auto; }
+
+        /* ── LOADING ── */
+        #loadingOverlay {
+            position: fixed; inset: 0; background: var(--bg);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 100; transition: opacity 0.3s;
+        }
+        .spinner {
+            width: 32px; height: 32px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── ALOJAMIENTO DETAIL ── */
+        .detail-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 24px;
+            animation: fadeUp 0.4s ease both;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .detail-head {
+            padding: 24px 28px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: flex-start;
+            justify-content: space-between; gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .aloj-titulo {
+            font-family: 'Playfair Display', serif;
+            font-size: 26px; font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .aloj-estado {
+            font-size: 11px; font-weight: 700;
+            padding: 3px 10px; border-radius: 20px;
+            letter-spacing: 0.5px; text-transform: uppercase;
+            white-space: nowrap; flex-shrink: 0;
+        }
+        .estado-activo   { background: rgba(52,211,153,0.15); color: #6ee7b7; border: 1px solid rgba(52,211,153,0.25); }
+        .estado-inactivo { background: rgba(100,116,139,0.15); color: #94a3b8; border: 1px solid rgba(100,116,139,0.25); }
+
+        .detail-body { padding: 24px 28px; }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+        .info-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 0.6px; text-transform: uppercase; margin-bottom: 6px; }
+        .info-value { font-size: 15px; font-weight: 500; }
+
+        .aloj-desc {
+            font-size: 14px; color: #94a3b8;
+            line-height: 1.7;
+            border-top: 1px solid var(--border);
+            padding-top: 16px; margin-top: 4px;
+        }
+
+        /* ── ACCIONES ── */
+        .actions-row {
+            display: flex; gap: 10px; flex-wrap: wrap;
+            margin-bottom: 32px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #6366f1);
+            border: none; border-radius: 9px;
+            padding: 11px 22px;
+            color: #fff;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px; font-weight: 600;
+            cursor: pointer; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 6px;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        .btn-edit-aloj {
+            background: rgba(59,130,246,0.12);
+            border: 1px solid rgba(59,130,246,0.25);
+            color: #93c5fd;
+            border-radius: 9px; padding: 11px 22px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px; font-weight: 500;
+            cursor: pointer; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 6px;
+            transition: all 0.2s;
+        }
+        .btn-edit-aloj:hover { background: rgba(59,130,246,0.22); }
+
+        .btn-delete-aloj {
+            background: rgba(127,29,29,0.35);
+            border: 1px solid rgba(252,165,165,0.2);
+            color: var(--delete-text);
+            border-radius: 9px; padding: 11px 22px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px; font-weight: 500;
+            cursor: pointer;
+            display: inline-flex; align-items: center; gap: 6px;
+            transition: all 0.2s;
+        }
+        .btn-delete-aloj:hover { background: rgba(127,29,29,0.55); }
+
+        /* ── REVIEWS ── */
+        .section-title {
+            font-size: 11px; font-weight: 700;
+            letter-spacing: 1.2px; text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .review-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            transition: border-color 0.2s;
+            animation: fadeUp 0.4s ease both;
+        }
+        .review-card:hover { border-color: #2d3f5c; }
+
+        .review-top {
+            display: flex; align-items: center;
+            justify-content: space-between; gap: 10px;
+            margin-bottom: 8px;
+        }
+        .review-author { font-size: 14px; font-weight: 600; }
+        .review-date   { font-size: 12px; color: var(--muted); }
+
+        .stars { font-size: 14px; letter-spacing: 1px; margin-bottom: 6px; }
+        .stars .filled { color: #fbbf24; }
+        .stars .empty  { color: var(--border); }
+
+        .review-comment {
+            font-size: 14px; color: #94a3b8;
+            line-height: 1.6;
+            border-left: 2px solid var(--border);
+            padding-left: 12px;
+            font-style: italic;
+        }
+
+        .empty-state { text-align: center; padding: 40px 24px; color: var(--muted); }
+        .empty-state .empty-icon { font-size: 36px; margin-bottom: 12px; }
+        .empty-state p { font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div id="loadingOverlay"><div class="spinner"></div></div>
+
+<header>
+    <div class="header-left">
+        <div class="logo-icon">🏠</div>
+        <span class="app-title">Gestión Alojamiento</span>
+    </div>
+    <a href="/listar-alojamientos.html" class="btn-back">← Volver</a>
+</header>
+
+<main id="mainContent" style="display:none">
+
+    <!-- Info del alojamiento -->
+    <div class="detail-card" id="detailCard">
+        <div class="detail-head" id="detailHead">
+            <div><div class="aloj-titulo" id="titulo">Cargando...</div></div>
+        </div>
+        <div class="detail-body" id="detailBody"></div>
+    </div>
+
+    <!-- Acciones según rol -->
+    <div class="actions-row" id="acciones"></div>
+
+    <!-- Reseñas -->
+    <div class="section-title">⭐ Reseñas</div>
+    <div id="reviews"></div>
+
+</main>
+
+<script>
+    const params = new URLSearchParams(location.search);
+    const id   = params.get('id');
+    const tipo = params.get('tipo') || 'casas';
+
+    let usuario = null;
+
+    async function cargarUsuario() {
+        try {
+            const resp = await fetch('/Usuario/me', { credentials: 'include' });
+            if (resp.ok) usuario = await resp.json();
+        } catch(e) {}
+    }
+
+    async function cargarAlojamiento() {
+        let url = '';
+        if (tipo === 'casas') url = `/Casa/mostrar/${id}`;
+        else if (tipo === 'hoteles') url = `/Hotel/mostrar/${id}`;
+        else url = `/Departamento/mostrar/${id}`;
+
+        const resp = await fetch(url, { credentials: 'include' });
+        if (!resp.ok) {
+            document.getElementById('detailBody').innerHTML = '<p style="color:var(--error)">Error al cargar el alojamiento.</p>';
+            return;
+        }
+
+        const data = await resp.json();
+        const a = data.alojamiento || data;
+
+        document.getElementById('titulo').innerText = a.titulo || 'Sin título';
+
+        const activo = a.activo !== false;
+        document.getElementById('detailHead').innerHTML = `
+            <div>
+                <div class="aloj-titulo">${a.titulo || 'Sin título'}</div>
+            </div>
+            <span class="aloj-estado ${activo ? 'estado-activo' : 'estado-inactivo'}">
+                ${activo ? '✅ Activo' : '❌ Inactivo'}
+            </span>
+        `;
+
+        const direccion = [a.direccion?.calle, a.direccion?.numero, a.direccion?.ciudad].filter(Boolean).join(' ');
+
+        document.getElementById('detailBody').innerHTML = `
+            <div class="info-grid">
+                ${direccion ? `<div class="info-item"><div class="info-label">📍 Dirección</div><div class="info-value">${direccion}</div></div>` : ''}
+                ${a.precioNoche ? `<div class="info-item"><div class="info-label">💰 Precio</div><div class="info-value">$${a.precioNoche} / noche</div></div>` : ''}
+                ${a.capacidad   ? `<div class="info-item"><div class="info-label">👥 Capacidad</div><div class="info-value">${a.capacidad} personas</div></div>` : ''}
+            </div>
+            ${a.descripcion ? `<div class="aloj-desc">${a.descripcion}</div>` : ''}
+        `;
+
+        // Botones de acción
+        const acciones = document.getElementById('acciones');
+        if (usuario) {
+            if (usuario.tipoUsuario === 'CLIENTE') {
+                acciones.innerHTML = `<a class="btn-primary" href="/registrar-reserva.html?idAlojamiento=${id}">📅 Reservar</a>`;
+            }
+            if (usuario.tipoUsuario === 'ADMINISTRADOR' ||
+                (usuario.tipoUsuario === 'ANFITRION' && a.anfitrion?.id === usuario.id)) {
+                acciones.innerHTML = `
+                    <a class="btn-edit-aloj" href="/actualizar-${tipo.slice(0,-1)}.html?id=${id}">✏️ Editar</a>
+                    <button class="btn-delete-aloj" onclick="eliminarAlojamiento()">🗑️ Eliminar</button>
+                `;
+            }
+        }
+    }
+
+    async function cargarReviews() {
+        const resp = await fetch(`/Review/alojamiento/${id}`, { credentials: 'include' });
+        if (!resp.ok) {
+            document.getElementById('reviews').innerHTML = '<p style="color:var(--muted)">No se pudieron cargar las reseñas.</p>';
+            return;
+        }
+
+        const reviews = await resp.json();
+
+        if (reviews.length === 0) {
+            document.getElementById('reviews').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">💬</div>
+                    <p>Sin reseñas todavía.</p>
+                </div>`;
+            return;
+        }
+
+        document.getElementById('reviews').innerHTML = reviews.map((r, i) => {
+            const filled = '★'.repeat(r.puntuacion);
+            const empty  = '☆'.repeat(5 - r.puntuacion);
+            const fecha  = r.fecha ? r.fecha.split('T')[0] : '';
+            return `
+            <div class="review-card" style="animation-delay:${i * 0.06}s">
+                <div class="review-top">
+                    <span class="review-author">${r.cliente?.nombre || 'Usuario'}</span>
+                    ${fecha ? `<span class="review-date">${fecha}</span>` : ''}
+                </div>
+                <div class="stars"><span class="filled">${filled}</span><span class="empty">${empty}</span></div>
+                ${r.comentario ? `<div class="review-comment">${r.comentario}</div>` : ''}
+            </div>`;
+        }).join('');
+    }
+
+    async function eliminarAlojamiento() {
+        if (!confirm('¿Eliminar este alojamiento?')) return;
+        let url = '';
+        if (tipo === 'casas') url = `/Casa/eliminar/${id}`;
+        else if (tipo === 'hoteles') url = `/Hotel/eliminar/${id}`;
+        else url = `/Departamento/eliminar/${id}`;
+
+        const resp = await fetch(url, { method: 'DELETE', credentials: 'include' });
+        if (resp.ok) window.location.href = '/listar-alojamientos.html';
+        else alert('No se pudo eliminar');
+    }
+
+    async function init() {
+        await cargarUsuario();
+        await cargarAlojamiento();
+        await cargarReviews();
+
+        const overlay = document.getElementById('loadingOverlay');
+        overlay.style.opacity = '0';
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+        }, 300);
+    }
+
+    init();
+</script>
+</body>
+</html>

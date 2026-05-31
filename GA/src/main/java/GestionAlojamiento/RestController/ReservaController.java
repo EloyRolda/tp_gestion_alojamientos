@@ -37,7 +37,10 @@ public class ReservaController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return reservaService.listarPorUsuario(auth.getName());
     }
-
+    @GetMapping("/listar/anfitrion")
+    public List<Reserva> listarReservasDeMisAlojamientos(Authentication auth) {
+        return reservaService.listarReservasPorAnfitrion(auth.getName());
+    }
 
     @PostMapping("/registrar")
     public Reserva registrar(@RequestBody ReservaRegistroDTO reservaRegistroDTO) {

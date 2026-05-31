@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +22,14 @@ public class AlojamientoService {
     /// Devuelve una lista de todos los alojamientos registrados
     public List<Alojamiento> listarTodos() {
         return alojamientoRepository.findAll(Sort.by(Sort.Direction.ASC, "titulo"));
+    }
+
+    /// Devuelve todos la lista de ids de alojamientos del anfitrion
+    public List<Long> obtenerIdsPorAnfitrion(Long anfitrionId) {
+        return alojamientoRepository.findByAnfitrionId(anfitrionId)
+                .stream()
+                .map(Alojamiento::getId)
+                .collect(Collectors.toList());
     }
 
     /// Devuelve un Objeto Alojamiento en base al id

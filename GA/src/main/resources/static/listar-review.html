@@ -148,9 +148,26 @@
     let datos = [];
     let filtroEstrellasActivo = 0;
     let pendingDeleteId = null;
+    let usuarioActual = null;
 
     async function cargar() {
         try {
+            const meResp = await fetch('/Usuario/me', { credentials: 'include' });
+            if (!meResp.ok) throw new Error('No autenticado');
+            usuarioActual = await meResp.json();
+
+            if (usuarioActual.tipoUsuario !== 'ADMINISTRADOR') {
+                document.getElementById('tbody').innerHTML = '';
+                document.getElementById('emptyState').innerHTML = `
+                    <div class="empty-icon">🔒</div>
+                    <div>Solo administradores pueden ver TODAS las reviews.<br>
+                    <a href="/mis-reviews.html">📝 Ver MIS reviews</a></div>
+                `;
+                document.getElementById('emptyState').style.display = 'block';
+                ocultarLoading();
+                return;
+            }
+
             const resp = await fetch('/Review/listar', { credentials: 'include' });
             if (!resp.ok) throw new Error('Error ' + resp.status);
             datos = await resp.json();

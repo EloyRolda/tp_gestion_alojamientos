@@ -158,6 +158,8 @@
   let datos = [];
   let filtroEstado = 'TODOS';
   let pendingDeleteId = null;
+  let usuarioActual = null;
+  let usuarioRol = null;
   const HOY = new Date().toISOString().split('T')[0];
 
   function estadoEfectivo(r) {
@@ -168,7 +170,29 @@
 
   async function cargar() {
     try {
-      const resp = await fetch('/Reserva/listar', { credentials: 'include' });
+      const meResp = await fetch('/Usuario/me', { credentials: 'include' });
+      if (!meResp.ok) throw new Error('No autenticado');
+      usuarioActual = await meResp.json();
+      usuarioRol = usuarioActual.tipoUsuario;
+
+      let url = '';
+      if (usuarioRol === 'ADMINISTRADOR') {
+        url = '/Reserva/listar';
+      } else if (usuarioRol === 'CLIENTE') {
+        url = '/Reserva/listar/propios';
+      } else if (usuarioRol === 'ANFITRION') {
+        document.getElementById('tbody').innerHTML = '';
+        document.getElementById('emptyState').innerHTML = `
+                    <div class="empty-icon">⚠️</div>
+                    <div>Funcionalidad pendiente: Ver reservas de tus alojamientos.<br>
+                    <small>El endpoint /Reserva/listar/anfitrion debe implementarse en el back.</small></div>
+                `;
+        document.getElementById('emptyState').style.display = 'block';
+        ocultarLoading();
+        return;
+      }
+
+      const resp = await fetch(url, { credentials: 'include' });
       if (!resp.ok) throw new Error('Error ' + resp.status);
       datos = await resp.json();
       renderizar(aplicarFiltros());

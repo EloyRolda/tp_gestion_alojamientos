@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -37,9 +38,27 @@ public class ReservaService {
     public Reserva obtenerPorId(Long id) {
         return reservaRepository.findById(id).orElseThrow(() -> new IdNoEncontradoException("Error, la reserva no se encuentra en la base de datos"));
     }
+
     /// Recibe un id de un anfitrion y devuelve una lista de las reservas es que posee.
     public List<Reserva> listarPorUsuario(String correoUsuario) {
         return reservaRepository.findByCliente_Email(correoUsuario);
+    }
+
+    /// devuelve las reservas segun el anfitrion
+    public List<Reserva> listarReservasPorAnfitrion(String email) {
+        Usuario anfitrion = usuarioService.obtenerPorEmail(email);
+
+        if (anfitrion == null) {
+            throw new RuntimeException("Anfitrión no encontrado");
+        }
+
+        List<Long> alojamientoIds = alojamientoService.obtenerIdsPorAnfitrion(anfitrion.getId());
+
+        if (alojamientoIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return reservaRepository.findByAlojamientoIdIn(alojamientoIds);
     }
 
     //------------------------ CREAR/BORRAR ------------------------
@@ -187,7 +206,7 @@ public class ReservaService {
     }
 
 
-    ///VERIFICA SI EL CLIENTE TUVO UNA RESERVA CONFIRMADA QUE YA PASO Y DEVUELVE V O F
+    /// VERIFICA SI EL CLIENTE TUVO UNA RESERVA CONFIRMADA QUE YA PASO Y DEVUELVE V O F
     public boolean tuvisteReservaConfirmada(Long clienteId, Long alojamientoId) {
         return reservaRepository.existsByClienteIdAndAlojamientoIdAndTipoEstadoAndFechaFinBefore(clienteId, alojamientoId, TipoEstado.CONFIRMADA, LocalDate.now());
     }

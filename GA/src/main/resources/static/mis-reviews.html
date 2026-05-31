@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Reviews</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap');
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0a0f1e;
+            --surface: #111827;
+            --surface2: #1a2435;
+            --border: #1e2d45;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+            --text: #e2e8f0;
+            --muted: #64748b;
+            --error: #f87171;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --delete: #7f1d1d;
+            --delete-text: #fca5a5;
+        }
+
+        body {
+            background: var(--bg);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ── HEADER ── */
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 12px; }
+
+        .logo-icon {
+            width: 38px; height: 38px;
+            background: linear-gradient(135deg, var(--accent), #6366f1);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+        }
+
+        .app-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px; font-weight: 600;
+        }
+
+        .btn-back {
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 14px;
+            color: var(--muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+        .btn-back:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* ── MAIN ── */
+        main {
+            padding: 32px;
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+        }
+
+        /* ── LOADING / ERROR ── */
+        #loadingOverlay {
+            position: fixed; inset: 0;
+            background: var(--bg);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 100;
+            transition: opacity 0.3s;
+        }
+
+        .spinner {
+            width: 32px; height: 32px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .error-banner {
+            background: rgba(248,113,113,0.1);
+            border: 1px solid rgba(248,113,113,0.3);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: var(--error);
+            font-size: 14px;
+            margin-bottom: 24px;
+            display: none;
+        }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            text-align: center;
+            padding: 64px 24px;
+            color: var(--muted);
+        }
+        .empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; }
+        .empty-state p { font-size: 15px; }
+
+        /* ── REVIEW CARD ── */
+        .review-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 16px;
+            transition: border-color 0.2s;
+            animation: fadeUp 0.4s ease both;
+        }
+        .review-card:hover { border-color: #2d3f5c; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .review-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .review-meta { flex: 1; }
+
+        .review-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .stars {
+            font-size: 15px;
+            letter-spacing: 1px;
+        }
+        .stars .filled { color: #fbbf24; }
+        .stars .empty  { color: var(--border); }
+
+        .review-date {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .review-comment {
+            font-size: 14px;
+            color: #94a3b8;
+            line-height: 1.6;
+            border-left: 2px solid var(--border);
+            padding-left: 12px;
+            margin-top: 12px;
+            font-style: italic;
+        }
+
+        .review-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .btn-edit, .btn-delete {
+            border-radius: 7px;
+            padding: 7px 14px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-edit {
+            background: rgba(59,130,246,0.12);
+            border: 1px solid rgba(59,130,246,0.25);
+            color: #93c5fd;
+        }
+        .btn-edit:hover { background: rgba(59,130,246,0.22); }
+
+        .btn-delete {
+            background: rgba(127,29,29,0.35);
+            border: 1px solid rgba(252,165,165,0.2);
+            color: var(--delete-text);
+        }
+        .btn-delete:hover { background: rgba(127,29,29,0.55); }
+    </style>
+</head>
+<body>
+
+<div id="loadingOverlay"><div class="spinner"></div></div>
+
+<header>
+    <div class="header-left">
+        <div class="logo-icon">🏠</div>
+        <span class="app-title">Gestión Alojamiento</span>
+    </div>
+    <a href="/home.html" class="btn-back">← Volver</a>
+</header>
+
+<main id="mainContent" style="display:none">
+    <div class="page-header">
+        <h1 class="page-title">⭐ Mis Reseñas</h1>
+    </div>
+
+    <div class="error-banner" id="mensaje"></div>
+    <div id="lista"></div>
+</main>
+
+<script>
+    let reviews = [];
+
+    async function cargar() {
+        try {
+            const me = await fetch('/Usuario/me', { credentials: 'include' }).then(r => r.json());
+            const resp = await fetch(`/Review/cliente/${me.id}`, { credentials: 'include' });
+            if (!resp.ok) throw new Error('Error al cargar reseñas');
+            reviews = await resp.json();
+            mostrar();
+        } catch(e) {
+            const msg = document.getElementById('mensaje');
+            msg.textContent = 'Error: ' + e.message;
+            msg.style.display = 'block';
+        } finally {
+            fadeIn();
+        }
+    }
+
+    function mostrar() {
+        const lista = document.getElementById('lista');
+        if (reviews.length === 0) {
+            lista.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">⭐</div>
+                    <p>No dejaste ninguna reseña todavía.</p>
+                </div>`;
+            return;
+        }
+
+        lista.innerHTML = reviews.map((r, i) => {
+            const filled = '★'.repeat(r.puntuacion);
+            const empty  = '☆'.repeat(5 - r.puntuacion);
+            const fecha  = r.fecha ? r.fecha.split('T')[0] : '';
+            const titulo = r.alojamiento?.titulo || 'Alojamiento ID: ' + r.idAlojamiento;
+            return `
+            <div class="review-card" style="animation-delay:${i * 0.06}s">
+                <div class="review-top">
+                    <div class="review-meta">
+                        <div class="review-title">${titulo}</div>
+                        <div class="stars">
+                            <span class="filled">${filled}</span><span class="empty">${empty}</span>
+                        </div>
+                        ${fecha ? `<div class="review-date">${fecha}</div>` : ''}
+                    </div>
+                </div>
+                ${r.comentario ? `<div class="review-comment">${r.comentario}</div>` : ''}
+                <div class="review-actions">
+                    <a class="btn-edit" href="/editar-review.html?id=${r.id}">✏️ Editar</a>
+                    <button class="btn-delete" onclick="eliminar(${r.id})">🗑️ Eliminar</button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    async function eliminar(id) {
+        if (!confirm('¿Eliminar esta reseña?')) return;
+        const resp = await fetch(`/Review/eliminar/${id}`, { method: 'DELETE', credentials: 'include' });
+        if (resp.ok) {
+            reviews = reviews.filter(r => r.id !== id);
+            mostrar();
+        } else {
+            alert('No se pudo eliminar');
+        }
+    }
+
+    function fadeIn() {
+        const overlay = document.getElementById('loadingOverlay');
+        overlay.style.opacity = '0';
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+        }, 300);
+    }
+
+    cargar();
+</script>
+</body>
+</html>

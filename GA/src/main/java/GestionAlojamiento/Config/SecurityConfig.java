@@ -46,13 +46,17 @@ public class SecurityConfig {
                                 "/actualizar-perfil.html",
                                 "/registrar-reserva.html",
                                 "/actualizar-reserva.html",
-                                "/cancelar-reserva.html",
                                 "/registrar-review.html",
                                 "/editar-review.html",
-                                "/eliminar-review.html",
                                 "/listar-alojamientos.html",
-                                "/listar-review.html"
+                                "/detalle-alojamiento.html"
                         ).hasAnyRole("ADMIN", "CLIENTE", "ANFITRION")
+
+                        // ── PÁGINAS ESTÁTICAS — CLIENTE ──────────────────────
+                        .requestMatchers(
+                                "/mis-reservas.html",
+                                "/mis-reviews.html"
+                        ).hasAnyRole("ADMIN", "CLIENTE")
 
                         // ── PÁGINAS ESTÁTICAS — ADMIN y ANFITRION ────────────
                         .requestMatchers(
@@ -62,13 +66,14 @@ public class SecurityConfig {
                                 "/actualizar-casa.html",
                                 "/actualizar-hotel.html",
                                 "/actualizar-departamento.html",
-                                "/eliminar-alojamiento.html"
+                                "/reservas-mis-alojamientos.html"
                         ).hasAnyRole("ADMIN", "ANFITRION")
 
                         // ── PÁGINAS ESTÁTICAS — SOLO ADMIN ───────────────────
                         .requestMatchers(
                                 "/listar-usuarios.html",
                                 "/listar-reservas.html",
+                                "/listar-review.html",
                                 "/admin-editar-usuario.html",
                                 "/eliminar-usuario.html"
                         ).hasRole("ADMIN")
@@ -120,11 +125,10 @@ public class SecurityConfig {
 
                         // ── RESERVAS ──────────────────────────────────────────
                         .requestMatchers("/Reserva/listar/propios").hasAnyRole("ADMIN", "CLIENTE")
+                        .requestMatchers("/Reserva/listar/anfitrion").hasAnyRole("ADMIN", "ANFITRION")  // ← AGREGAR ESTA LÍNEA
                         .requestMatchers("/Reserva/mostrar/**").hasAnyRole("ADMIN", "ANFITRION", "CLIENTE")
                         .requestMatchers("/Reserva/registrar").hasAnyRole("ADMIN", "CLIENTE")
-                        .requestMatchers(
-                                "/Reserva/actualizar",
-                                "/Reserva/eliminar/**"
+                        .requestMatchers("/Reserva/actualizar", "/Reserva/eliminar/**"
                         ).hasAnyRole("ADMIN", "CLIENTE")
 
                         // ── REVIEWS ───────────────────────────────────────────

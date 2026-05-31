@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservas de mis alojamientos</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap');
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #0a0f1e;
+            --surface: #111827;
+            --surface2: #1a2435;
+            --border: #1e2d45;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+            --text: #e2e8f0;
+            --muted: #64748b;
+            --error: #f87171;
+        }
+
+        body {
+            background: var(--bg);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--accent), #6366f1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .app-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 13px;
+            border: 1px solid var(--border);
+            padding: 7px 14px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--text);
+            border-color: #2d3f5c;
+        }
+
+        main {
+            padding: 32px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            margin-bottom: 28px;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 18px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--accent);
+            color: var(--text);
+        }
+
+        .filter-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .msg {
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .msg.error {
+            background: rgba(248, 113, 113, 0.1);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+            color: var(--error);
+        }
+
+        .reservas-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .reserva-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px 24px;
+            transition: border-color 0.2s;
+            animation: fadeUp 0.3s ease both;
+        }
+
+        .reserva-card:hover {
+            border-color: #2d3f5c;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .alojamiento-nombre {
+            font-weight: 600;
+            font-size: 18px;
+            color: var(--text);
+        }
+
+        .cliente-nombre {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .badge-estado {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        .estado-PENDIENTE {
+            background: rgba(251, 191, 36, 0.15);
+            color: #fde68a;
+        }
+
+        .estado-CONFIRMADA {
+            background: rgba(52, 211, 153, 0.15);
+            color: #6ee7b7;
+        }
+
+        .estado-CANCELADA {
+            background: rgba(100, 116, 139, 0.15);
+            color: #94a3b8;
+        }
+
+        .card-body {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .info-item {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+
+        .info-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .info-value.price {
+            color: #4ade80;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--muted);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        #loadingOverlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            transition: opacity 0.3s;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loadingOverlay">
+    <div class="spinner"></div>
+</div>
+
+<header>
+    <div class="header-left">
+        <div class="logo-icon">🏠</div>
+        <span class="app-title">Gestión Alojamiento</span>
+    </div>
+    <a href="/home.html" class="back-link">← Volver</a>
+</header>
+
+<main>
+    <h1 class="page-title">📅 Reservas de mis alojamientos</h1>
+
+    <div class="filter-bar">
+        <button class="filter-btn active" data-filter="TODOS" onclick="filtrar('TODOS', this)">Todas</button>
+        <button class="filter-btn" data-filter="PENDIENTE" onclick="filtrar('PENDIENTE', this)">⏳ Pendientes</button>
+        <button class="filter-btn" data-filter="CONFIRMADA" onclick="filtrar('CONFIRMADA', this)">✅ Confirmadas</button>
+        <button class="filter-btn" data-filter="CANCELADA" onclick="filtrar('CANCELADA', this)">❌ Canceladas</button>
+    </div>
+
+    <div class="msg error" id="msgError"></div>
+    <div class="reservas-list" id="reservasList"></div>
+</main>
+
+<script>
+    let todasReservas = [];
+    let filtroActual = 'TODOS';
+
+    async function cargarReservas() {
+        try {
+            const resp = await fetch('/Reserva/listar/anfitrion', { credentials: 'include' });
+            if (!resp.ok) {
+                if (resp.status === 403) {
+                    throw new Error('No tenés permisos para ver esta página. Solo anfitriones y administradores.');
+                }
+                throw new Error('Error ' + resp.status + ' al cargar las reservas');
+            }
+            todasReservas = await resp.json();
+            renderizar();
+        } catch (e) {
+            mostrarError(e.message);
+        } finally {
+            ocultarLoading();
+        }
+    }
+
+    function filtrar(estado, btn) {
+        filtroActual = estado;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderizar();
+    }
+
+    function renderizar() {
+        const container = document.getElementById('reservasList');
+        let filtradas = todasReservas;
+
+        if (filtroActual !== 'TODOS') {
+            filtradas = todasReservas.filter(r => r.tipoEstado === filtroActual);
+        }
+
+        if (filtradas.length === 0) {
+            container.innerHTML = `
+                <div class="empty">
+                    <div class="empty-icon">📅</div>
+                    <div>No hay reservas ${filtroActual === 'TODOS' ? '' : 'con estado ' + filtroActual}</div>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = filtradas.map(r => {
+            const alojamiento = r.alojamiento?.titulo || 'Alojamiento ID: ' + r.alojamiento?.id;
+            const cliente = r.cliente?.nombre || 'Cliente ID: ' + r.cliente?.id;
+            const precio = r.precioTotal ? `$${parseFloat(r.precioTotal).toLocaleString('es-AR')}` : '—';
+            const noches = r.fechaInicio && r.fechaFin
+                ? Math.max(0, Math.round((new Date(r.fechaFin) - new Date(r.fechaInicio)) / 86400000))
+                : null;
+
+            return `
+                <div class="reserva-card">
+                    <div class="card-top">
+                        <div>
+                            <div class="alojamiento-nombre">${alojamiento}</div>
+                            <div class="cliente-nombre">🧑 ${cliente}</div>
+                        </div>
+                        <span class="badge-estado estado-${r.tipoEstado}">${r.tipoEstado}</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-item">
+                            <div class="info-label">Desde</div>
+                            <div class="info-value">${r.fechaInicio || '—'}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Hasta</div>
+                            <div class="info-value">${r.fechaFin || '—'}</div>
+                        </div>
+                        ${noches !== null ? `
+                        <div class="info-item">
+                            <div class="info-label">Noches</div>
+                            <div class="info-value">${noches}</div>
+                        </div>
+                        ` : ''}
+                        <div class="info-item">
+                            <div class="info-label">Total</div>
+                            <div class="info-value price">${precio}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function mostrarError(msg) {
+        const el = document.getElementById('msgError');
+        el.textContent = msg;
+        el.style.display = 'block';
+        setTimeout(() => { el.style.display = 'none'; }, 5000);
+    }
+
+    function ocultarLoading() {
+        const ov = document.getElementById('loadingOverlay');
+        ov.style.opacity = '0';
+        setTimeout(() => ov.style.display = 'none', 300);
+    }
+
+    cargarReservas();
+</script>
+</body>
+</html>
