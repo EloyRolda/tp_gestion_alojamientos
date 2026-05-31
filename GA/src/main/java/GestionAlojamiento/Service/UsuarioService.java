@@ -58,6 +58,7 @@ public class UsuarioService {
     //---------------------------------------- CREAR ----------------------------------------
 
     @Transactional
+    ///Crea un usuario validando que no haya duplicados en la base de datos, no se puede usar para crear un administrador
     public Usuario crear(UsuarioRegistroDTO dto) {
 
         if (usuarioRepository.existsByEmail(dto.getEmail().toLowerCase())) {
@@ -84,9 +85,14 @@ public class UsuarioService {
 
         return usuarioRepository.save(usuario);
     }
-
-    // Crear admin
+    ///Sobrecarga de crear un usuario, pero recibiendo el usuario. Preferiblemente usar para testing o debuging
     @Transactional
+    public Usuario crear(Usuario usuario) {
+        return usuarioRepository.save(usuario);
+    }
+
+    @Transactional
+    ///Crea un administrador, solo un admin puede acceder a este mismo apartado, si la base de datos es nueva, se recomeinda "harcodeaar" el administrador en algun endpoint publico y luego borrarlo.
     public Usuario crearAdministrador(UsuarioRegistroDTO dto) {
 
         if (usuarioRepository.existsByEmail(dto.getEmail().toLowerCase())) {
@@ -108,8 +114,9 @@ public class UsuarioService {
 
     //---------------------------------------- MODIFICAR ----------------------------------------
     @Transactional
+    ///Actualiza la informacion de un usuario con el dto cargado. Deberia venir con los datos de sesion (id) del usuario actual cargado en el dto
     public Usuario actualizar(UsuarioModificarDTO dto) {
-        
+
         Usuario usuario = obtenerPorId(dto.getId());
 
         if (dto.getNombre() != null) {
@@ -118,11 +125,12 @@ public class UsuarioService {
 
         if (dto.getEmail() != null) {
             // Verificar que el nuevo email no lo tenga otro usuario
-            usuarioRepository.findByEmail(dto.getEmail().toLowerCase()).ifPresent(existente -> {
-                if (!existente.getId().equals(usuario.getId())) {
-                    throw new RecursoDuplicadoException("El correo ya está en uso por otro usuario.");
-                }
-            });
+            usuarioRepository.findByEmail(dto.getEmail().toLowerCase())
+                    .ifPresent(existente -> {
+                        if (!existente.getId().equals(usuario.getId())) {
+                            throw new RecursoDuplicadoException("El correo ya está en uso por otro usuario.");
+                        }
+                    });
             usuario.setEmail(dto.getEmail().toLowerCase());
         }
 
@@ -151,6 +159,7 @@ public class UsuarioService {
 
     //---------------------------------------- BORRAR/DESACTIVAR ----------------------------------------
 
+    /// Recibe el id del usuario, cambia su estado a inactivo.
     @Transactional
     public void borrarPorId(Long id) {
         Usuario usuario = obtenerPorId(id);
@@ -158,6 +167,7 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
     }
 
+    /// Recibe un id, si el usuario anfitrion es valido entonces retorna el usuario, si no tira parametro invalido exception
     public Usuario obtenerAnfitrionPorId(Long id) {
         Usuario u = obtenerPorId(id);
         if (u.getTipoUsuario() != TipoUsuario.ANFITRION) {
@@ -166,6 +176,7 @@ public class UsuarioService {
         return u;
     }
 
+    /// Recibe un id, si el usuario cliente es valido entonces retorna el usuario, si no tira parametro invalido exception
     public Usuario obtenerClientePorId(Long id) {
         Usuario u = obtenerPorId(id);
         if (u.getTipoUsuario() != TipoUsuario.CLIENTE) {
@@ -175,10 +186,4 @@ public class UsuarioService {
     }
 
 
-
-
-    @Transactional
-    public Usuario crear(Usuario usuario) {
-        return usuarioRepository.save(usuario);
-    }
 }

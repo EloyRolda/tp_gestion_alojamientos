@@ -33,6 +33,9 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.obtenerPorEmail(auth.getName()));
     }
 
+    /// Registra un usuario recibido por el fornt en un DTO
+    // Los elementos comentados sirven para crear un administrador en una primera instancia registrando otro usuario
+    // recomiendo registrar un cliente desde el front, el admin siempre sera id 1.
     @PostMapping("/registrar")
     public ResponseEntity<?> registrar(@Valid @RequestBody UsuarioRegistroDTO dto) {
        /* String passwordEncriptada = new BCryptPasswordEncoder().encode("admin");
@@ -90,6 +93,7 @@ public class UsuarioController {
         usuarioService.crearAdministrador(dto);
         return ResponseEntity.ok("Administrador registrado correctamente");
     }
+
     @PutMapping("/actualizar")
     public ResponseEntity<Usuario> actualizar(@Valid @RequestBody UsuarioModificarDTO dto) {
         // Obtener el usuario autenticado desde Spring Security
@@ -102,6 +106,7 @@ public class UsuarioController {
 
         return ResponseEntity.ok(usuarioService.actualizar(dto));
     }
+
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<?> eliminar(@PathVariable Long id) {
         usuarioService.borrarPorId(id);
