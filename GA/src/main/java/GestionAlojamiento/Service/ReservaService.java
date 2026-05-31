@@ -4,14 +4,15 @@ import GestionAlojamiento.DTO.ReservaModificarDTO;
 import GestionAlojamiento.DTO.ReservaRegistroDTO;
 import GestionAlojamiento.Exception.IdNoEncontradoException;
 import GestionAlojamiento.Exception.ParametroInvalidoException;
-import GestionAlojamiento.Model.Alojamiento;
+import GestionAlojamiento.Model.*;
 import GestionAlojamiento.Model.Enums.TipoEstado;
-import GestionAlojamiento.Model.Reserva;
-import GestionAlojamiento.Model.Usuario;
 import GestionAlojamiento.Repository.ReservaRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -33,8 +34,12 @@ public class ReservaService {
         return reservaRepository.findAll();
     }
 
-    public Reserva mostrarPorId(Long id) {
+    public Reserva obtenerPorId(Long id) {
         return reservaRepository.findById(id).orElseThrow(() -> new IdNoEncontradoException("Error, la reserva no se encuentra en la base de datos"));
+    }
+    /// Recibe un id de un anfitrion y devuelve una lista de las reservas es que posee.
+    public List<Reserva> listarPorUsuario(String correoUsuario) {
+        return reservaRepository.findByCliente_Email(correoUsuario);
     }
 
     //------------------------ CREAR/BORRAR ------------------------
@@ -186,5 +191,6 @@ public class ReservaService {
     public boolean tuvisteReservaConfirmada(Long clienteId, Long alojamientoId) {
         return reservaRepository.existsByClienteIdAndAlojamientoIdAndTipoEstadoAndFechaFinBefore(clienteId, alojamientoId, TipoEstado.CONFIRMADA, LocalDate.now());
     }
+
 
 }

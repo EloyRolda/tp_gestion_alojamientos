@@ -29,7 +29,7 @@ public class HotelService {
         return hotelRepository.findById(id).orElseThrow(() -> new IdNoEncontradoException("Error, id de hotel no encontrado en la base de datos."));
     }
 
-    /// Recibe un id de un anfitrion y devuelve una lista de los hoteles que posee.
+    /// Recibe un id de un anfitrion y devuelve una lista de los hotel es que posee.
     public List<Hotel> listarPorAnfitrion(String correoAnfitrion) {
         return hotelRepository.findByAlojamientoAnfitrionEmail(correoAnfitrion);
     }

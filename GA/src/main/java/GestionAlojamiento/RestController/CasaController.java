@@ -2,9 +2,12 @@ package GestionAlojamiento.RestController;
 
 import GestionAlojamiento.DTO.CasaModificarDTO;
 import GestionAlojamiento.DTO.CasaRegistroDTO;
+import GestionAlojamiento.Exception.ParametroInvalidoException;
 import GestionAlojamiento.Model.Casa;
 import GestionAlojamiento.Model.Hotel;
+import GestionAlojamiento.Model.Usuario;
 import GestionAlojamiento.Service.CasaService;
+import GestionAlojamiento.Service.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +20,7 @@ import java.util.List;
 public class CasaController {
 
     private final CasaService casaService;
+    private final UsuarioService usuarioService;
 
     @GetMapping("/listar")
     public List<Casa> listar() {
@@ -44,11 +48,24 @@ public class CasaController {
     public Casa actualizar(@RequestBody CasaModificarDTO casaModificarDTO) {
         return casaService.modificar(casaModificarDTO);
     }
-
     @DeleteMapping("/eliminar/{id}")
     public void borrarPorId(@PathVariable Long id) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+
+        Usuario usuarioLogueado = usuarioService.obtenerPorEmail(email);
+
+        Casa casa = casaService.obtenerPorId(id);
+
+        if (!casa.getAlojamiento()
+                .getAnfitrion()
+                .getId()
+                .equals(usuarioLogueado.getId())) {
+
+            throw new ParametroInvalidoException("No autorizado para eliminar esta casa");
+        }
+
         casaService.borrarPorId(id);
     }
-
-
 }
