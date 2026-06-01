@@ -4,6 +4,7 @@ import GestionAlojamiento.DTO.DepartamentoModificarDTO;
 import GestionAlojamiento.DTO.DepartamentoRegistroDTO;
 import GestionAlojamiento.Exception.ParametroInvalidoException;
 import GestionAlojamiento.Model.Departamento;
+import GestionAlojamiento.Model.Enums.TipoUsuario;
 import GestionAlojamiento.Model.Hotel;
 import GestionAlojamiento.Model.Usuario;
 import GestionAlojamiento.Service.DepartamentoService;
@@ -63,7 +64,7 @@ public class DepartamentoController {
         if (!departamento.getAlojamiento()
                 .getAnfitrion()
                 .getId()
-                .equals(usuarioLogueado.getId())) {
+                .equals(usuarioLogueado.getId()) && usuarioLogueado.getTipoUsuario() != TipoUsuario.ADMINISTRADOR) {
 
             throw new ParametroInvalidoException("No autorizado para eliminar este departamento");
         }

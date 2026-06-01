@@ -10,7 +10,7 @@
         :root { --bg: #0a0f1e; --surface: #111827; --surface2: #0f1929; --border: #1e2d45; --accent: #3b82f6; --accent-glow: rgba(59,130,246,0.2); --text: #e2e8f0; --muted: #64748b; --error: #f87171; --success: #4ade80; }
         body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
         body::before { content: ''; position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%); top: -150px; right: -150px; pointer-events: none; }
-        .container { width: 100%; max-width: 480px; }
+        .container { width: 100%; max-width: 520px; }
         .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 14px; margin-bottom: 28px; transition: color 0.2s; }
         .back-link:hover { color: var(--text); }
         .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 36px 32px; animation: fadeUp 0.4s ease both; }
@@ -20,54 +20,59 @@
         h1 { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 4px; }
         .subtitle { color: var(--muted); font-size: 14px; }
 
-        /* Info card de la reserva cargada */
-        .reserva-info { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 22px; display: none; font-size: 13px; line-height: 1.8; }
-        .reserva-info.visible { display: block; }
-        .reserva-info strong { color: var(--text); }
-        .reserva-info span { color: var(--muted); }
+        .info-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; }
+        .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: var(--muted); }
+        .info-value { font-weight: 600; color: var(--text); }
 
         .field { margin-bottom: 18px; }
         label { display: block; font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.6px; }
-        input[type="date"], input[type="number"], select { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; appearance: none; }
+        input[type="date"], select { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; appearance: none; }
         input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+        input[readonly] { opacity: 0.7; cursor: not-allowed; background: var(--surface2); }
         input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.5; }
         select option { background: var(--surface); }
-        .hint { font-size: 11px; color: var(--muted); margin-top: 5px; }
-        .divider { border: none; border-top: 1px solid var(--border); margin: 4px 0 18px; }
+        .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
         .section-lbl { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
         .msg { border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 18px; display: none; }
         .msg.error   { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: var(--error); }
         .msg.success { background: rgba(74,222,128,0.1);  border: 1px solid rgba(74,222,128,0.3);  color: var(--success); }
-        .btn { width: 100%; background: linear-gradient(135deg, #6366f1, var(--accent)); border: none; border-radius: 10px; padding: 14px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.1s; margin-top: 4px; }
+        .btn { width: 100%; background: linear-gradient(135deg, #6366f1, var(--accent)); border: none; border-radius: 10px; padding: 14px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.1s; margin-top: 8px; }
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
         .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .loading-small { text-align: center; padding: 20px; color: var(--muted); }
     </style>
 </head>
 <body>
 <div class="container">
-    <a href="/listar-reservas.html" class="back-link">← Volver a reservas</a>
+    <a href="/mis-reservas.html" class="back-link">← Volver a mis reservas</a>
     <div class="card">
         <div class="logo">
             <div class="logo-icon">✏️</div>
             <h1>Actualizar Reserva</h1>
-            <p class="subtitle" id="subtitleText">Modificá solo los campos que querés cambiar</p>
+            <p class="subtitle" id="subtitleText">Modificá las fechas o el estado</p>
         </div>
 
         <div class="msg" id="msg"></div>
 
-        <!-- Info de la reserva pre-cargada -->
-        <div class="reserva-info" id="reservaInfo"></div>
-
-        <div class="section-lbl">Identificación</div>
-        <div class="field">
-            <label for="id">ID de la Reserva *</label>
-            <input type="number" id="id" placeholder="Ej: 7" min="1" required>
-            <p class="hint">Campo obligatorio</p>
+        <!-- Info actual de la reserva (solo lectura) -->
+        <div class="info-card" id="infoCard" style="display:none;">
+            <div class="info-row"><span class="info-label">Reserva ID:</span><span class="info-value" id="infoId">—</span></div>
+            <div class="info-row"><span class="info-label">Alojamiento:</span><span class="info-value" id="infoAlojamiento">—</span></div>
+            <div class="info-row"><span class="info-label">Cliente:</span><span class="info-value" id="infoCliente">—</span></div>
+            <div class="info-row"><span class="info-label">Estado actual:</span><span class="info-value" id="infoEstado">—</span></div>
+            <div class="info-row"><span class="info-label">Fechas actuales:</span><span class="info-value" id="infoFechas">—</span></div>
         </div>
 
-        <hr class="divider">
-        <div class="section-lbl">Modificaciones</div>
+        <div class="loading-small" id="loadingInfo">Cargando datos de la reserva...</div>
 
+        <!-- Campos ocultos para IDs (se llenan automáticamente) -->
+        <input type="hidden" id="idReserva">
+        <input type="hidden" id="idAlojamientoHidden">
+        <input type="hidden" id="idClienteHidden">
+
+        <div class="section-lbl">📅 Fechas</div>
         <div class="field">
             <label for="fechaInicio">Nueva fecha de inicio</label>
             <input type="date" id="fechaInicio">
@@ -78,25 +83,17 @@
             <input type="date" id="fechaFin">
         </div>
 
+        <hr class="divider">
+
+        <div class="section-lbl">📌 Estado</div>
         <div class="field">
-            <label for="tipoEstado">Estado</label>
+            <label for="tipoEstado">Cambiar estado</label>
             <select id="tipoEstado">
-                <option value="" selected>— Sin cambiar —</option>
+                <option value="">— Mantener actual —</option>
                 <option value="PENDIENTE">Pendiente</option>
                 <option value="CONFIRMADA">Confirmada</option>
                 <option value="CANCELADA">Cancelada</option>
             </select>
-        </div>
-
-        <div class="field">
-            <label for="idAlojamiento">ID del Alojamiento</label>
-            <input type="number" id="idAlojamiento" placeholder="Ej: 5" min="1">
-        </div>
-
-        <div class="field">
-            <label for="idCliente">ID del Cliente</label>
-            <input type="number" id="idCliente" placeholder="Ej: 3" min="1">
-            <p class="hint">Solo ADMIN puede reasignar cliente</p>
         </div>
 
         <button class="btn" id="submitBtn" onclick="enviar()">Guardar cambios</button>
@@ -104,74 +101,99 @@
 </div>
 
 <script>
-    // Al cargar: si viene ?id=... desde listar-reservas, pre-cargar el ID y buscar la reserva
-    window.addEventListener('DOMContentLoaded', async () => {
-        const params = new URLSearchParams(location.search);
-        const idParam = params.get('id');
-        if (idParam) {
-            document.getElementById('id').value = idParam;
-            document.getElementById('id').readOnly = true; // no dejar que lo cambien
-            await precargarReserva(idParam);
-        }
-    });
+    let reservaActual = null;
 
-    async function precargarReserva(id) {
+    // Cargar datos automáticamente desde la URL
+    async function cargarReserva() {
+        const params = new URLSearchParams(location.search);
+        const id = params.get('id');
+
+        if (!id) {
+            document.getElementById('loadingInfo').innerHTML = '⚠️ No se especificó ID de reserva. Volvé a mis reservas y seleccioná editar.';
+            document.getElementById('submitBtn').disabled = true;
+            return;
+        }
+
         try {
             const resp = await fetch(`/Reserva/mostrar/${id}`, { credentials: 'include' });
-            if (!resp.ok) return;
-            const r = await resp.json();
+            if (!resp.ok) {
+                if (resp.status === 403) throw new Error('No tenés permiso para modificar esta reserva');
+                if (resp.status === 404) throw new Error('Reserva no encontrada');
+                throw new Error('Error ' + resp.status);
+            }
 
-            // Mostrar info de la reserva actual
-            const infoEl = document.getElementById('reservaInfo');
-            infoEl.innerHTML = `
-                <strong>Reserva #${r.id}</strong><br>
-                <span>Cliente:</span> <strong>${r.cliente?.nombre || '—'}</strong> &nbsp;|&nbsp;
-                <span>Alojamiento:</span> <strong>${r.alojamiento?.titulo || '—'}</strong><br>
-                <span>Fechas actuales:</span> <strong>${r.fechaInicio || '—'} → ${r.fechaFin || '—'}</strong><br>
-                <span>Estado:</span> <strong>${r.tipoEstado || '—'}</strong>
-            `;
-            infoEl.classList.add('visible');
+            reservaActual = await resp.json();
+            mostrarDatos(reservaActual);
 
-            // Pre-cargar campos con valores actuales
-            if (r.fechaInicio) document.getElementById('fechaInicio').value = r.fechaInicio;
-            if (r.fechaFin)    document.getElementById('fechaFin').value    = r.fechaFin;
-            if (r.tipoEstado)  document.getElementById('tipoEstado').value  = r.tipoEstado;
-            if (r.alojamiento?.id) document.getElementById('idAlojamiento').value = r.alojamiento.id;
-            if (r.cliente?.id)     document.getElementById('idCliente').value     = r.cliente.id;
-
-            document.getElementById('subtitleText').textContent = `Editando reserva #${r.id}`;
         } catch (e) {
-            // Silencioso — el usuario igual puede editar manualmente
+            document.getElementById('loadingInfo').innerHTML = `<span style="color:var(--error)">❌ ${e.message}</span>`;
+            document.getElementById('submitBtn').disabled = true;
         }
     }
 
-    function val(id) { return document.getElementById(id).value.trim(); }
-    function num(id) { const v = val(id); return v !== '' ? Number(v) : null; }
+    function mostrarDatos(r) {
+        // Ocultar loading, mostrar info card
+        document.getElementById('loadingInfo').style.display = 'none';
+        const infoCard = document.getElementById('infoCard');
+        infoCard.style.display = 'block';
+
+        // Llenar info card (solo lectura)
+        document.getElementById('infoId').textContent = r.id;
+        document.getElementById('infoAlojamiento').textContent = r.alojamiento?.titulo || 'ID: ' + r.idAlojamiento;
+        document.getElementById('infoCliente').textContent = r.cliente?.nombre || 'ID: ' + r.idCliente;
+        document.getElementById('infoEstado').textContent = r.tipoEstado;
+        document.getElementById('infoFechas').textContent = `${r.fechaInicio || '—'} → ${r.fechaFin || '—'}`;
+
+        // Guardar IDs en campos ocultos
+        document.getElementById('idReserva').value = r.id;
+        document.getElementById('idAlojamientoHidden').value = r.idAlojamiento;
+        document.getElementById('idClienteHidden').value = r.idCliente;
+
+        // Pre-cargar fechas actuales en los inputs (para que el usuario las vea y pueda modificarlas)
+        if (r.fechaInicio) document.getElementById('fechaInicio').value = r.fechaInicio;
+        if (r.fechaFin) document.getElementById('fechaFin').value = r.fechaFin;
+
+        // Subtítulo personalizado
+        document.getElementById('subtitleText').textContent = `Editando reserva #${r.id} - ${r.alojamiento?.titulo || 'Alojamiento'}`;
+    }
 
     async function enviar() {
         const btn = document.getElementById('submitBtn');
         const msg = document.getElementById('msg');
         msg.style.display = 'none';
 
-        const id = num('id');
-        if (!id || id < 1) {
-            msg.className = 'msg error'; msg.textContent = 'El ID de la reserva es obligatorio.';
-            msg.style.display = 'block'; return;
+        if (!reservaActual) {
+            msg.className = 'msg error';
+            msg.textContent = 'No hay reserva cargada.';
+            msg.style.display = 'block';
+            return;
         }
 
-        const datos = { id };
-        const fechaInicio = val('fechaInicio'); if (fechaInicio) datos.fechaInicio = fechaInicio;
-        const fechaFin    = val('fechaFin');    if (fechaFin)    datos.fechaFin    = fechaFin;
-        const estado      = val('tipoEstado');  if (estado)      datos.tipoEstado  = estado;
-        const idAloj = num('idAlojamiento'); if (idAloj)    datos.idAlojamiento = idAloj;
-        const idCli  = num('idCliente');     if (idCli)     datos.idCliente     = idCli;
+        const datos = { id: reservaActual.id };
 
-        if (Object.keys(datos).length === 1) {
-            msg.className = 'msg error'; msg.textContent = 'Completá al menos un campo para actualizar.';
-            msg.style.display = 'block'; return;
+        const fechaInicio = document.getElementById('fechaInicio').value;
+        const fechaFin = document.getElementById('fechaFin').value;
+        const tipoEstado = document.getElementById('tipoEstado').value;
+
+        if (fechaInicio) datos.fechaInicio = fechaInicio;
+        if (fechaFin) datos.fechaFin = fechaFin;
+        if (tipoEstado) datos.tipoEstado = tipoEstado;
+
+        // Verificar si se cambió algo
+        const sinCambios = (!fechaInicio || fechaInicio === reservaActual.fechaInicio) &&
+            (!fechaFin || fechaFin === reservaActual.fechaFin) &&
+            (!tipoEstado || tipoEstado === reservaActual.tipoEstado);
+
+        if (sinCambios) {
+            msg.className = 'msg error';
+            msg.textContent = 'No realizaste ningún cambio. Modificá al menos una fecha o el estado.';
+            msg.style.display = 'block';
+            return;
         }
 
-        btn.disabled = true; btn.textContent = 'Guardando...';
+        btn.disabled = true;
+        btn.textContent = 'Guardando...';
+
         try {
             const resp = await fetch('/Reserva/actualizar', {
                 method: 'PUT',
@@ -179,15 +201,34 @@
                 credentials: 'include',
                 body: JSON.stringify(datos)
             });
+
             const texto = await resp.text();
-            msg.className = resp.ok ? 'msg success' : 'msg error';
-            msg.textContent = resp.ok ? '✓ Reserva actualizada correctamente.' : 'Error: ' + texto;
-            if (resp.ok) await precargarReserva(id); // refrescar info mostrada
-        } catch {
-            msg.className = 'msg error'; msg.textContent = 'No se pudo conectar con el servidor.';
+
+            if (resp.ok) {
+                msg.className = 'msg success';
+                msg.textContent = '✓ Reserva actualizada correctamente. Redirigiendo...';
+                msg.style.display = 'block';
+                setTimeout(() => {
+                    window.location.href = '/mis-reservas.html';
+                }, 2000);
+            } else {
+                msg.className = 'msg error';
+                msg.textContent = 'Error: ' + texto;
+                msg.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = 'Guardar cambios';
+            }
+        } catch (e) {
+            msg.className = 'msg error';
+            msg.textContent = 'No se pudo conectar con el servidor.';
+            msg.style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = 'Guardar cambios';
         }
-        msg.style.display = 'block'; btn.disabled = false; btn.textContent = 'Guardar cambios';
     }
+
+    // Cargar al iniciar
+    cargarReserva();
 </script>
 </body>
 </html>

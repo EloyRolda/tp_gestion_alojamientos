@@ -4,6 +4,7 @@ import GestionAlojamiento.DTO.CasaModificarDTO;
 import GestionAlojamiento.DTO.CasaRegistroDTO;
 import GestionAlojamiento.Exception.ParametroInvalidoException;
 import GestionAlojamiento.Model.Casa;
+import GestionAlojamiento.Model.Enums.TipoUsuario;
 import GestionAlojamiento.Model.Hotel;
 import GestionAlojamiento.Model.Usuario;
 import GestionAlojamiento.Service.CasaService;
@@ -14,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/Casa")
@@ -48,6 +50,7 @@ public class CasaController {
     public Casa actualizar(@RequestBody CasaModificarDTO casaModificarDTO) {
         return casaService.modificar(casaModificarDTO);
     }
+
     @DeleteMapping("/eliminar/{id}")
     public void borrarPorId(@PathVariable Long id) {
 
@@ -61,7 +64,7 @@ public class CasaController {
         if (!casa.getAlojamiento()
                 .getAnfitrion()
                 .getId()
-                .equals(usuarioLogueado.getId())) {
+                .equals(usuarioLogueado.getId()) && usuarioLogueado.getTipoUsuario() != TipoUsuario.ADMINISTRADOR) {
 
             throw new ParametroInvalidoException("No autorizado para eliminar esta casa");
         }

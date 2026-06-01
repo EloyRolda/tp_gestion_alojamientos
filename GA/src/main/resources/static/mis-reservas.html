@@ -40,6 +40,24 @@
             justify-content: space-between;
             position: sticky; top: 0; z-index: 10;
         }
+        .btn-edit {
+            background: rgba(59,130,246,0.12);
+            border: 1px solid rgba(59,130,246,0.25);
+            color: #93c5fd;
+            border-radius: 7px;
+            padding: 7px 14px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+        .btn-edit:hover {
+            background: rgba(59,130,246,0.22);
+        }
         .header-left { display: flex; align-items: center; gap: 12px; }
         .logo-icon {
             width: 38px; height: 38px;
@@ -229,7 +247,14 @@
 <script>
     let reservas = [];
     let filtro = 'TODOS';
-
+    function getTipoUrl(tipo) {
+        if (!tipo) return 'casas';
+        const t = tipo.toUpperCase();
+        if (t === 'HOTEL') return 'hoteles';
+        if (t === 'DEPARTAMENTO') return 'departamentos';
+        if (t === 'CASA') return 'casas';
+        return 'casas';
+    }
     async function cargar() {
         try {
             const resp = await fetch('/Reserva/listar/propios', { credentials: 'include' });
@@ -271,10 +296,12 @@
                     <div class="detail-item">📅 <span>${r.fechaInicio}</span> → <span>${r.fechaFin}</span></div>
                     <div class="detail-item">💰 Total: <span>${r.precioTotal ? '$' + r.precioTotal : 'No calculado'}</span></div>
                 </div>
-                <div class="reserva-actions">
-                    <a class="btn-link" href="/detalle-alojamiento.html?id=${r.alojamiento?.id}&tipo=casas">🏠 Ver alojamiento</a>
-                    ${r.tipoEstado !== 'CANCELADA' ? `<button class="btn-cancel" onclick="cancelar(${r.id})">Cancelar reserva</button>` : ''}
-                </div>
+           <div class="reserva-actions">
+    <a class="btn-link" href="/detalle-alojamiento.html?id=${r.alojamiento?.id}&tipo=${getTipoUrl(r.alojamiento?.tipoInmueble)}">🏠 Ver alojamiento</a>
+
+    <a class="btn-edit" href="/actualizar-reserva.html?id=${r.id}">✏️ Editar</a>
+    ${r.tipoEstado !== 'CANCELADA' ? `<button class="btn-cancel" onclick="cancelar(${r.id})">Cancelar reserva</button>` : ''}
+</div>
             </div>
         `).join('');
     }

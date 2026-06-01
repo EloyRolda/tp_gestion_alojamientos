@@ -10,7 +10,7 @@
     :root { --bg: #0a0f1e; --surface: #111827; --border: #1e2d45; --accent: #3b82f6; --accent-glow: rgba(59,130,246,0.2); --text: #e2e8f0; --muted: #64748b; --error: #f87171; --success: #4ade80; --star: #fbbf24; }
     body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
     body::before { content: ''; position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, rgba(251,191,36,0.05) 0%, transparent 70%); top: -150px; left: -150px; pointer-events: none; }
-    .container { width: 100%; max-width: 480px; }
+    .container { width: 100%; max-width: 520px; }
     .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 14px; margin-bottom: 28px; transition: color 0.2s; }
     .back-link:hover { color: var(--text); }
     .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 36px 32px; animation: fadeUp 0.4s ease both; }
@@ -19,16 +19,21 @@
     .logo-icon { width: 48px; height: 48px; background: linear-gradient(135deg, #d97706, #f59e0b); border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 14px; }
     h1 { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 4px; }
     .subtitle { color: var(--muted); font-size: 14px; }
+
+    .info-card { background: rgba(100,116,139,0.1); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; }
+    .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { color: var(--muted); }
+    .info-value { font-weight: 600; color: var(--text); }
+
     .field { margin-bottom: 20px; }
     label { display: block; font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.6px; }
-    input[type="number"], textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
-    input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
-    input::placeholder, textarea::placeholder { color: var(--muted); }
-    textarea { resize: vertical; min-height: 110px; }
-    .hint { font-size: 11px; color: var(--muted); margin-top: 5px; }
-    .divider { border: none; border-top: 1px solid var(--border); margin: 4px 0 20px; }
+    textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; resize: vertical; min-height: 110px; }
+    textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    textarea::placeholder { color: var(--muted); }
+
     /* Stars */
-    .stars-row { display: flex; gap: 8px; }
+    .stars-row { display: flex; gap: 8px; margin-bottom: 8px; }
     .star-opt input[type="radio"] { display: none; }
     .star-opt label { font-size: 28px; cursor: pointer; color: var(--border); transition: color 0.15s, transform 0.1s; display: block; line-height: 1; text-transform: none; letter-spacing: 0; }
     .star-opt label:hover { transform: scale(1.2); }
@@ -43,33 +48,41 @@
     .stars-row:has(.star-opt:nth-child(4) input:checked) .star-opt:nth-child(3) label,
     .stars-row:has(.star-opt:nth-child(4) input:checked) .star-opt:nth-child(4) label { color: var(--star); }
     .stars-row:has(.star-opt:nth-child(5) input:checked) .star-opt label { color: var(--star); }
+
+    .hint { font-size: 11px; color: var(--muted); margin-top: 5px; }
     .msg { border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 18px; display: none; }
     .msg.error { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: var(--error); }
     .msg.success { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); color: var(--success); }
     .btn { width: 100%; background: linear-gradient(135deg, #d97706, #f59e0b); border: none; border-radius: 10px; padding: 14px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.1s; margin-top: 4px; }
     .btn:hover { opacity: 0.9; transform: translateY(-1px); }
     .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .loading-small { text-align: center; padding: 20px; color: var(--muted); }
   </style>
 </head>
 <body>
 <div class="container">
-  <a href="/home.html" class="back-link">← Volver al panel</a>
+  <a href="/mis-reviews.html" class="back-link">← Volver a mis reviews</a>
   <div class="card">
     <div class="logo">
       <div class="logo-icon">✏️</div>
       <h1>Editar Review</h1>
-      <p class="subtitle">Modificá tu puntuación o comentario</p>
+      <p class="subtitle" id="subtitleText">Modificá tu puntuación o comentario</p>
     </div>
 
     <div class="msg" id="msg"></div>
 
-    <div class="field">
-      <label for="id">ID de la Review</label>
-      <input type="number" id="id" placeholder="Ej: 4" min="1" required>
-      <p class="hint">El ID lo ves al listar tus reviews</p>
+    <!-- Info actual de la review -->
+    <div class="info-card" id="infoCard" style="display:none;">
+      <div class="info-row"><span class="info-label">Review ID:</span><span class="info-value" id="infoId">—</span></div>
+      <div class="info-row"><span class="info-label">Alojamiento:</span><span class="info-value" id="infoAlojamiento">—</span></div>
+      <div class="info-row"><span class="info-label">Puntuación actual:</span><span class="info-value" id="infoPuntuacion">—</span></div>
+      <div class="info-row"><span class="info-label">Comentario actual:</span><span class="info-value" id="infoComentario">—</span></div>
     </div>
 
-    <hr class="divider">
+    <div class="loading-small" id="loadingInfo">Cargando datos de la review...</div>
+
+    <!-- ID oculto -->
+    <input type="hidden" id="reviewId">
 
     <div class="field">
       <label>Nueva puntuación <span style="color:var(--muted);font-size:11px;">(opcional)</span></label>
@@ -83,7 +96,7 @@
     </div>
 
     <div class="field">
-      <label for="comentario">Comentario <span style="color:var(--muted);font-size:11px;">(opcional)</span></label>
+      <label for="comentario">Nuevo comentario <span style="color:var(--muted);font-size:11px;">(opcional)</span></label>
       <textarea id="comentario" placeholder="Actualizá tu experiencia..."></textarea>
     </div>
 
@@ -92,30 +105,91 @@
 </div>
 
 <script>
+  let reviewActual = null;
+
+  async function cargarReview() {
+    const params = new URLSearchParams(location.search);
+    const id = params.get('id');
+
+    if (!id) {
+      document.getElementById('loadingInfo').innerHTML = '⚠️ No se especificó ID de review. Volvé a mis reviews y seleccioná editar.';
+      document.getElementById('submitBtn').disabled = true;
+      return;
+    }
+
+    try {
+      const resp = await fetch(`/Review/mostrar/${id}`, { credentials: 'include' });
+      if (!resp.ok) {
+        if (resp.status === 403) throw new Error('No tenés permiso para editar esta review');
+        if (resp.status === 404) throw new Error('Review no encontrada');
+        throw new Error('Error ' + resp.status);
+      }
+
+      reviewActual = await resp.json();
+      mostrarDatos(reviewActual);
+
+    } catch (e) {
+      document.getElementById('loadingInfo').innerHTML = `<span style="color:var(--error)">❌ ${e.message}</span>`;
+      document.getElementById('submitBtn').disabled = true;
+    }
+  }
+
+  function mostrarDatos(r) {
+    document.getElementById('loadingInfo').style.display = 'none';
+    const infoCard = document.getElementById('infoCard');
+    infoCard.style.display = 'block';
+
+    document.getElementById('infoId').textContent = r.id;
+    document.getElementById('infoAlojamiento').textContent = r.alojamiento?.titulo || 'ID: ' + r.idAlojamiento;
+    document.getElementById('infoPuntuacion').textContent = '★'.repeat(r.puntuacion) + '☆'.repeat(5 - r.puntuacion);
+    document.getElementById('infoComentario').textContent = r.comentario || '(sin comentario)';
+
+    document.getElementById('reviewId').value = r.id;
+
+    // Pre-cargar comentario actual en el textarea
+    if (r.comentario) document.getElementById('comentario').value = r.comentario;
+
+    // Pre-seleccionar la estrella actual
+    const estrellaActual = document.getElementById(`p${r.puntuacion}`);
+    if (estrellaActual) estrellaActual.checked = true;
+
+    document.getElementById('subtitleText').textContent = `Editando review #${r.id} - ${r.alojamiento?.titulo || 'Alojamiento'}`;
+  }
+
   async function enviar() {
     const btn = document.getElementById('submitBtn');
     const msg = document.getElementById('msg');
     msg.style.display = 'none';
 
-    const id = document.getElementById('id').value;
-    if (!id || id < 1) {
-      msg.className = 'msg error'; msg.textContent = 'Ingresá el ID de la review a editar.';
-      msg.style.display = 'block'; return;
+    if (!reviewActual) {
+      msg.className = 'msg error';
+      msg.textContent = 'No hay review cargada.';
+      msg.style.display = 'block';
+      return;
     }
 
+    const id = reviewActual.id;
     const puntuacionEl = document.querySelector('input[name="puntuacion"]:checked');
     const comentario = document.getElementById('comentario').value.trim();
 
-    const datos = { id: Number(id) };
-    if (puntuacionEl) datos.puntuacion = Number(puntuacionEl.value);
-    if (comentario) datos.comentario = comentario;
-
-    if (Object.keys(datos).length === 1) {
-      msg.className = 'msg error'; msg.textContent = 'Modificá al menos la puntuación o el comentario.';
-      msg.style.display = 'block'; return;
+    const datos = { id };
+    if (puntuacionEl && parseInt(puntuacionEl.value) !== reviewActual.puntuacion) {
+      datos.puntuacion = parseInt(puntuacionEl.value);
+    }
+    if (comentario && comentario !== (reviewActual.comentario || '')) {
+      datos.comentario = comentario;
     }
 
-    btn.disabled = true; btn.textContent = 'Guardando...';
+    if (Object.keys(datos).length === 1) {
+      msg.className = 'msg error';
+      msg.textContent = 'Modificá al menos la puntuación o el comentario.';
+      msg.style.display = 'block';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Guardando...';
+
     try {
       const resp = await fetch('/Review/actualizar', {
         method: 'PUT',
@@ -123,14 +197,33 @@
         credentials: 'include',
         body: JSON.stringify(datos)
       });
+
       const texto = await resp.text();
-      msg.className = resp.ok ? 'msg success' : 'msg error';
-      msg.textContent = resp.ok ? '✓ Review actualizada correctamente.' : 'Error: ' + texto;
-    } catch {
-      msg.className = 'msg error'; msg.textContent = 'No se pudo conectar con el servidor.';
+
+      if (resp.ok) {
+        msg.className = 'msg success';
+        msg.textContent = '✓ Review actualizada correctamente. Redirigiendo...';
+        msg.style.display = 'block';
+        setTimeout(() => {
+          window.location.href = '/mis-reviews.html';
+        }, 2000);
+      } else {
+        msg.className = 'msg error';
+        msg.textContent = 'Error: ' + texto;
+        msg.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Guardar cambios';
+      }
+    } catch (e) {
+      msg.className = 'msg error';
+      msg.textContent = 'No se pudo conectar con el servidor.';
+      msg.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Guardar cambios';
     }
-    msg.style.display = 'block'; btn.disabled = false; btn.textContent = 'Guardar cambios';
   }
+
+  cargarReview();
 </script>
 </body>
 </html>

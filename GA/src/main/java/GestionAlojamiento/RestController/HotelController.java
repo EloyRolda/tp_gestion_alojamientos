@@ -4,6 +4,7 @@ package GestionAlojamiento.RestController;
 import GestionAlojamiento.DTO.HotelModificarDTO;
 import GestionAlojamiento.DTO.HotelRegistroDTO;
 import GestionAlojamiento.Exception.ParametroInvalidoException;
+import GestionAlojamiento.Model.Enums.TipoUsuario;
 import GestionAlojamiento.Model.Hotel;
 import GestionAlojamiento.Model.Usuario;
 import GestionAlojamiento.Service.HotelService;
@@ -60,7 +61,7 @@ public class HotelController {
         String email = auth.getName(); // email del usuario logueado
         Usuario usuarioLogueado = usuarioService.obtenerPorEmail(email);
 
-        if (hotelService.obtenerPorId(id).getAlojamiento().getAnfitrion().getId() != usuarioLogueado.getId()) {
+        if (hotelService.obtenerPorId(id).getAlojamiento().getAnfitrion().getId() != usuarioLogueado.getId() && usuarioLogueado.getTipoUsuario() != TipoUsuario.ADMINISTRADOR) {
             throw new ParametroInvalidoException("Error al borrar, el hotel no es de su autiroia");
         }
 

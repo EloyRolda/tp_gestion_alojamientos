@@ -322,7 +322,7 @@
             if (usuario.tipoUsuario === 'ADMINISTRADOR' ||
                 (usuario.tipoUsuario === 'ANFITRION' && a.anfitrion?.id === usuario.id)) {
                 acciones.innerHTML = `
-                    <a class="btn-edit-aloj" href="/actualizar-${tipo.slice(0,-1)}.html?id=${id}">✏️ Editar</a>
+                  <a class="btn-edit-aloj" href="/actualizar-${tipo.slice(0,-1)}.html?id=${a.id}">✏️ Editar</a>
                     <button class="btn-delete-aloj" onclick="eliminarAlojamiento()">🗑️ Eliminar</button>
                 `;
             }

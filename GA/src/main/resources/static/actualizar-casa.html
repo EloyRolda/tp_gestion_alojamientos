@@ -137,28 +137,76 @@
             <div class="field"><label for="altura">Altura</label><input type="number" id="altura" placeholder="1234" min="0"></div>
         </div>
     </div>
-
-    <!-- Estado y anfitrión -->
+    <!-- Estado -->
     <div class="card">
-        <div class="section-title">Administración</div>
-        <div class="grid">
-            <div class="field">
-                <label for="anfitrion_id">ID del Anfitrión</label>
-                <input type="number" id="anfitrion_id" placeholder="Ej: 2" min="1">
-            </div>
-        </div>
-        <div style="margin-top:16px;">
-            <div class="check-item" style="display:inline-block;">
-                <input type="checkbox" id="activo">
-                <label for="activo"><span class="check-dot"></span>Alojamiento activo</label>
-            </div>
+        <div class="section-title">Estado</div>
+        <div class="check-item" style="display:inline-block;">
+            <input type="checkbox" id="activo">
+            <label for="activo"><span class="check-dot"></span>Alojamiento activo</label>
         </div>
     </div>
-
     <button class="btn" id="submitBtn" onclick="enviar()">Guardar cambios</button>
 </div>
 
 <script>
+    // ==================== CARGA AUTOMÁTICA DE DATOS ====================
+    async function cargarDatos() {
+        const params = new URLSearchParams(location.search);
+        const id = params.get('id');
+
+        if (!id) return;
+
+        try {
+            const resp = await fetch(`/Casa/mostrar/${id}`, { credentials: 'include' });
+            if (!resp.ok) throw new Error('No se pudo cargar');
+
+            const casa = await resp.json();
+            const a = casa.alojamiento || casa;
+
+            // ID
+            document.getElementById('idCasa').value = a.id;
+            document.getElementById('idCasa').readOnly = true;
+
+            // Datos generales
+            if (a.titulo) document.getElementById('titulo').value = a.titulo;
+            if (a.descripcion) document.getElementById('descripcion').value = a.descripcion;
+            if (a.precioNoche) document.getElementById('precioNoche').value = a.precioNoche;
+            if (a.capacidad) document.getElementById('capacidad').value = a.capacidad;
+            if (a.cantAmbientes) document.getElementById('cantAmbientes').value = a.cantAmbientes;
+            if (a.cantHabitaciones) document.getElementById('cantHabitaciones').value = a.cantHabitaciones;
+            if (a.cantCamas) document.getElementById('cantCamas').value = a.cantCamas;
+            if (a.cantBanios) document.getElementById('cantBanios').value = a.cantBanios;
+
+            // Características
+            if (casa.tienePatio !== undefined) document.getElementById('tienePatio').checked = casa.tienePatio;
+            if (casa.tienePileta !== undefined) document.getElementById('tienePileta').checked = casa.tienePileta;
+            if (casa.tieneParrilla !== undefined) document.getElementById('tieneParrilla').checked = casa.tieneParrilla;
+
+            // Servicios
+            if (casa.tieneCocina !== undefined) document.getElementById('tieneCocina').checked = casa.tieneCocina;
+            if (casa.tieneLavarropa !== undefined) document.getElementById('tieneLavarropa').checked = casa.tieneLavarropa;
+            if (casa.tieneWifi !== undefined) document.getElementById('tieneWifi').checked = casa.tieneWifi;
+            if (casa.tieneEstacionamiento !== undefined) document.getElementById('tieneEstacionamiento').checked = casa.tieneEstacionamiento;
+
+            // Dirección
+            if (a.direccion) {
+                if (a.direccion.pais) document.getElementById('pais').value = a.direccion.pais;
+                if (a.direccion.provincia) document.getElementById('provincia').value = a.direccion.provincia;
+                if (a.direccion.ciudad) document.getElementById('ciudad').value = a.direccion.ciudad;
+                if (a.direccion.codigoPostal) document.getElementById('codigoPostal').value = a.direccion.codigoPostal;
+                if (a.direccion.calle) document.getElementById('calle').value = a.direccion.calle;
+                if (a.direccion.altura) document.getElementById('altura').value = a.direccion.altura;
+            }
+
+            // Anfitrión y estado
+            if (a.activo !== undefined) document.getElementById('activo').checked = a.activo;
+
+        } catch (e) {
+            console.error('Error al cargar datos:', e);
+        }
+    }
+
+    // ==================== ENVÍO DE ACTUALIZACIÓN ====================
     function val(id) { return document.getElementById(id).value.trim(); }
     function num(id) { const v = val(id); return v !== '' ? Number(v) : null; }
     function chk(id) { return document.getElementById(id).checked; }
@@ -189,9 +237,7 @@
         const codigoPostal = val('codigoPostal'); if (codigoPostal) datos.codigoPostal = codigoPostal;
         const calle = val('calle'); if (calle) datos.calle = calle;
         const altura = num('altura'); if (altura !== null && val('altura') !== '') datos.altura = altura;
-        const anfitrion_id = num('anfitrion_id'); if (anfitrion_id !== null && val('anfitrion_id') !== '') datos.anfitrion_id = anfitrion_id;
 
-        // Checkboxes — solo los que están marcados se envían como true
         ['tienePatio','tienePileta','tieneParrilla','tieneCocina','tieneLavarropa','tieneWifi','tieneEstacionamiento'].forEach(k => {
             if (chk(k)) datos[k] = true;
         });
@@ -214,6 +260,9 @@
         msg.style.display = 'block'; btn.disabled = false; btn.textContent = 'Guardar cambios';
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+    // Ejecutar carga automática al iniciar
+    cargarDatos();
 </script>
 </body>
 </html>

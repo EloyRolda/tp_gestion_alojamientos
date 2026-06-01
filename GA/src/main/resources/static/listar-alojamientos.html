@@ -166,9 +166,9 @@
 
 <script>
     const CONFIG = {
-        casas:        { url: '/Casa/listar',         deleteUrl: id => `/Casa/eliminar/${id}`,        editUrl: id => `/actualizar-casa.html?id=${id}`,         label: '🏠 Casas' },
-        hoteles:      { url: '/Hotel/listar',        deleteUrl: id => `/Hotel/eliminar/${id}`,       editUrl: '/actualizar-hotel.html',        label: '🏨 Hoteles' },
-        departamentos:{ url: '/Departamento/listar', deleteUrl: id => `/Departamento/eliminar/${id}`,editUrl: '/actualizar-departamento.html', label: '🏢 Departamentos' }
+        casas:        { url: '/Casa/listar', deleteUrl: id => `/Casa/eliminar/${id}`, editUrl: id => `/actualizar-casa.html?id=${id}`, label: '🏠 Casas' },
+        hoteles:      { url: '/Hotel/listar', deleteUrl: id => `/Hotel/eliminar/${id}`, editUrl: id => `/actualizar-hotel.html?id=${id}`, label: '🏨 Hoteles' },
+        departamentos:{ url: '/Departamento/listar', deleteUrl: id => `/Departamento/eliminar/${id}`, editUrl: id => `/actualizar-departamento.html?id=${id}`, label: '🏢 Departamentos' }
     };
 
     let datos = [];
@@ -264,7 +264,7 @@
                     <div class="actions">
                         <a class="btn-action btn-edit" href="/detalle-alojamiento.html?id=${a.id}&tipo=${tipo}" style="background:rgba(59,130,246,0.15);color:#60a5fa;">🔍 Ver</a>
                         ${puedeEditar ?
-                `<a class="btn-action btn-edit" href="${cfg.editUrl}?id=${a.id}">✏️ Editar</a>
+                `<a class="btn-action btn-edit" href="${cfg.editUrl(a.id)}">✏️ Editar</a>
                             <button class="btn-action btn-delete" onclick="abrirModal(${a.id}, '${(a.titulo||'').replace(/'/g,"\\'")}')">🗑️ Eliminar</button>` : ''}
                     </div>
                 </td>

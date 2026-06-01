@@ -5,135 +5,434 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear Reserva</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 40px 20px; }
-        .container { max-width: 500px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1 { margin-bottom: 20px; }
-        .field { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
-        button:hover { background: #0056b3; }
-        .msg { padding: 10px; margin-bottom: 15px; border-radius: 4px; display: none; }
-        .msg.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .msg.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .hint { font-size: 12px; color: #666; margin-top: 5px; }
-        a { color: #007bff; text-decoration: none; }
-        a:hover { text-decoration: underline; }
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap');
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0a0f1e;
+            --surface: #111827;
+            --surface2: #1a2435;
+            --border: #1e2d45;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.2);
+            --text: #e2e8f0;
+            --muted: #64748b;
+            --error: #f87171;
+            --success: #4ade80;
+        }
+
+        body {
+            background: var(--bg);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ── HEADER ── */
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 32px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 10;
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .logo-icon {
+            width: 38px; height: 38px;
+            background: linear-gradient(135deg, var(--accent), #6366f1);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+        }
+        .app-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; }
+        .btn-back {
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px; padding: 8px 14px;
+            color: var(--muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px; cursor: pointer;
+            text-decoration: none; display: inline-block;
+            transition: all 0.2s;
+        }
+        .btn-back:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* ── MAIN ── */
+        main {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 40px 20px;
+            min-height: calc(100vh - 71px);
+        }
+
+        .container { width: 100%; max-width: 500px; }
+
+        /* ── CARD ── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 36px 32px;
+            animation: fadeUp 0.4s ease both;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .card-icon {
+            width: 52px; height: 52px;
+            background: linear-gradient(135deg, var(--accent), #6366f1);
+            border-radius: 14px;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+        .card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px; font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .card-subtitle { color: var(--muted); font-size: 14px; }
+
+        /* ── PREVIEW CARD del alojamiento ── */
+        .aloj-preview {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 8px;
+            display: none;
+            animation: fadeUp 0.3s ease both;
+        }
+        .aloj-preview.visible { display: block; }
+        .aloj-preview-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .aloj-preview-meta { font-size: 12px; color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap; }
+        .aloj-preview-price { color: #4ade80; font-weight: 600; }
+
+        /* ── FIELDS ── */
+        .field { margin-bottom: 20px; }
+        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+
+        label {
+            display: block;
+            font-size: 12px; font-weight: 500;
+            color: var(--muted);
+            margin-bottom: 8px;
+            text-transform: uppercase; letter-spacing: 0.6px;
+        }
+
+        select, input[type="date"] {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            appearance: none;
+            cursor: pointer;
+        }
+        select:focus, input[type="date"]:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        select option { background: var(--surface); }
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(0.6);
+            cursor: pointer;
+        }
+
+        /* ── PRECIO ESTIMADO ── */
+        .precio-estimado {
+            background: rgba(59,130,246,0.08);
+            border: 1px solid rgba(59,130,246,0.2);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 13px;
+        }
+        .precio-estimado.visible { display: flex; align-items: center; justify-content: space-between; }
+        .precio-label { color: var(--muted); }
+        .precio-valor { font-size: 18px; font-weight: 600; color: #4ade80; }
+
+        /* ── MSG ── */
+        .msg {
+            border-radius: 8px; padding: 10px 14px;
+            font-size: 13px; margin-bottom: 20px; display: none;
+        }
+        .msg.error   { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: var(--error); }
+        .msg.success { background: rgba(74,222,128,0.1);  border: 1px solid rgba(74,222,128,0.3);  color: var(--success); }
+
+        /* ── BTN ── */
+        .btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent), #6366f1);
+            border: none; border-radius: 10px;
+            padding: 14px;
+            color: #fff;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px; font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            margin-top: 4px;
+        }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>📅 Crear Reserva</h1>
-    <a href="/home.html">← Volver al panel</a>
-    <hr>
 
-    <div class="msg" id="msg"></div>
-
-    <div class="field">
-        <label for="idAlojamiento">Alojamiento</label>
-        <select id="idAlojamiento">
-            <option value="">-- Cargando alojamientos --</option>
-        </select>
-        <p class="hint"><a href="/listar-alojamientos.html">Ver todos los alojamientos disponibles</a></p>
+<header>
+    <div class="header-left">
+        <div class="logo-icon">🏠</div>
+        <span class="app-title">Gestión Alojamiento</span>
     </div>
+    <a href="/listar-alojamientos.html" class="btn-back" id="btnBack">← Volver</a>
+</header>
 
-    <div class="field">
-        <label for="fechaInicio">Fecha de inicio</label>
-        <input type="date" id="fechaInicio">
+<main>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon">📅</div>
+                <div class="card-title">Crear Reserva</div>
+                <div class="card-subtitle">Elegí el alojamiento y las fechas</div>
+            </div>
+
+            <div class="msg" id="msg"></div>
+
+            <!-- Alojamiento -->
+            <div class="field">
+                <label for="idAlojamiento">Alojamiento</label>
+                <select id="idAlojamiento" onchange="onAlojamientoChange()">
+                    <option value="">Cargando alojamientos...</option>
+                </select>
+            </div>
+
+            <!-- Preview del alojamiento seleccionado -->
+            <div class="aloj-preview" id="alojPreview">
+                <div class="aloj-preview-title" id="previewTitulo"></div>
+                <div class="aloj-preview-meta">
+                    <span id="previewDireccion"></span>
+                    <span class="aloj-preview-price" id="previewPrecio"></span>
+                    <span id="previewCapacidad"></span>
+                </div>
+            </div>
+
+            <!-- Fechas -->
+            <div class="field-row">
+                <div>
+                    <label for="fechaInicio">Fecha de inicio</label>
+                    <input type="date" id="fechaInicio" onchange="calcularPrecio()">
+                </div>
+                <div>
+                    <label for="fechaFin">Fecha de fin</label>
+                    <input type="date" id="fechaFin" onchange="calcularPrecio()">
+                </div>
+            </div>
+
+            <!-- Precio estimado -->
+            <div class="precio-estimado" id="precioEstimado">
+                <span class="precio-label">Precio estimado</span>
+                <span class="precio-valor" id="precioValor"></span>
+            </div>
+
+            <button class="btn" id="submitBtn" onclick="enviar()">Confirmar reserva</button>
+        </div>
     </div>
-
-    <div class="field">
-        <label for="fechaFin">Fecha de fin</label>
-        <input type="date" id="fechaFin">
-    </div>
-
-    <div class="field">
-        <label for="tipoEstado">Estado</label>
-        <select id="tipoEstado">
-            <option value="PENDIENTE" selected>Pendiente</option>
-            <option value="CONFIRMADA">Confirmada</option>
-            <option value="CANCELADA">Cancelada</option>
-        </select>
-    </div>
-
-    <button id="submitBtn" onclick="enviar()">Confirmar reserva</button>
-</div>
+</main>
 
 <script>
     let idCliente = null;
+    let alojamientosData = []; // guardamos los datos para el preview y cálculo de precio
+
+    // Fechas mínimas: hoy
+    const hoy = new Date().toISOString().split('T')[0];
+    document.getElementById('fechaInicio').min = hoy;
+    document.getElementById('fechaFin').min = hoy;
+
+    // Si hay ?idAlojamiento en la URL, lo pre-seleccionamos
+    const params = new URLSearchParams(location.search);
+    const idAlojParam = params.get('idAlojamiento');
+
+    // Ajustar el botón Volver: si venimos del detalle, volvemos ahí
+    const idReferer = params.get('idAlojamiento');
+    const tipoReferer = params.get('tipo');
+    if (idReferer && tipoReferer) {
+        document.getElementById('btnBack').href = `/detalle-alojamiento.html?id=${idReferer}&tipo=${tipoReferer}`;
+    }
 
     async function cargarAlojamientos() {
         const select = document.getElementById('idAlojamiento');
-        select.innerHTML = '<option value="">-- Seleccionar alojamiento --</option>';
-
         try {
             const [casas, hoteles, deptos] = await Promise.all([
-                fetch('/Casa/listar', { credentials: 'include' }).then(r => r.json()).catch(() => []),
-                fetch('/Hotel/listar', { credentials: 'include' }).then(r => r.json()).catch(() => []),
-                fetch('/Departamento/listar', { credentials: 'include' }).then(r => r.json()).catch(() => [])
+                fetch('/Casa/listar', { credentials: 'include' }).then(r => r.ok ? r.json() : []).catch(() => []),
+                fetch('/Hotel/listar', { credentials: 'include' }).then(r => r.ok ? r.json() : []).catch(() => []),
+                fetch('/Departamento/listar', { credentials: 'include' }).then(r => r.ok ? r.json() : []).catch(() => [])
             ]);
 
             const todos = [...casas, ...hoteles, ...deptos];
+            // Solo activos
+            const activos = todos.filter(a => {
+                const aloj = a.alojamiento || a;
+                return aloj.activo !== false;
+            });
 
-            if (todos.length === 0) {
-                select.innerHTML = '<option value="">-- No hay alojamientos disponibles --</option>';
+            if (activos.length === 0) {
+                select.innerHTML = '<option value="">No hay alojamientos disponibles</option>';
                 return;
             }
 
-            todos.forEach(a => {
+            select.innerHTML = '<option value="">— Seleccioná un alojamiento —</option>';
+            activos.forEach(a => {
                 const aloj = a.alojamiento || a;
-                const tipo = a.tipoInmueble || (a.estrellas !== undefined ? 'HOTEL' : (a.tienePatio !== undefined ? 'CASA' : 'DEPARTAMENTO'));
+                const tipo = aloj.tipoInmueble || (a.estrellas !== undefined ? 'HOTEL' : (a.tienePatio !== undefined ? 'CASA' : 'DEPARTAMENTO'));
                 const option = document.createElement('option');
                 option.value = aloj.id;
-                option.textContent = `${tipo} - ${aloj.titulo || 'Sin título'} ($${aloj.precioNoche || 0}/noche)`;
+                option.textContent = `${tipo} — ${aloj.titulo || 'Sin título'} · $${parseFloat(aloj.precioNoche || 0).toLocaleString('es-AR')}/noche`;
                 select.appendChild(option);
+                // guardamos el objeto completo para el preview
+                alojamientosData[aloj.id] = { ...aloj, tipoInmueble: tipo };
             });
 
-            const params = new URLSearchParams(location.search);
-            const idParam = params.get('idAlojamiento');
-            if (idParam) select.value = idParam;
+            if (idAlojParam) {
+                select.value = idAlojParam;
+                onAlojamientoChange();
+            }
 
         } catch(e) {
-            select.innerHTML = '<option value="">-- Error cargando alojamientos --</option>';
+            select.innerHTML = '<option value="">Error cargando alojamientos</option>';
         }
     }
 
-    fetch('/Usuario/me', { credentials: 'include' }).then(r => r.json()).then(u => {
-        idCliente = u.id;
-        cargarAlojamientos();
-    }).catch(() => {});
+    function onAlojamientoChange() {
+        const id = document.getElementById('idAlojamiento').value;
+        const preview = document.getElementById('alojPreview');
+
+        if (!id || !alojamientosData[id]) {
+            preview.classList.remove('visible');
+            document.getElementById('precioEstimado').classList.remove('visible');
+            return;
+        }
+
+        const a = alojamientosData[id];
+        document.getElementById('previewTitulo').textContent = a.titulo || 'Sin título';
+        const dir = a.direccion ? `${a.direccion.calle || ''} ${a.direccion.altura || ''}, ${a.direccion.ciudad || ''}`.trim() : '';
+        document.getElementById('previewDireccion').textContent = dir ? `📍 ${dir}` : '';
+        document.getElementById('previewPrecio').textContent = `$${parseFloat(a.precioNoche).toLocaleString('es-AR')}/noche`;
+        document.getElementById('previewCapacidad').textContent = a.capacidad ? `👥 ${a.capacidad} personas` : '';
+        preview.classList.add('visible');
+
+        calcularPrecio();
+    }
+
+    function calcularPrecio() {
+        const id = document.getElementById('idAlojamiento').value;
+        const inicio = document.getElementById('fechaInicio').value;
+        const fin = document.getElementById('fechaFin').value;
+        const estimado = document.getElementById('precioEstimado');
+
+        if (!id || !inicio || !fin || !alojamientosData[id]) {
+            estimado.classList.remove('visible');
+            return;
+        }
+
+        const dias = Math.round((new Date(fin) - new Date(inicio)) / (1000 * 60 * 60 * 24));
+        if (dias <= 0) {
+            estimado.classList.remove('visible');
+            return;
+        }
+
+        const precio = parseFloat(alojamientosData[id].precioNoche) * dias;
+        document.getElementById('precioValor').textContent =
+            `$${precio.toLocaleString('es-AR')} · ${dias} noche${dias !== 1 ? 's' : ''}`;
+        estimado.classList.add('visible');
+    }
+
+    // Fecha fin mínima = fecha inicio
+    document.getElementById('fechaInicio').addEventListener('change', function() {
+        document.getElementById('fechaFin').min = this.value;
+        if (document.getElementById('fechaFin').value < this.value) {
+            document.getElementById('fechaFin').value = '';
+        }
+        calcularPrecio();
+    });
 
     async function enviar() {
         const btn = document.getElementById('submitBtn');
         const msg = document.getElementById('msg');
         msg.style.display = 'none';
 
+        const idAlojamiento = parseInt(document.getElementById('idAlojamiento').value);
+        const fechaInicio   = document.getElementById('fechaInicio').value;
+        const fechaFin      = document.getElementById('fechaFin').value;
+
+        if (!idAlojamiento) {
+            mostrarMsg('error', 'Seleccioná un alojamiento.'); return;
+        }
+        if (!fechaInicio) {
+            mostrarMsg('error', 'Ingresá la fecha de inicio.'); return;
+        }
+        if (!fechaFin) {
+            mostrarMsg('error', 'Ingresá la fecha de fin.'); return;
+        }
+        if (fechaFin <= fechaInicio) {
+            mostrarMsg('error', 'La fecha de fin debe ser posterior a la de inicio.'); return;
+        }
+
         const datos = {
             idCliente,
-            idAlojamiento: parseInt(document.getElementById('idAlojamiento').value),
-            fechaInicio:   document.getElementById('fechaInicio').value,
-            fechaFin:      document.getElementById('fechaFin').value,
-            tipoEstado:    document.getElementById('tipoEstado').value,
+            idAlojamiento,
+            fechaInicio,
+            fechaFin,
+            tipoEstado: 'PENDIENTE'   // siempre PENDIENTE al crear
         };
-
-        if (!datos.idAlojamiento) {
-            msg.className = 'msg error'; msg.textContent = 'Seleccioná un alojamiento.';
-            msg.style.display = 'block'; return;
-        }
 
         btn.disabled = true; btn.textContent = 'Reservando...';
         try {
-            const resp = await fetch('/Reserva/registrar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos) });
+            const resp = await fetch('/Reserva/registrar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(datos)
+            });
             const texto = await resp.text();
-            msg.className = resp.ok ? 'msg success' : 'msg error';
-            msg.textContent = resp.ok ? '¡Reserva creada correctamente! Redirigiendo...' : 'Error: ' + texto;
-            if (resp.ok) setTimeout(() => window.location.href = '/mis-reservas.html', 2000);
+            if (resp.ok) {
+                mostrarMsg('success', '¡Reserva creada correctamente! Redirigiendo...');
+                setTimeout(() => window.location.href = '/mis-reservas.html', 2000);
+            } else {
+                mostrarMsg('error', 'Error: ' + texto);
+                btn.disabled = false; btn.textContent = 'Confirmar reserva';
+            }
         } catch {
-            msg.className = 'msg error'; msg.textContent = 'No se pudo conectar con el servidor.';
+            mostrarMsg('error', 'No se pudo conectar con el servidor.');
+            btn.disabled = false; btn.textContent = 'Confirmar reserva';
         }
-        msg.style.display = 'block'; btn.disabled = false; btn.textContent = 'Confirmar reserva';
     }
+
+    function mostrarMsg(tipo, texto) {
+        const msg = document.getElementById('msg');
+        msg.className = 'msg ' + tipo;
+        msg.textContent = texto;
+        msg.style.display = 'block';
+    }
+
+    // Inicialización
+    fetch('/Usuario/me', { credentials: 'include' })
+        .then(r => r.json())
+        .then(u => { idCliente = u.id; cargarAlojamientos(); })
+        .catch(() => {});
 </script>
 </body>
 </html>
