@@ -3,23 +3,36 @@ package GestionAlojamiento.Config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   UserDetailsService userDetailsService) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, UserDetailsService userDetailsService,
+                                                   JwtAuthFilter jwtAuthFilter,
+                                                   AuthenticationProvider authenticationProvider) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider)
                 .userDetailsService(userDetailsService)
                 .authorizeHttpRequests(auth -> auth
 
@@ -31,6 +44,7 @@ public class SecurityConfig {
                                 "/registrarse.html",
                                 "/403.html",
                                 "/login",
+                                "/auth/login",
                                 "/Usuario/registrar",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
@@ -98,9 +112,9 @@ public class SecurityConfig {
 
                         // ── ALOJAMIENTOS — LISTAR (todos los roles) ───────────
                         .requestMatchers(
-                                "/Casa/listar",           "/Casa/mostrar/**",
-                                "/Hotel/listar",          "/Hotel/mostrar/**",
-                                "/Departamento/listar",   "/Departamento/mostrar/**"
+                                "/Casa/listar",         "/Casa/mostrar/**",
+                                "/Hotel/listar",        "/Hotel/mostrar/**",
+                                "/Departamento/listar", "/Departamento/mostrar/**"
                         ).hasAnyRole("ADMIN", "ANFITRION", "CLIENTE")
 
                         // ── ALOJAMIENTOS — PROPIOS (admin + anfitrion) ────────
@@ -125,11 +139,10 @@ public class SecurityConfig {
 
                         // ── RESERVAS ──────────────────────────────────────────
                         .requestMatchers("/Reserva/listar/propios").hasAnyRole("ADMIN", "CLIENTE")
-                        .requestMatchers("/Reserva/listar/anfitrion").hasAnyRole("ADMIN", "ANFITRION")  // ← AGREGAR ESTA LÍNEA
+                        .requestMatchers("/Reserva/listar/anfitrion").hasAnyRole("ADMIN", "ANFITRION")
                         .requestMatchers("/Reserva/mostrar/**").hasAnyRole("ADMIN", "ANFITRION", "CLIENTE")
                         .requestMatchers("/Reserva/registrar").hasAnyRole("ADMIN", "CLIENTE")
-                        .requestMatchers("/Reserva/actualizar", "/Reserva/eliminar/**"
-                        ).hasAnyRole("ADMIN", "CLIENTE")
+                        .requestMatchers("/Reserva/actualizar", "/Reserva/eliminar/**").hasAnyRole("ADMIN", "CLIENTE")
 
                         // ── REVIEWS ───────────────────────────────────────────
                         .requestMatchers(
@@ -146,31 +159,32 @@ public class SecurityConfig {
 
                         .anyRequest().authenticated()
                 )
-                .formLogin(form -> form
-                        .loginPage("/login.html")
-                        .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/home.html", true)
-                        .failureUrl("/login.html?error=true")
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutSuccessUrl("/login.html")
-                        .permitAll()
-                )
-                .exceptionHandling(ex -> ex
-                        .accessDeniedHandler((request, response, accessDeniedException) ->
-                                response.sendRedirect("/403.html")
-                        )
-                        .authenticationEntryPoint((request, response, authException) ->
-                                response.sendRedirect("/login.html")
-                        )
-                )
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService) {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("*"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        config.setAllowedHeaders(List.of("*"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
     @Bean
