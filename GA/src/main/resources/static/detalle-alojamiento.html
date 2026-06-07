@@ -47,6 +47,7 @@
             font-size: 18px;
         }
         .app-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; }
+        .header-right { display: flex; align-items: center; gap: 20px; }
         .btn-back {
             background: transparent;
             border: 1px solid var(--border);
@@ -58,6 +59,13 @@
             transition: all 0.2s;
         }
         .btn-back:hover { border-color: var(--accent); color: var(--accent); }
+        .logout-link {
+            color: #fca5a5;
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.2s;
+        }
+        .logout-link:hover { color: #f87171; }
 
         /* ── MAIN ── */
         main { padding: 32px; max-width: 900px; margin: 0 auto; }
@@ -94,8 +102,10 @@
         .detail-head {
             padding: 24px 28px 20px;
             border-bottom: 1px solid var(--border);
-            display: flex; align-items: flex-start;
-            justify-content: space-between; gap: 16px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
             flex-wrap: wrap;
         }
 
@@ -239,7 +249,10 @@
         <div class="logo-icon">🏠</div>
         <span class="app-title">Gestión Alojamiento</span>
     </div>
-    <a href="/listar-alojamientos.html" class="btn-back">← Volver</a>
+    <div class="header-right">
+        <a href="/listar-alojamientos.html" class="btn-back">← Volver</a>
+        <a href="#" onclick="cerrarSesion()" class="logout-link">Cerrar sesión</a>
+    </div>
 </header>
 
 <main id="mainContent" style="display:none">
@@ -262,6 +275,17 @@
 </main>
 
 <script>
+    // ==================== GUARD DE AUTENTICACIÓN ====================
+    if (!localStorage.getItem('token')) {
+        window.location.href = '/login.html';
+    }
+
+    // ==================== CERRAR SESIÓN ====================
+    function cerrarSesion() {
+        localStorage.removeItem('token');
+        window.location.href = '/login.html';
+    }
+
     const params = new URLSearchParams(location.search);
     const id   = params.get('id');
     const tipo = params.get('tipo') || 'casas';
@@ -270,7 +294,7 @@
 
     async function cargarUsuario() {
         try {
-            const resp = await fetch('/Usuario/me', { credentials: 'include' });
+            const resp = await fetch('/Usuario/me', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             if (resp.ok) usuario = await resp.json();
         } catch(e) {}
     }
@@ -281,7 +305,7 @@
         else if (tipo === 'hoteles') url = `/Hotel/mostrar/${id}`;
         else url = `/Departamento/mostrar/${id}`;
 
-        const resp = await fetch(url, { credentials: 'include' });
+        const resp = await fetch(url, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (!resp.ok) {
             document.getElementById('detailBody').innerHTML = '<p style="color:var(--error)">Error al cargar el alojamiento.</p>';
             return;
@@ -330,7 +354,7 @@
     }
 
     async function cargarReviews() {
-        const resp = await fetch(`/Review/alojamiento/${id}`, { credentials: 'include' });
+        const resp = await fetch(`/Review/alojamiento/${id}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (!resp.ok) {
             document.getElementById('reviews').innerHTML = '<p style="color:var(--muted)">No se pudieron cargar las reseñas.</p>';
             return;
@@ -370,7 +394,7 @@
         else if (tipo === 'hoteles') url = `/Hotel/eliminar/${id}`;
         else url = `/Departamento/eliminar/${id}`;
 
-        const resp = await fetch(url, { method: 'DELETE', credentials: 'include' });
+        const resp = await fetch(url, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (resp.ok) window.location.href = '/listar-alojamientos.html';
         else alert('No se pudo eliminar');
     }

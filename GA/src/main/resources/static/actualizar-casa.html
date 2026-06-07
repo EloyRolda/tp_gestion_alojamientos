@@ -11,7 +11,7 @@
         body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); min-height: 100vh; padding: 40px 20px; }
         body::before { content: ''; position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%); top: -150px; right: -150px; pointer-events: none; }
         .container { max-width: 720px; margin: 0 auto; }
-        .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 14px; margin-bottom: 28px; transition: color 0.2s; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 14px; transition: color 0.2s; }
         .back-link:hover { color: var(--text); }
         .page-title { font-family: 'Playfair Display', serif; font-size: 28px; margin-bottom: 6px; }
         .page-sub { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
@@ -49,7 +49,10 @@
 </head>
 <body>
 <div class="container">
-    <a href="/home.html" class="back-link">← Volver al panel</a>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px;">
+        <a href="/home.html" class="back-link" style="margin-bottom: 0;">← Volver al panel</a>
+        <a href="#" onclick="cerrarSesion()" style="color:#fca5a5; text-decoration: none; font-size: 14px;">Cerrar sesión</a>
+    </div>
     <div class="page-title">🏠 Actualizar Casa</div>
     <p class="page-sub">Modificá solo los campos que querés cambiar</p>
 
@@ -149,6 +152,17 @@
 </div>
 
 <script>
+    // ==================== GUARD DE AUTENTICACIÓN ====================
+    if (!localStorage.getItem('token')) {
+        window.location.href = '/login.html';
+    }
+
+    // ==================== CERRAR SESIÓN ====================
+    function cerrarSesion() {
+        localStorage.removeItem('token');
+        window.location.href = '/login.html';
+    }
+
     // ==================== CARGA AUTOMÁTICA DE DATOS ====================
     async function cargarDatos() {
         const params = new URLSearchParams(location.search);
@@ -157,7 +171,7 @@
         if (!id) return;
 
         try {
-            const resp = await fetch(`/Casa/mostrar/${id}`, { credentials: 'include' });
+            const resp = await fetch(`/Casa/mostrar/${id}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             if (!resp.ok) throw new Error('No se pudo cargar');
 
             const casa = await resp.json();
@@ -247,8 +261,10 @@
         try {
             const resp = await fetch('/Casa/actualizar', {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
                 body: JSON.stringify(datos)
             });
             const texto = await resp.text();

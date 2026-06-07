@@ -11,7 +11,7 @@
         body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
         body::before { content: ''; position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, rgba(251,191,36,0.05) 0%, transparent 70%); top: -150px; left: -150px; pointer-events: none; }
         .container { width: 100%; max-width: 480px; }
-        .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 14px; margin-bottom: 28px; transition: color 0.2s; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 14px; transition: color 0.2s; }
         .back-link:hover { color: var(--text); }
         .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 36px 32px; animation: fadeUp 0.4s ease both; }
         @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
@@ -48,7 +48,6 @@
         .stars-row:has(.star-opt:nth-child(4) input:checked) .star-opt:nth-child(3) label,
         .stars-row:has(.star-opt:nth-child(4) input:checked) .star-opt:nth-child(4) label { color: var(--star); }
         .stars-row:has(.star-opt:nth-child(5) input:checked) .star-opt label { color: var(--star); }
-        .stars-row:has(.star-opt:nth-child(6) input:checked) .star-opt label { color: var(--star); }
         .star-opt label:hover { transform: scale(1.2); }
         .hint { font-size: 11px; color: var(--muted); margin-top: 5px; }
         .msg { border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 18px; display: none; }
@@ -57,11 +56,17 @@
         .btn { width: 100%; background: linear-gradient(135deg, #d97706, #f59e0b); border: none; border-radius: 10px; padding: 14px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.1s; margin-top: 4px; }
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
         .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+        .logout-link { color: #fca5a5; text-decoration: none; font-size: 14px; transition: color 0.2s; }
+        .logout-link:hover { color: #f87171; }
     </style>
 </head>
 <body>
 <div class="container">
-    <a href="/home.html" class="back-link">← Volver al panel</a>
+    <div class="header-actions">
+        <a href="/home.html" class="back-link">← Volver al panel</a>
+        <a href="#" onclick="cerrarSesion()" class="logout-link">Cerrar sesión</a>
+    </div>
     <div class="card">
         <div class="logo">
             <div class="logo-icon">⭐</div>
@@ -98,15 +103,33 @@
 </div>
 
 <script>
+    // ==================== GUARD DE AUTENTICACIÓN ====================
+    if (!localStorage.getItem('token')) {
+        window.location.href = '/login.html';
+    }
+
+    // ==================== CERRAR SESIÓN ====================
+    function cerrarSesion() {
+        localStorage.removeItem('token');
+        window.location.href = '/login.html';
+    }
+
     let idCliente = null;
-    fetch('/Usuario/me', { credentials: 'include' }).then(r => r.json()).then(u => { idCliente = u.id; }).catch(() => {});
+    fetch('/Usuario/me', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } }).then(r => r.json()).then(u => { idCliente = u.id; }).catch(() => {});
 
     async function enviar() {
         const btn = document.getElementById('submitBtn');
         const msg = document.getElementById('msg');
         msg.style.display = 'none';
 
+        const idAlojamiento = parseInt(document.getElementById('idAlojamiento').value);
         const puntuacionEl = document.querySelector('input[name="puntuacion"]:checked');
+
+        if (!idAlojamiento || idAlojamiento < 1) {
+            msg.className = 'msg error'; msg.textContent = 'Ingresá un ID de alojamiento válido.';
+            msg.style.display = 'block'; return;
+        }
+
         if (!puntuacionEl) {
             msg.className = 'msg error'; msg.textContent = 'Por favor seleccioná una puntuación.';
             msg.style.display = 'block'; return;
@@ -114,14 +137,21 @@
 
         const datos = {
             idCliente,
-            idAlojamiento: parseInt(document.getElementById('idAlojamiento').value),
+            idAlojamiento: idAlojamiento,
             puntuacion:    parseInt(puntuacionEl.value),
             comentario:    document.getElementById('comentario').value,
         };
 
         btn.disabled = true; btn.textContent = 'Publicando...';
         try {
-            const resp = await fetch('/Review/registrar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos) });
+            const resp = await fetch('/Review/registrar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
+                body: JSON.stringify(datos)
+            });
             const texto = await resp.text();
             msg.className = resp.ok ? 'msg success' : 'msg error';
             msg.textContent = resp.ok ? '¡Review publicada correctamente!' : 'Error: ' + texto;

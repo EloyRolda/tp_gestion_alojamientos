@@ -11,7 +11,7 @@
         body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
         body::before { content: ''; position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%); top: -150px; right: -150px; pointer-events: none; }
         .container { width: 100%; max-width: 480px; }
-        .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 14px; margin-bottom: 28px; transition: color 0.2s; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 14px; transition: color 0.2s; }
         .back-link:hover { color: var(--text); }
         .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 36px 32px; animation: fadeUp 0.4s ease both; }
         @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
@@ -37,11 +37,17 @@
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
         .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
         .section-label { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+        .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+        .logout-link { color: #fca5a5; text-decoration: none; font-size: 14px; transition: color 0.2s; }
+        .logout-link:hover { color: #f87171; }
     </style>
 </head>
 <body>
 <div class="container">
-    <a href="/home.html" class="back-link">← Volver al panel</a>
+    <div class="header-actions">
+        <a href="/home.html" class="back-link">← Volver al panel</a>
+        <a href="#" onclick="cerrarSesion()" class="logout-link">Cerrar sesión</a>
+    </div>
     <div class="card">
         <div class="logo">
             <div class="logo-icon">👤</div>
@@ -88,6 +94,17 @@
 </div>
 
 <script>
+    // ==================== GUARD DE AUTENTICACIÓN ====================
+    if (!localStorage.getItem('token')) {
+        window.location.href = '/login.html';
+    }
+
+    // ==================== CERRAR SESIÓN ====================
+    function cerrarSesion() {
+        localStorage.removeItem('token');
+        window.location.href = '/login.html';
+    }
+
     async function enviar() {
         const btn = document.getElementById('submitBtn');
         const msg = document.getElementById('msg');
@@ -117,8 +134,10 @@
         try {
             const resp = await fetch('/Usuario/actualizar', {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
                 body: JSON.stringify(datos)
             });
             const texto = await resp.text();

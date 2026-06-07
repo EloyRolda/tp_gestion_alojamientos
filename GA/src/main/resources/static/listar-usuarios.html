@@ -21,6 +21,8 @@
         .app-title { font-family: 'Playfair Display', serif; font-size: 18px; }
         .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 13px; border: 1px solid var(--border); padding: 7px 14px; border-radius: 8px; transition: all 0.2s; }
         .back-link:hover { color: var(--text); border-color: #2d3f5c; }
+        .logout-link { color: #fca5a5; text-decoration: none; font-size: 13px; border: 1px solid var(--border); padding: 7px 14px; border-radius: 8px; transition: all 0.2s; }
+        .logout-link:hover { color: #f87171; border-color: #fca5a5; }
 
         /* MAIN */
         main { padding: 32px; max-width: 1400px; margin: 0 auto; }
@@ -111,9 +113,11 @@
         <div class="logo-icon">🏠</div>
         <span class="app-title">Gestión Alojamiento</span>
     </div>
-    <a href="/home.html" class="back-link">← Panel</a>
+    <div class="header-right" style="display:flex;align-items:center;gap:16px;">
+        <a href="/home.html" class="back-link">← Panel</a>
+        <a href="#" onclick="cerrarSesion()" class="logout-link">Cerrar sesión</a>
+    </div>
 </header>
-
 <main>
     <div class="page-header">
         <h1 class="page-title" id="pageTitle">Usuarios <span id="pageSubtitle"></span></h1>
@@ -173,6 +177,14 @@
 </div>
 
 <script>
+    // ==================== GUARD DE AUTENTICACIÓN ====================
+    if (!localStorage.getItem('token')) {
+        window.location.href = '/login.html';
+    }
+
+    let datos = [];
+    let pendingDeleteId = null;
+
     const ENDPOINTS = {
         todos:           '/Usuario/listar',
         clientes:        '/Usuario/listar/clientes',
@@ -186,10 +198,12 @@
         administradores: 'Administradores'
     };
 
-    let datos = [];
-    let pendingDeleteId = null;
-
     const tipo = new URLSearchParams(location.search).get('tipo') || 'todos';
+
+    function cerrarSesion() {
+        localStorage.removeItem('token');
+        window.location.href = '/login.html';
+    }
 
     // Activar tab
     const tabEl = document.getElementById('tab-' + tipo);
@@ -199,7 +213,7 @@
     async function cargar() {
         const url = ENDPOINTS[tipo] || ENDPOINTS.todos;
         try {
-            const resp = await fetch(url, { credentials: 'include' });
+            const resp = await fetch(url, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             if (!resp.ok) throw new Error('Error ' + resp.status + ': no autorizado o error del servidor.');
             datos = await resp.json();
             renderizar(datos);
@@ -264,7 +278,7 @@
         const btn = document.getElementById('btnConfirmDelete');
         btn.textContent = 'Desactivando...'; btn.disabled = true;
         try {
-            const resp = await fetch(`/Usuario/eliminar/${pendingDeleteId}`, { method: 'DELETE', credentials: 'include' });
+            const resp = await fetch(`/Usuario/eliminar/${pendingDeleteId}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             if (resp.ok) {
                 datos = datos.filter(u => u.id !== pendingDeleteId);
                 renderizar(datos);

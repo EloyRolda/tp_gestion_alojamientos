@@ -1,244 +1,666 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reservas — Gestión Alojamiento</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap');
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #0a0f1e; --surface: #111827; --surface2: #0f1929;
-      --border: #1e2d45; --accent: #3b82f6; --text: #e2e8f0; --muted: #64748b;
-      --error: #f87171;
-    }
-    body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); min-height: 100vh; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservas — Gestión Alojamiento</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap');
 
-    header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
-    .header-left { display: flex; align-items: center; gap: 12px; }
-    .logo-icon { width: 38px; height: 38px; background: linear-gradient(135deg, var(--accent), #6366f1); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-    .app-title { font-family: 'Playfair Display', serif; font-size: 18px; }
-    .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 13px; border: 1px solid var(--border); padding: 7px 14px; border-radius: 8px; transition: all 0.2s; }
-    .back-link:hover { color: var(--text); border-color: #2d3f5c; }
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    main { padding: 32px; max-width: 1400px; margin: 0 auto; }
-    .page-title { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 28px; }
+        :root {
+            --bg: #0a0f1e;
+            --surface: #111827;
+            --surface2: #0f1929;
+            --border: #1e2d45;
+            --accent: #3b82f6;
+            --text: #e2e8f0;
+            --muted: #64748b;
+            --error: #f87171;
+        }
 
-    .filter-bar { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
-    .estado-btn { padding: 7px 16px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-    .estado-btn:hover { color: var(--text); }
-    .estado-btn.active-TODOS       { border-color: var(--accent); color: var(--accent); background: rgba(59,130,246,0.08); }
-    .estado-btn.active-PENDIENTE   { border-color: #fbbf24; color: #fbbf24; background: rgba(251,191,36,0.08); }
-    .estado-btn.active-CONFIRMADA  { border-color: #4ade80; color: #4ade80; background: rgba(74,222,128,0.08); }
-    .estado-btn.active-CANCELADA   { border-color: #f87171; color: #f87171; background: rgba(248,113,113,0.08); }
-    .estado-btn.active-VENCIDA     { border-color: #94a3b8; color: #94a3b8; background: rgba(148,163,184,0.08); }
+        body {
+            background: var(--bg);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+            min-height: 100vh;
+        }
 
-    .toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
-    .search-wrap { position: relative; flex: 1; min-width: 220px; max-width: 360px; }
-    .search-wrap input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 9px; padding: 10px 14px 10px 36px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; transition: border-color 0.2s; }
-    .search-wrap input:focus { border-color: var(--accent); }
-    .search-wrap::before { content: '🔍'; position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 13px; pointer-events: none; }
-    .count-badge { font-size: 12px; color: var(--muted); margin-left: auto; }
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
 
-    .msg { border-radius: 8px; padding: 12px 16px; font-size: 13px; margin-bottom: 16px; display: none; }
-    .msg.error { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: var(--error); }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-    .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    thead tr { background: var(--surface); border-bottom: 1px solid var(--border); }
-    th { padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
-    tbody tr { border-bottom: 1px solid var(--border); background: var(--surface2); transition: background 0.15s; }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: #131f30; }
-    td { padding: 13px 16px; vertical-align: middle; }
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--accent), #6366f1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
 
-    .cell-muted  { color: var(--muted); }
-    .cell-email  { color: #93c5fd; }
-    .cell-price  { color: #4ade80; font-weight: 600; }
-    .cell-fechas { font-size: 12px; color: var(--muted); line-height: 1.6; }
+        .app-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+        }
 
-    .badge-estado { font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
-    .est-PENDIENTE  { background: rgba(251,191,36,0.12);  color: #fbbf24; }
-    .est-CONFIRMADA { background: rgba(74,222,128,0.12);  color: #4ade80; }
-    .est-CANCELADA  { background: rgba(248,113,113,0.12); color: #f87171; }
-    .est-VENCIDA    { background: rgba(148,163,184,0.1);  color: #94a3b8; }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 13px;
+            border: 1px solid var(--border);
+            padding: 7px 14px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
 
-    .actions { display: flex; gap: 6px; }
-    .btn-action { border: none; border-radius: 6px; padding: 5px 10px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: opacity 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
-    .btn-edit   { background: rgba(59,130,246,0.15); color: #60a5fa; }
-    .btn-edit:hover { background: rgba(59,130,246,0.25); }
-    .btn-delete { background: rgba(248,113,113,0.12); color: #f87171; }
-    .btn-delete:hover { background: rgba(248,113,113,0.22); }
+        .back-link:hover {
+            color: var(--text);
+            border-color: #2d3f5c;
+        }
 
-    .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
-    .empty-icon { font-size: 40px; margin-bottom: 12px; }
+        .logout-link {
+            color: #fca5a5;
+            text-decoration: none;
+            font-size: 13px;
+            border: 1px solid var(--border);
+            padding: 7px 14px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
 
-    #loadingOverlay { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 100; transition: opacity 0.3s; }
-    .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+        .logout-link:hover {
+            color: #f87171;
+            border-color: #fca5a5;
+        }
 
-    .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 200; }
-    .modal-bg.open { display: flex; }
-    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px 28px 24px; max-width: 380px; width: 90%; animation: fadeUp 0.25s ease both; }
-    @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-    .modal h3 { font-family: 'Playfair Display', serif; font-size: 18px; margin-bottom: 8px; }
-    .modal p { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
-    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
-    .btn-cancel-modal { background: transparent; border: 1px solid var(--border); border-radius: 8px; padding: 8px 16px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; }
-    .btn-confirm-delete { background: rgba(248,113,113,0.15); border: 1px solid rgba(248,113,113,0.3); border-radius: 8px; padding: 8px 16px; color: var(--error); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; }
-    .btn-confirm-delete:hover { background: rgba(248,113,113,0.25); }
-  </style>
+        main {
+            padding: 32px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            margin-bottom: 28px;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .estado-btn {
+            padding: 7px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .estado-btn:hover {
+            color: var(--text);
+        }
+
+        .estado-btn.active-TODOS {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(59, 130, 246, 0.08);
+        }
+
+        .estado-btn.active-PENDIENTE {
+            border-color: #fbbf24;
+            color: #fbbf24;
+            background: rgba(251, 191, 36, 0.08);
+        }
+
+        .estado-btn.active-CONFIRMADA {
+            border-color: #4ade80;
+            color: #4ade80;
+            background: rgba(74, 222, 128, 0.08);
+        }
+
+        .estado-btn.active-CANCELADA {
+            border-color: #f87171;
+            color: #f87171;
+            background: rgba(248, 113, 113, 0.08);
+        }
+
+        .estado-btn.active-VENCIDA {
+            border-color: #94a3b8;
+            color: #94a3b8;
+            background: rgba(148, 163, 184, 0.08);
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 220px;
+            max-width: 360px;
+        }
+
+        .search-wrap input {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 10px 14px 10px 36px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-wrap input:focus {
+            border-color: var(--accent);
+        }
+
+        .search-wrap::before {
+            content: '🔍';
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 13px;
+            pointer-events: none;
+        }
+
+        .count-badge {
+            font-size: 12px;
+            color: var(--muted);
+            margin-left: auto;
+        }
+
+        .msg {
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .msg.error {
+            background: rgba(248, 113, 113, 0.1);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+            color: var(--error);
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead tr {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            background: var(--surface2);
+            transition: background 0.15s;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: #131f30;
+        }
+
+        td {
+            padding: 13px 16px;
+            vertical-align: middle;
+        }
+
+        .cell-muted {
+            color: var(--muted);
+        }
+
+        .cell-email {
+            color: #93c5fd;
+        }
+
+        .cell-price {
+            color: #4ade80;
+            font-weight: 600;
+        }
+
+        .cell-fechas {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .badge-estado {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        .est-PENDIENTE {
+            background: rgba(251, 191, 36, 0.12);
+            color: #fbbf24;
+        }
+
+        .est-CONFIRMADA {
+            background: rgba(74, 222, 128, 0.12);
+            color: #4ade80;
+        }
+
+        .est-CANCELADA {
+            background: rgba(248, 113, 113, 0.12);
+            color: #f87171;
+        }
+
+        .est-VENCIDA {
+            background: rgba(148, 163, 184, 0.1);
+            color: #94a3b8;
+        }
+
+        .actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-action {
+            border: none;
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: opacity 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-edit {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+        }
+
+        .btn-edit:hover {
+            background: rgba(59, 130, 246, 0.25);
+        }
+
+        .btn-delete {
+            background: rgba(248, 113, 113, 0.12);
+            color: #f87171;
+        }
+
+        .btn-delete:hover {
+            background: rgba(248, 113, 113, 0.22);
+        }
+
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--muted);
+        }
+
+        .empty-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        #loadingOverlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            transition: opacity 0.3s;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .modal-bg {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+
+        .modal-bg.open {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 28px 28px 24px;
+            max-width: 380px;
+            width: 90%;
+            animation: fadeUp 0.25s ease both;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .modal p {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 22px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-cancel-modal {
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: var(--muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .btn-confirm-delete {
+            background: rgba(248, 113, 113, 0.15);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: var(--error);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-confirm-delete:hover {
+            background: rgba(248, 113, 113, 0.25);
+        }
+    </style>
 </head>
 <body>
 
-<div id="loadingOverlay"><div class="spinner"></div></div>
+<div id="loadingOverlay">
+    <div class="spinner"></div>
+</div>
 
 <header>
-  <div class="header-left">
-    <div class="logo-icon">🏠</div>
-    <span class="app-title">Gestión Alojamiento</span>
-  </div>
-  <a href="/home.html" class="back-link">← Panel</a>
+    <div class="header-left">
+        <div class="logo-icon">🏠</div>
+        <span class="app-title">Gestión Alojamiento</span>
+    </div>
+    <div class="header-right" style="display:flex;align-items:center;gap:16px;">
+        <a href="/home.html" class="back-link">← Panel</a>
+        <a href="#" onclick="cerrarSesion()" class="logout-link">Cerrar sesión</a>
+    </div>
 </header>
 
 <main>
-  <h1 class="page-title">📅 Reservas</h1>
+    <h1 class="page-title">📅 Reservas</h1>
 
-  <div class="filter-bar">
-    <button class="estado-btn active-TODOS" data-estado="TODOS" onclick="filtrarEstado('TODOS', this)">Todas</button>
-    <button class="estado-btn" data-estado="PENDIENTE"  onclick="filtrarEstado('PENDIENTE', this)">⏳ Pendiente</button>
-    <button class="estado-btn" data-estado="CONFIRMADA" onclick="filtrarEstado('CONFIRMADA', this)">✅ Confirmada</button>
-    <button class="estado-btn" data-estado="CANCELADA"  onclick="filtrarEstado('CANCELADA', this)">❌ Cancelada</button>
-    <button class="estado-btn" data-estado="VENCIDA"    onclick="filtrarEstado('VENCIDA', this)">🕓 Vencida</button>
-  </div>
-
-  <div class="msg error" id="msgError"></div>
-
-  <div class="toolbar">
-    <div class="search-wrap">
-      <input type="text" id="searchInput" placeholder="Buscar por cliente o alojamiento..." oninput="filtrar()">
+    <div class="filter-bar">
+        <button class="estado-btn active-TODOS" data-estado="TODOS" onclick="filtrarEstado('TODOS', this)">Todas
+        </button>
+        <button class="estado-btn" data-estado="PENDIENTE" onclick="filtrarEstado('PENDIENTE', this)">⏳ Pendiente
+        </button>
+        <button class="estado-btn" data-estado="CONFIRMADA" onclick="filtrarEstado('CONFIRMADA', this)">✅ Confirmada
+        </button>
+        <button class="estado-btn" data-estado="CANCELADA" onclick="filtrarEstado('CANCELADA', this)">❌ Cancelada
+        </button>
+        <button class="estado-btn" data-estado="VENCIDA" onclick="filtrarEstado('VENCIDA', this)">🕓 Vencida</button>
     </div>
-    <span class="count-badge" id="countBadge"></span>
-  </div>
 
-  <div class="table-wrap">
-    <table>
-      <thead>
-      <tr>
-        <th>ID</th>
-        <th>Cliente</th>
-        <th>Alojamiento</th>
-        <th>Fechas</th>
-        <th>Precio Total</th>
-        <th>Estado</th>
-        <th>Acciones</th>
-      </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
-    <div class="empty" id="emptyState" style="display:none">
-      <div class="empty-icon">📅</div>
-      <div>No hay reservas que mostrar</div>
+    <div class="msg error" id="msgError"></div>
+
+    <div class="toolbar">
+        <div class="search-wrap">
+            <input type="text" id="searchInput" placeholder="Buscar por cliente o alojamiento..." oninput="filtrar()">
+        </div>
+        <span class="count-badge" id="countBadge"></span>
     </div>
-  </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Alojamiento</th>
+                <th>Fechas</th>
+                <th>Precio Total</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+        <div class="empty" id="emptyState" style="display:none">
+            <div class="empty-icon">📅</div>
+            <div>No hay reservas que mostrar</div>
+        </div>
+    </div>
 </main>
 
 <div class="modal-bg" id="modalBg">
-  <div class="modal">
-    <h3>Cancelar reserva</h3>
-    <p id="modalText">¿Cancelar esta reserva? Esta acción no se puede deshacer.</p>
-    <div class="modal-actions">
-      <button class="btn-cancel-modal" onclick="cerrarModal()">Volver</button>
-      <button class="btn-confirm-delete" id="btnConfirmDelete" onclick="confirmarEliminar()">Cancelar reserva</button>
+    <div class="modal">
+        <h3>Cancelar reserva</h3>
+        <p id="modalText">¿Cancelar esta reserva? Esta acción no se puede deshacer.</p>
+        <div class="modal-actions">
+            <button class="btn-cancel-modal" onclick="cerrarModal()">Volver</button>
+            <button class="btn-confirm-delete" id="btnConfirmDelete" onclick="confirmarEliminar()">Cancelar reserva
+            </button>
+        </div>
     </div>
-  </div>
 </div>
 
 <script>
-  let datos = [];
-  let filtroEstado = 'TODOS';
-  let pendingDeleteId = null;
-  let usuarioActual = null;
-  let usuarioRol = null;
-  const HOY = new Date().toISOString().split('T')[0];
+    // ==================== GUARD DE AUTENTICACIÓN ====================
+    if (!localStorage.getItem('token')) {
+        window.location.href = '/login.html';
+    }
 
-  function estadoEfectivo(r) {
-    if (r.tipoEstado === 'CANCELADA') return 'CANCELADA';
-    if (r.fechaFin && r.fechaFin < HOY && r.tipoEstado === 'CONFIRMADA') return 'VENCIDA';
-    return r.tipoEstado;
-  }
+    let datos = [];
+    let filtroEstado = 'TODOS';
+    let pendingDeleteId = null;
+    let usuarioActual = null;
+    let usuarioRol = null;
+    const HOY = new Date().toISOString().split('T')[0];
 
-  async function cargar() {
-    try {
-      const meResp = await fetch('/Usuario/me', { credentials: 'include' });
-      if (!meResp.ok) throw new Error('No autenticado');
-      usuarioActual = await meResp.json();
-      usuarioRol = usuarioActual.tipoUsuario;
+    function getAuthHeaders() {
+        return {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+        };
+    }
 
-      let url = '';
-      if (usuarioRol === 'ADMINISTRADOR') {
-        url = '/Reserva/listar';
-      } else if (usuarioRol === 'CLIENTE') {
-        url = '/Reserva/listar/propios';
-      } else if (usuarioRol === 'ANFITRION') {
-        document.getElementById('tbody').innerHTML = '';
-        document.getElementById('emptyState').innerHTML = `
+    function cerrarSesion() {
+        localStorage.removeItem('token');
+        window.location.href = '/login.html';
+    }
+
+    function estadoEfectivo(r) {
+        if (r.tipoEstado === 'CANCELADA') return 'CANCELADA';
+        if (r.fechaFin && r.fechaFin < HOY && r.tipoEstado === 'CONFIRMADA') return 'VENCIDA';
+        return r.tipoEstado;
+    }
+
+    async function cargar() {
+        try {
+            const meResp = await fetch('/Usuario/me', { headers: getAuthHeaders() });
+            if (!meResp.ok) throw new Error('No autenticado');
+            usuarioActual = await meResp.json();
+            usuarioRol = usuarioActual.tipoUsuario;
+
+            let url = '';
+            if (usuarioRol === 'ADMINISTRADOR') {
+                url = '/Reserva/listar';
+            } else if (usuarioRol === 'CLIENTE') {
+                url = '/Reserva/listar/propios';
+            } else if (usuarioRol === 'ANFITRION') {
+                document.getElementById('tbody').innerHTML = '';
+                document.getElementById('emptyState').innerHTML = `
                     <div class="empty-icon">⚠️</div>
                     <div>Funcionalidad pendiente: Ver reservas de tus alojamientos.<br>
                     <small>El endpoint /Reserva/listar/anfitrion debe implementarse en el back.</small></div>
                 `;
-        document.getElementById('emptyState').style.display = 'block';
-        ocultarLoading();
-        return;
-      }
+                document.getElementById('emptyState').style.display = 'block';
+                ocultarLoading();
+                return;
+            }
 
-      const resp = await fetch(url, { credentials: 'include' });
-      if (!resp.ok) throw new Error('Error ' + resp.status);
-      datos = await resp.json();
-      renderizar(aplicarFiltros());
-    } catch (e) {
-      mostrarError('No se pudieron cargar las reservas: ' + e.message);
-    } finally { ocultarLoading(); }
-  }
+            const resp = await fetch(url, { headers: getAuthHeaders() });
+            if (!resp.ok) throw new Error('Error ' + resp.status);
+            datos = await resp.json();
+            renderizar(aplicarFiltros());
+        } catch (e) {
+            mostrarError('No se pudieron cargar las reservas: ' + e.message);
+        } finally {
+            ocultarLoading();
+        }
+    }
 
-  function aplicarFiltros() {
-    const q = document.getElementById('searchInput').value.toLowerCase();
-    return datos.filter(r => {
-      const matchEstado = filtroEstado === 'TODOS' || estadoEfectivo(r) === filtroEstado;
-      const matchTexto  =
-              (r.cliente?.nombre     || '').toLowerCase().includes(q) ||
-              (r.alojamiento?.titulo || '').toLowerCase().includes(q);
-      return matchEstado && matchTexto;
-    });
-  }
+    function aplicarFiltros() {
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        return datos.filter(r => {
+            const matchEstado = filtroEstado === 'TODOS' || estadoEfectivo(r) === filtroEstado;
+            const matchTexto =
+                (r.cliente?.nombre || '').toLowerCase().includes(q) ||
+                (r.alojamiento?.titulo || '').toLowerCase().includes(q);
+            return matchEstado && matchTexto;
+        });
+    }
 
-  function filtrar() { renderizar(aplicarFiltros()); }
+    function filtrar() {
+        renderizar(aplicarFiltros());
+    }
 
-  function filtrarEstado(estado, btn) {
-    filtroEstado = estado;
-    document.querySelectorAll('.estado-btn').forEach(b => b.className = 'estado-btn');
-    btn.classList.add('active-' + estado);
-    renderizar(aplicarFiltros());
-  }
+    function filtrarEstado(estado, btn) {
+        filtroEstado = estado;
+        document.querySelectorAll('.estado-btn').forEach(b => b.className = 'estado-btn');
+        btn.classList.add('active-' + estado);
+        renderizar(aplicarFiltros());
+    }
 
-  function renderizar(lista) {
-    const tbody = document.getElementById('tbody');
-    const empty = document.getElementById('emptyState');
-    document.getElementById('countBadge').textContent = lista.length + ' reserva' + (lista.length !== 1 ? 's' : '');
+    function renderizar(lista) {
+        const tbody = document.getElementById('tbody');
+        const empty = document.getElementById('emptyState');
+        document.getElementById('countBadge').textContent = lista.length + ' reserva' + (lista.length !== 1 ? 's' : '');
 
-    if (lista.length === 0) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
-    empty.style.display = 'none';
+        if (lista.length === 0) {
+            tbody.innerHTML = '';
+            empty.style.display = 'block';
+            return;
+        }
+        empty.style.display = 'none';
 
-    tbody.innerHTML = lista.map(r => {
-      const estado = estadoEfectivo(r);
-      const precio = r.precioTotal ? `$${parseFloat(r.precioTotal).toLocaleString('es-AR')}` : '—';
-      const cliente = r.cliente?.nombre || '—';
-      const aloj    = r.alojamiento?.titulo || '—';
-      const noches  = r.fechaInicio && r.fechaFin
-              ? Math.max(0, Math.round((new Date(r.fechaFin) - new Date(r.fechaInicio)) / 86400000))
-              : null;
+        tbody.innerHTML = lista.map(r => {
+            const estado = estadoEfectivo(r);
+            const precio = r.precioTotal ? `$${parseFloat(r.precioTotal).toLocaleString('es-AR')}` : '—';
+            const cliente = r.cliente?.nombre || '—';
+            const aloj = r.alojamiento?.titulo || '—';
+            const noches = r.fechaInicio && r.fechaFin
+                ? Math.max(0, Math.round((new Date(r.fechaFin) - new Date(r.fechaInicio)) / 86400000))
+                : null;
 
-      return `<tr>
+            return `<tr>
                 <td class="cell-muted">${r.id}</td>
                 <td class="cell-email">${cliente}</td>
                 <td class="cell-muted">${aloj}</td>
@@ -255,28 +677,58 @@
                     </div>
                 </td>
             </tr>`;
-    }).join('');
-  }
+        }).join('');
+    }
 
-  function abrirModal(id) { pendingDeleteId = id; document.getElementById('modalBg').classList.add('open'); }
-  function cerrarModal() { document.getElementById('modalBg').classList.remove('open'); pendingDeleteId = null; }
+    function abrirModal(id) {
+        pendingDeleteId = id;
+        document.getElementById('modalBg').classList.add('open');
+    }
 
-  async function confirmarEliminar() {
-    if (!pendingDeleteId) return;
-    const btn = document.getElementById('btnConfirmDelete');
-    btn.textContent = 'Cancelando...'; btn.disabled = true;
-    try {
-      const resp = await fetch(`/Reserva/eliminar/${pendingDeleteId}`, { method: 'DELETE', credentials: 'include' });
-      if (resp.ok) { datos = datos.filter(r => r.id !== pendingDeleteId); renderizar(aplicarFiltros()); cerrarModal(); }
-      else { mostrarError('No se pudo cancelar la reserva.'); cerrarModal(); }
-    } catch { mostrarError('Error de conexión.'); cerrarModal(); }
-    btn.textContent = 'Cancelar reserva'; btn.disabled = false;
-  }
+    function cerrarModal() {
+        document.getElementById('modalBg').classList.remove('open');
+        pendingDeleteId = null;
+    }
 
-  function mostrarError(msg) { const el = document.getElementById('msgError'); el.textContent = msg; el.style.display = 'block'; }
-  function ocultarLoading() { const ov = document.getElementById('loadingOverlay'); ov.style.opacity = '0'; setTimeout(() => ov.style.display = 'none', 300); }
+    async function confirmarEliminar() {
+        if (!pendingDeleteId) return;
+        const btn = document.getElementById('btnConfirmDelete');
+        btn.textContent = 'Cancelando...';
+        btn.disabled = true;
+        try {
+            const resp = await fetch(`/Reserva/eliminar/${pendingDeleteId}`, {
+                method: 'DELETE',
+                headers: getAuthHeaders()
+            });
+            if (resp.ok) {
+                datos = datos.filter(r => r.id !== pendingDeleteId);
+                renderizar(aplicarFiltros());
+                cerrarModal();
+            } else {
+                mostrarError('No se pudo cancelar la reserva.');
+                cerrarModal();
+            }
+        } catch {
+            mostrarError('Error de conexión.');
+            cerrarModal();
+        }
+        btn.textContent = 'Cancelar reserva';
+        btn.disabled = false;
+    }
 
-  cargar();
+    function mostrarError(msg) {
+        const el = document.getElementById('msgError');
+        el.textContent = msg;
+        el.style.display = 'block';
+    }
+
+    function ocultarLoading() {
+        const ov = document.getElementById('loadingOverlay');
+        ov.style.opacity = '0';
+        setTimeout(() => ov.style.display = 'none', 300);
+    }
+
+    cargar();
 </script>
 </body>
 </html>

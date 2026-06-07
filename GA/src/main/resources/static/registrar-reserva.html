@@ -34,7 +34,9 @@
             background: var(--surface);
             border-bottom: 1px solid var(--border);
             padding: 16px 32px;
-            display: flex; align-items: center; justify-content: space-between;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             position: sticky; top: 0; z-index: 10;
         }
         .header-left { display: flex; align-items: center; gap: 12px; }
@@ -57,6 +59,17 @@
             transition: all 0.2s;
         }
         .btn-back:hover { border-color: var(--accent); color: var(--accent); }
+        .logout-link {
+            color: #fca5a5;
+            text-decoration: none;
+            font-size: 13px;
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            margin-left: 12px;
+        }
+        .logout-link:hover { color: #f87171; border-color: #fca5a5; }
 
         /* ── MAIN ── */
         main {
@@ -198,7 +211,10 @@
         <div class="logo-icon">🏠</div>
         <span class="app-title">Gestión Alojamiento</span>
     </div>
-    <a href="/listar-alojamientos.html" class="btn-back" id="btnBack">← Volver</a>
+    <div style="display:flex;align-items:center;">
+        <a href="/listar-alojamientos.html" class="btn-back" id="btnBack">← Volver</a>
+        <a href="#" onclick="cerrarSesion()" class="logout-link">Cerrar sesión</a>
+    </div>
 </header>
 
 <main>
@@ -254,6 +270,17 @@
 </main>
 
 <script>
+    // ==================== GUARD DE AUTENTICACIÓN ====================
+    if (!localStorage.getItem('token')) {
+        window.location.href = '/login.html';
+    }
+
+    // ==================== CERRAR SESIÓN ====================
+    function cerrarSesion() {
+        localStorage.removeItem('token');
+        window.location.href = '/login.html';
+    }
+
     let idCliente = null;
     let alojamientosData = []; // guardamos los datos para el preview y cálculo de precio
 
@@ -273,13 +300,20 @@
         document.getElementById('btnBack').href = `/detalle-alojamiento.html?id=${idReferer}&tipo=${tipoReferer}`;
     }
 
+    function getAuthHeaders() {
+        return {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+        };
+    }
+
     async function cargarAlojamientos() {
         const select = document.getElementById('idAlojamiento');
         try {
             const [casas, hoteles, deptos] = await Promise.all([
-                fetch('/Casa/listar', { credentials: 'include' }).then(r => r.ok ? r.json() : []).catch(() => []),
-                fetch('/Hotel/listar', { credentials: 'include' }).then(r => r.ok ? r.json() : []).catch(() => []),
-                fetch('/Departamento/listar', { credentials: 'include' }).then(r => r.ok ? r.json() : []).catch(() => [])
+                fetch('/Casa/listar', { headers: getAuthHeaders() }).then(r => r.ok ? r.json() : []).catch(() => []),
+                fetch('/Hotel/listar', { headers: getAuthHeaders() }).then(r => r.ok ? r.json() : []).catch(() => []),
+                fetch('/Departamento/listar', { headers: getAuthHeaders() }).then(r => r.ok ? r.json() : []).catch(() => [])
             ]);
 
             const todos = [...casas, ...hoteles, ...deptos];
@@ -403,8 +437,7 @@
         try {
             const resp = await fetch('/Reserva/registrar', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
+                headers: getAuthHeaders(),
                 body: JSON.stringify(datos)
             });
             const texto = await resp.text();
@@ -429,7 +462,7 @@
     }
 
     // Inicialización
-    fetch('/Usuario/me', { credentials: 'include' })
+    fetch('/Usuario/me', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } })
         .then(r => r.json())
         .then(u => { idCliente = u.id; cargarAlojamientos(); })
         .catch(() => {});

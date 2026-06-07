@@ -378,7 +378,7 @@
             <div class="user-name" id="userName">Cargando...</div>
             <span class="user-role" id="userRoleBadge"></span>
         </div>
-        <a href="/logout" class="btn-logout">Cerrar sesión</a>
+        <a href="#" class="btn-logout" onclick="cerrarSesion()">Cerrar sesión</a>
     </div>
 </header>
 
@@ -641,8 +641,11 @@
 
 <script>
     async function cargarUsuario() {
+        if (!localStorage.getItem('token')) {
+            window.location.href = '/login.html';
+        }
         try {
-            const resp = await fetch('/Usuario/me', {credentials: 'include'});
+            const resp = await fetch('/Usuario/me', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             if (resp.ok) {
                 const user = await resp.json();
                 mostrarUsuario(user.nombre, user.tipoUsuario, user.id);
@@ -660,8 +663,12 @@
             }, 300);
             aplicarBloqueos();
         }
-    }
 
+    }
+    function cerrarSesion() {
+        localStorage.removeItem('token');
+        window.location.href = '/login.html';
+    }
     function mostrarUsuario(nombre, rol, id) {
         document.getElementById('userName').textContent = nombre;
         const badge = document.getElementById('userRoleBadge');

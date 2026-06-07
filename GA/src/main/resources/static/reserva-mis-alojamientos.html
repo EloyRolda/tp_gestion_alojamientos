@@ -85,6 +85,22 @@
             border-color: #2d3f5c;
         }
 
+        .logout-link {
+            color: #fca5a5;
+            text-decoration: none;
+            font-size: 13px;
+            border: 1px solid var(--border);
+            padding: 7px 14px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            margin-left: 12px;
+        }
+
+        .logout-link:hover {
+            color: #f87171;
+            border-color: #fca5a5;
+        }
+
         main {
             padding: 32px;
             max-width: 1000px;
@@ -293,7 +309,10 @@
         <div class="logo-icon">🏠</div>
         <span class="app-title">Gestión Alojamiento</span>
     </div>
-    <a href="/home.html" class="back-link">← Volver</a>
+    <div style="display:flex;align-items:center;">
+        <a href="/home.html" class="back-link">← Volver</a>
+        <a href="#" onclick="cerrarSesion()" class="logout-link">Cerrar sesión</a>
+    </div>
 </header>
 
 <main>
@@ -311,12 +330,25 @@
 </main>
 
 <script>
+    // ==================== GUARD DE AUTENTICACIÓN ====================
+    if (!localStorage.getItem('token')) {
+        window.location.href = '/login.html';
+    }
+
+    // ==================== CERRAR SESIÓN ====================
+    function cerrarSesion() {
+        localStorage.removeItem('token');
+        window.location.href = '/login.html';
+    }
+
     let todasReservas = [];
     let filtroActual = 'TODOS';
 
     async function cargarReservas() {
         try {
-            const resp = await fetch('/Reserva/listar/anfitrion', { credentials: 'include' });
+            const resp = await fetch('/Reserva/listar/anfitrion', {
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+            });
             if (!resp.ok) {
                 if (resp.status === 403) {
                     throw new Error('No tenés permisos para ver esta página. Solo anfitriones y administradores.');

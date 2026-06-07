@@ -25,8 +25,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         String rol = switch (user.getTipoUsuario()) {
             case ADMINISTRADOR -> "ROLE_ADMIN";
-            case CLIENTE -> "ROLE_CLIENTE";
-            case ANFITRION -> "ROLE_ANFITRION";
+            case CLIENTE       -> "ROLE_CLIENTE";
+            case ANFITRION     -> "ROLE_ANFITRION";
         };
 
         return new org.springframework.security.core.userdetails.User(

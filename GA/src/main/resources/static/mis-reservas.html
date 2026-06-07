@@ -79,6 +79,16 @@
             transition: all 0.2s;
         }
         .btn-back:hover { border-color: var(--accent); color: var(--accent); }
+        .logout-link {
+            color: #fca5a5;
+            text-decoration: none;
+            font-size: 13px;
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .logout-link:hover { color: #f87171; border-color: #fca5a5; }
 
         /* ── MAIN ── */
         main { padding: 32px; max-width: 900px; margin: 0 auto; }
@@ -224,7 +234,10 @@
         <div class="logo-icon">🏠</div>
         <span class="app-title">Gestión Alojamiento</span>
     </div>
-    <a href="/home.html" class="btn-back">← Volver</a>
+    <div style="display:flex;align-items:center;gap:16px;">
+        <a href="/home.html" class="btn-back">← Volver</a>
+        <a href="#" onclick="cerrarSesion()" class="logout-link">Cerrar sesión</a>
+    </div>
 </header>
 
 <main id="mainContent" style="display:none">
@@ -245,8 +258,20 @@
 </main>
 
 <script>
+    // ==================== GUARD DE AUTENTICACIÓN ====================
+    if (!localStorage.getItem('token')) {
+        window.location.href = '/login.html';
+    }
+
+    // ==================== CERRAR SESIÓN ====================
+    function cerrarSesion() {
+        localStorage.removeItem('token');
+        window.location.href = '/login.html';
+    }
+
     let reservas = [];
     let filtro = 'TODOS';
+
     function getTipoUrl(tipo) {
         if (!tipo) return 'casas';
         const t = tipo.toUpperCase();
@@ -255,9 +280,10 @@
         if (t === 'CASA') return 'casas';
         return 'casas';
     }
+
     async function cargar() {
         try {
-            const resp = await fetch('/Reserva/listar/propios', { credentials: 'include' });
+            const resp = await fetch('/Reserva/listar/propios', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             if (!resp.ok) throw new Error('No autorizado');
             reservas = await resp.json();
             mostrar();
@@ -296,19 +322,18 @@
                     <div class="detail-item">📅 <span>${r.fechaInicio}</span> → <span>${r.fechaFin}</span></div>
                     <div class="detail-item">💰 Total: <span>${r.precioTotal ? '$' + r.precioTotal : 'No calculado'}</span></div>
                 </div>
-           <div class="reserva-actions">
-    <a class="btn-link" href="/detalle-alojamiento.html?id=${r.alojamiento?.id}&tipo=${getTipoUrl(r.alojamiento?.tipoInmueble)}">🏠 Ver alojamiento</a>
-
-    <a class="btn-edit" href="/actualizar-reserva.html?id=${r.id}">✏️ Editar</a>
-    ${r.tipoEstado !== 'CANCELADA' ? `<button class="btn-cancel" onclick="cancelar(${r.id})">Cancelar reserva</button>` : ''}
-</div>
+                <div class="reserva-actions">
+                    <a class="btn-link" href="/detalle-alojamiento.html?id=${r.alojamiento?.id}&tipo=${getTipoUrl(r.alojamiento?.tipoInmueble)}">🏠 Ver alojamiento</a>
+                    <a class="btn-edit" href="/actualizar-reserva.html?id=${r.id}">✏️ Editar</a>
+                    ${r.tipoEstado !== 'CANCELADA' ? `<button class="btn-cancel" onclick="cancelar(${r.id})">Cancelar reserva</button>` : ''}
+                </div>
             </div>
         `).join('');
     }
 
     async function cancelar(id) {
         if (!confirm('¿Cancelar esta reserva?')) return;
-        const resp = await fetch(`/Reserva/eliminar/${id}`, { method: 'DELETE', credentials: 'include' });
+        const resp = await fetch(`/Reserva/eliminar/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
         if (resp.ok) {
             reservas = reservas.filter(r => r.id !== id);
             mostrar();

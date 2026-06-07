@@ -20,6 +20,8 @@
         .app-title { font-family: 'Playfair Display', serif; font-size: 18px; }
         .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 13px; border: 1px solid var(--border); padding: 7px 14px; border-radius: 8px; transition: all 0.2s; }
         .back-link:hover { color: var(--text); border-color: #2d3f5c; }
+        .logout-link { color: #fca5a5; text-decoration: none; font-size: 13px; border: 1px solid var(--border); padding: 7px 14px; border-radius: 8px; transition: all 0.2s; }
+        .logout-link:hover { color: #f87171; border-color: #fca5a5; }
 
         main { padding: 32px; max-width: 1400px; margin: 0 auto; }
         .page-title { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 28px; }
@@ -88,7 +90,10 @@
         <div class="logo-icon">🏠</div>
         <span class="app-title">Gestión Alojamiento</span>
     </div>
-    <a href="/home.html" class="back-link">← Panel</a>
+    <div class="header-right" style="display:flex;align-items:center;gap:16px;">
+        <a href="/home.html" class="back-link">← Panel</a>
+        <a href="#" onclick="cerrarSesion()" class="logout-link">Cerrar sesión</a>
+    </div>
 </header>
 
 <main>
@@ -145,14 +150,24 @@
 </div>
 
 <script>
+    // ==================== GUARD DE AUTENTICACIÓN ====================
+    if (!localStorage.getItem('token')) {
+        window.location.href = '/login.html';
+    }
+
     let datos = [];
     let filtroEstrellasActivo = 0;
     let pendingDeleteId = null;
     let usuarioActual = null;
 
+    function cerrarSesion() {
+        localStorage.removeItem('token');
+        window.location.href = '/login.html';
+    }
+
     async function cargar() {
         try {
-            const meResp = await fetch('/Usuario/me', { credentials: 'include' });
+            const meResp = await fetch('/Usuario/me', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             if (!meResp.ok) throw new Error('No autenticado');
             usuarioActual = await meResp.json();
 
@@ -168,7 +183,7 @@
                 return;
             }
 
-            const resp = await fetch('/Review/listar', { credentials: 'include' });
+            const resp = await fetch('/Review/listar', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             if (!resp.ok) throw new Error('Error ' + resp.status);
             datos = await resp.json();
             renderizar(aplicarFiltros());
@@ -244,7 +259,7 @@
         const btn = document.getElementById('btnConfirmDelete');
         btn.textContent = 'Eliminando...'; btn.disabled = true;
         try {
-            const resp = await fetch(`/Review/eliminar/${pendingDeleteId}`, { method: 'DELETE', credentials: 'include' });
+            const resp = await fetch(`/Review/eliminar/${pendingDeleteId}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             if (resp.ok) { datos = datos.filter(r => r.id !== pendingDeleteId); renderizar(aplicarFiltros()); cerrarModal(); }
             else { mostrarError('No se pudo eliminar la review.'); cerrarModal(); }
         } catch { mostrarError('Error de conexión.'); cerrarModal(); }

@@ -17,7 +17,7 @@
         body::before { content: ''; position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%); top: -150px; right: -150px; pointer-events: none; }
 
         .container { width: 100%; max-width: 520px; }
-        .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 14px; margin-bottom: 28px; transition: color 0.2s; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 14px; transition: color 0.2s; }
         .back-link:hover { color: var(--text); }
 
         .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 36px 32px; animation: fadeUp 0.4s ease both; }
@@ -77,11 +77,17 @@
         .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
         .btn-search { background: var(--accent); }
         .btn-save   { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+        .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+        .logout-link { color: #fca5a5; text-decoration: none; font-size: 14px; transition: color 0.2s; }
+        .logout-link:hover { color: #f87171; }
     </style>
 </head>
 <body>
 <div class="container">
-    <a href="/listar-usuarios.html" class="back-link">← Volver a usuarios</a>
+    <div class="header-actions">
+        <a href="/listar-usuarios.html" class="back-link">← Volver a usuarios</a>
+        <a href="#" onclick="cerrarSesion()" class="logout-link">Cerrar sesión</a>
+    </div>
     <div class="card">
         <div class="logo">
             <div class="logo-icon">🛡️</div>
@@ -165,6 +171,17 @@
 </div>
 
 <script>
+    // ==================== GUARD DE AUTENTICACIÓN ====================
+    if (!localStorage.getItem('token')) {
+        window.location.href = '/login.html';
+    }
+
+    // ==================== CERRAR SESIÓN ====================
+    function cerrarSesion() {
+        localStorage.removeItem('token');
+        window.location.href = '/login.html';
+    }
+
     let usuarioActual = null;
 
     // ── Al cargar: si viene ?email=... desde listar-usuarios, buscar automáticamente ──
@@ -191,7 +208,7 @@
         btn.disabled = true; btn.textContent = 'Buscando...';
 
         try {
-            const resp = await fetch('/Usuario/listar', { credentials: 'include' });
+            const resp = await fetch('/Usuario/listar', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             if (!resp.ok) throw new Error('No autorizado o error del servidor.');
 
             const lista = await resp.json();
@@ -282,8 +299,10 @@
             // y no lo pise con el del usuario logueado
             const resp = await fetch('/Usuario/actualizar/admin', {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
                 body: JSON.stringify(datos)
             });
 

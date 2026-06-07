@@ -1,3 +1,6 @@
+Aquí está el archivo `mi-perfil.html` completo modificado:
+
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -11,8 +14,11 @@
         body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); min-height: 100vh; padding: 40px 20px; }
         body::before { content: ''; position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%); top: -150px; right: -150px; pointer-events: none; }
         .container { max-width: 560px; margin: 0 auto; }
-        .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 14px; margin-bottom: 28px; transition: color 0.2s; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 14px; transition: color 0.2s; }
         .back-link:hover { color: var(--text); }
+        .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+        .logout-link { color: #fca5a5; text-decoration: none; font-size: 14px; transition: color 0.2s; }
+        .logout-link:hover { color: #f87171; }
         /* Avatar header */
         .profile-header { text-align: center; margin-bottom: 32px; }
         .avatar { width: 72px; height: 72px; background: linear-gradient(135deg, #6366f1, var(--accent)); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 14px; }
@@ -49,7 +55,10 @@
 </head>
 <body>
 <div class="container">
-    <a href="/home.html" class="back-link">← Volver al panel</a>
+    <div class="header-actions">
+        <a href="/home.html" class="back-link">← Volver al panel</a>
+        <a href="#" onclick="cerrarSesion()" class="logout-link">Cerrar sesión</a>
+    </div>
 
     <div class="profile-header">
         <div class="avatar" id="avatarIcon">👤</div>
@@ -83,6 +92,17 @@
 </div>
 
 <script>
+    // ==================== GUARD DE AUTENTICACIÓN ====================
+    if (!localStorage.getItem('token')) {
+        window.location.href = '/login.html';
+    }
+
+    // ==================== CERRAR SESIÓN ====================
+    function cerrarSesion() {
+        localStorage.removeItem('token');
+        window.location.href = '/login.html';
+    }
+
     const roleLabels = { ADMIN: '🔐 Administrador', ANFITRION: '🏠 Anfitrión', CLIENTE: '🧳 Cliente' };
     const roleEmojis = { ADMIN: '🔐', ANFITRION: '🏠', CLIENTE: '🧳' };
 
@@ -101,12 +121,12 @@
     async function cargarPerfil() {
         try {
             // Obtener datos del usuario logueado
-            const meResp = await fetch('/Usuario/me', { credentials: 'include' });
+            const meResp = await fetch('/Usuario/me', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             if (!meResp.ok) { window.location.href = '/login.html'; return; }
             const me = await meResp.json();
 
             // Cargar datos completos por ID
-            const resp = await fetch(`/Usuario/mostrar/${me.id}`, { credentials: 'include' });
+            const resp = await fetch(`/Usuario/mostrar/${me.id}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             if (!resp.ok) throw new Error('No se pudo obtener el perfil');
             const u = await resp.json();
 
@@ -143,3 +163,4 @@
 </script>
 </body>
 </html>
+```

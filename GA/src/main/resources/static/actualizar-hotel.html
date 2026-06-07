@@ -56,7 +56,6 @@
             color: var(--muted);
             text-decoration: none;
             font-size: 14px;
-            margin-bottom: 28px;
             transition: color 0.2s;
         }
 
@@ -303,7 +302,10 @@
 </head>
 <body>
 <div class="container">
-    <a href="/home.html" class="back-link">← Volver al panel</a>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px;">
+        <a href="/home.html" class="back-link" style="margin-bottom: 0;">← Volver al panel</a>
+        <a href="#" onclick="cerrarSesion()" style="color:#fca5a5; text-decoration: none; font-size: 14px;">Cerrar sesión</a>
+    </div>
     <div class="page-title">🏨 Actualizar Hotel</div>
     <p class="page-sub">Modificá solo los campos que querés cambiar</p>
 
@@ -424,6 +426,17 @@
 </div>
 
 <script>
+    // ==================== GUARD DE AUTENTICACIÓN ====================
+    if (!localStorage.getItem('token')) {
+        window.location.href = '/login.html';
+    }
+
+    // ==================== CERRAR SESIÓN ====================
+    function cerrarSesion() {
+        localStorage.removeItem('token');
+        window.location.href = '/login.html';
+    }
+
     // ==================== CARGA AUTOMÁTICA DE DATOS ====================
     async function cargarDatos() {
         const params = new URLSearchParams(location.search);
@@ -432,7 +445,7 @@
         if (!id) return;
 
         try {
-            const resp = await fetch(`/Hotel/mostrar/${id}`, {credentials: 'include'});
+            const resp = await fetch(`/Hotel/mostrar/${id}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             if (!resp.ok) throw new Error('No se pudo cargar');
 
             const hotel = await resp.json();
@@ -556,8 +569,10 @@
         try {
             const resp = await fetch('/Hotel/actualizar', {
                 method: 'PUT',
-                headers: {'Content-Type': 'application/json'},
-                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
                 body: JSON.stringify(datos)
             });
             const texto = await resp.text();

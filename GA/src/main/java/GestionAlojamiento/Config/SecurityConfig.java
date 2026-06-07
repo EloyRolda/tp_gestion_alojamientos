@@ -39,10 +39,8 @@ public class SecurityConfig {
                         // ── PÚBLICO ──────────────────────────────────────────
                         .requestMatchers(
                                 "/",
-                                "/index.html",
-                                "/login.html",
-                                "/registrarse.html",
-                                "/403.html",
+                                "/favicon.ico",
+                                "/*.html",
                                 "/login",
                                 "/auth/login",
                                 "/Usuario/registrar",
@@ -52,45 +50,6 @@ public class SecurityConfig {
 
                         // ── CUALQUIER AUTENTICADO ─────────────────────────────
                         .requestMatchers("/Usuario/me").authenticated()
-
-                        // ── PÁGINAS ESTÁTICAS — TODOS LOS ROLES ──────────────
-                        .requestMatchers(
-                                "/home.html",
-                                "/mi-perfil.html",
-                                "/actualizar-perfil.html",
-                                "/registrar-reserva.html",
-                                "/actualizar-reserva.html",
-                                "/registrar-review.html",
-                                "/editar-review.html",
-                                "/listar-alojamientos.html",
-                                "/detalle-alojamiento.html"
-                        ).hasAnyRole("ADMIN", "CLIENTE", "ANFITRION")
-
-                        // ── PÁGINAS ESTÁTICAS — CLIENTE ──────────────────────
-                        .requestMatchers(
-                                "/mis-reservas.html",
-                                "/mis-reviews.html"
-                        ).hasAnyRole("ADMIN", "CLIENTE")
-
-                        // ── PÁGINAS ESTÁTICAS — ADMIN y ANFITRION ────────────
-                        .requestMatchers(
-                                "/registrar-casa.html",
-                                "/registrar-hotel.html",
-                                "/registrar-departamento.html",
-                                "/actualizar-casa.html",
-                                "/actualizar-hotel.html",
-                                "/actualizar-departamento.html",
-                                "/reservas-mis-alojamientos.html"
-                        ).hasAnyRole("ADMIN", "ANFITRION")
-
-                        // ── PÁGINAS ESTÁTICAS — SOLO ADMIN ───────────────────
-                        .requestMatchers(
-                                "/listar-usuarios.html",
-                                "/listar-reservas.html",
-                                "/listar-review.html",
-                                "/admin-editar-usuario.html",
-                                "/eliminar-usuario.html"
-                        ).hasRole("ADMIN")
 
                         // ── SOLO ADMIN — ENDPOINTS ────────────────────────────
                         .requestMatchers(
@@ -179,9 +138,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("*"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        config.setAllowedOriginPatterns(List.of("*"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
