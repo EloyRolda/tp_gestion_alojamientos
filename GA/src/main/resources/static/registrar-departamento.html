@@ -158,10 +158,27 @@
                 body: JSON.stringify(datos)
             });
             const texto = await resp.text();
-            msg.className = resp.ok ? 'msg success' : 'msg error';
-            msg.textContent = resp.ok ? '¡Departamento publicado correctamente!' : 'Error: ' + texto;
+
+            if (resp.ok) {
+                const data = JSON.parse(texto);
+                const alojamientoId = data.alojamiento?.id || data.id;
+                const gResp = await fetch(`/gallery/alojamiento/${alojamientoId}`, {
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                });
+                const gallery = await gResp.json();
+                window.location.href = `/upload-galeria.html?galleryId=${gallery.id}`;
+            } else {
+                msg.className = 'msg error';
+                msg.textContent = 'Error: ' + texto;
+                msg.style.display = 'block';
+            }
         } catch {
-            msg.className = 'msg error'; msg.textContent = 'No se pudo conectar con el servidor.';
+            msg.className = 'msg error';
+            msg.textContent = 'No se pudo conectar con el servidor.';
+            msg.style.display = 'block';
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Publicar casa'; // o hotel / departamento según corresponda
         }
         msg.style.display = 'block'; btn.disabled = false; btn.textContent = 'Publicar departamento';
     }

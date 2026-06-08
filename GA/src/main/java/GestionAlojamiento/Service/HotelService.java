@@ -19,6 +19,7 @@ public class HotelService {
     private final HotelRepository hotelRepository;
     private final UsuarioService usuarioService;
     private final AlojamientoService alojamientoService;
+    private final GalleryService galleryService;
 
     //---------------------------------------- LISTAR ----------------------------------------
     public List<Hotel> listarTodos() {
@@ -44,6 +45,9 @@ public class HotelService {
         hotel.setIncluyeLimpieza(dto.isIncluyeLimpieza());
 
         hotel.setAlojamiento(mapearAlojamiento(dto));
+
+        Gallery gallery = new Gallery(null, dto.getTitulo(), hotel.getAlojamiento());
+        galleryService.createGallery(gallery);
 
         return hotelRepository.save(hotel);
     }

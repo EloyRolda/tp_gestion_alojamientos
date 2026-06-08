@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Galería</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap');
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0a0f1e;
+            --surface: #111827;
+            --surface2: #1a2435;
+            --border: #1e2d45;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+            --text: #e2e8f0;
+            --muted: #64748b;
+            --error: #f87171;
+            --success: #4ade80;
+            --delete: rgba(127, 29, 29, 0.4);
+            --delete-text: #fca5a5;
+        }
+
+        body {
+            background: var(--bg);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%);
+            top: -150px; right: -150px;
+            pointer-events: none;
+        }
+
+        .container { max-width: 760px; margin: 0 auto; }
+
+        /* ── HEADER ── */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--text); }
+
+        .logout-link {
+            color: #fca5a5;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        .logout-link:hover { color: var(--error); }
+
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 26px;
+            margin-bottom: 4px;
+        }
+        .page-sub { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+
+        /* ── CARD ── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 28px 32px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .counter-badge {
+            font-size: 12px;
+            color: var(--muted);
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-weight: 500;
+            letter-spacing: 0;
+            text-transform: none;
+        }
+
+        /* ── GALERÍA EXISTENTE ── */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .gallery-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            animation: fadeUp 0.3s ease both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .gallery-item img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .gallery-item .overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .gallery-item:hover .overlay { background: rgba(0,0,0,0.45); }
+
+        .btn-delete-img {
+            opacity: 0;
+            background: rgba(127,29,29,0.85);
+            border: 1px solid rgba(252,165,165,0.3);
+            border-radius: 8px;
+            padding: 7px 14px;
+            color: var(--delete-text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s, background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .gallery-item:hover .btn-delete-img { opacity: 1; }
+        .btn-delete-img:hover { background: rgba(153,27,27,0.95); }
+
+        /* spinner sobre foto mientras se elimina */
+        .gallery-item.deleting::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+        }
+        .gallery-item.deleting .overlay { background: rgba(0,0,0,0.6); }
+        .gallery-item.deleting .btn-delete-img {
+            opacity: 1;
+            pointer-events: none;
+        }
+
+        .empty-gallery {
+            text-align: center;
+            padding: 32px 0 12px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+        .empty-gallery .icon { font-size: 32px; margin-bottom: 8px; }
+
+        /* ── DROP ZONE ── */
+        .drop-zone {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 32px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            margin-bottom: 16px;
+        }
+        .drop-zone:hover, .drop-zone.over {
+            border-color: var(--accent);
+            background: var(--accent-glow);
+        }
+        .drop-zone.disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .dz-icon { font-size: 32px; margin-bottom: 8px; }
+        .dz-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+        .dz-sub { font-size: 12px; color: var(--muted); }
+
+        /* ── PREVIEWS (nuevas fotos a subir) ── */
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .preview-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--accent);
+            animation: fadeUp 0.25s ease both;
+        }
+        .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+
+        .preview-item .remove-btn {
+            position: absolute;
+            top: 5px; right: 5px;
+            background: rgba(0,0,0,0.75);
+            border: none;
+            border-radius: 50%;
+            width: 22px; height: 22px;
+            color: #fca5a5;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .preview-item .remove-btn:hover { background: rgba(127,29,29,0.85); }
+
+        .preview-item .upload-status {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+        }
+
+        /* ── PROGRESS ── */
+        .progress-wrap {
+            display: none;
+            background: var(--surface2);
+            border-radius: 99px;
+            height: 5px;
+            overflow: hidden;
+            margin-bottom: 14px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #6366f1);
+            border-radius: 99px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* ── ACCIONES ── */
+        .actions-row {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-upload {
+            background: linear-gradient(135deg, var(--accent), #6366f1);
+            border: none;
+            border-radius: 10px;
+            padding: 11px 26px;
+            color: #fff;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+        .btn-upload:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-upload:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        /* ── MENSAJES ── */
+        .msg {
+            display: none;
+            font-size: 13px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-top: 14px;
+        }
+        .msg.success { background: rgba(74,222,128,0.1); color: var(--success); border: 1px solid rgba(74,222,128,0.2); }
+        .msg.error   { background: rgba(248,113,113,0.1); color: var(--error);   border: 1px solid rgba(248,113,113,0.2); }
+
+        /* ── LOADING OVERLAY ── */
+        #loadingOverlay {
+            position: fixed; inset: 0;
+            background: var(--bg);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 100;
+            transition: opacity 0.3s;
+        }
+        .spinner {
+            width: 30px; height: 30px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 600px) {
+            .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+            .preview-grid { grid-template-columns: repeat(3, 1fr); }
+            .card { padding: 20px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loadingOverlay"><div class="spinner"></div></div>
+
+<div class="container" id="mainContent" style="display:none">
+    <div class="top-bar">
+        <a class="back-link" id="backLink" href="/listar-alojamientos.html">← Volver</a>
+        <a class="logout-link" href="#" onclick="cerrarSesion()">Cerrar sesión</a>
+    </div>
+
+    <div class="page-title">🖼️ Editar Galería</div>
+    <p class="page-sub" id="pageSubtitle">Administrá las fotos de tu alojamiento</p>
+
+    <!-- Fotos actuales -->
+    <div class="card">
+        <div class="section-title">
+            <span>Fotos actuales</span>
+            <span class="counter-badge" id="counterExisting">0 fotos</span>
+        </div>
+        <div class="gallery-grid" id="galleryGrid">
+            <div class="empty-gallery" id="emptyState">
+                <div class="icon">📭</div>
+                <p>Este alojamiento todavía no tiene fotos.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agregar fotos -->
+    <div class="card">
+        <div class="section-title">
+            <span>Agregar fotos</span>
+            <span class="counter-badge" id="counterNew">0 seleccionadas</span>
+        </div>
+
+        <div class="drop-zone" id="dropZone"
+             onclick="document.getElementById('fileInput').click()"
+             ondragover="onDragOver(event)"
+             ondragleave="onDragLeave(event)"
+             ondrop="onDrop(event)">
+            <div class="dz-icon">📷</div>
+            <div class="dz-title">Hacé click o arrastrá imágenes aquí</div>
+            <div class="dz-sub">JPG, PNG, WEBP — máx. 10 fotos en total</div>
+        </div>
+
+        <input type="file" id="fileInput" accept="image/*" multiple style="display:none"
+               onchange="agregarArchivos(this.files)">
+
+        <div class="progress-wrap" id="progressWrap">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="preview-grid" id="previewGrid"></div>
+
+        <div class="actions-row">
+            <button class="btn-upload" id="btnUpload" onclick="subirFotos()">⬆ Subir fotos</button>
+        </div>
+
+        <div class="msg" id="msg"></div>
+    </div>
+</div>
+
+<script>
+    // ── GUARD ──
+    if (!localStorage.getItem('token')) window.location.href = '/login.html';
+
+    function cerrarSesion() {
+        localStorage.removeItem('token');
+        window.location.href = '/login.html';
+    }
+
+    const params  = new URLSearchParams(location.search);
+    const idAloj  = params.get('id');
+    const tipo    = params.get('tipo') || 'casas'; // casas | hoteles | departamentos
+
+    if (!idAloj) window.location.href = '/listar-alojamientos.html';
+
+    // Actualizamos el link "Volver" para ir al detalle del alojamiento
+    document.getElementById('backLink').href =
+        `/detalle-alojamiento.html?id=${idAloj}&tipo=${tipo}`;
+
+    let galleryId    = null;   // id de la Gallery en BD
+    let existingImgs = [];     // imágenes ya subidas { id, url, alt }
+    let queue        = [];     // nuevas fotos seleccionadas por el usuario
+
+    // ── INIT ──
+    async function init() {
+        try {
+            // 1. Obtener info del alojamiento para el subtítulo
+            const tipoSingular = { casas: 'Casa', hoteles: 'Hotel', departamentos: 'Departamento' }[tipo] || '';
+            let urlAloj = '';
+            if (tipo === 'casas')          urlAloj = `/Casa/mostrar/${idAloj}`;
+            else if (tipo === 'hoteles')   urlAloj = `/Hotel/mostrar/${idAloj}`;
+            else                           urlAloj = `/Departamento/mostrar/${idAloj}`;
+
+            const rAloj = await authFetch(urlAloj);
+            if (rAloj.ok) {
+                const data = await rAloj.json();
+                const titulo = (data.alojamiento || data).titulo || '';
+                if (titulo) document.getElementById('pageSubtitle').textContent = titulo;
+            }
+
+            // 2. Obtener la galería
+            const rGal = await authFetch(`/gallery/alojamiento/${idAloj}`);
+            if (!rGal.ok) throw new Error('No se encontró la galería.');
+            const gallery = await rGal.json();
+            galleryId = gallery.id;
+
+            // 3. Cargar imágenes existentes
+            await cargarImagenesExistentes();
+
+        } catch (e) {
+            mostrarMsg('Error al cargar la galería: ' + e.message, 'error');
+        } finally {
+            ocultarOverlay();
+        }
+    }
+
+    async function cargarImagenesExistentes() {
+        const r = await authFetch(`/gallery/${galleryId}/images`);
+        if (!r.ok) return;
+        existingImgs = await r.json();
+        renderGaleria();
+    }
+
+    function renderGaleria() {
+        const grid = document.getElementById('galleryGrid');
+        const empty = document.getElementById('emptyState');
+        const total = existingImgs.length;
+
+        document.getElementById('counterExisting').textContent =
+            `${total} / 10 foto${total !== 1 ? 's' : ''}`;
+
+        // Actualizar drop zone si se llegó al límite
+        actualizarDropZone();
+
+        if (total === 0) {
+            grid.innerHTML = '';
+            grid.appendChild(Object.assign(document.createElement('div'), {
+                className: 'empty-gallery',
+                innerHTML: '<div class="icon">📭</div><p>Este alojamiento todavía no tiene fotos.</p>'
+            }));
+            return;
+        }
+
+        grid.innerHTML = existingImgs.map((img, i) => `
+            <div class="gallery-item" id="img-${img.id}" style="animation-delay:${i*0.04}s">
+                <img src="${img.url}" alt="${img.alt || ''}">
+                <div class="overlay">
+                    <button class="btn-delete-img" onclick="eliminarImagen(${img.id})">
+                        🗑 Eliminar
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // ── ELIMINAR IMAGEN ──
+    async function eliminarImagen(imgId) {
+        if (!confirm('¿Eliminar esta foto?')) return;
+
+        const item = document.getElementById(`img-${imgId}`);
+        if (item) item.classList.add('deleting');
+
+        try {
+            const r = await authFetch(`/gallery/delete/${imgId}`, { method: 'DELETE' });
+            if (r.ok) {
+                existingImgs = existingImgs.filter(i => i.id !== imgId);
+                renderGaleria();
+                mostrarMsg('✓ Foto eliminada.', 'success');
+            } else {
+                if (item) item.classList.remove('deleting');
+                mostrarMsg('No se pudo eliminar la foto.', 'error');
+            }
+        } catch {
+            if (item) item.classList.remove('deleting');
+            mostrarMsg('Error de conexión al eliminar.', 'error');
+        }
+    }
+
+    // ── DRAG & DROP ──
+    function onDragOver(e) {
+        e.preventDefault();
+        document.getElementById('dropZone').classList.add('over');
+    }
+    function onDragLeave() {
+        document.getElementById('dropZone').classList.remove('over');
+    }
+    function onDrop(e) {
+        e.preventDefault();
+        document.getElementById('dropZone').classList.remove('over');
+        agregarArchivos(e.dataTransfer.files);
+    }
+
+    function agregarArchivos(files) {
+        const disponibles = 10 - existingImgs.length - queue.length;
+        if (disponibles <= 0) {
+            mostrarMsg('Ya llegaste al límite de 10 fotos.', 'error');
+            return;
+        }
+        Array.from(files).slice(0, disponibles).forEach(file => {
+            queue.push({
+                file,
+                alt: file.name.replace(/\.[^.]+$/, ''),
+                objectUrl: URL.createObjectURL(file),
+                status: null
+            });
+        });
+        renderPreviews();
+    }
+
+    function renderPreviews() {
+        document.getElementById('counterNew').textContent =
+            `${queue.length} seleccionada${queue.length !== 1 ? 's' : ''}`;
+        const grid = document.getElementById('previewGrid');
+        if (queue.length === 0) { grid.innerHTML = ''; return; }
+        grid.innerHTML = queue.map((f, i) => `
+            <div class="preview-item">
+                <img src="${f.objectUrl}" alt="${f.alt}">
+                ${f.status === null
+            ? `<button class="remove-btn" onclick="quitarPreview(${i})">✕</button>`
+            : ''}
+                ${f.status === 'ok'    ? `<div class="upload-status">✅</div>` : ''}
+                ${f.status === 'error' ? `<div class="upload-status">❌</div>` : ''}
+            </div>
+        `).join('');
+    }
+
+    function quitarPreview(i) {
+        URL.revokeObjectURL(queue[i].objectUrl);
+        queue.splice(i, 1);
+        renderPreviews();
+        actualizarDropZone();
+    }
+
+    function actualizarDropZone() {
+        const dz = document.getElementById('dropZone');
+        const lleno = (existingImgs.length + queue.length) >= 10;
+        dz.classList.toggle('disabled', lleno);
+        document.getElementById('dropZone').querySelector('.dz-sub').textContent =
+            lleno ? 'Límite de 10 fotos alcanzado' : 'JPG, PNG, WEBP — máx. 10 fotos en total';
+    }
+
+    // ── SUBIR FOTOS ──
+    async function subirFotos() {
+        if (queue.length === 0) {
+            mostrarMsg('Seleccioná al menos una foto para subir.', 'error');
+            return;
+        }
+
+        setBloqueado(true);
+        document.getElementById('progressWrap').style.display = 'block';
+        ocultarMsg();
+
+        let exitosas = 0;
+        for (let i = 0; i < queue.length; i++) {
+            const foto = queue[i];
+            const fd = new FormData();
+            fd.append('file', foto.file);
+            fd.append('alt', foto.alt);
+            fd.append('galleryId', galleryId);
+
+            try {
+                const r = await fetch('/gallery/upload', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+                    body: fd
+                });
+                queue[i].status = r.ok ? 'ok' : 'error';
+                if (r.ok) exitosas++;
+            } catch {
+                queue[i].status = 'error';
+            }
+
+            document.getElementById('progressFill').style.width =
+                `${((i + 1) / queue.length) * 100}%`;
+            renderPreviews();
+        }
+
+        if (exitosas === queue.length) {
+            mostrarMsg(`✅ ${exitosas} foto${exitosas !== 1 ? 's' : ''} subida${exitosas !== 1 ? 's' : ''} correctamente.`, 'success');
+            queue = [];
+            renderPreviews();
+            document.getElementById('progressWrap').style.display = 'none';
+            document.getElementById('progressFill').style.width = '0%';
+            await cargarImagenesExistentes(); // refresca la galería
+        } else {
+            const fallidas = queue.length - exitosas;
+            mostrarMsg(`⚠️ ${exitosas} subida${exitosas !== 1 ? 's' : ''}, ${fallidas} fallida${fallidas !== 1 ? 's' : ''} (marcadas en rojo).`, 'error');
+            // Quitamos solo las exitosas de la queue
+            queue = queue.filter(f => f.status !== 'ok');
+            renderPreviews();
+            await cargarImagenesExistentes();
+        }
+
+        setBloqueado(false);
+        actualizarDropZone();
+    }
+
+    // ── HELPERS ──
+    function authFetch(url, opts = {}) {
+        return fetch(url, {
+            ...opts,
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token'),
+                ...(opts.headers || {})
+            }
+        });
+    }
+
+    function setBloqueado(val) {
+        document.getElementById('btnUpload').disabled = val;
+        document.getElementById('btnUpload').textContent = val ? 'Subiendo...' : '⬆ Subir fotos';
+        document.getElementById('fileInput').disabled = val;
+    }
+
+    function mostrarMsg(texto, tipo) {
+        const el = document.getElementById('msg');
+        el.textContent = texto;
+        el.className = `msg ${tipo}`;
+        el.style.display = 'block';
+    }
+
+    function ocultarMsg() {
+        document.getElementById('msg').style.display = 'none';
+    }
+
+    function ocultarOverlay() {
+        const overlay = document.getElementById('loadingOverlay');
+        overlay.style.opacity = '0';
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+        }, 300);
+    }
+
+    init();
+</script>
+</body>
+</html>

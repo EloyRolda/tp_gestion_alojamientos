@@ -19,6 +19,7 @@ public class CasaService {
     private final CasaRepository casaRepository;
     private final UsuarioService usuarioService;
     private final AlojamientoService alojamientoService;
+    private final GalleryService galleryService;
 
     //---------------------------------------- LISTAR ----------------------------------------
     public List<Casa> listar() {
@@ -44,6 +45,9 @@ public class CasaService {
         casa.setTieneParrilla(dto.isTieneParrilla());
 
         casa.setAlojamiento(mapearAlojamiento(dto));
+
+        Gallery gallery = new Gallery(null, dto.getTitulo(), casa.getAlojamiento());
+        galleryService.createGallery(gallery);
 
         return casaRepository.save(casa);
     }

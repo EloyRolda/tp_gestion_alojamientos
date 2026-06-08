@@ -7,7 +7,11 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap');
 
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         :root {
             --bg: #0a0f1e;
@@ -35,55 +39,106 @@
             background: var(--surface);
             border-bottom: 1px solid var(--border);
             padding: 16px 32px;
-            display: flex; align-items: center; justify-content: space-between;
-            position: sticky; top: 0; z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
-        .header-left { display: flex; align-items: center; gap: 12px; }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
         .logo-icon {
-            width: 38px; height: 38px;
+            width: 38px;
+            height: 38px;
             background: linear-gradient(135deg, var(--accent), #6366f1);
             border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 18px;
         }
-        .app-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; }
-        .header-right { display: flex; align-items: center; gap: 20px; }
+
+        .app-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
         .btn-back {
             background: transparent;
             border: 1px solid var(--border);
-            border-radius: 8px; padding: 8px 14px;
+            border-radius: 8px;
+            padding: 8px 14px;
             color: var(--muted);
             font-family: 'DM Sans', sans-serif;
-            font-size: 13px; cursor: pointer;
-            text-decoration: none; display: inline-block;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
             transition: all 0.2s;
         }
-        .btn-back:hover { border-color: var(--accent); color: var(--accent); }
+
+        .btn-back:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
         .logout-link {
             color: #fca5a5;
             text-decoration: none;
             font-size: 13px;
             transition: color 0.2s;
         }
-        .logout-link:hover { color: #f87171; }
+
+        .logout-link:hover {
+            color: #f87171;
+        }
 
         /* ── MAIN ── */
-        main { padding: 32px; max-width: 900px; margin: 0 auto; }
+        main {
+            padding: 32px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
 
         /* ── LOADING ── */
         #loadingOverlay {
-            position: fixed; inset: 0; background: var(--bg);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 100; transition: opacity 0.3s;
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            transition: opacity 0.3s;
         }
+
         .spinner {
-            width: 32px; height: 32px;
+            width: 32px;
+            height: 32px;
             border: 3px solid var(--border);
             border-top-color: var(--accent);
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
         /* ── ALOJAMIENTO DETAIL ── */
         .detail-card {
@@ -94,9 +149,16 @@
             margin-bottom: 24px;
             animation: fadeUp 0.4s ease both;
         }
+
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(14px); }
-            to   { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .detail-head {
@@ -111,20 +173,37 @@
 
         .aloj-titulo {
             font-family: 'Playfair Display', serif;
-            font-size: 26px; font-weight: 600;
+            font-size: 26px;
+            font-weight: 600;
             margin-bottom: 6px;
         }
 
         .aloj-estado {
-            font-size: 11px; font-weight: 700;
-            padding: 3px 10px; border-radius: 20px;
-            letter-spacing: 0.5px; text-transform: uppercase;
-            white-space: nowrap; flex-shrink: 0;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
-        .estado-activo   { background: rgba(52,211,153,0.15); color: #6ee7b7; border: 1px solid rgba(52,211,153,0.25); }
-        .estado-inactivo { background: rgba(100,116,139,0.15); color: #94a3b8; border: 1px solid rgba(100,116,139,0.25); }
 
-        .detail-body { padding: 24px 28px; }
+        .estado-activo {
+            background: rgba(52, 211, 153, 0.15);
+            color: #6ee7b7;
+            border: 1px solid rgba(52, 211, 153, 0.25);
+        }
+
+        .estado-inactivo {
+            background: rgba(100, 116, 139, 0.15);
+            color: #94a3b8;
+            border: 1px solid rgba(100, 116, 139, 0.25);
+        }
+
+        .detail-body {
+            padding: 24px 28px;
+        }
 
         .info-grid {
             display: grid;
@@ -139,65 +218,129 @@
             border-radius: 10px;
             padding: 14px 16px;
         }
-        .info-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 0.6px; text-transform: uppercase; margin-bottom: 6px; }
-        .info-value { font-size: 15px; font-weight: 500; }
+
+        .info-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .info-value {
+            font-size: 15px;
+            font-weight: 500;
+        }
 
         .aloj-desc {
-            font-size: 14px; color: #94a3b8;
+            font-size: 14px;
+            color: #94a3b8;
             line-height: 1.7;
             border-top: 1px solid var(--border);
-            padding-top: 16px; margin-top: 4px;
+            padding-top: 16px;
+            margin-top: 4px;
+        }
+
+        /* ── GALERÍA ── */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .gallery-img {
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            width: 100%;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+
+        .gallery-img:hover {
+            transform: scale(1.03);
         }
 
         /* ── ACCIONES ── */
         .actions-row {
-            display: flex; gap: 10px; flex-wrap: wrap;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
             margin-bottom: 32px;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, var(--accent), #6366f1);
-            border: none; border-radius: 9px;
+            border: none;
+            border-radius: 9px;
             padding: 11px 22px;
             color: #fff;
             font-family: 'DM Sans', sans-serif;
-            font-size: 14px; font-weight: 600;
-            cursor: pointer; text-decoration: none;
-            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             transition: opacity 0.2s, transform 0.1s;
         }
-        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
 
         .btn-edit-aloj {
-            background: rgba(59,130,246,0.12);
-            border: 1px solid rgba(59,130,246,0.25);
+            background: rgba(59, 130, 246, 0.12);
+            border: 1px solid rgba(59, 130, 246, 0.25);
             color: #93c5fd;
-            border-radius: 9px; padding: 11px 22px;
+            border-radius: 9px;
+            padding: 11px 22px;
             font-family: 'DM Sans', sans-serif;
-            font-size: 14px; font-weight: 500;
-            cursor: pointer; text-decoration: none;
-            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             transition: all 0.2s;
         }
-        .btn-edit-aloj:hover { background: rgba(59,130,246,0.22); }
+
+        .btn-edit-aloj:hover {
+            background: rgba(59, 130, 246, 0.22);
+        }
 
         .btn-delete-aloj {
-            background: rgba(127,29,29,0.35);
-            border: 1px solid rgba(252,165,165,0.2);
+            background: rgba(127, 29, 29, 0.35);
+            border: 1px solid rgba(252, 165, 165, 0.2);
             color: var(--delete-text);
-            border-radius: 9px; padding: 11px 22px;
+            border-radius: 9px;
+            padding: 11px 22px;
             font-family: 'DM Sans', sans-serif;
-            font-size: 14px; font-weight: 500;
+            font-size: 14px;
+            font-weight: 500;
             cursor: pointer;
-            display: inline-flex; align-items: center; gap: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             transition: all 0.2s;
         }
-        .btn-delete-aloj:hover { background: rgba(127,29,29,0.55); }
+
+        .btn-delete-aloj:hover {
+            background: rgba(127, 29, 29, 0.55);
+        }
 
         /* ── REVIEWS ── */
         .section-title {
-            font-size: 11px; font-weight: 700;
-            letter-spacing: 1.2px; text-transform: uppercase;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
             color: var(--muted);
             margin-bottom: 16px;
             padding-bottom: 8px;
@@ -213,36 +356,170 @@
             transition: border-color 0.2s;
             animation: fadeUp 0.4s ease both;
         }
-        .review-card:hover { border-color: #2d3f5c; }
+
+        .review-card:hover {
+            border-color: #2d3f5c;
+        }
 
         .review-top {
-            display: flex; align-items: center;
-            justify-content: space-between; gap: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
             margin-bottom: 8px;
         }
-        .review-author { font-size: 14px; font-weight: 600; }
-        .review-date   { font-size: 12px; color: var(--muted); }
 
-        .stars { font-size: 14px; letter-spacing: 1px; margin-bottom: 6px; }
-        .stars .filled { color: #fbbf24; }
-        .stars .empty  { color: var(--border); }
+        .review-author {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .review-date {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .stars {
+            font-size: 14px;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .stars .filled {
+            color: #fbbf24;
+        }
+
+        .stars .empty {
+            color: var(--border);
+        }
 
         .review-comment {
-            font-size: 14px; color: #94a3b8;
+            font-size: 14px;
+            color: #94a3b8;
             line-height: 1.6;
             border-left: 2px solid var(--border);
             padding-left: 12px;
             font-style: italic;
         }
 
-        .empty-state { text-align: center; padding: 40px 24px; color: var(--muted); }
-        .empty-state .empty-icon { font-size: 36px; margin-bottom: 12px; }
-        .empty-state p { font-size: 14px; }
+        .empty-state {
+            text-align: center;
+            padding: 40px 24px;
+            color: var(--muted);
+        }
+
+        .empty-state .empty-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* ── LIGHTBOX ── */
+        .lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.92);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .lightbox.open {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .lb-img {
+            max-width: 90vw;
+            max-height: 85vh;
+            border-radius: 10px;
+            object-fit: contain;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        .lb-btn {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            z-index: 201;
+        }
+
+        .lb-btn:hover {
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        .lb-prev {
+            left: 16px;
+        }
+
+        .lb-next {
+            right: 16px;
+        }
+
+        .lb-close {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            z-index: 201;
+        }
+
+        .lb-close:hover {
+            background: rgba(200, 50, 50, 0.4);
+        }
+
+        .lb-counter {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            z-index: 201;
+        }
     </style>
 </head>
 <body>
 
-<div id="loadingOverlay"><div class="spinner"></div></div>
+<div id="loadingOverlay">
+    <div class="spinner"></div>
+</div>
 
 <header>
     <div class="header-left">
@@ -260,11 +537,15 @@
     <!-- Info del alojamiento -->
     <div class="detail-card" id="detailCard">
         <div class="detail-head" id="detailHead">
-            <div><div class="aloj-titulo" id="titulo">Cargando...</div></div>
+            <div>
+                <div class="aloj-titulo" id="titulo">Cargando...</div>
+            </div>
         </div>
         <div class="detail-body" id="detailBody"></div>
     </div>
-
+    <!-- Galería -->
+    <div class="section-title" id="galeriaTitulo" style="display:none">🖼️ Galería</div>
+    <div class="gallery-grid" id="galeriaGrid"></div>
     <!-- Acciones según rol -->
     <div class="actions-row" id="acciones"></div>
 
@@ -287,16 +568,17 @@
     }
 
     const params = new URLSearchParams(location.search);
-    const id   = params.get('id');
+    const id = params.get('id');
     const tipo = params.get('tipo') || 'casas';
 
     let usuario = null;
 
     async function cargarUsuario() {
         try {
-            const resp = await fetch('/Usuario/me', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+            const resp = await fetch('/Usuario/me', {headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}});
             if (resp.ok) usuario = await resp.json();
-        } catch(e) {}
+        } catch (e) {
+        }
     }
 
     async function cargarAlojamiento() {
@@ -305,7 +587,7 @@
         else if (tipo === 'hoteles') url = `/Hotel/mostrar/${id}`;
         else url = `/Departamento/mostrar/${id}`;
 
-        const resp = await fetch(url, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        const resp = await fetch(url, {headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}});
         if (!resp.ok) {
             document.getElementById('detailBody').innerHTML = '<p style="color:var(--error)">Error al cargar el alojamiento.</p>';
             return;
@@ -332,7 +614,7 @@
             <div class="info-grid">
                 ${direccion ? `<div class="info-item"><div class="info-label">📍 Dirección</div><div class="info-value">${direccion}</div></div>` : ''}
                 ${a.precioNoche ? `<div class="info-item"><div class="info-label">💰 Precio</div><div class="info-value">$${a.precioNoche} / noche</div></div>` : ''}
-                ${a.capacidad   ? `<div class="info-item"><div class="info-label">👥 Capacidad</div><div class="info-value">${a.capacidad} personas</div></div>` : ''}
+                ${a.capacidad ? `<div class="info-item"><div class="info-label">👥 Capacidad</div><div class="info-value">${a.capacidad} personas</div></div>` : ''}
             </div>
             ${a.descripcion ? `<div class="aloj-desc">${a.descripcion}</div>` : ''}
         `;
@@ -346,7 +628,8 @@
             if (usuario.tipoUsuario === 'ADMINISTRADOR' ||
                 (usuario.tipoUsuario === 'ANFITRION' && a.anfitrion?.id === usuario.id)) {
                 acciones.innerHTML = `
-                  <a class="btn-edit-aloj" href="/actualizar-${tipo.slice(0,-1)}.html?id=${a.id}">✏️ Editar</a>
+                  <a class="btn-edit-aloj" href="/actualizar-${tipo.slice(0, -1)}.html?id=${a.id}">✏️ Editar</a>
+                  <a class="btn-edit-aloj" href="/editar-galeria.html?id=${a.id}&tipo=${tipo}">🖼️ Galería</a>
                     <button class="btn-delete-aloj" onclick="eliminarAlojamiento()">🗑️ Eliminar</button>
                 `;
             }
@@ -354,7 +637,7 @@
     }
 
     async function cargarReviews() {
-        const resp = await fetch(`/Review/alojamiento/${id}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        const resp = await fetch(`/Review/alojamiento/${id}`, {headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}});
         if (!resp.ok) {
             document.getElementById('reviews').innerHTML = '<p style="color:var(--muted)">No se pudieron cargar las reseñas.</p>';
             return;
@@ -373,8 +656,8 @@
 
         document.getElementById('reviews').innerHTML = reviews.map((r, i) => {
             const filled = '★'.repeat(r.puntuacion);
-            const empty  = '☆'.repeat(5 - r.puntuacion);
-            const fecha  = r.fecha ? r.fecha.split('T')[0] : '';
+            const empty = '☆'.repeat(5 - r.puntuacion);
+            const fecha = r.fecha ? r.fecha.split('T')[0] : '';
             return `
             <div class="review-card" style="animation-delay:${i * 0.06}s">
                 <div class="review-top">
@@ -394,14 +677,19 @@
         else if (tipo === 'hoteles') url = `/Hotel/eliminar/${id}`;
         else url = `/Departamento/eliminar/${id}`;
 
-        const resp = await fetch(url, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        const resp = await fetch(url, {
+            method: 'DELETE',
+            headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}
+        });
         if (resp.ok) window.location.href = '/listar-alojamientos.html';
         else alert('No se pudo eliminar');
     }
 
+
     async function init() {
         await cargarUsuario();
         await cargarAlojamiento();
+        await cargarGaleria();
         await cargarReviews();
 
         const overlay = document.getElementById('loadingOverlay');
@@ -412,7 +700,74 @@
         }, 300);
     }
 
+    async function cargarGaleria() {
+        try {
+            const gResp = await fetch(`/gallery/alojamiento/${id}`, {
+                headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}
+            });
+            if (!gResp.ok) return;
+            const gallery = await gResp.json();
+
+            const iResp = await fetch(`/gallery/${gallery.id}/images`, {
+                headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}
+            });
+            if (!iResp.ok) return;
+            const images = await iResp.json();
+            if (images.length === 0) return;
+
+            lbImages = images;
+            document.getElementById('galeriaTitulo').style.display = 'block';
+            document.getElementById('galeriaGrid').innerHTML = images.map((img, i) => `
+    <img class="gallery-img"
+         src="${img.url}"
+         alt="${img.alt || ''}"
+         onclick="lbAbrir(${i})">
+`).join('');
+        } catch (e) {
+        }
+    }
+
+    // ── LIGHTBOX ──
+    let lbImages = [];
+    let lbIndex = 0;
+
+    function lbAbrir(index) {
+        lbIndex = index;
+        lbActualizar();
+        document.getElementById('lightbox').classList.add('open');
+        document.addEventListener('keydown', lbTeclado);
+    }
+
+    function lbCerrar() {
+        document.getElementById('lightbox').classList.remove('open');
+        document.removeEventListener('keydown', lbTeclado);
+    }
+
+    function lbMover(dir) {
+        lbIndex = (lbIndex + dir + lbImages.length) % lbImages.length;
+        lbActualizar();
+    }
+
+    function lbActualizar() {
+        document.getElementById('lbImg').src = lbImages[lbIndex].url;
+        document.getElementById('lbImg').alt = lbImages[lbIndex].alt || '';
+        document.getElementById('lbCounter').textContent = `${lbIndex + 1} / ${lbImages.length}`;
+    }
+
+    function lbTeclado(e) {
+        if (e.key === 'ArrowRight') lbMover(1);
+        if (e.key === 'ArrowLeft') lbMover(-1);
+        if (e.key === 'Escape') lbCerrar();
+    }
+
     init();
 </script>
+<div class="lightbox" id="lightbox" onclick="lbCerrar()">
+    <button class="lb-close" onclick="lbCerrar()">✕</button>
+    <button class="lb-btn lb-prev" onclick="lbMover(-1); event.stopPropagation()">‹</button>
+    <img class="lb-img" id="lbImg" src="" alt="" onclick="event.stopPropagation()">
+    <button class="lb-btn lb-next" onclick="lbMover(1); event.stopPropagation()">›</button>
+    <span class="lb-counter" id="lbCounter"></span>
+</div>
 </body>
 </html>
