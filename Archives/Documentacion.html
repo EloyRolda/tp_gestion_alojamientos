@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>GA — Backend Cheatsheet</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Courier New", Courier, monospace; font-size: 15px; background: #1a1a1a; color: #d4d4d4; }
+
+  h1 { font-size: 23px; color: #fff; padding: 18px 20px 4px; border-bottom: 2px solid #444; }
+  .subtitle { color: #777; font-size: 13px; padding: 4px 20px 14px; border-bottom: 1px solid #333; }
+
+  .layout { display: flex; }
+
+  /* ── SIDEBAR ─────────────────────────────────────────── */
+  nav { width: 190px; min-width: 190px; background: #111; padding: 12px 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+  nav a { display: block; padding: 3px 16px; color: #888; text-decoration: none; font-size: 13px; }
+  nav a:hover { color: #eee; }
+  nav .nav-section { color: #555; font-size: 11px; padding: 10px 16px 2px; text-transform: uppercase; letter-spacing: 1px; }
+
+  /* ── MAIN ─────────────────────────────────────────────── */
+  main { flex: 1; padding: 0 0 40px; overflow-x: hidden; }
+
+  /* ── SECTION HEADER ──────────────────────────────────── */
+  .section-header {
+    background: #2a2a2a;
+    padding: 8px 20px;
+    color: #ccc;
+    font-size: 13px;
+    border-top: 1px solid #3a3a3a;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  /* ── GRID ─────────────────────────────────────────────── */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 0; }
+
+  /* ── CARD ─────────────────────────────────────────────── */
+  .card { border-right: 1px solid #2a2a2a; border-bottom: 1px solid #2a2a2a; padding: 10px 14px 12px; }
+  .card-title { color: #9cdcfe; font-size: 13px; margin-bottom: 6px; font-weight: bold; }
+  .card-title .tag { font-size: 11px; color: #555; margin-left: 6px; font-weight: normal; }
+
+  /* method rows */
+  .method { display: flex; align-items: baseline; gap: 6px; padding: 1px 0; }
+  .http { font-size: 11px; font-weight: bold; padding: 1px 5px; border-radius: 2px; min-width: 38px; text-align: center; }
+  .get    { background: #1a3a1a; color: #4ec94e; }
+  .post   { background: #1a2a3a; color: #4e9cec; }
+  .put    { background: #3a2a1a; color: #ecb94e; }
+  .delete { background: #3a1a1a; color: #ec4e4e; }
+
+  .route { color: #ce9178; flex: 1; }
+  .roles { color: #555; font-size: 12px; }
+
+  /* service method rows */
+  .smethod { padding: 2px 0; color: #d4d4d4; }
+  .ret { color: #4ec9b0; }
+  .fname { color: #dcdcaa; }
+  .param { color: #9cdcfe; }
+  .ptype { color: #4ec9b0; }
+  .comment { color: #6a9955; font-size: 13px; display: block; padding-left: 12px; margin-bottom: 2px; }
+
+  /* model field rows */
+  .field { padding: 1px 0; }
+  .ftype { color: #4ec9b0; }
+  .fname2 { color: #9cdcfe; }
+  .constraint { color: #c586c0; font-size: 12px; margin-left: 4px; }
+
+  /* enum */
+  .enum-val { color: #ce9178; margin-right: 8px; }
+
+  /* exception */
+  .exc { color: #f48771; }
+  .exc-http { color: #555; margin-left: 6px; font-size: 12px; }
+
+  /* front section */
+  .front-table { width: 100%; border-collapse: collapse; }
+  .front-table td { padding: 3px 6px; border-bottom: 1px solid #2a2a2a; vertical-align: top; }
+  .front-table td:first-child { color: #9cdcfe; white-space: nowrap; width: 220px; }
+  .front-table td:last-child { color: #ce9178; font-size: 13px; }
+  .front-table .section-row td { color: #555; font-size: 12px; padding-top: 8px; text-transform: uppercase; letter-spacing: 1px; border-bottom: none; }
+
+  .full-card { grid-column: 1 / -1; }
+  .sep { height: 1px; background: #333; margin: 0; }
+</style>
+</head>
+<body>
+
+<h1>Gestión Alojamientos — Backend Reference</h1>
+<p class="subtitle">Spring Boot 3 · JWT Auth · Cloudinary · JPA/Hibernate &nbsp;|&nbsp; package: GestionAlojamiento</p>
+
+<div class="layout">
+
+<!-- ══════════════════ SIDEBAR ══════════════════ -->
+<nav>
+  <div class="nav-section">Modelos</div>
+  <a href="#models">Entidades</a>
+  <a href="#enums">Enums</a>
+  <div class="nav-section">DTOs</div>
+  <a href="#dtos">DTOs</a>
+  <div class="nav-section">API Endpoints</div>
+  <a href="#auth">Auth</a>
+  <a href="#usuario-ctrl">Usuario</a>
+  <a href="#casa-ctrl">Casa</a>
+  <a href="#depto-ctrl">Departamento</a>
+  <a href="#hotel-ctrl">Hotel</a>
+  <a href="#reserva-ctrl">Reserva</a>
+  <a href="#review-ctrl">Review</a>
+  <a href="#gallery-ctrl">Gallery</a>
+  <div class="nav-section">Servicios</div>
+  <a href="#usuario-svc">UsuarioService</a>
+  <a href="#aloj-svc">AlojamientoService</a>
+  <a href="#reserva-svc">ReservaService</a>
+  <a href="#review-svc">ReviewService</a>
+  <a href="#gallery-svc">GalleryService</a>
+  <a href="#image-svc">ImageService</a>
+  <a href="#cloudinary-svc">CloudinaryService</a>
+  <a href="#jwt-svc">JwtService</a>
+  <div class="nav-section">Config / Excepciones</div>
+  <a href="#security">SecurityConfig</a>
+  <a href="#exceptions">Excepciones</a>
+  <div class="nav-section">Front</div>
+  <a href="#front">Páginas HTML</a>
+</nav>
+
+<!-- ══════════════════ MAIN ══════════════════ -->
+<main>
+
+<!-- ─────────────────── MODELOS ─────────────────── -->
+<div class="section-header" id="models">── Modelos (JPA Entities)</div>
+<div class="grid">
+
+  <div class="card">
+    <div class="card-title">Alojamiento <span class="tag">@Entity · tabla: alojamiento</span></div>
+    <div class="field"><span class="ftype">Long</span> <span class="fname2">id</span></div>
+    <div class="field"><span class="ftype">String</span> <span class="fname2">titulo</span> <span class="constraint">max 150</span></div>
+    <div class="field"><span class="ftype">String</span> <span class="fname2">descripcion</span> <span class="constraint">TEXT max 3000</span></div>
+    <div class="field"><span class="ftype">BigDecimal</span> <span class="fname2">precioNoche</span> <span class="constraint">&gt;0</span></div>
+    <div class="field"><span class="ftype">Integer</span> <span class="fname2">capacidad</span> <span class="constraint">min 1</span></div>
+    <div class="field"><span class="ftype">Integer</span> <span class="fname2">cantAmbientes / cantHabitaciones / cantCamas / cantBanios</span></div>
+    <div class="field"><span class="ftype">Boolean</span> <span class="fname2">activo</span></div>
+    <div class="field"><span class="ftype">TipoInmueble</span> <span class="fname2">tipoInmueble</span></div>
+    <div class="field"><span class="ftype">@ManyToOne Usuario</span> <span class="fname2">anfitrion</span></div>
+    <div class="field"><span class="ftype">@OneToOne Direccion</span> <span class="fname2">direccion</span> <span class="constraint">cascade ALL</span></div>
+    <div class="field"><span class="ftype">@OneToOne Servicio</span> <span class="fname2">servicio</span> <span class="constraint">cascade ALL</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Casa <span class="tag">@Entity · tabla: casa · extiende Alojamiento vía @MapsId</span></div>
+    <div class="field"><span class="ftype">Long</span> <span class="fname2">id</span> <span class="constraint">= id_alojamiento</span></div>
+    <div class="field"><span class="ftype">boolean</span> <span class="fname2">tienePatio</span></div>
+    <div class="field"><span class="ftype">boolean</span> <span class="fname2">tienePileta</span></div>
+    <div class="field"><span class="ftype">boolean</span> <span class="fname2">tieneParrilla</span></div>
+    <div class="field"><span class="ftype">@OneToOne Alojamiento</span> <span class="fname2">alojamiento</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Departamento <span class="tag">@Entity · tabla: departamento · @MapsId</span></div>
+    <div class="field"><span class="ftype">Long</span> <span class="fname2">id</span></div>
+    <div class="field"><span class="ftype">Integer</span> <span class="fname2">piso</span> <span class="constraint">≥0</span></div>
+    <div class="field"><span class="ftype">boolean</span> <span class="fname2">tieneAscensor</span></div>
+    <div class="field"><span class="ftype">boolean</span> <span class="fname2">expensasIncluidas</span></div>
+    <div class="field"><span class="ftype">@OneToOne Alojamiento</span> <span class="fname2">alojamiento</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Hotel <span class="tag">@Entity · tabla: hotel · @MapsId</span></div>
+    <div class="field"><span class="ftype">Long</span> <span class="fname2">id</span></div>
+    <div class="field"><span class="ftype">Integer</span> <span class="fname2">estrellas</span> <span class="constraint">0-5</span></div>
+    <div class="field"><span class="ftype">Boolean</span> <span class="fname2">incluyeDesayuno</span></div>
+    <div class="field"><span class="ftype">Boolean</span> <span class="fname2">incluyeLimpieza</span></div>
+    <div class="field"><span class="ftype">@OneToOne Alojamiento</span> <span class="fname2">alojamiento</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Usuario <span class="tag">@Entity · tabla: usuario</span></div>
+    <div class="field"><span class="ftype">Long</span> <span class="fname2">id</span></div>
+    <div class="field"><span class="ftype">String</span> <span class="fname2">nombre</span> <span class="constraint">max 100</span></div>
+    <div class="field"><span class="ftype">String</span> <span class="fname2">email</span> <span class="constraint">unique · @Email</span></div>
+    <div class="field"><span class="ftype">String</span> <span class="fname2">password</span> <span class="constraint">WRITE_ONLY (bcrypt)</span></div>
+    <div class="field"><span class="ftype">String</span> <span class="fname2">telefono</span></div>
+    <div class="field"><span class="ftype">LocalDateTime</span> <span class="fname2">fechaRegistro</span></div>
+    <div class="field"><span class="ftype">Boolean</span> <span class="fname2">activo</span></div>
+    <div class="field"><span class="ftype">TipoUsuario</span> <span class="fname2">tipoUsuario</span></div>
+    <div class="field"><span class="ftype">String</span> <span class="fname2">metodo_pago</span> <span class="constraint">nullable · CLIENTE</span></div>
+    <div class="field"><span class="ftype">String</span> <span class="fname2">matricula</span> <span class="constraint">nullable · ADMIN</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Reserva <span class="tag">@Entity · tabla: reserva</span></div>
+    <div class="field"><span class="ftype">Long</span> <span class="fname2">id</span></div>
+    <div class="field"><span class="ftype">LocalDate</span> <span class="fname2">fechaInicio / fechaFin</span></div>
+    <div class="field"><span class="ftype">BigDecimal</span> <span class="fname2">precioTotal</span> <span class="constraint">calculado auto</span></div>
+    <div class="field"><span class="ftype">TipoEstado</span> <span class="fname2">tipoEstado</span> <span class="constraint">default PENDIENTE</span></div>
+    <div class="field"><span class="ftype">@ManyToOne Usuario</span> <span class="fname2">cliente</span></div>
+    <div class="field"><span class="ftype">@ManyToOne Alojamiento</span> <span class="fname2">alojamiento</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Review <span class="tag">@Entity · tabla: review · unique(cliente, alojamiento)</span></div>
+    <div class="field"><span class="ftype">Long</span> <span class="fname2">id</span></div>
+    <div class="field"><span class="ftype">Integer</span> <span class="fname2">puntuacion</span> <span class="constraint">0-5</span></div>
+    <div class="field"><span class="ftype">String</span> <span class="fname2">comentario</span> <span class="constraint">TEXT max 2000</span></div>
+    <div class="field"><span class="ftype">LocalDateTime</span> <span class="fname2">fecha</span> <span class="constraint">auto · no modificable</span></div>
+    <div class="field"><span class="ftype">@ManyToOne Usuario</span> <span class="fname2">cliente</span></div>
+    <div class="field"><span class="ftype">@ManyToOne Alojamiento</span> <span class="fname2">alojamiento</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Servicio <span class="tag">@Entity · tabla: servicio</span></div>
+    <div class="field"><span class="ftype">Boolean</span> <span class="fname2">tieneCocina / tieneLavarropa / tieneWifi / tieneEstacionamiento</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Direccion <span class="tag">@Entity · tabla: direccion</span></div>
+    <div class="field"><span class="ftype">String</span> <span class="fname2">pais, provincia, codigoPostal, ciudad, calle</span></div>
+    <div class="field"><span class="ftype">Integer</span> <span class="fname2">altura</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Gallery <span class="tag">@Entity · tabla: gallery</span></div>
+    <div class="field"><span class="ftype">Long</span> <span class="fname2">id</span></div>
+    <div class="field"><span class="ftype">String</span> <span class="fname2">gallery_name</span></div>
+    <div class="field"><span class="ftype">@OneToOne Alojamiento</span> <span class="fname2">alojamiento</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Image <span class="tag">@Entity · tabla: image</span></div>
+    <div class="field"><span class="ftype">Long</span> <span class="fname2">id</span></div>
+    <div class="field"><span class="ftype">String</span> <span class="fname2">alt, url</span> <span class="constraint">max 255</span></div>
+    <div class="field"><span class="ftype">String</span> <span class="fname2">publicId</span> <span class="constraint">Cloudinary ID para delete</span></div>
+    <div class="field"><span class="ftype">@ManyToOne Gallery</span> <span class="fname2">gallery</span></div>
+  </div>
+
+</div>
+
+<!-- ─────────────────── ENUMS ─────────────────── -->
+<div class="section-header" id="enums">── Enums</div>
+<div class="grid">
+  <div class="card">
+    <div class="card-title">TipoUsuario</div>
+    <span class="enum-val">CLIENTE</span><span class="enum-val">ANFITRION</span><span class="enum-val">ADMINISTRADOR</span>
+  </div>
+  <div class="card">
+    <div class="card-title">TipoEstado</div>
+    <span class="enum-val">PENDIENTE</span><span class="enum-val">CONFIRMADA</span><span class="enum-val">CANCELADA</span>
+  </div>
+  <div class="card">
+    <div class="card-title">TipoInmueble</div>
+    <span class="enum-val">CASA</span><span class="enum-val">DEPARTAMENTO</span><span class="enum-val">HOTEL</span>
+  </div>
+</div>
+
+<!-- ─────────────────── DTOs ─────────────────── -->
+<div class="section-header" id="dtos">── DTOs</div>
+<div class="grid">
+
+  <div class="card">
+    <div class="card-title">LoginDTO</div>
+    <div class="field"><span class="ftype">String</span> <span class="fname2">email</span> <span class="constraint">@Email @NotBlank</span></div>
+    <div class="field"><span class="ftype">String</span> <span class="fname2">password</span> <span class="constraint">@NotBlank</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">LoginResponse</div>
+    <div class="field"><span class="ftype">String</span> <span class="fname2">token</span> <span class="constraint">JWT · 1h expiry</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">UsuarioRegistroDTO</div>
+    <div class="field"><span class="ftype">String</span> <span class="fname2">nombre, email, password, telefono</span> <span class="constraint">@NotBlank</span></div>
+    <div class="field"><span class="ftype">TipoUsuario</span> <span class="fname2">tipoUsuario</span> <span class="constraint">no puede ser ADMINISTRADOR</span></div>
+    <div class="field"><span class="ftype">String?</span> <span class="fname2">metodoPago</span> <span class="constraint">CLIENTE</span></div>
+    <div class="field"><span class="ftype">String?</span> <span class="fname2">matricula</span> <span class="constraint">ADMINISTRADOR</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">UsuarioModificarDTO</div>
+    <div class="field"><span class="ftype">Long</span> <span class="fname2">id</span> <span class="constraint">auto-set desde sesión en /actualizar</span></div>
+    <div class="field"><span class="ftype">String?</span> <span class="fname2">nombre, email, password, telefono, metodoPago, matricula</span></div>
+    <div class="field"><span class="ftype">Boolean?</span> <span class="fname2">activo</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">CasaRegistroDTO</div>
+    <div class="field"><span class="ftype">Long</span> <span class="fname2">idAnfitrion</span></div>
+    <div class="field"><span class="ftype">boolean</span> <span class="fname2">tienePatio, tienePileta, tieneParrilla</span></div>
+    <div class="comment">// Campos de Alojamiento</div>
+    <div class="field"><span class="ftype">String</span> <span class="fname2">titulo</span> <span class="constraint">max 150</span> &nbsp; <span class="ftype">String</span> <span class="fname2">descripcion</span> <span class="constraint">max 3000</span></div>
+    <div class="field"><span class="ftype">BigDecimal</span> <span class="fname2">precioNoche</span> &nbsp; <span class="ftype">Integer</span> <span class="fname2">capacidad, cantAmbientes, cantBanios, cantCamas, cantHabitaciones</span></div>
+    <div class="comment">// Campos de Direccion</div>
+    <div class="field"><span class="ftype">String</span> <span class="fname2">pais, provincia, codigoPostal, ciudad, calle</span> &nbsp; <span class="ftype">Integer</span> <span class="fname2">altura</span></div>
+    <div class="comment">// Campos de Servicio</div>
+    <div class="field"><span class="ftype">boolean</span> <span class="fname2">tieneCocina, tieneLavarropa, tieneWifi, tieneEstacionamiento</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">ReservaRegistroDTO</div>
+    <div class="field"><span class="ftype">LocalDate</span> <span class="fname2">fechaInicio, fechaFin</span> <span class="constraint">@NotNull · inicio &lt; fin · inicio ≥ hoy</span></div>
+    <div class="field"><span class="ftype">TipoEstado</span> <span class="fname2">tipoEstado</span> <span class="constraint">default PENDIENTE</span></div>
+    <div class="field"><span class="ftype">Long</span> <span class="fname2">idCliente, idAlojamiento</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">ReservaModificarDTO</div>
+    <div class="field"><span class="ftype">Long</span> <span class="fname2">id</span> <span class="constraint">requerido</span></div>
+    <div class="field"><span class="ftype">LocalDate?</span> <span class="fname2">fechaInicio, fechaFin</span></div>
+    <div class="field"><span class="ftype">Long?</span> <span class="fname2">idCliente, idAlojamiento</span></div>
+    <div class="field"><span class="ftype">TipoEstado?</span> <span class="fname2">tipoEstado</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">ReviewRegistroDTO / ReviewModificarDTO</div>
+    <div class="field"><span class="ftype">Integer</span> <span class="fname2">puntuacion</span> <span class="constraint">0-5</span></div>
+    <div class="field"><span class="ftype">String</span> <span class="fname2">comentario</span> <span class="constraint">max 2000</span></div>
+    <div class="field"><span class="ftype">Long</span> <span class="fname2">idCliente, idAlojamiento</span></div>
+  </div>
+
+</div>
+
+<!-- ─────────────────── ENDPOINTS ─────────────────── -->
+<div class="section-header" id="auth">── REST Controllers · Auth</div>
+<div class="grid">
+  <div class="card">
+    <div class="card-title">AuthController <span class="tag">/auth</span></div>
+    <div class="method"><span class="http post">POST</span><span class="route">/auth/login</span><span class="roles">PUBLIC</span></div>
+    <div style="padding-left:12px;color:#6a9955;font-size:11px;">body: LoginDTO → LoginResponse { token }</div>
+  </div>
+</div>
+
+<div class="section-header" id="usuario-ctrl">── REST Controllers · Usuario</div>
+<div class="grid">
+  <div class="card full-card">
+    <div class="card-title">UsuarioController <span class="tag">/Usuario</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/Usuario/me</span><span class="roles">authenticated</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/Usuario/listar</span><span class="roles">ADMIN</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/Usuario/listar/clientes</span><span class="roles">ADMIN</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/Usuario/listar/anfitriones</span><span class="roles">ADMIN</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/Usuario/listar/administradores</span><span class="roles">ADMIN</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/Usuario/mostrar/{id}</span><span class="roles">ADMIN · propio usuario</span></div>
+    <div class="method"><span class="http post">POST</span><span class="route">/Usuario/registrar</span><span class="roles">PUBLIC · body: UsuarioRegistroDTO</span></div>
+    <div class="method"><span class="http post">POST</span><span class="route">/Usuario/registrar/administrador</span><span class="roles">ADMIN · body: UsuarioRegistroDTO</span></div>
+    <div class="method"><span class="http put">PUT</span><span class="route">/Usuario/actualizar</span><span class="roles">ADMIN|CLIENTE|ANFITRION · id desde sesión</span></div>
+    <div class="method"><span class="http put">PUT</span><span class="route">/Usuario/actualizar/admin</span><span class="roles">ADMIN · id en DTO</span></div>
+    <div class="method"><span class="http delete">DEL</span><span class="route">/Usuario/eliminar/{id}</span><span class="roles">ADMIN · soft-delete (activo=false)</span></div>
+  </div>
+</div>
+
+<div class="section-header" id="casa-ctrl">── REST Controllers · Casa</div>
+<div class="grid">
+  <div class="card full-card">
+    <div class="card-title">CasaController <span class="tag">/Casa</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/Casa/listar</span><span class="roles">ADMIN|ANFITRION|CLIENTE</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/Casa/mostrar/{id}</span><span class="roles">ADMIN|ANFITRION|CLIENTE</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/Casa/listar/propios</span><span class="roles">ADMIN|ANFITRION · filtra por email sesión</span></div>
+    <div class="method"><span class="http post">POST</span><span class="route">/Casa/registrar</span><span class="roles">ADMIN|ANFITRION · body: CasaRegistroDTO · crea Gallery automáticamente</span></div>
+    <div class="method"><span class="http put">PUT</span><span class="route">/Casa/actualizar</span><span class="roles">ADMIN|ANFITRION · body: CasaModificarDTO</span></div>
+    <div class="method"><span class="http delete">DEL</span><span class="route">/Casa/eliminar/{id}</span><span class="roles">ADMIN|propietario</span></div>
+  </div>
+</div>
+
+<div class="section-header" id="depto-ctrl">── REST Controllers · Departamento</div>
+<div class="grid">
+  <div class="card full-card">
+    <div class="card-title">DepartamentoController <span class="tag">/Departamento</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/Departamento/listar</span><span class="roles">ADMIN|ANFITRION|CLIENTE</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/Departamento/mostrar/{id}</span><span class="roles">ADMIN|ANFITRION|CLIENTE</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/Departamento/listar/propios</span><span class="roles">ADMIN|ANFITRION</span></div>
+    <div class="method"><span class="http post">POST</span><span class="route">/Departamento/registrar</span><span class="roles">ADMIN|ANFITRION · body: DepartamentoRegistroDTO</span></div>
+    <div class="method"><span class="http put">PUT</span><span class="route">/Departamento/actualizar</span><span class="roles">ADMIN|ANFITRION · body: DepartamentoModificarDTO</span></div>
+    <div class="method"><span class="http delete">DEL</span><span class="route">/Departamento/eliminar/{id}</span><span class="roles">ADMIN|propietario</span></div>
+  </div>
+</div>
+
+<div class="section-header" id="hotel-ctrl">── REST Controllers · Hotel</div>
+<div class="grid">
+  <div class="card full-card">
+    <div class="card-title">HotelController <span class="tag">/Hotel</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/Hotel/listar</span><span class="roles">ADMIN|ANFITRION|CLIENTE</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/Hotel/mostrar/{id}</span><span class="roles">ADMIN|ANFITRION|CLIENTE</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/Hotel/listar/propios</span><span class="roles">ADMIN|ANFITRION</span></div>
+    <div class="method"><span class="http post">POST</span><span class="route">/Hotel/registrar</span><span class="roles">ADMIN|ANFITRION · body: HotelRegistroDTO</span></div>
+    <div class="method"><span class="http put">PUT</span><span class="route">/Hotel/actualizar</span><span class="roles">ADMIN|ANFITRION · body: HotelModificarDTO</span></div>
+    <div class="method"><span class="http delete">DEL</span><span class="route">/Hotel/eliminar/{id}</span><span class="roles">ADMIN|propietario</span></div>
+  </div>
+</div>
+
+<div class="section-header" id="reserva-ctrl">── REST Controllers · Reserva</div>
+<div class="grid">
+  <div class="card full-card">
+    <div class="card-title">ReservaController <span class="tag">/Reserva</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/Reserva/listar</span><span class="roles">ADMIN</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/Reserva/mostrar/{id}</span><span class="roles">ADMIN|ANFITRION|CLIENTE</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/Reserva/listar/propios</span><span class="roles">ADMIN|CLIENTE · filtra por email sesión</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/Reserva/listar/anfitrion</span><span class="roles">ADMIN|ANFITRION · reservas de mis alojamientos</span></div>
+    <div class="method"><span class="http post">POST</span><span class="route">/Reserva/registrar</span><span class="roles">ADMIN|CLIENTE · body: ReservaRegistroDTO · precio calculado auto</span></div>
+    <div class="method"><span class="http put">PUT</span><span class="route">/Reserva/actualizar</span><span class="roles">ADMIN|CLIENTE · body: ReservaModificarDTO</span></div>
+    <div class="method"><span class="http delete">DEL</span><span class="route">/Reserva/eliminar/{id}</span><span class="roles">propietario de la reserva</span></div>
+  </div>
+</div>
+
+<div class="section-header" id="review-ctrl">── REST Controllers · Review</div>
+<div class="grid">
+  <div class="card full-card">
+    <div class="card-title">ReviewController <span class="tag">/Review</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/Review/listar</span><span class="roles">ADMIN|ANFITRION|CLIENTE</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/Review/mostrar/{id}</span><span class="roles">ADMIN|ANFITRION|CLIENTE</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/Review/alojamiento/{idAlojamiento}</span><span class="roles">ADMIN|ANFITRION|CLIENTE</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/Review/cliente/{idCliente}</span><span class="roles">ADMIN|CLIENTE</span></div>
+    <div class="method"><span class="http post">POST</span><span class="route">/Review/registrar</span><span class="roles">ADMIN|CLIENTE · body: ReviewRegistroDTO · @Valid</span></div>
+    <div class="method"><span class="http put">PUT</span><span class="route">/Review/actualizar</span><span class="roles">ADMIN|CLIENTE · body: ReviewModificarDTO · @Valid</span></div>
+    <div class="method"><span class="http delete">DEL</span><span class="route">/Review/eliminar/{id}</span><span class="roles">ADMIN|CLIENTE → devuelve String</span></div>
+  </div>
+</div>
+
+<div class="section-header" id="gallery-ctrl">── REST Controllers · Gallery</div>
+<div class="grid">
+  <div class="card full-card">
+    <div class="card-title">GalleryController <span class="tag">/gallery</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/gallery/alojamiento/{idAlojamiento}</span><span class="roles">autenticado → Gallery</span></div>
+    <div class="method"><span class="http get">GET</span><span class="route">/gallery/{id}/images</span><span class="roles">autenticado → List&lt;Image&gt; · público (ver fotos)</span></div>
+    <div class="method"><span class="http post">POST</span><span class="route">/gallery/upload</span><span class="roles">anfitrion propietario · multipart: file, alt, galleryId · máx 10 imgs · sube a Cloudinary</span></div>
+    <div class="method"><span class="http post">POST</span><span class="route">/gallery/create/{idAlojamiento}</span><span class="roles">autenticado · crea galería (normalmente auto al crear alojamiento)</span></div>
+    <div class="method"><span class="http delete">DEL</span><span class="route">/gallery/delete/{id}</span><span class="roles">autenticado · borra de Cloudinary y BD</span></div>
+  </div>
+</div>
+
+<!-- ─────────────────── SERVICES ─────────────────── -->
+<div class="section-header" id="usuario-svc">── Services · UsuarioService</div>
+<div class="grid">
+  <div class="card full-card">
+    <div class="card-title">UsuarioService</div>
+
+    <div class="smethod"><span class="ret">List&lt;Usuario&gt;</span> <span class="fname">listarTodos</span>()</div>
+    <div class="smethod"><span class="ret">List&lt;Usuario&gt;</span> <span class="fname">listarClientes</span>() <span style="color:#555">/ listarAnfitriones() / listarAdministradores()</span></div>
+    <div class="smethod"><span class="ret">Usuario</span> <span class="fname">obtenerPorId</span>(<span class="ptype">Long</span> <span class="param">id</span>)</div>
+    <div class="smethod"><span class="ret">Usuario</span> <span class="fname">obtenerPorEmail</span>(<span class="ptype">String</span> <span class="param">email</span>)</div>
+    <div class="smethod"><span class="ret">Usuario</span> <span class="fname">obtenerAnfitrionPorId</span>(<span class="ptype">Long</span> <span class="param">id</span>) <span style="color:#555">// valida TipoUsuario.ANFITRION</span></div>
+    <div class="smethod"><span class="ret">Usuario</span> <span class="fname">obtenerClientePorId</span>(<span class="ptype">Long</span> <span class="param">id</span>) <span style="color:#555">// valida TipoUsuario.CLIENTE</span></div>
+    <div class="smethod"><span class="ret">Usuario</span> <span class="fname">crear</span>(<span class="ptype">UsuarioRegistroDTO</span> <span class="param">dto</span>) <span style="color:#555">// no acepta ADMINISTRADOR · valida email único · bcrypt</span></div>
+    <div class="smethod"><span class="ret">Usuario</span> <span class="fname">crear</span>(<span class="ptype">Usuario</span> <span class="param">usuario</span>) <span style="color:#555">// sobrecarga directa · para testing</span></div>
+    <div class="smethod"><span class="ret">Usuario</span> <span class="fname">crearAdministrador</span>(<span class="ptype">UsuarioRegistroDTO</span> <span class="param">dto</span>) <span style="color:#555">// fuerza ADMINISTRADOR · requiere matricula</span></div>
+    <div class="smethod"><span class="ret">Usuario</span> <span class="fname">actualizar</span>(<span class="ptype">UsuarioModificarDTO</span> <span class="param">dto</span>) <span style="color:#555">// null-safe · re-codifica password</span></div>
+    <div class="smethod"><span class="ret">void</span> <span class="fname">borrarPorId</span>(<span class="ptype">Long</span> <span class="param">id</span>) <span style="color:#555">// soft-delete: activo = false</span></div>
+  </div>
+</div>
+
+<div class="section-header" id="aloj-svc">── Services · AlojamientoService</div>
+<div class="grid">
+  <div class="card full-card">
+    <div class="card-title">AlojamientoService</div>
+    <div class="smethod"><span class="ret">List&lt;Alojamiento&gt;</span> <span class="fname">listarTodos</span>() <span style="color:#555">// ordenado ASC por titulo</span></div>
+    <div class="smethod"><span class="ret">Alojamiento</span> <span class="fname">obtenerPorId</span>(<span class="ptype">Long</span> <span class="param">id</span>)</div>
+    <div class="smethod"><span class="ret">List&lt;Long&gt;</span> <span class="fname">obtenerIdsPorAnfitrion</span>(<span class="ptype">Long</span> <span class="param">anfitrionId</span>) <span style="color:#555">// usado por ReservaService</span></div>
+    <div class="smethod"><span class="ret">Alojamiento</span> <span class="fname">modificarObjeto</span>(<span class="ptype">Alojamiento</span> <span class="param">original</span>, <span class="ptype">Alojamiento</span> <span class="param">cambios</span>) <span style="color:#555">// solo modifica en memoria · no persiste</span></div>
+  </div>
+</div>
+
+<div class="section-header" id="reserva-svc">── Services · ReservaService</div>
+<div class="grid">
+  <div class="card full-card">
+    <div class="card-title">ReservaService</div>
+    <div class="smethod"><span class="ret">List&lt;Reserva&gt;</span> <span class="fname">listarTodos</span>()</div>
+    <div class="smethod"><span class="ret">Reserva</span> <span class="fname">obtenerPorId</span>(<span class="ptype">Long</span> <span class="param">id</span>)</div>
+    <div class="smethod"><span class="ret">List&lt;Reserva&gt;</span> <span class="fname">listarPorUsuario</span>(<span class="ptype">String</span> <span class="param">correoUsuario</span>)</div>
+    <div class="smethod"><span class="ret">List&lt;Reserva&gt;</span> <span class="fname">listarReservasPorAnfitrion</span>(<span class="ptype">String</span> <span class="param">email</span>) <span style="color:#555">// todas las reservas de sus alojamientos</span></div>
+    <div class="smethod"><span class="ret">Reserva</span> <span class="fname">crear</span>(<span class="ptype">ReservaRegistroDTO</span> <span class="param">dto</span>) <span style="color:#555">// valida fechas · solapamiento · activo · calcula precio</span></div>
+    <div class="smethod"><span class="ret">Reserva</span> <span class="fname">actualizar</span>(<span class="ptype">ReservaModificarDTO</span> <span class="param">dto</span>) <span style="color:#555">// re-valida solapamiento · recalcula precio</span></div>
+    <div class="smethod"><span class="ret">void</span> <span class="fname">borrarPorId</span>(<span class="ptype">Long</span> <span class="param">id</span>) <span style="color:#555">// hard-delete · libera fechas</span></div>
+    <div class="smethod"><span class="ret">boolean</span> <span class="fname">tuvisteReservaConfirmada</span>(<span class="ptype">Long</span> <span class="param">clienteId</span>, <span class="ptype">Long</span> <span class="param">alojamientoId</span>) <span style="color:#555">// útil para validar que se puede dejar review</span></div>
+    <div class="smethod" style="color:#555;font-size:11px;">private BigDecimal calcularPrecio(Alojamiento, LocalDate inicio, LocalDate fin) // precioNoche × días</div>
+  </div>
+</div>
+
+<div class="section-header" id="review-svc">── Services · ReviewService</div>
+<div class="grid">
+  <div class="card full-card">
+    <div class="card-title">ReviewService</div>
+    <div class="smethod"><span class="ret">List&lt;Review&gt;</span> <span class="fname">listarTodas</span>()</div>
+    <div class="smethod"><span class="ret">List&lt;Review&gt;</span> <span class="fname">listarPorAlojamiento</span>(<span class="ptype">Long</span> <span class="param">idAlojamiento</span>)</div>
+    <div class="smethod"><span class="ret">List&lt;Review&gt;</span> <span class="fname">listarPorCliente</span>(<span class="ptype">Long</span> <span class="param">idCliente</span>)</div>
+    <div class="smethod"><span class="ret">Review</span> <span class="fname">obtenerPorId</span>(<span class="ptype">Long</span> <span class="param">id</span>)</div>
+    <div class="smethod"><span class="ret">Review</span> <span class="fname">crear</span>(<span class="ptype">ReviewRegistroDTO</span> <span class="param">dto</span>)</div>
+    <div class="smethod"><span class="ret">Review</span> <span class="fname">modificar</span>(<span class="ptype">ReviewModificarDTO</span> <span class="param">dto</span>)</div>
+    <div class="smethod"><span class="ret">void</span> <span class="fname">borrarPorId</span>(<span class="ptype">Long</span> <span class="param">id_review</span>)</div>
+  </div>
+</div>
+
+<div class="section-header" id="gallery-svc">── Services · GalleryService / ImageService / CloudinaryService</div>
+<div class="grid">
+
+  <div class="card">
+    <div class="card-title">GalleryService</div>
+    <div class="smethod"><span class="ret">Gallery</span> <span class="fname">getGalleryByAlojamiento</span>(<span class="ptype">Long</span> <span class="param">idAlojamiento</span>)</div>
+    <div class="smethod"><span class="ret">Gallery</span> <span class="fname">getGalleryById</span>(<span class="ptype">Long</span> <span class="param">galleryId</span>, <span class="ptype">String</span> <span class="param">userEmail</span>) <span style="color:#555">// verifica ownership</span></div>
+    <div class="smethod"><span class="ret">Gallery</span> <span class="fname">getGalleryByIdPublic</span>(<span class="ptype">Long</span> <span class="param">galleryId</span>) <span style="color:#555">// sin verificar owner</span></div>
+    <div class="smethod"><span class="ret">Gallery</span> <span class="fname">createGallery</span>(<span class="ptype">Gallery</span> <span class="param">gallery</span>)</div>
+  </div>
+
+  <div class="card" id="image-svc">
+    <div class="card-title">ImageService</div>
+    <div class="smethod"><span class="ret">List&lt;Image&gt;</span> <span class="fname">obtainByGallery</span>(<span class="ptype">Long</span> <span class="param">id_gallery</span>)</div>
+    <div class="smethod"><span class="ret">Image</span> <span class="fname">createImage</span>(<span class="ptype">Image</span> <span class="param">image</span>)</div>
+    <div class="smethod"><span class="ret">void</span> <span class="fname">deleteImage</span>(<span class="ptype">Long</span> <span class="param">id</span>) <span style="color:#555">// borra en Cloudinary y en BD</span></div>
+  </div>
+
+  <div class="card" id="cloudinary-svc">
+    <div class="card-title">CloudinaryService</div>
+    <div class="smethod"><span class="ret">Map</span> <span class="fname">upload</span>(<span class="ptype">MultipartFile</span> <span class="param">file</span>) <span style="color:#555">// → { secure_url, public_id } · 600×600 pad · webp</span></div>
+    <div class="smethod"><span class="ret">void</span> <span class="fname">delete</span>(<span class="ptype">String</span> <span class="param">publicId</span>)</div>
+  </div>
+
+  <div class="card" id="jwt-svc">
+    <div class="card-title">JwtService</div>
+    <div class="smethod"><span class="ret">String</span> <span class="fname">generateToken</span>(<span class="ptype">UserDetails</span> <span class="param">userDetails</span>) <span style="color:#555">// exp 1h · claims: sub, roles</span></div>
+    <div class="smethod"><span class="ret">boolean</span> <span class="fname">isTokenValid</span>(<span class="ptype">String</span> <span class="param">token</span>, <span class="ptype">UserDetails</span> <span class="param">userDetails</span>)</div>
+    <div class="smethod"><span class="ret">String</span> <span class="fname">extractUsername</span>(<span class="ptype">String</span> <span class="param">token</span>) <span style="color:#555">// = email</span></div>
+  </div>
+
+</div>
+
+<!-- ─────────────────── CONFIG ─────────────────── -->
+<div class="section-header" id="security">── Config · Security</div>
+<div class="grid">
+  <div class="card full-card">
+    <div class="card-title">SecurityConfig <span class="tag">JWT stateless · BCrypt · CORS *</span></div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px;">
+      <tr><td style="color:#555;padding:2px 8px 2px 0;white-space:nowrap;">PUBLIC</td><td style="color:#ce9178">/, /favicon.ico, /*.html, /login, /auth/login, /Usuario/registrar, /swagger-ui/**, /v3/api-docs/**</td></tr>
+      <tr><td style="color:#555;padding:2px 8px 2px 0;">authenticated</td><td style="color:#ce9178">/Usuario/me</td></tr>
+      <tr><td style="color:#555;padding:2px 8px 2px 0;">ADMIN</td><td style="color:#ce9178">/Usuario/listar**, /Usuario/eliminar/**, /Usuario/registrar/administrador, /Usuario/actualizar/admin, /Reserva/listar</td></tr>
+      <tr><td style="color:#555;padding:2px 8px 2px 0;">ADMIN|ANFITRION|CLIENTE</td><td style="color:#ce9178">/Casa/listar, /Casa/mostrar/**, /Hotel/listar, /Hotel/mostrar/**, /Departamento/listar, /Departamento/mostrar/**, /Reserva/mostrar/**, /Review/listar, /Review/mostrar/**, /Review/alojamiento/**</td></tr>
+      <tr><td style="color:#555;padding:2px 8px 2px 0;">ADMIN|ANFITRION</td><td style="color:#ce9178">/*/listar/propios, /*/registrar (alojamientos), /*/actualizar, /*/eliminar/**</td></tr>
+      <tr><td style="color:#555;padding:2px 8px 2px 0;">ADMIN|CLIENTE</td><td style="color:#ce9178">/Reserva/listar/propios, /Reserva/registrar, /Reserva/actualizar, /Reserva/eliminar/**, /Review/cliente/**, /Review/registrar, /Review/actualizar, /Review/eliminar/**</td></tr>
+      <tr><td style="color:#555;padding:2px 8px 2px 0;">ADMIN|ANFITRION</td><td style="color:#ce9178">/Reserva/listar/anfitrion</td></tr>
+    </table>
+    <div style="margin-top:8px;color:#555;font-size:11px;">
+      JwtAuthFilter → lee header Authorization: Bearer &lt;token&gt; → valida con JwtService → setea SecurityContext<br>
+      CustomUserDetailsService → carga Usuario por email → mapea TipoUsuario a ROLE_CLIENTE / ROLE_ANFITRION / ROLE_ADMIN
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────────── EXCEPTIONS ─────────────────── -->
+<div class="section-header" id="exceptions">── Exceptions · GlobalExceptionHandler (@RestControllerAdvice)</div>
+<div class="grid">
+  <div class="card">
+    <div class="card-title">Excepciones propias</div>
+    <div class="smethod"><span class="exc">IdNoEncontradoException</span><span class="exc-http">→ 404 NOT_FOUND</span></div>
+    <div class="smethod"><span class="exc">ParametroInvalidoException</span><span class="exc-http">→ 400 BAD_REQUEST</span></div>
+    <div class="smethod"><span class="exc">RecursoDuplicadoException</span><span class="exc-http">→ 409 CONFLICT</span></div>
+    <div class="smethod"><span class="exc">UnautorizedExeption</span><span class="exc-http">→ 401 UNAUTHORIZED</span></div>
+    <div class="smethod"><span class="exc">MethodArgumentNotValidException</span><span class="exc-http">→ 400 · lista field: mensaje</span></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Notas</div>
+    <div style="color:#6a9955;font-size:11px;line-height:1.8;">
+      // Todas devuelven ResponseEntity con el mensaje como body String<br>
+      // El delete de usuario es SOFT (activo=false), no hard-delete<br>
+      // La verificación de ownership en controllers (Casa/Hotel/Departamento/Reserva)<br>
+      // lanza ParametroInvalidoException, no AccessDeniedException
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────────── FRONT ─────────────────── -->
+<div class="section-header" id="front">── Frontend · Páginas HTML (static/) → endpoints consumidos</div>
+<div class="grid">
+  <div class="card full-card">
+    <table class="front-table">
+      <tr class="section-row"><td colspan="2">Acceso público</td></tr>
+      <tr><td>index.html</td><td>— (landing sin fetch)</td></tr>
+      <tr><td>login.html</td><td>POST /auth/login</td></tr>
+      <tr><td>registrarse.html</td><td>POST /Usuario/registrar</td></tr>
+      <tr><td>403.html</td><td>— (error page)</td></tr>
+
+      <tr class="section-row"><td colspan="2">Usuario / perfil</td></tr>
+      <tr><td>home.html</td><td>GET /Usuario/me</td></tr>
+      <tr><td>mi-perfil.html</td><td>GET /Usuario/me</td></tr>
+      <tr><td>actualizar-perfil.html</td><td>PUT /Usuario/actualizar</td></tr>
+
+      <tr class="section-row"><td colspan="2">Alojamientos</td></tr>
+      <tr><td>listar-alojamientos.html</td><td>GET /Usuario/me</td></tr>
+      <tr><td>detalle-alojamiento.html</td><td>GET /Usuario/me</td></tr>
+      <tr><td>registrar-casa.html</td><td>GET /Usuario/me · POST /Casa/registrar</td></tr>
+      <tr><td>actualizar-casa.html</td><td>PUT /Casa/actualizar</td></tr>
+      <tr><td>registrar-departamento.html</td><td>GET /Usuario/me · POST /Departamento/registrar</td></tr>
+      <tr><td>actualizar-departamento.html</td><td>PUT /Departamento/actualizar</td></tr>
+      <tr><td>registrar-hotel.html</td><td>GET /Usuario/me · POST /Hotel/registrar</td></tr>
+      <tr><td>actualizar-hotel.html</td><td>PUT /Hotel/actualizar</td></tr>
+
+      <tr class="section-row"><td colspan="2">Reservas</td></tr>
+      <tr><td>registrar-reserva.html</td><td>GET /Usuario/me · GET /Casa/listar · GET /Hotel/listar · GET /Departamento/listar · POST /Reserva/registrar</td></tr>
+      <tr><td>actualizar-reserva.html</td><td>PUT /Reserva/actualizar</td></tr>
+      <tr><td>mis-reservas.html</td><td>GET /Reserva/listar/propios</td></tr>
+      <tr><td>listar-reservas.html</td><td>GET /Usuario/me</td></tr>
+      <tr><td>reserva-mis-alojamientos.html</td><td>GET /Reserva/listar/anfitrion</td></tr>
+
+      <tr class="section-row"><td colspan="2">Reviews</td></tr>
+      <tr><td>registrar-review.html</td><td>GET /Usuario/me · POST /Review/registrar</td></tr>
+      <tr><td>editar-review.html</td><td>PUT /Review/actualizar</td></tr>
+      <tr><td>mis-reviews.html</td><td>GET /Usuario/me</td></tr>
+      <tr><td>listar-review.html</td><td>GET /Usuario/me · GET /Review/listar</td></tr>
+
+      <tr class="section-row"><td colspan="2">Galería</td></tr>
+      <tr><td>upload-galeria.html</td><td>POST /gallery/upload</td></tr>
+      <tr><td>editar-galeria.html</td><td>POST /gallery/upload</td></tr>
+
+      <tr class="section-row"><td colspan="2">Admin</td></tr>
+      <tr><td>listar-usuarios.html</td><td>— (usa session/local)</td></tr>
+      <tr><td>admin-editar-usuario.html</td><td>GET /Usuario/listar · PUT /Usuario/actualizar/admin</td></tr>
+      <tr><td>eliminar-usuario.html</td><td>— (navega por form)</td></tr>
+    </table>
+  </div>
+</div>
+
+</main>
+</div>
+</body>
+</html>
