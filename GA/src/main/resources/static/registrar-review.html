@@ -320,7 +320,7 @@
 
             // Filtrar: CONFIRMADA, fechaFin ya pasó, y sin review previa
             const elegibles = reservas.filter(r => {
-                if (r.tipoEstado !== 'CONFIRMADA') return false;
+                if ( r.tipoEstado !== 'FINALIZADA') return false;
                 const fin = new Date(r.fechaFin + 'T00:00:00');
                 if (fin >= hoy) return false;
                 if (yaReseniados.has(r.alojamiento?.id)) return false;
@@ -370,8 +370,7 @@
             const ciudad = a?.direccion?.ciudad || '';
             const fin = r.fechaFin || '';
             return `
-            <div class="aloj-card" onclick="seleccionar(${a.id}, '${titulo.replace(/'/g,"\\'")}', '${tipo}', '${ciudad.replace(/'/g,"\\'")}', '${fin}')">
-                <div class="aloj-card-icon">${icon}</div>
+            <div class="aloj-card" onclick='seleccionar(event, ${a.id}, ${JSON.stringify(titulo)}, ${JSON.stringify(tipo)}, ${JSON.stringify(ciudad)}, ${JSON.stringify(fin)})'>    <div class="aloj-card-icon">${icon}</div>
                 <div class="aloj-card-info">
                     <div class="aloj-card-title">${titulo}</div>
                     <div class="aloj-card-meta">${ciudad ? '📍 ' + ciudad + ' · ' : ''}Estadía hasta ${fin}</div>

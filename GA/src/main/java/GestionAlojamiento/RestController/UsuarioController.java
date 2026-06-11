@@ -38,7 +38,7 @@ public class UsuarioController {
     // recomiendo registrar un cliente desde el front, el admin siempre sera id 1.
     @PostMapping("/registrar")
     public ResponseEntity<?> registrar(@Valid @RequestBody UsuarioRegistroDTO dto) {
-       /* String passwordEncriptada = new BCryptPasswordEncoder().encode("admin");
+        /*String passwordEncriptada = new BCryptPasswordEncoder().encode("admin");
         Usuario admin = new Usuario();
         admin.setNombre("admin");
         admin.setEmail("admin@correo.com");
