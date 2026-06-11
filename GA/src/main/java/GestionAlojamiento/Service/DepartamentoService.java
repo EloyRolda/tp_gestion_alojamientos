@@ -20,6 +20,8 @@ public class DepartamentoService {
     private final UsuarioService usuarioService;
     private final AlojamientoService alojamientoService;
     private final GalleryService galleryService;
+    private final ReservaService reservaService;
+    private final ReviewService reviewService;
 
     //---------------------------------------- LISTAR ----------------------------------------
     public List<Departamento> listarTodos() {
@@ -55,9 +57,12 @@ public class DepartamentoService {
     //---------------------------------------- BORRAR ----------------------------------------
     @Transactional
     public void borrarPorId(Long id_departamento) {
-        if (!departamentoRepository.existsById(id_departamento)) {
-            throw new IdNoEncontradoException("Error, el id de DEPARTAMENTO no se encuentra en la base de datos:" + id_departamento);
-        }
+        Departamento departamento = departamentoRepository.findById(id_departamento)
+                .orElseThrow(() -> new IdNoEncontradoException("Error, el id de DEPARTAMENTO no se encuentra en la base de datos:" + id_departamento));
+        Alojamiento alojamiento = departamento.getAlojamiento();
+        reservaService.borrarPorAlojamientoId(alojamiento.getId());
+        reviewService.borrarPorAlojamiento(alojamiento);
+        galleryService.borrarPorAlojamientoId(alojamiento.getId());
         departamentoRepository.deleteById(id_departamento);
     }
 

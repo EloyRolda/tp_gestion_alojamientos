@@ -15,7 +15,7 @@ public class ImageService {
     private final ImageRepository imageRepository;
     private final CloudinaryService cloudinaryService;
 
-    /// Obtains all the images from a gallery
+    /// Obtiene todas las imagenes de una galeria
     public List<Image> obtainByGallery(Long id_gallery) {
         return imageRepository.findByGalleryId(id_gallery);
     }
@@ -29,5 +29,14 @@ public class ImageService {
         Image image = imageRepository.findById(id).orElseThrow(()-> new RuntimeException("Imagen not found"));
         cloudinaryService.delete(image.getPublicId());
         imageRepository.deleteById(id);
+    }
+
+    /// Borra todas las imágenes de una galería y tambien en Cloudinary
+    public void borrarPorGalleryId(Long galleryId) {
+        List<Image> imagenes = imageRepository.findByGalleryId(galleryId);
+        for (Image image : imagenes) {
+            cloudinaryService.delete(image.getPublicId());
+        }
+        imagenes.forEach(image -> imageRepository.deleteById(image.getId()));
     }
 }

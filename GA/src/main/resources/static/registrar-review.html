@@ -7,36 +7,174 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        :root { --bg: #0a0f1e; --surface: #111827; --border: #1e2d45; --accent: #3b82f6; --accent-glow: rgba(59,130,246,0.2); --text: #e2e8f0; --muted: #64748b; --error: #f87171; --success: #4ade80; --star: #fbbf24; }
-        body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
-        body::before { content: ''; position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, rgba(251,191,36,0.05) 0%, transparent 70%); top: -150px; left: -150px; pointer-events: none; }
-        .container { width: 100%; max-width: 480px; }
-        .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 14px; transition: color 0.2s; }
-        .back-link:hover { color: var(--text); }
-        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 36px 32px; animation: fadeUp 0.4s ease both; }
-        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
-        .logo { text-align: center; margin-bottom: 28px; }
-        .logo-icon { width: 48px; height: 48px; background: linear-gradient(135deg, #d97706, #f59e0b); border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 14px; }
-        h1 { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 4px; }
-        .subtitle { color: var(--muted); font-size: 14px; }
-        .field { margin-bottom: 20px; }
-        label { display: block; font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.6px; }
-        input[type="number"], textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
-        input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
-        input::placeholder, textarea::placeholder { color: var(--muted); }
-        textarea { resize: vertical; min-height: 110px; }
+        :root {
+            --bg: #0a0f1e; --surface: #111827; --surface2: #1a2435;
+            --border: #1e2d45; --accent: #3b82f6; --accent-glow: rgba(59,130,246,0.2);
+            --text: #e2e8f0; --muted: #64748b; --error: #f87171; --success: #4ade80; --star: #fbbf24;
+        }
+        body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); min-height: 100vh; }
+
+        /* ── HEADER ── */
+        header {
+            background: var(--surface); border-bottom: 1px solid var(--border);
+            padding: 16px 32px; display: flex; align-items: center;
+            justify-content: space-between; position: sticky; top: 0; z-index: 10;
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .logo-icon {
+            width: 38px; height: 38px;
+            background: linear-gradient(135deg, #d97706, #f59e0b);
+            border-radius: 10px; display: flex; align-items: center;
+            justify-content: center; font-size: 18px;
+        }
+        .app-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; }
+        .header-right { display: flex; align-items: center; gap: 16px; }
+        .btn-back {
+            background: transparent; border: 1px solid var(--border); border-radius: 8px;
+            padding: 8px 14px; color: var(--muted); font-family: 'DM Sans', sans-serif;
+            font-size: 13px; cursor: pointer; text-decoration: none; transition: all 0.2s;
+        }
+        .btn-back:hover { border-color: var(--accent); color: var(--accent); }
+        .logout-link { color: #fca5a5; text-decoration: none; font-size: 13px; transition: color 0.2s; }
+        .logout-link:hover { color: #f87171; }
+
+        /* ── LOADING ── */
+        #loadingOverlay {
+            position: fixed; inset: 0; background: var(--bg);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 100; transition: opacity 0.3s;
+        }
+        .spinner {
+            width: 32px; height: 32px; border: 3px solid var(--border);
+            border-top-color: var(--accent); border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── MAIN ── */
+        main { padding: 40px 20px; max-width: 640px; margin: 0 auto; }
+
+        .page-title {
+            font-family: 'Playfair Display', serif; font-size: 24px;
+            margin-bottom: 6px;
+        }
+        .page-subtitle { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
+
+        /* ── STEP INDICATOR ── */
+        .steps {
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 32px; font-size: 13px;
+        }
+        .step {
+            display: flex; align-items: center; gap: 6px;
+            color: var(--muted); transition: color 0.2s;
+        }
+        .step.active { color: var(--text); font-weight: 600; }
+        .step.done { color: var(--success); }
+        .step-num {
+            width: 24px; height: 24px; border-radius: 50%;
+            border: 1.5px solid currentColor;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 700; flex-shrink: 0;
+        }
+        .step-sep { color: var(--border); flex-shrink: 0; }
+
+        /* ── ALOJAMIENTO CARDS ── */
+        .section-label {
+            font-size: 11px; font-weight: 700; letter-spacing: 1.1px;
+            text-transform: uppercase; color: var(--muted);
+            margin-bottom: 14px;
+        }
+        .aloj-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+
+        .aloj-card {
+            background: var(--surface); border: 1.5px solid var(--border);
+            border-radius: 12px; padding: 16px 18px;
+            cursor: pointer; transition: border-color 0.2s, background 0.2s;
+            display: flex; align-items: center; gap: 14px;
+        }
+        .aloj-card:hover { border-color: #2d3f5c; background: var(--surface2); }
+        .aloj-card.selected {
+            border-color: var(--accent);
+            background: rgba(59,130,246,0.06);
+        }
+        .aloj-card-icon {
+            width: 42px; height: 42px; border-radius: 10px; flex-shrink: 0;
+            background: var(--surface2); display: flex; align-items: center;
+            justify-content: center; font-size: 20px;
+            border: 1px solid var(--border);
+        }
+        .aloj-card.selected .aloj-card-icon {
+            background: rgba(59,130,246,0.12);
+            border-color: rgba(59,130,246,0.3);
+        }
+        .aloj-card-info { flex: 1; min-width: 0; }
+        .aloj-card-title { font-size: 14px; font-weight: 600; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .aloj-card-meta { font-size: 12px; color: var(--muted); }
+        .aloj-card-check {
+            width: 20px; height: 20px; border-radius: 50%;
+            border: 1.5px solid var(--border); flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; color: transparent; transition: all 0.2s;
+        }
+        .aloj-card.selected .aloj-card-check {
+            background: var(--accent); border-color: var(--accent);
+            color: #fff;
+        }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            text-align: center; padding: 48px 24px;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; color: var(--muted);
+        }
+        .empty-state .empty-icon { font-size: 40px; margin-bottom: 14px; }
+        .empty-state p { font-size: 14px; line-height: 1.6; }
+
+        /* ── FORM ── */
+        #formSection { display: none; animation: fadeUp 0.35s ease both; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+        .selected-preview {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; padding: 14px 16px; margin-bottom: 24px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .selected-preview-icon { font-size: 20px; }
+        .selected-preview-name { font-size: 14px; font-weight: 600; }
+        .selected-preview-meta { font-size: 12px; color: var(--muted); }
+        .btn-change {
+            margin-left: auto; background: transparent;
+            border: 1px solid var(--border); border-radius: 6px;
+            padding: 5px 10px; color: var(--muted); font-family: 'DM Sans', sans-serif;
+            font-size: 12px; cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+        }
+        .btn-change:hover { border-color: var(--accent); color: var(--accent); }
+
+        .field { margin-bottom: 22px; }
+        label {
+            display: block; font-size: 12px; font-weight: 500; color: var(--muted);
+            margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.6px;
+        }
+        textarea {
+            width: 100%; background: var(--bg); border: 1px solid var(--border);
+            border-radius: 10px; padding: 12px 14px; color: var(--text);
+            font-family: 'DM Sans', sans-serif; font-size: 14px;
+            outline: none; resize: vertical; min-height: 110px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+        textarea::placeholder { color: var(--muted); }
+
         /* Estrellas interactivas */
         .stars-row { display: flex; gap: 8px; }
         .star-opt input[type="radio"] { display: none; }
         .star-opt label {
-            font-size: 28px; cursor: pointer; color: var(--border);
+            font-size: 32px; cursor: pointer; color: var(--border);
             transition: color 0.15s, transform 0.1s;
             display: block; line-height: 1;
             text-transform: none; letter-spacing: 0;
         }
-        .star-opt input[type="radio"]:checked ~ .star-opt label,
-        .star-opt label:hover { color: var(--star); }
-        /* CSS-only star fill trick */
         .stars-row:has(.star-opt:nth-child(1) input:checked) .star-opt:nth-child(1) label { color: var(--star); }
         .stars-row:has(.star-opt:nth-child(2) input:checked) .star-opt:nth-child(1) label,
         .stars-row:has(.star-opt:nth-child(2) input:checked) .star-opt:nth-child(2) label { color: var(--star); }
@@ -48,39 +186,75 @@
         .stars-row:has(.star-opt:nth-child(4) input:checked) .star-opt:nth-child(3) label,
         .stars-row:has(.star-opt:nth-child(4) input:checked) .star-opt:nth-child(4) label { color: var(--star); }
         .stars-row:has(.star-opt:nth-child(5) input:checked) .star-opt label { color: var(--star); }
-        .star-opt label:hover { transform: scale(1.2); }
-        .hint { font-size: 11px; color: var(--muted); margin-top: 5px; }
+        .star-opt label:hover { transform: scale(1.15); color: var(--star) !important; }
+
         .msg { border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 18px; display: none; }
-        .msg.error { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: var(--error); }
-        .msg.success { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); color: var(--success); }
-        .btn { width: 100%; background: linear-gradient(135deg, #d97706, #f59e0b); border: none; border-radius: 10px; padding: 14px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.1s; margin-top: 4px; }
+        .msg.error   { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: var(--error); }
+        .msg.success { background: rgba(74,222,128,0.1);  border: 1px solid rgba(74,222,128,0.3);  color: var(--success); }
+
+        .btn {
+            width: 100%; background: linear-gradient(135deg, #d97706, #f59e0b);
+            border: none; border-radius: 10px; padding: 14px; color: #fff;
+            font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600;
+            cursor: pointer; transition: opacity 0.2s, transform 0.1s; margin-top: 4px;
+        }
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
         .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-        .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
-        .logout-link { color: #fca5a5; text-decoration: none; font-size: 14px; transition: color 0.2s; }
-        .logout-link:hover { color: #f87171; }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="header-actions">
-        <a href="/home.html" class="back-link">← Volver al panel</a>
+
+<div id="loadingOverlay"><div class="spinner"></div></div>
+
+<header>
+    <div class="header-left">
+        <div class="logo-icon">⭐</div>
+        <span class="app-title">Gestión Alojamiento</span>
+    </div>
+    <div class="header-right">
+        <a href="/mis-reviews.html" class="btn-back">← Volver</a>
         <a href="#" onclick="cerrarSesion()" class="logout-link">Cerrar sesión</a>
     </div>
-    <div class="card">
-        <div class="logo">
-            <div class="logo-icon">⭐</div>
-            <h1>Dejar una Review</h1>
-            <p class="subtitle">Contá tu experiencia en el alojamiento</p>
+</header>
+
+<main id="mainContent" style="display:none">
+    <div class="page-title">Dejar una review</div>
+    <p class="page-subtitle">Solo podés reseñar alojamientos donde ya completaste una estadía confirmada.</p>
+
+    <!-- Indicador de pasos -->
+    <div class="steps">
+        <div class="step active" id="step1">
+            <span class="step-num">1</span>
+            <span>Elegí el alojamiento</span>
+        </div>
+        <span class="step-sep">›</span>
+        <div class="step" id="step2">
+            <span class="step-num">2</span>
+            <span>Escribí tu reseña</span>
+        </div>
+    </div>
+
+    <!-- PASO 1: Lista de alojamientos disponibles para reseñar -->
+    <div id="selectionSection">
+        <div class="section-label">Tus estadías finalizadas</div>
+        <div class="aloj-list" id="alojList">
+            <!-- se llena dinámicamente -->
+        </div>
+    </div>
+
+    <!-- PASO 2: Formulario de review -->
+    <div id="formSection">
+        <!-- Preview del alojamiento seleccionado -->
+        <div class="selected-preview" id="selectedPreview">
+            <span class="selected-preview-icon" id="selectedIcon"></span>
+            <div>
+                <div class="selected-preview-name" id="selectedName"></div>
+                <div class="selected-preview-meta" id="selectedMeta"></div>
+            </div>
+            <button class="btn-change" onclick="volverASeleccion()">Cambiar</button>
         </div>
 
         <div class="msg" id="msg"></div>
-
-        <div class="field">
-            <label for="idAlojamiento">ID del Alojamiento</label>
-            <input type="number" id="idAlojamiento" placeholder="Ej: 3" min="1">
-            <p class="hint">El ID lo encontrás al listar los alojamientos</p>
-        </div>
 
         <div class="field">
             <label>Puntuación</label>
@@ -100,66 +274,217 @@
 
         <button class="btn" id="submitBtn" onclick="enviar()">Publicar review</button>
     </div>
-</div>
+</main>
 
 <script>
-    // ==================== GUARD DE AUTENTICACIÓN ====================
-    if (!localStorage.getItem('token')) {
-        window.location.href = '/login.html';
-    }
+    if (!localStorage.getItem('token')) window.location.href = '/login.html';
 
-    // ==================== CERRAR SESIÓN ====================
     function cerrarSesion() {
         localStorage.removeItem('token');
         window.location.href = '/login.html';
     }
 
+    const TIPO_ICON = { CASA: '🏠', HOTEL: '🏨', DEPARTAMENTO: '🏢' };
+
     let idCliente = null;
-    fetch('/Usuario/me', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } }).then(r => r.json()).then(u => { idCliente = u.id; }).catch(() => {});
+    let alojamientoSeleccionado = null; // { id, titulo, tipo, reservaFin }
+
+    function authHeaders() {
+        return {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+        };
+    }
+
+    async function init() {
+        try {
+            // Cargar usuario
+            const meResp = await fetch('/Usuario/me', { headers: authHeaders() });
+            if (!meResp.ok) { window.location.href = '/login.html'; return; }
+            const usuario = await meResp.json();
+            idCliente = usuario.id;
+
+            // Cargar reservas y reviews del cliente en paralelo
+            const [resResp, revResp] = await Promise.all([
+                fetch('/Reserva/listar/propios', { headers: authHeaders() }),
+                fetch(`/Review/cliente/${idCliente}`, { headers: authHeaders() })
+            ]);
+            const reservas = resResp.ok ? await resResp.json() : [];
+            const reviews  = revResp.ok ? await revResp.json() : [];
+
+            // IDs de alojamientos donde el usuario ya dejó review
+            const yaReseniados = new Set(reviews.map(r => r.alojamiento?.id));
+
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+
+            // Filtrar: CONFIRMADA, fechaFin ya pasó, y sin review previa
+            const elegibles = reservas.filter(r => {
+                if (r.tipoEstado !== 'CONFIRMADA') return false;
+                const fin = new Date(r.fechaFin + 'T00:00:00');
+                if (fin >= hoy) return false;
+                if (yaReseniados.has(r.alojamiento?.id)) return false;
+                return true;
+            });
+
+            // Deduplicar por alojamiento (si reservó varias veces, mostrar una vez)
+            const vistos = new Set();
+            const unicos = elegibles.filter(r => {
+                const idAloj = r.alojamiento?.id;
+                if (vistos.has(idAloj)) return false;
+                vistos.add(idAloj);
+                return true;
+            });
+
+            renderLista(unicos);
+        } catch (e) {
+            document.getElementById('alojList').innerHTML =
+                '<p style="color:var(--error);font-size:14px">Error cargando tus estadías.</p>';
+        } finally {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+            }, 300);
+        }
+    }
+
+    function renderLista(reservas) {
+        const list = document.getElementById('alojList');
+        if (reservas.length === 0) {
+            list.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">🏡</div>
+                    <p>No tenés estadías finalizadas disponibles para reseñar.<br>
+                    Solo podés dejar una review tras completar una reserva confirmada.</p>
+                </div>`;
+            return;
+        }
+
+        list.innerHTML = reservas.map(r => {
+            const a = r.alojamiento;
+            const tipo = a?.tipoInmueble || 'CASA';
+            const icon = TIPO_ICON[tipo] || '🏠';
+            const titulo = a?.titulo || 'Alojamiento';
+            const ciudad = a?.direccion?.ciudad || '';
+            const fin = r.fechaFin || '';
+            return `
+            <div class="aloj-card" onclick="seleccionar(${a.id}, '${titulo.replace(/'/g,"\\'")}', '${tipo}', '${ciudad.replace(/'/g,"\\'")}', '${fin}')">
+                <div class="aloj-card-icon">${icon}</div>
+                <div class="aloj-card-info">
+                    <div class="aloj-card-title">${titulo}</div>
+                    <div class="aloj-card-meta">${ciudad ? '📍 ' + ciudad + ' · ' : ''}Estadía hasta ${fin}</div>
+                </div>
+                <div class="aloj-card-check">✓</div>
+            </div>`;
+        }).join('');
+    }
+
+    function seleccionar(idAloj, titulo, tipo, ciudad, fechaFin) {
+        alojamientoSeleccionado = { id: idAloj, titulo, tipo, ciudad, fechaFin };
+
+        // Marcar card seleccionada
+        document.querySelectorAll('.aloj-card').forEach(c => c.classList.remove('selected'));
+        event.currentTarget.classList.add('selected');
+
+        // Pequeño delay para que se vea el efecto antes de pasar al paso 2
+        setTimeout(() => mostrarFormulario(), 220);
+    }
+
+    function mostrarFormulario() {
+        const a = alojamientoSeleccionado;
+        document.getElementById('selectedIcon').textContent = TIPO_ICON[a.tipo] || '🏠';
+        document.getElementById('selectedName').textContent = a.titulo;
+        document.getElementById('selectedMeta').textContent =
+            (a.ciudad ? '📍 ' + a.ciudad + ' · ' : '') + 'Estadía hasta ' + a.fechaFin;
+
+        // Reset form
+        document.querySelectorAll('input[name="puntuacion"]').forEach(r => r.checked = false);
+        document.getElementById('comentario').value = '';
+        document.getElementById('msg').style.display = 'none';
+
+        // Pasos
+        document.getElementById('step1').classList.remove('active');
+        document.getElementById('step1').classList.add('done');
+        document.getElementById('step1').querySelector('.step-num').textContent = '✓';
+        document.getElementById('step2').classList.add('active');
+
+        document.getElementById('selectionSection').style.display = 'none';
+        const form = document.getElementById('formSection');
+        form.style.display = 'block';
+        // re-trigger animation
+        form.style.animation = 'none';
+        form.offsetHeight;
+        form.style.animation = '';
+    }
+
+    function volverASeleccion() {
+        alojamientoSeleccionado = null;
+        document.getElementById('formSection').style.display = 'none';
+        document.getElementById('selectionSection').style.display = 'block';
+
+        document.getElementById('step1').classList.add('active');
+        document.getElementById('step1').classList.remove('done');
+        document.getElementById('step1').querySelector('.step-num').textContent = '1';
+        document.getElementById('step2').classList.remove('active');
+
+        document.querySelectorAll('.aloj-card').forEach(c => c.classList.remove('selected'));
+    }
 
     async function enviar() {
         const btn = document.getElementById('submitBtn');
         const msg = document.getElementById('msg');
         msg.style.display = 'none';
 
-        const idAlojamiento = parseInt(document.getElementById('idAlojamiento').value);
         const puntuacionEl = document.querySelector('input[name="puntuacion"]:checked');
-
-        if (!idAlojamiento || idAlojamiento < 1) {
-            msg.className = 'msg error'; msg.textContent = 'Ingresá un ID de alojamiento válido.';
-            msg.style.display = 'block'; return;
-        }
-
         if (!puntuacionEl) {
-            msg.className = 'msg error'; msg.textContent = 'Por favor seleccioná una puntuación.';
-            msg.style.display = 'block'; return;
+            mostrarMsg('error', 'Por favor seleccioná una puntuación.');
+            return;
+        }
+        const comentario = document.getElementById('comentario').value.trim();
+        if (!comentario) {
+            mostrarMsg('error', 'El comentario no puede estar vacío.');
+            return;
         }
 
         const datos = {
             idCliente,
-            idAlojamiento: idAlojamiento,
+            idAlojamiento: alojamientoSeleccionado.id,
             puntuacion:    parseInt(puntuacionEl.value),
-            comentario:    document.getElementById('comentario').value,
+            comentario
         };
 
         btn.disabled = true; btn.textContent = 'Publicando...';
         try {
             const resp = await fetch('/Review/registrar', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('token')
-                },
+                headers: authHeaders(),
                 body: JSON.stringify(datos)
             });
             const texto = await resp.text();
-            msg.className = resp.ok ? 'msg success' : 'msg error';
-            msg.textContent = resp.ok ? '¡Review publicada correctamente!' : 'Error: ' + texto;
+            if (resp.ok) {
+                mostrarMsg('success', '¡Review publicada correctamente! Redirigiendo...');
+                btn.disabled = true;
+                setTimeout(() => window.location.href = '/mis-reviews.html', 2000);
+            } else {
+                mostrarMsg('error', 'Error: ' + texto);
+                btn.disabled = false; btn.textContent = 'Publicar review';
+            }
         } catch {
-            msg.className = 'msg error'; msg.textContent = 'No se pudo conectar con el servidor.';
+            mostrarMsg('error', 'No se pudo conectar con el servidor.');
+            btn.disabled = false; btn.textContent = 'Publicar review';
         }
-        msg.style.display = 'block'; btn.disabled = false; btn.textContent = 'Publicar review';
     }
+
+    function mostrarMsg(tipo, texto) {
+        const msg = document.getElementById('msg');
+        msg.className = 'msg ' + tipo;
+        msg.textContent = texto;
+        msg.style.display = 'block';
+    }
+
+    init();
 </script>
 </body>
 </html>

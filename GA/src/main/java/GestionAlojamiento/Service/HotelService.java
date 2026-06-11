@@ -20,6 +20,8 @@ public class HotelService {
     private final UsuarioService usuarioService;
     private final AlojamientoService alojamientoService;
     private final GalleryService galleryService;
+    private final ReservaService reservaService;
+    private final ReviewService reviewService;
 
     //---------------------------------------- LISTAR ----------------------------------------
     public List<Hotel> listarTodos() {
@@ -55,9 +57,12 @@ public class HotelService {
     //---------------------------------------- BORRAR ----------------------------------------
     @Transactional
     public void borrarPorId(Long id_hotel) {
-        if (!hotelRepository.existsById(id_hotel)) {
-            throw new IdNoEncontradoException("Error, el id de HOTEL no se encuentra en la base de datos:" + id_hotel);
-        }
+        Hotel hotel = hotelRepository.findById(id_hotel)
+                .orElseThrow(() -> new IdNoEncontradoException("Error, el id de HOTEL no se encuentra en la base de datos:" + id_hotel));
+        Alojamiento alojamiento = hotel.getAlojamiento();
+        reservaService.borrarPorAlojamientoId(alojamiento.getId());
+        reviewService.borrarPorAlojamiento(alojamiento);
+        galleryService.borrarPorAlojamientoId(alojamiento.getId());
         hotelRepository.deleteById(id_hotel);
     }
 
@@ -75,9 +80,7 @@ public class HotelService {
         if (dto.getIncluyeLimpieza() != null) {
             hotel.setIncluyeLimpieza(dto.getIncluyeLimpieza());
         }
-
         hotel.setAlojamiento(alojamientoService.modificarObjeto(hotel.getAlojamiento(), mapearAlojamiento(dto)));
-
         return hotelRepository.save(hotel);
     }
 

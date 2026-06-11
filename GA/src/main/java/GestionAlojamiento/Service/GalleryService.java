@@ -4,6 +4,7 @@ import GestionAlojamiento.Exception.IdNoEncontradoException;
 import GestionAlojamiento.Model.Alojamiento;
 import GestionAlojamiento.Model.Gallery;
 import GestionAlojamiento.Repository.GalleryRepository;
+//Amongus
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ public class GalleryService {
 
     private final GalleryRepository galleryRepository;
     private final AlojamientoService alojamientoService;
+    private final ImageService imageService;
 
     /// Retorna la galería asociada a un alojamiento
     public Gallery getGalleryByAlojamiento(Long idAlojamiento) {
@@ -47,5 +49,14 @@ public class GalleryService {
     /// Crea una nueva galería
     public Gallery createGallery(Gallery gallery) {
         return galleryRepository.save(gallery);
+    }
+
+    /// Borra la galería asociada a un alojamiento (usado al eliminar un alojamiento)
+    public void borrarPorAlojamientoId(Long alojamientoId) {
+        Gallery gallery = galleryRepository.findByAlojamientoId(alojamientoId);
+        if (gallery != null) {
+            imageService.borrarPorGalleryId(gallery.getId());
+            galleryRepository.deleteByAlojamientoId(alojamientoId);
+        }
     }
 }

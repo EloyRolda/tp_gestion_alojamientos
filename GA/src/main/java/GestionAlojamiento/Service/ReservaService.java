@@ -6,6 +6,7 @@ import GestionAlojamiento.Exception.IdNoEncontradoException;
 import GestionAlojamiento.Exception.ParametroInvalidoException;
 import GestionAlojamiento.Model.*;
 import GestionAlojamiento.Model.Enums.TipoEstado;
+import GestionAlojamiento.Model.Enums.TipoUsuario;
 import GestionAlojamiento.Repository.ReservaRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -117,6 +118,37 @@ public class ReservaService {
         reservaRepository.deleteById(id);
     }
 
+    @Transactional
+    /// Borra todas las reservas asociadas a un alojamiento (usado al eliminar un alojamiento)
+    public void borrarPorAlojamientoId(Long alojamientoId) {
+        reservaRepository.deleteByAlojamientoId(alojamientoId);
+    }
+
+    @Transactional
+    /// Finaliza una reserva confirmada cuya fecha de fin ya pasó. Solo puede hacerlo el anfitrión del alojamiento o un administrador.
+    public Reserva finalizar(Long id, String emailSolicitante) {
+        Reserva reserva = obtenerPorId(id);
+
+        if (reserva.getTipoEstado() != TipoEstado.CONFIRMADA) {
+            throw new ParametroInvalidoException("Solo se pueden finalizar reservas con estado CONFIRMADA.");
+        }
+
+        if (!reserva.getFechaFin().isBefore(LocalDate.now())) {
+            throw new ParametroInvalidoException("La reserva aún no ha finalizado.");
+        }
+
+        Usuario solicitante = usuarioService.obtenerPorEmail(emailSolicitante);
+        boolean esAdmin = solicitante.getTipoUsuario() == GestionAlojamiento.Model.Enums.TipoUsuario.ADMINISTRADOR;
+        boolean esAnfitrionDueño = reserva.getAlojamiento().getAnfitrion().getId().equals(solicitante.getId());
+
+        if (!esAdmin && !esAnfitrionDueño) {
+            throw new ParametroInvalidoException("No autorizado para finalizar esta reserva.");
+        }
+
+        reserva.setTipoEstado(TipoEstado.FINALIZADA);
+        return reservaRepository.save(reserva);
+    }
+
     //------------------------ MODIFICAR ------------------------
 
     /// Valida el dto recibido y llena los campos pertinentes
@@ -206,9 +238,10 @@ public class ReservaService {
     }
 
 
-    /// VERIFICA SI EL CLIENTE TUVO UNA RESERVA CONFIRMADA QUE YA PASO Y DEVUELVE V O F
+    /// VERIFICA SI EL CLIENTE TUVO UNA RESERVA CONFIRMADA O FINALIZADA QUE YA PASO Y DEVUELVE V O F
     public boolean tuvisteReservaConfirmada(Long clienteId, Long alojamientoId) {
-        return reservaRepository.existsByClienteIdAndAlojamientoIdAndTipoEstadoAndFechaFinBefore(clienteId, alojamientoId, TipoEstado.CONFIRMADA, LocalDate.now());
+        return reservaRepository.existsByClienteIdAndAlojamientoIdAndTipoEstadoAndFechaFinBefore(clienteId, alojamientoId, TipoEstado.CONFIRMADA, LocalDate.now())
+                || reservaRepository.existsByClienteIdAndAlojamientoIdAndTipoEstadoAndFechaFinBefore(clienteId, alojamientoId, TipoEstado.FINALIZADA, LocalDate.now());
     }
 
 

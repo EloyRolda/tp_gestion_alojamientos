@@ -612,11 +612,14 @@
     let usuarioActual = null;
 
     const tipo = new URLSearchParams(location.search).get('tipo') || 'casas';
+    const misPropios = new URLSearchParams(location.search).get('mis-propios') === 'true';
     const cfg = CONFIG[tipo] || CONFIG.casas;
 
     const tabEl = document.getElementById('tab-' + tipo);
     if (tabEl) tabEl.classList.add('active');
-    document.getElementById('pageSubtitle').textContent = '— ' + cfg.label;
+    document.getElementById('pageSubtitle').textContent = misPropios
+        ? '— Mis ' + cfg.label.split(' ').slice(1).join(' ')
+        : '— ' + cfg.label;
 
     function getAuthHeaders() {
         return {
@@ -647,7 +650,11 @@
             });
             if (meResp.ok) usuarioActual = await meResp.json();
 
-            const resp = await fetch(cfg.url, {
+            const url = misPropios
+                ? cfg.url.replace('/listar', '/listar/propios')
+                : cfg.url;
+
+            const resp = await fetch(url, {
                 headers: getAuthHeaders()
             });
             if (!resp.ok) throw new Error('Error ' + resp.status);

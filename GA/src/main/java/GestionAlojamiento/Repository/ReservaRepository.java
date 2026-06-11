@@ -21,4 +21,6 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
     List<Reserva> findByAlojamientoIdIn(List<Long> alojamientoIds);
 
+    void deleteByAlojamientoId(Long alojamientoId);
+
 }

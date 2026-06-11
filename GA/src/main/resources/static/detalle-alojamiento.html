@@ -34,7 +34,7 @@
             min-height: 100vh;
         }
 
-        /* ── HEADER ── */
+        /* HEADER */
         header {
             background: var(--surface);
             border-bottom: 1px solid var(--border);
@@ -106,14 +106,14 @@
             color: #f87171;
         }
 
-        /* ── MAIN ── */
+        /* MAIN */
         main {
             padding: 32px;
             max-width: 900px;
             margin: 0 auto;
         }
 
-        /* ── LOADING ── */
+        /* LOADING */
         #loadingOverlay {
             position: fixed;
             inset: 0;
@@ -140,7 +140,7 @@
             }
         }
 
-        /* ── ALOJAMIENTO DETAIL ── */
+        /* DETAIL CARD */
         .detail-card {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -240,9 +240,67 @@
             border-top: 1px solid var(--border);
             padding-top: 16px;
             margin-top: 4px;
+            margin-bottom: 20px;
         }
 
-        /* ── GALERÍA ── */
+        /* TOGGLE BUTTON */
+        .toggle-detalles-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 9px 16px;
+            color: var(--muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .toggle-detalles-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-glow);
+        }
+
+        .toggle-detalles-btn .toggle-arrow {
+            display: inline-block;
+            transition: transform 0.25s ease;
+            line-height: 1;
+        }
+
+        .toggle-detalles-btn.open .toggle-arrow {
+            transform: rotate(180deg);
+        }
+
+        /* DETAILS PANEL — animated with max-height trick */
+        .mas-detalles-panel {
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 0.4s ease, opacity 0.3s ease, margin-top 0.3s ease;
+            margin-top: 0;
+        }
+
+        .mas-detalles-panel.open {
+            max-height: 900px;
+            opacity: 1;
+            margin-top: 20px;
+        }
+
+        .mas-detalles-panel .info-grid {
+            margin-bottom: 12px;
+        }
+
+        .mas-detalles-panel .info-grid:last-child {
+            margin-bottom: 0;
+        }
+
+        /* GALLERY */
         .gallery-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -264,7 +322,7 @@
             transform: scale(1.03);
         }
 
-        /* ── ACCIONES ── */
+        /* ACTIONS */
         .actions-row {
             display: flex;
             gap: 10px;
@@ -335,7 +393,7 @@
             background: rgba(127, 29, 29, 0.55);
         }
 
-        /* ── REVIEWS ── */
+        /* REVIEWS */
         .section-title {
             font-size: 11px;
             font-weight: 700;
@@ -417,7 +475,7 @@
             font-size: 14px;
         }
 
-        /* ── LIGHTBOX ── */
+        /* LIGHTBOX */
         .lightbox {
             display: none;
             position: fixed;
@@ -533,8 +591,6 @@
 </header>
 
 <main id="mainContent" style="display:none">
-
-    <!-- Info del alojamiento -->
     <div class="detail-card" id="detailCard">
         <div class="detail-head" id="detailHead">
             <div>
@@ -543,25 +599,19 @@
         </div>
         <div class="detail-body" id="detailBody"></div>
     </div>
-    <!-- Galería -->
+
     <div class="section-title" id="galeriaTitulo" style="display:none">🖼️ Galería</div>
     <div class="gallery-grid" id="galeriaGrid"></div>
-    <!-- Acciones según rol -->
+
     <div class="actions-row" id="acciones"></div>
 
-    <!-- Reseñas -->
     <div class="section-title">⭐ Reseñas</div>
     <div id="reviews"></div>
-
 </main>
 
 <script>
-    // ==================== GUARD DE AUTENTICACIÓN ====================
-    if (!localStorage.getItem('token')) {
-        window.location.href = '/login.html';
-    }
+    if (!localStorage.getItem('token')) window.location.href = '/login.html';
 
-    // ==================== CERRAR SESIÓN ====================
     function cerrarSesion() {
         localStorage.removeItem('token');
         window.location.href = '/login.html';
@@ -570,7 +620,6 @@
     const params = new URLSearchParams(location.search);
     const id = params.get('id');
     const tipo = params.get('tipo') || 'casas';
-
     let usuario = null;
 
     async function cargarUsuario() {
@@ -582,10 +631,7 @@
     }
 
     async function cargarAlojamiento() {
-        let url = '';
-        if (tipo === 'casas') url = `/Casa/mostrar/${id}`;
-        else if (tipo === 'hoteles') url = `/Hotel/mostrar/${id}`;
-        else url = `/Departamento/mostrar/${id}`;
+        let url = tipo === 'casas' ? `/Casa/mostrar/${id}` : tipo === 'hoteles' ? `/Hotel/mostrar/${id}` : `/Departamento/mostrar/${id}`;
 
         const resp = await fetch(url, {headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}});
         if (!resp.ok) {
@@ -600,40 +646,89 @@
 
         const activo = a.activo !== false;
         document.getElementById('detailHead').innerHTML = `
-            <div>
-                <div class="aloj-titulo">${a.titulo || 'Sin título'}</div>
-            </div>
+            <div><div class="aloj-titulo">${a.titulo || 'Sin título'}</div></div>
             <span class="aloj-estado ${activo ? 'estado-activo' : 'estado-inactivo'}">
                 ${activo ? '✅ Activo' : '❌ Inactivo'}
-            </span>
-        `;
+            </span>`;
 
-        const direccion = [a.direccion?.calle, a.direccion?.numero, a.direccion?.ciudad].filter(Boolean).join(' ');
+        const dir = a.direccion;
+        const direccionSimple = dir ? [dir.calle, dir.altura, dir.ciudad].filter(Boolean).join(' ') : null;
+        const direccionCompleta = dir ? [dir.calle, dir.altura, dir.ciudad, dir.provincia, dir.pais, dir.codigoPostal].filter(Boolean).join(', ') : null;
+        const srv = a.servicio || {};
+
+        const extrasHTML = tipo === 'casas' ? `
+            <div class="info-item"><div class="info-label">🌿 Patio</div><div class="info-value">${data.tienePatio ? '✅ Sí' : '❌ No'}</div></div>
+            <div class="info-item"><div class="info-label">🏊 Pileta</div><div class="info-value">${data.tienePileta ? '✅ Sí' : '❌ No'}</div></div>
+            <div class="info-item"><div class="info-label">🔥 Parrilla</div><div class="info-value">${data.tieneParrilla ? '✅ Sí' : '❌ No'}</div></div>`
+            : tipo === 'hoteles' ? `
+            <div class="info-item"><div class="info-label">⭐ Estrellas</div><div class="info-value">${'★'.repeat(data.estrellas || 0) || '—'}</div></div>
+            <div class="info-item"><div class="info-label">🍳 Desayuno</div><div class="info-value">${data.incluyeDesayuno ? '✅ Incluido' : '❌ No'}</div></div>
+            <div class="info-item"><div class="info-label">🧹 Limpieza</div><div class="info-value">${data.incluyeLimpieza ? '✅ Incluida' : '❌ No'}</div></div>`
+                : tipo === 'departamentos' ? `
+            <div class="info-item"><div class="info-label">🏢 Piso</div><div class="info-value">${data.piso ?? '—'}</div></div>
+            <div class="info-item"><div class="info-label">🛗 Ascensor</div><div class="info-value">${data.tieneAscensor ? '✅ Sí' : '❌ No'}</div></div>
+            <div class="info-item"><div class="info-label">🧾 Expensas</div><div class="info-value">${data.expensasIncluidas ? '✅ Incluidas' : '❌ No'}</div></div>`
+                    : '';
 
         document.getElementById('detailBody').innerHTML = `
+            <!-- Vista reducida -->
             <div class="info-grid">
-                ${direccion ? `<div class="info-item"><div class="info-label">📍 Dirección</div><div class="info-value">${direccion}</div></div>` : ''}
-                ${a.precioNoche ? `<div class="info-item"><div class="info-label">💰 Precio</div><div class="info-value">$${a.precioNoche} / noche</div></div>` : ''}
+                ${direccionSimple ? `<div class="info-item"><div class="info-label">📍 Dirección</div><div class="info-value">${direccionSimple}</div></div>` : ''}
+                ${a.precioNoche ? `<div class="info-item"><div class="info-label">💰 Precio</div><div class="info-value">$${parseFloat(a.precioNoche).toLocaleString('es-AR')} / noche</div></div>` : ''}
                 ${a.capacidad ? `<div class="info-item"><div class="info-label">👥 Capacidad</div><div class="info-value">${a.capacidad} personas</div></div>` : ''}
             </div>
             ${a.descripcion ? `<div class="aloj-desc">${a.descripcion}</div>` : ''}
-        `;
+
+            <!-- Botón toggle -->
+            <button class="toggle-detalles-btn" id="toggleBtn" onclick="toggleDetalles()">
+                <span id="toggleLabel">Ver más detalles</span>
+                <span class="toggle-arrow">▼</span>
+            </button>
+
+            <!-- Panel expandible -->
+            <div id="masDetalles" class="mas-detalles-panel">
+                <div class="info-grid">
+                    ${a.cantAmbientes ? `<div class="info-item"><div class="info-label">🏠 Ambientes</div><div class="info-value">${a.cantAmbientes}</div></div>` : ''}
+                    ${a.cantHabitaciones ? `<div class="info-item"><div class="info-label">🛏️ Habitaciones</div><div class="info-value">${a.cantHabitaciones}</div></div>` : ''}
+                    ${a.cantCamas ? `<div class="info-item"><div class="info-label">🛌 Camas</div><div class="info-value">${a.cantCamas}</div></div>` : ''}
+                    ${a.cantBanios ? `<div class="info-item"><div class="info-label">🚿 Baños</div><div class="info-value">${a.cantBanios}</div></div>` : ''}
+                    ${a.anfitrion?.nombre ? `<div class="info-item"><div class="info-label">👤 Anfitrión</div><div class="info-value">${a.anfitrion.nombre}</div></div>` : ''}
+                    ${direccionCompleta ? `<div class="info-item" style="grid-column:span 2"><div class="info-label">📍 Dirección completa</div><div class="info-value">${direccionCompleta}</div></div>` : ''}
+                </div>
+                <div class="info-grid">
+                    <div class="info-item"><div class="info-label">🍳 Cocina</div><div class="info-value">${srv.tieneCocina ? '✅ Sí' : '❌ No'}</div></div>
+                    <div class="info-item"><div class="info-label">📶 WiFi</div><div class="info-value">${srv.tieneWifi ? '✅ Sí' : '❌ No'}</div></div>
+                    <div class="info-item"><div class="info-label">🧺 Lavarropa</div><div class="info-value">${srv.tieneLavarropa ? '✅ Sí' : '❌ No'}</div></div>
+                    <div class="info-item"><div class="info-label">🚗 Estacionamiento</div><div class="info-value">${srv.tieneEstacionamiento ? '✅ Sí' : '❌ No'}</div></div>
+                    ${extrasHTML}
+                </div>
+            </div>`;
 
         // Botones de acción
         const acciones = document.getElementById('acciones');
         if (usuario) {
             if (usuario.tipoUsuario === 'CLIENTE') {
-                acciones.innerHTML = `<a class="btn-primary" href="/registrar-reserva.html?idAlojamiento=${id}">📅 Reservar</a>`;
+                acciones.innerHTML = `<a class="btn-primary" href="/registrar-reserva.html?idAlojamiento=${id}&tipo=${tipo}">📅 Reservar</a>`;
             }
-            if (usuario.tipoUsuario === 'ADMINISTRADOR' ||
-                (usuario.tipoUsuario === 'ANFITRION' && a.anfitrion?.id === usuario.id)) {
+            if (usuario.tipoUsuario === 'ADMINISTRADOR' || (usuario.tipoUsuario === 'ANFITRION' && a.anfitrion?.id === usuario.id)) {
                 acciones.innerHTML = `
                   <a class="btn-edit-aloj" href="/actualizar-${tipo.slice(0, -1)}.html?id=${a.id}">✏️ Editar</a>
                   <a class="btn-edit-aloj" href="/editar-galeria.html?id=${a.id}&tipo=${tipo}">🖼️ Galería</a>
-                    <button class="btn-delete-aloj" onclick="eliminarAlojamiento()">🗑️ Eliminar</button>
-                `;
+                  <button class="btn-delete-aloj" onclick="eliminarAlojamiento()">🗑️ Eliminar</button>`;
             }
         }
+    }
+
+    // ── TOGGLE ──
+    function toggleDetalles() {
+        const panel = document.getElementById('masDetalles');
+        const btn = document.getElementById('toggleBtn');
+        const label = document.getElementById('toggleLabel');
+        const isOpen = panel.classList.contains('open');
+
+        panel.classList.toggle('open', !isOpen);
+        btn.classList.toggle('open', !isOpen);
+        label.textContent = isOpen ? 'Ver más detalles' : 'Ver menos';
     }
 
     async function cargarReviews() {
@@ -644,22 +739,15 @@
         }
 
         const reviews = await resp.json();
-
         if (reviews.length === 0) {
-            document.getElementById('reviews').innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-icon">💬</div>
-                    <p>Sin reseñas todavía.</p>
-                </div>`;
+            document.getElementById('reviews').innerHTML = `<div class="empty-state"><div class="empty-icon">💬</div><p>Sin reseñas todavía.</p></div>`;
             return;
         }
-
         document.getElementById('reviews').innerHTML = reviews.map((r, i) => {
             const filled = '★'.repeat(r.puntuacion);
             const empty = '☆'.repeat(5 - r.puntuacion);
             const fecha = r.fecha ? r.fecha.split('T')[0] : '';
-            return `
-            <div class="review-card" style="animation-delay:${i * 0.06}s">
+            return `<div class="review-card" style="animation-delay:${i * 0.06}s">
                 <div class="review-top">
                     <span class="review-author">${r.cliente?.nombre || 'Usuario'}</span>
                     ${fecha ? `<span class="review-date">${fecha}</span>` : ''}
@@ -672,11 +760,7 @@
 
     async function eliminarAlojamiento() {
         if (!confirm('¿Eliminar este alojamiento?')) return;
-        let url = '';
-        if (tipo === 'casas') url = `/Casa/eliminar/${id}`;
-        else if (tipo === 'hoteles') url = `/Hotel/eliminar/${id}`;
-        else url = `/Departamento/eliminar/${id}`;
-
+        const url = tipo === 'casas' ? `/Casa/eliminar/${id}` : tipo === 'hoteles' ? `/Hotel/eliminar/${id}` : `/Departamento/eliminar/${id}`;
         const resp = await fetch(url, {
             method: 'DELETE',
             headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}
@@ -685,13 +769,27 @@
         else alert('No se pudo eliminar');
     }
 
+    async function cargarGaleria() {
+        try {
+            const gResp = await fetch(`/gallery/alojamiento/${id}`, {headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}});
+            if (!gResp.ok) return;
+            const gallery = await gResp.json();
+            const iResp = await fetch(`/gallery/${gallery.id}/images`, {headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}});
+            if (!iResp.ok) return;
+            const images = await iResp.json();
+            if (images.length === 0) return;
+            lbImages = images;
+            document.getElementById('galeriaTitulo').style.display = 'block';
+            document.getElementById('galeriaGrid').innerHTML = images.map((img, i) => `<img class="gallery-img" src="${img.url}" alt="${img.alt || ''}" onclick="lbAbrir(${i})">`).join('');
+        } catch (e) {
+        }
+    }
 
     async function init() {
         await cargarUsuario();
         await cargarAlojamiento();
         await cargarGaleria();
         await cargarReviews();
-
         const overlay = document.getElementById('loadingOverlay');
         overlay.style.opacity = '0';
         setTimeout(() => {
@@ -700,39 +798,11 @@
         }, 300);
     }
 
-    async function cargarGaleria() {
-        try {
-            const gResp = await fetch(`/gallery/alojamiento/${id}`, {
-                headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}
-            });
-            if (!gResp.ok) return;
-            const gallery = await gResp.json();
+    // LIGHTBOX
+    let lbImages = [], lbIndex = 0;
 
-            const iResp = await fetch(`/gallery/${gallery.id}/images`, {
-                headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}
-            });
-            if (!iResp.ok) return;
-            const images = await iResp.json();
-            if (images.length === 0) return;
-
-            lbImages = images;
-            document.getElementById('galeriaTitulo').style.display = 'block';
-            document.getElementById('galeriaGrid').innerHTML = images.map((img, i) => `
-    <img class="gallery-img"
-         src="${img.url}"
-         alt="${img.alt || ''}"
-         onclick="lbAbrir(${i})">
-`).join('');
-        } catch (e) {
-        }
-    }
-
-    // ── LIGHTBOX ──
-    let lbImages = [];
-    let lbIndex = 0;
-
-    function lbAbrir(index) {
-        lbIndex = index;
+    function lbAbrir(i) {
+        lbIndex = i;
         lbActualizar();
         document.getElementById('lightbox').classList.add('open');
         document.addEventListener('keydown', lbTeclado);
@@ -743,8 +813,8 @@
         document.removeEventListener('keydown', lbTeclado);
     }
 
-    function lbMover(dir) {
-        lbIndex = (lbIndex + dir + lbImages.length) % lbImages.length;
+    function lbMover(d) {
+        lbIndex = (lbIndex + d + lbImages.length) % lbImages.length;
         lbActualizar();
     }
 
@@ -762,6 +832,7 @@
 
     init();
 </script>
+
 <div class="lightbox" id="lightbox" onclick="lbCerrar()">
     <button class="lb-close" onclick="lbCerrar()">✕</button>
     <button class="lb-btn lb-prev" onclick="lbMover(-1); event.stopPropagation()">‹</button>

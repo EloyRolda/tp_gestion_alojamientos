@@ -86,6 +86,12 @@ public class ReviewService {
         reviewRepository.deleteById(id_review);
     }
 
+    @Transactional
+    /// Borra todas las reviews asociadas a un alojamiento (usado al eliminar un alojamiento)
+    public void borrarPorAlojamiento(Alojamiento alojamiento) {
+        reviewRepository.deleteByAlojamiento(alojamiento);
+    }
+
 
     //---------------------------------------- MODIFICAR ----------------------------------------
     @Transactional
@@ -124,5 +130,4 @@ public class ReviewService {
             throw new ParametroInvalidoException("El puntaje debe estar entre 1 y 5.");
         }
     }
-
 }

@@ -12,4 +12,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByAlojamiento(Alojamiento alojamiento);
 
     List<Review> findByCliente(Usuario cliente);
+
+    void deleteByAlojamiento(Alojamiento alojamiento);
 }

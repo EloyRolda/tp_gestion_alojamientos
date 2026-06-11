@@ -61,7 +61,7 @@ public class HotelController {
         String email = auth.getName(); // email del usuario logueado
         Usuario usuarioLogueado = usuarioService.obtenerPorEmail(email);
 
-        if (hotelService.obtenerPorId(id).getAlojamiento().getAnfitrion().getId() != usuarioLogueado.getId() && usuarioLogueado.getTipoUsuario() != TipoUsuario.ADMINISTRADOR) {
+        if (!hotelService.obtenerPorId(id).getAlojamiento().getAnfitrion().getId().equals(usuarioLogueado.getId())  && usuarioLogueado.getTipoUsuario() != TipoUsuario.ADMINISTRADOR) {
             throw new ParametroInvalidoException("Error al borrar, el hotel no es de su autiroia");
         }
 

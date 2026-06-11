@@ -226,11 +226,30 @@
             color: #94a3b8;
         }
 
-        .card-body {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 12px;
-            margin-bottom: 16px;
+        .estado-FINALIZADA {
+            background: rgba(139,92,246,0.15);
+            color: #c4b5fd;
+        }
+
+        .btn-finalizar {
+            margin-top: 12px;
+            background: rgba(139,92,246,0.15);
+            border: 1px solid rgba(139,92,246,0.3);
+            color: #c4b5fd;
+            border-radius: 8px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-finalizar:hover {
+            background: rgba(139,92,246,0.3);
+        }
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 12px;
+        margin-bottom: 16px;
         }
 
         .info-item {
@@ -323,6 +342,7 @@
         <button class="filter-btn" data-filter="PENDIENTE" onclick="filtrar('PENDIENTE', this)">⏳ Pendientes</button>
         <button class="filter-btn" data-filter="CONFIRMADA" onclick="filtrar('CONFIRMADA', this)">✅ Confirmadas</button>
         <button class="filter-btn" data-filter="CANCELADA" onclick="filtrar('CANCELADA', this)">❌ Canceladas</button>
+        <button class="filter-btn" data-filter="FINALIZADA" onclick="filtrar('FINALIZADA', this)">🏁 Finalizadas</button>
     </div>
 
     <div class="msg error" id="msgError"></div>
@@ -426,6 +446,10 @@
                             <div class="info-value price">${precio}</div>
                         </div>
                     </div>
+                    ${puedeFinalizarse(r) ? `
+                    <div style="padding: 0 16px 16px;">
+                        <button class="btn-finalizar" onclick="finalizarReserva(${r.id}, this)">🏁 Marcar como Finalizada</button>
+                    </div>` : ''}
                 </div>
             `;
         }).join('');
@@ -445,6 +469,34 @@
     }
 
     cargarReservas();
+
+    function puedeFinalizarse(r) {
+        if (r.tipoEstado !== 'CONFIRMADA') return false;
+        return r.fechaFin && new Date(r.fechaFin) < new Date();
+    }
+
+    async function finalizarReserva(id, btn) {
+        btn.disabled = true;
+        btn.textContent = 'Finalizando...';
+        try {
+            const resp = await fetch(`/Reserva/finalizar/${id}`, {
+                method: 'PATCH',
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+            });
+            if (!resp.ok) {
+                const err = await resp.json().catch(() => ({}));
+                throw new Error(err.message || 'Error ' + resp.status);
+            }
+            const reservaActualizada = await resp.json();
+            const idx = todasReservas.findIndex(r => r.id === id);
+            if (idx !== -1) todasReservas[idx] = reservaActualizada;
+            renderizar();
+        } catch (e) {
+            btn.disabled = false;
+            btn.textContent = '🏁 Marcar como Finalizada';
+            alert('Error al finalizar: ' + e.message);
+        }
+    }
 </script>
 </body>
 </html>

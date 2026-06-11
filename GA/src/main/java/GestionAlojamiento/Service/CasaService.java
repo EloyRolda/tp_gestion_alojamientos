@@ -20,6 +20,8 @@ public class CasaService {
     private final UsuarioService usuarioService;
     private final AlojamientoService alojamientoService;
     private final GalleryService galleryService;
+    private final ReservaService reservaService;
+    private final ReviewService reviewService;
 
     //---------------------------------------- LISTAR ----------------------------------------
     public List<Casa> listar() {
@@ -55,9 +57,12 @@ public class CasaService {
     //---------------------------------------- BORRAR ----------------------------------------
     @Transactional
     public void borrarPorId(Long id_casa) {
-        if (!casaRepository.existsById(id_casa)) {
-            throw new IdNoEncontradoException("Error, el id de CASA no se encuentra en la base de datos:" + id_casa);
-        }
+        Casa casa = casaRepository.findById(id_casa)
+                .orElseThrow(() -> new IdNoEncontradoException("Error, el id de CASA no se encuentra en la base de datos:" + id_casa));
+        Alojamiento alojamiento = casa.getAlojamiento();
+        reservaService.borrarPorAlojamientoId(alojamiento.getId());
+        reviewService.borrarPorAlojamiento(alojamiento);
+        galleryService.borrarPorAlojamientoId(alojamiento.getId());
         casaRepository.deleteById(id_casa);
     }
 
@@ -165,5 +170,4 @@ public class CasaService {
                 servicio
         );
     }
-
 }

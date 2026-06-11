@@ -407,7 +407,6 @@
                 <div class="card-body">
                     <ul>
                         <li><div class="endpoint-row"><span class="badge get">GET</span><a class="endpoint-link" href="/mis-reservas.html">📋 Ver mis reservas</a><span class="access-tag tag-cliente">VISTA</span></div></li>
-                        <li><div class="endpoint-row"><span class="badge post">POST</span><a class="endpoint-link" href="/registrar-reserva.html">📝 Crear reserva</a><span class="access-tag tag-cliente">VISTA</span></div></li>
                     </ul>
                 </div>
             </div>
@@ -421,19 +420,6 @@
                     <ul>
                         <li><div class="endpoint-row"><span class="badge get">GET</span><a class="endpoint-link" href="/mis-reviews.html">📋 Ver mis reviews</a><span class="access-tag tag-cliente">VISTA</span></div></li>
                         <li><div class="endpoint-row"><span class="badge post">POST</span><a class="endpoint-link" href="/registrar-review.html">📝 Dejar review</a><span class="access-tag tag-cliente">VISTA</span></div></li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-icon">👤</span>
-                    <span class="card-title">Mi Perfil</span>
-                </div>
-                <div class="card-body">
-                    <ul>
-                        <li><div class="endpoint-row"><span class="badge get">GET</span><a class="endpoint-link" href="/mi-perfil.html">👤 Ver mi perfil</a><span class="access-tag tag-all">VISTA</span></div></li>
-                        <li><div class="endpoint-row"><span class="badge put">PUT</span><a class="endpoint-link" href="/actualizar-perfil.html">✏️ Actualizar perfil</a><span class="access-tag tag-all">VISTA</span></div></li>
                     </ul>
                 </div>
             </div>
@@ -486,7 +472,6 @@
                     <ul>
                         <li><div class="endpoint-row"><span class="badge get">GET</span><a class="endpoint-link" href="/listar-usuarios.html">📋 Listar usuarios</a><span class="access-tag tag-admin">VISTA</span></div></li>
                         <li><div class="endpoint-row"><span class="badge put">PUT</span><a class="endpoint-link" href="/admin-editar-usuario.html">✏️ Editar usuario</a><span class="access-tag tag-admin">VISTA</span></div></li>
-                        <li><div class="endpoint-row"><span class="badge delete">DELETE</span><a class="endpoint-link" href="/eliminar-usuario.html">🗑️ Desactivar usuario</a><span class="access-tag tag-admin">VISTA</span></div></li>
                     </ul>
                 </div>
             </div>
@@ -511,6 +496,25 @@
                 <div class="card-body">
                     <ul>
                         <li><div class="endpoint-row"><span class="badge get">GET</span><a class="endpoint-link" href="/listar-review.html">📋 Todas las reviews</a><span class="access-tag tag-admin">VISTA</span></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ PERFIL — TODOS LOS ROLES ═══════════════ -->
+    <div id="perfilSection">
+        <div class="section-title">👤 Mi Cuenta</div>
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">👤</span>
+                    <span class="card-title">Mi Perfil</span>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li><div class="endpoint-row"><span class="badge get">GET</span><a class="endpoint-link" href="/mi-perfil.html">👤 Ver mi perfil</a><span class="access-tag tag-all">VISTA</span></div></li>
+                        <li><div class="endpoint-row"><span class="badge put">PUT</span><a class="endpoint-link" href="/actualizar-perfil.html">✏️ Actualizar perfil</a><span class="access-tag tag-all">VISTA</span></div></li>
                     </ul>
                 </div>
             </div>
@@ -600,11 +604,13 @@
     }
 
     function mostrarSeccionesPorRol(rol) {
-        // Sección cliente: visible para todos los roles autenticados
-        document.getElementById('clienteSection').style.display = 'block';
+        // Sección cliente: solo para CLIENTE
+        if (rol === 'CLIENTE') {
+            document.getElementById('clienteSection').style.display = 'block';
+        }
 
-        // Sección anfitrión: solo para ANFITRION y ADMINISTRADOR
-        if (rol === 'ANFITRION' || rol === 'ADMINISTRADOR') {
+        // Sección anfitrión: solo para ANFITRION
+        if (rol === 'ANFITRION') {
             document.getElementById('anfitrionSection').style.display = 'block';
         }
 

@@ -228,17 +228,9 @@
 
             <div class="msg" id="msg"></div>
 
-            <!-- Alojamiento -->
-            <div class="field">
-                <label for="idAlojamiento">Alojamiento</label>
-                <select id="idAlojamiento" onchange="onAlojamientoChange()">
-                    <option value="">Cargando alojamientos...</option>
-                </select>
-            </div>
-
-            <!-- Preview del alojamiento seleccionado -->
-            <div class="aloj-preview" id="alojPreview">
-                <div class="aloj-preview-title" id="previewTitulo"></div>
+            <!-- Preview fijo del alojamiento recibido por URL -->
+            <div class="aloj-preview visible" id="alojPreview">
+                <div class="aloj-preview-title" id="previewTitulo">Cargando...</div>
                 <div class="aloj-preview-meta">
                     <span id="previewDireccion"></span>
                     <span class="aloj-preview-price" id="previewPrecio"></span>
@@ -281,24 +273,27 @@
         window.location.href = '/login.html';
     }
 
-    let idCliente = null;
-    let alojamientosData = []; // guardamos los datos para el preview y cálculo de precio
+    // Parámetros de la URL — obligatorios
+    const params = new URLSearchParams(location.search);
+    const idAlojParam = params.get('idAlojamiento');
+    const tipoParam   = params.get('tipo');
+
+    // Guard: si no viene el alojamiento por URL, redirigir a la lista
+    if (!idAlojParam || !tipoParam) {
+        window.location.href = '/listar-alojamientos.html';
+    }
+
+    // Botón Volver apunta al detalle del alojamiento
+    document.getElementById('btnBack').href =
+        `/detalle-alojamiento.html?id=${idAlojParam}&tipo=${tipoParam}`;
 
     // Fechas mínimas: hoy
     const hoy = new Date().toISOString().split('T')[0];
     document.getElementById('fechaInicio').min = hoy;
     document.getElementById('fechaFin').min = hoy;
 
-    // Si hay ?idAlojamiento en la URL, lo pre-seleccionamos
-    const params = new URLSearchParams(location.search);
-    const idAlojParam = params.get('idAlojamiento');
-
-    // Ajustar el botón Volver: si venimos del detalle, volvemos ahí
-    const idReferer = params.get('idAlojamiento');
-    const tipoReferer = params.get('tipo');
-    if (idReferer && tipoReferer) {
-        document.getElementById('btnBack').href = `/detalle-alojamiento.html?id=${idReferer}&tipo=${tipoReferer}`;
-    }
+    let idCliente = null;
+    let alojamientoActual = null; // datos del alojamiento cargado
 
     function getAuthHeaders() {
         return {
@@ -307,77 +302,43 @@
         };
     }
 
-    async function cargarAlojamientos() {
-        const select = document.getElementById('idAlojamiento');
-        try {
-            const [casas, hoteles, deptos] = await Promise.all([
-                fetch('/Casa/listar', { headers: getAuthHeaders() }).then(r => r.ok ? r.json() : []).catch(() => []),
-                fetch('/Hotel/listar', { headers: getAuthHeaders() }).then(r => r.ok ? r.json() : []).catch(() => []),
-                fetch('/Departamento/listar', { headers: getAuthHeaders() }).then(r => r.ok ? r.json() : []).catch(() => [])
-            ]);
-
-            const todos = [...casas, ...hoteles, ...deptos];
-            // Solo activos
-            const activos = todos.filter(a => {
-                const aloj = a.alojamiento || a;
-                return aloj.activo !== false;
-            });
-
-            if (activos.length === 0) {
-                select.innerHTML = '<option value="">No hay alojamientos disponibles</option>';
-                return;
-            }
-
-            select.innerHTML = '<option value="">— Seleccioná un alojamiento —</option>';
-            activos.forEach(a => {
-                const aloj = a.alojamiento || a;
-                const tipo = aloj.tipoInmueble || (a.estrellas !== undefined ? 'HOTEL' : (a.tienePatio !== undefined ? 'CASA' : 'DEPARTAMENTO'));
-                const option = document.createElement('option');
-                option.value = aloj.id;
-                option.textContent = `${tipo} — ${aloj.titulo || 'Sin título'} · $${parseFloat(aloj.precioNoche || 0).toLocaleString('es-AR')}/noche`;
-                select.appendChild(option);
-                // guardamos el objeto completo para el preview
-                alojamientosData[aloj.id] = { ...aloj, tipoInmueble: tipo };
-            });
-
-            if (idAlojParam) {
-                select.value = idAlojParam;
-                onAlojamientoChange();
-            }
-
-        } catch(e) {
-            select.innerHTML = '<option value="">Error cargando alojamientos</option>';
-        }
-    }
-
-    function onAlojamientoChange() {
-        const id = document.getElementById('idAlojamiento').value;
-        const preview = document.getElementById('alojPreview');
-
-        if (!id || !alojamientosData[id]) {
-            preview.classList.remove('visible');
-            document.getElementById('precioEstimado').classList.remove('visible');
+    async function cargarAlojamiento() {
+        // Determinar endpoint según tipo
+        const endpoints = { casas: 'Casa', hoteles: 'Hotel', departamentos: 'Departamento' };
+        const recurso = endpoints[tipoParam];
+        if (!recurso) {
+            mostrarMsg('error', 'Tipo de alojamiento desconocido.');
             return;
         }
 
-        const a = alojamientosData[id];
-        document.getElementById('previewTitulo').textContent = a.titulo || 'Sin título';
-        const dir = a.direccion ? `${a.direccion.calle || ''} ${a.direccion.altura || ''}, ${a.direccion.ciudad || ''}`.trim() : '';
-        document.getElementById('previewDireccion').textContent = dir ? `📍 ${dir}` : '';
-        document.getElementById('previewPrecio').textContent = `$${parseFloat(a.precioNoche).toLocaleString('es-AR')}/noche`;
-        document.getElementById('previewCapacidad').textContent = a.capacidad ? `👥 ${a.capacidad} personas` : '';
-        preview.classList.add('visible');
+        try {
+            const resp = await fetch(`/${recurso}/mostrar/${idAlojParam}`, { headers: getAuthHeaders() });
+            if (!resp.ok) throw new Error('No se pudo cargar el alojamiento.');
+            const data = await resp.json();
+            const a = data.alojamiento || data;
+            alojamientoActual = a;
 
-        calcularPrecio();
+            // Mostrar preview
+            document.getElementById('previewTitulo').textContent = a.titulo || 'Sin título';
+            const dir = a.direccion
+                ? `${a.direccion.calle || ''} ${a.direccion.altura || ''}, ${a.direccion.ciudad || ''}`.trim()
+                : '';
+            document.getElementById('previewDireccion').textContent = dir ? `📍 ${dir}` : '';
+            document.getElementById('previewPrecio').textContent =
+                `$${parseFloat(a.precioNoche).toLocaleString('es-AR')}/noche`;
+            document.getElementById('previewCapacidad').textContent =
+                a.capacidad ? `👥 ${a.capacidad} personas` : '';
+        } catch (e) {
+            mostrarMsg('error', e.message || 'Error cargando el alojamiento.');
+        }
     }
 
     function calcularPrecio() {
-        const id = document.getElementById('idAlojamiento').value;
         const inicio = document.getElementById('fechaInicio').value;
-        const fin = document.getElementById('fechaFin').value;
+        const fin    = document.getElementById('fechaFin').value;
         const estimado = document.getElementById('precioEstimado');
 
-        if (!id || !inicio || !fin || !alojamientosData[id]) {
+        if (!alojamientoActual || !inicio || !fin) {
             estimado.classList.remove('visible');
             return;
         }
@@ -388,14 +349,14 @@
             return;
         }
 
-        const precio = parseFloat(alojamientosData[id].precioNoche) * dias;
+        const precio = parseFloat(alojamientoActual.precioNoche) * dias;
         document.getElementById('precioValor').textContent =
             `$${precio.toLocaleString('es-AR')} · ${dias} noche${dias !== 1 ? 's' : ''}`;
         estimado.classList.add('visible');
     }
 
     // Fecha fin mínima = fecha inicio
-    document.getElementById('fechaInicio').addEventListener('change', function() {
+    document.getElementById('fechaInicio').addEventListener('change', function () {
         document.getElementById('fechaFin').min = this.value;
         if (document.getElementById('fechaFin').value < this.value) {
             document.getElementById('fechaFin').value = '';
@@ -405,32 +366,22 @@
 
     async function enviar() {
         const btn = document.getElementById('submitBtn');
-        const msg = document.getElementById('msg');
-        msg.style.display = 'none';
+        const fechaInicio = document.getElementById('fechaInicio').value;
+        const fechaFin    = document.getElementById('fechaFin').value;
 
-        const idAlojamiento = parseInt(document.getElementById('idAlojamiento').value);
-        const fechaInicio   = document.getElementById('fechaInicio').value;
-        const fechaFin      = document.getElementById('fechaFin').value;
-
-        if (!idAlojamiento) {
-            mostrarMsg('error', 'Seleccioná un alojamiento.'); return;
-        }
-        if (!fechaInicio) {
-            mostrarMsg('error', 'Ingresá la fecha de inicio.'); return;
-        }
-        if (!fechaFin) {
-            mostrarMsg('error', 'Ingresá la fecha de fin.'); return;
-        }
+        if (!fechaInicio) { mostrarMsg('error', 'Ingresá la fecha de inicio.'); return; }
+        if (!fechaFin)    { mostrarMsg('error', 'Ingresá la fecha de fin.');    return; }
         if (fechaFin <= fechaInicio) {
-            mostrarMsg('error', 'La fecha de fin debe ser posterior a la de inicio.'); return;
+            mostrarMsg('error', 'La fecha de fin debe ser posterior a la de inicio.');
+            return;
         }
 
         const datos = {
             idCliente,
-            idAlojamiento,
+            idAlojamiento: parseInt(idAlojParam),
             fechaInicio,
             fechaFin,
-            tipoEstado: 'PENDIENTE'   // siempre PENDIENTE al crear
+            tipoEstado: 'PENDIENTE'
         };
 
         btn.disabled = true; btn.textContent = 'Reservando...';
@@ -464,7 +415,7 @@
     // Inicialización
     fetch('/Usuario/me', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } })
         .then(r => r.json())
-        .then(u => { idCliente = u.id; cargarAlojamientos(); })
+        .then(u => { idCliente = u.id; cargarAlojamiento(); })
         .catch(() => {});
 </script>
 </body>

@@ -3,6 +3,7 @@ package GestionAlojamiento.RestController;
 import GestionAlojamiento.DTO.ReservaModificarDTO;
 import GestionAlojamiento.DTO.ReservaRegistroDTO;
 import GestionAlojamiento.Exception.ParametroInvalidoException;
+import GestionAlojamiento.Model.Enums.TipoUsuario;
 import GestionAlojamiento.Model.Reserva;
 import GestionAlojamiento.Model.Usuario;
 import GestionAlojamiento.Service.ReservaService;
@@ -52,6 +53,13 @@ public class ReservaController {
         return reservaService.actualizar(reservaModificarDTO);
     }
 
+    @PatchMapping("/finalizar/{id}")
+    public Reserva finalizar(@PathVariable Long id) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        return reservaService.finalizar(id, email);
+    }
+
     @DeleteMapping("/eliminar/{id}")
     public void borrarPorId(@PathVariable Long id) {
 
@@ -64,7 +72,7 @@ public class ReservaController {
 
         if (!reserva.getCliente()
                 .getId()
-                .equals(usuarioLogueado.getId())) {
+                .equals(usuarioLogueado.getId()) && usuarioLogueado.getTipoUsuario() != TipoUsuario.ADMINISTRADOR) {
 
             throw new ParametroInvalidoException("No autorizado para eliminar esta reserva");
         }
