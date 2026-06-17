@@ -139,9 +139,9 @@ public class ReservaService {
 
         Usuario solicitante = usuarioService.obtenerPorEmail(emailSolicitante);
         boolean esAdmin = solicitante.getTipoUsuario() == GestionAlojamiento.Model.Enums.TipoUsuario.ADMINISTRADOR;
-        boolean esAnfitrionDueño = reserva.getAlojamiento().getAnfitrion().getId().equals(solicitante.getId());
+        boolean esAnfitrionDuenio = reserva.getAlojamiento().getAnfitrion().getId().equals(solicitante.getId());
 
-        if (!esAdmin && !esAnfitrionDueño) {
+        if (!esAdmin && !esAnfitrionDuenio) {
             throw new ParametroInvalidoException("No autorizado para finalizar esta reserva.");
         }
 

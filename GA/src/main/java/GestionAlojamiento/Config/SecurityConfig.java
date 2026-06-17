@@ -102,7 +102,7 @@ public class SecurityConfig {
                         .requestMatchers("/Reserva/mostrar/**").hasAnyRole("ADMIN", "ANFITRION", "CLIENTE")
                         .requestMatchers("/Reserva/registrar").hasAnyRole("ADMIN", "CLIENTE")
                         .requestMatchers("/Reserva/actualizar", "/Reserva/eliminar/**").hasAnyRole("ADMIN", "CLIENTE")
-
+                        .requestMatchers("/Reserva/finalizar/**").hasAnyRole("ADMIN", "ANFITRION")
                         // ── REVIEWS ───────────────────────────────────────────
                         .requestMatchers(
                                 "/Review/listar",
@@ -139,7 +139,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(List.of("*"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
