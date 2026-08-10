@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todas las reservas</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 6px 8px; font-size: 13px; text-align: left; }
+    </style>
+</head>
+<body>
+<p><a href="/home.html">Volver al panel</a></p>
+<h1>Todas las reservas</h1>
+
+<table>
+    <thead><tr><th>Id</th><th>Alojamiento</th><th>Cliente</th><th>Fechas</th><th>Personas</th><th>Precio</th><th>Estado</th></tr></thead>
+    <tbody id="tbody"></tbody>
+</table>
+
+<script src="/js/api.js"></script>
+<script>
+    requireLogin();
+
+    apiJson("/Reserva/listar").then(reservas => {
+        document.getElementById("tbody").innerHTML = reservas.map(r => `
+            <tr>
+                <td>${r.id}</td>
+                <td>${r.alojamiento.titulo}</td>
+                <td>${r.cliente.nombre}</td>
+                <td>${r.fechaInicio} a ${r.fechaFin}</td>
+                <td>${r.cantidadPersonas}</td>
+                <td>$${r.precioTotal}</td>
+                <td>${r.estado}</td>
+            </tr>
+        `).join("");
+    });
+</script>
+</body>
+</html>

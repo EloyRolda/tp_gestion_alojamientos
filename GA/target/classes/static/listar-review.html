@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todas las reviews</title>
+    <style>
+        body { font-family: sans-serif; max-width: 700px; margin: 0 auto; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 6px 8px; font-size: 14px; text-align: left; }
+    </style>
+</head>
+<body>
+<p><a href="/home.html">Volver al panel</a></p>
+<h1>Todas las reviews</h1>
+
+<table>
+    <thead><tr><th>Alojamiento</th><th>Cliente</th><th>Puntuacion</th><th>Comentario</th><th>Fecha</th></tr></thead>
+    <tbody id="tbody"></tbody>
+</table>
+
+<script src="/js/api.js"></script>
+<script>
+    requireLogin();
+
+    apiJson("/Review/listar").then(reviews => {
+        document.getElementById("tbody").innerHTML = reviews.map(r => `
+            <tr>
+                <td>${r.alojamiento.titulo}</td>
+                <td>${r.cliente.nombre}</td>
+                <td>${r.puntuacion}</td>
+                <td>${r.comentario}</td>
+                <td>${r.fecha.split("T")[0]}</td>
+            </tr>
+        `).join("");
+    });
+</script>
+</body>
+</html>

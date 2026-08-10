@@ -81,11 +81,6 @@ public class UsuarioService {
         usuario.setFechaRegistro(LocalDateTime.now());
         usuario.setTipoUsuario(dto.getTipoUsuario());
 
-        // Campos específicos por rol
-        if (dto.getTipoUsuario() == TipoUsuario.CLIENTE && dto.getMetodoPago() != null) {
-            usuario.setMetodo_pago(dto.getMetodoPago());
-        }
-
         return usuarioRepository.save(usuario);
     }
     ///Sobrecarga de crear un usuario, pero recibiendo el usuario. Preferiblemente usar para testing o debuging
@@ -147,10 +142,6 @@ public class UsuarioService {
 
         if (dto.getActivo() != null) {
             usuario.setActivo(dto.getActivo());
-        }
-
-        if (dto.getMetodoPago() != null) {
-            usuario.setMetodo_pago(dto.getMetodoPago());
         }
 
         if (dto.getMatricula() != null) {

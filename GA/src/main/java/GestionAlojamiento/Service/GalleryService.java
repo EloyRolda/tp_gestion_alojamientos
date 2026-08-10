@@ -6,9 +6,7 @@ import GestionAlojamiento.Model.Alojamiento;
 import GestionAlojamiento.Model.Gallery;
 import GestionAlojamiento.Repository.GalleryRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -31,14 +29,12 @@ public class GalleryService {
         return gallery;
     }
 
-    /// Retorna una Gallery por id, verificando que el email del anfitrión coincida
+    /// Retorna una Gallery por id, verificando que el solicitante sea el dueno (o admin).
     public Gallery getGalleryById(Long galleryId, String userEmail) {
         Gallery gallery = galleryRepository.findById(galleryId)
                 .orElseThrow(() -> new IdNoEncontradoException("Gallery not found"));
 
-        if (!gallery.getAlojamiento().getAnfitrion().getEmail().equals(userEmail)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This gallery doesn't belong to you");
-        }
+        alojamientoService.validarPropietarioOAdmin(gallery.getAlojamiento(), userEmail);
 
         return gallery;
     }
@@ -59,15 +55,12 @@ public class GalleryService {
         return "alojamientos/" + idAlojamiento;
     }
 
-    /// El anfitrion intenta publicar (hacer visible en el listado) su alojamiento.
+    /// El anfitrion (o el admin) intenta publicar (hacer visible en el listado) el alojamiento.
     /// Solo se permite si tiene al menos MINIMO_IMAGENES_PARA_PUBLICAR fotos cargadas
     /// (el precio ya es obligatorio a nivel de columna, no hace falta validarlo aca).
-    public void publicar(Long idAlojamiento, String emailAnfitrion) {
+    public void publicar(Long idAlojamiento, String emailSolicitante) {
         Alojamiento alojamiento = alojamientoService.obtenerPorId(idAlojamiento);
-
-        if (!alojamiento.getAnfitrion().getEmail().equals(emailAnfitrion)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Este alojamiento no te pertenece");
-        }
+        alojamientoService.validarPropietarioOAdmin(alojamiento, emailSolicitante);
 
         Gallery gallery = getGalleryByAlojamiento(idAlojamiento);
         int cantidadImagenes = imageService.obtainByGallery(gallery.getId()).size();
@@ -80,7 +73,9 @@ public class GalleryService {
         alojamientoService.actualizarPublicado(idAlojamiento, true);
     }
 
-    public void despublicar(Long idAlojamiento) {
+    public void despublicar(Long idAlojamiento, String emailSolicitante) {
+        Alojamiento alojamiento = alojamientoService.obtenerPorId(idAlojamiento);
+        alojamientoService.validarPropietarioOAdmin(alojamiento, emailSolicitante);
         alojamientoService.actualizarPublicado(idAlojamiento, false);
     }
 

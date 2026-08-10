@@ -1,9 +1,9 @@
 # Gestion de Alojamiento (GA)
 
 Sistema web tipo Airbnb para gestion de alojamientos turisticos: busqueda con
-filtros, solicitud de reserva con aprobacion del anfitrion, pago (simulado,
-listo para Mercado Pago), chat en tiempo real por reserva, notificaciones,
-reviews, reportes y estadisticas para anfitriones y clientes.
+filtros, solicitud de reserva con aprobacion del anfitrion, pago (Mercado
+Pago), chat entre cliente y anfitrion, reviews, notificaciones, reportes y
+panel de administracion.
 
 ---
 
@@ -12,43 +12,51 @@ reviews, reportes y estadisticas para anfitriones y clientes.
 | Tecnologia | Uso |
 |---|---|
 | Java 21 + Spring Boot 3.2.5 | Backend |
-| Spring Security + JWT | Autenticacion y autorizacion por roles |
+| Spring Security + JWT | Autenticacion y autorizacion por rol (stateless) |
 | Spring Data JPA + MySQL | Persistencia |
 | Spring WebSocket (STOMP) | Chat en tiempo real |
-| Cloudinary | Almacenamiento de imagenes (carpeta por entidad) |
-| Lombok / Bean Validation | Reduccion de boilerplate y validaciones |
-| SpringDoc OpenAPI (Swagger) | Documentacion interactiva |
-| HTML / CSS / JS (vanilla) | Frontend estatico minimo |
+| Cloudinary | Fotos de usuarios y alojamientos |
+| Mercado Pago (OAuth, opcional) / modo simulado | Cobro de reservas |
+| Lombok, Bean Validation, SpringDoc OpenAPI | Utilidades |
+| HTML / CSS / JS (vanilla, sin build tool) | Frontend estatico |
+
+---
+
+## Antes de arrancar: variables de entorno
+
+La app lee configuracion sensible desde variables de entorno (`application.properties`
+usa `${VARIABLE}`). Copiar `.env.example` a `.env` (o cargar esas mismas
+variables en tu IDE / shell) o el arranque falla con
+`Could not resolve placeholder`.
+
+```bash
+cp GA/.env.example GA/.env
+# completar DB_USER, DB_PASSWORD, JWT_SECRET, credenciales de Cloudinary, etc.
+```
+
+Como Spring Boot no lee `.env` de forma nativa, hay que exportarlas antes de
+correr, por ejemplo:
+
+```bash
+export $(grep -v '^#' GA/.env | xargs) && ./mvnw spring-boot:run
+```
+
+o cargarlas en la configuracion de "Environment variables" de tu IDE.
+
+Las variables de Mercado Pago (`MP_CLIENT_ID`, `MP_CLIENT_SECRET`) son
+**opcionales**: si quedan vacias, la app arranca igual y los anfitriones
+solo pueden cargar un alias/CVU manual (ver mas abajo).
 
 ---
 
 ## Como ejecutar
 
-### Requisitos
-- Java 21+
-- Maven (o el `mvnw` incluido)
-- MySQL en ejecucion
+1. Tener MySQL corriendo y crear la base `newgestiondb` (o la que pongas en `DB_NAME`).
+2. Cargar las variables de entorno (ver arriba).
+3. `cd GA && ./mvnw spring-boot:run`
+4. Abrir `http://localhost:8080` (o directamente `http://localhost:8080/login.html`)
 
-### 1. Variables de entorno
-Copiar `GA/.env.example` a `GA/.env` (o cargar esas mismas variables en tu IDE:
-Run Configuration -> Environment variables) con los datos de tu base y tus
-credenciales. Sin esto la app no arranca (falla con
-`Could not resolve placeholder`).
-
-### 2. Base de datos
-No hace falta correr ningun script SQL a mano: con `spring.jpa.hibernate.ddl-auto=update`
-Hibernate genera el esquema a partir de las entidades la primera vez que
-arranca la app. Solo hay que tener la base `newgestiondb` creada (vacia) en MySQL.
-
-### 3. Levantar el backend
-```bash
-cd GA
-./mvnw spring-boot:run
-```
-
-### 4. Acceder
-- Frontend: `http://localhost:8080`
-- Swagger: `http://localhost:8080/swagger-ui/index.html`
+Swagger: `http://localhost:8080/swagger-ui/index.html`
 
 ---
 
@@ -57,46 +65,79 @@ cd GA
 ```
 src/main/java/GestionAlojamiento/
 ├── Config/          # Seguridad (JWT, roles), WebSocket, seed de amenities
-├── DTO/             # Objetos de transferencia (registro/modificacion)
+├── DTO/             # Objetos de entrada/salida de los endpoints
 ├── Exception/       # Manejo global de excepciones
 ├── Model/           # Entidades JPA
-│   └── Enums/       # EstadoReserva, CategoriaAmenity, EstadoPago, etc.
-├── Repository/       # Interfaces Spring Data JPA
-├── RestController/   # Endpoints REST
-└── Service/          # Logica de negocio (cada Service solo llama a OTROS
-                       # Services para datos que no son suyos, nunca a un
-                       # Repository ajeno)
-src/main/resources/static/   # Frontend: HTML minimo + js/api.js (helper de fetch)
+│   └── Enums/
+├── Repository/      # Spring Data JPA
+├── RestController/  # Endpoints REST
+└── Service/         # Logica de negocio (un service SOLO llama a otros
+                      # services para datos de otro dominio, nunca a su
+                      # repository/model directamente)
+src/main/resources/static/   # Frontend (HTML + /js/api.js)
 ```
 
-## Roles
+### Jerarquia de Alojamiento
+
+`Alojamiento` es una clase abstracta con herencia JPA `JOINED`. `Casa`,
+`Departamento` y `Hotel` la extienden directamente, por lo que
+`AlojamientoRepository` puede listar/buscar los tres tipos mezclados (listado
+estilo Airbnb) sin tocar las tablas de cada subtipo.
+
+### Maquina de estados de Reserva
+
+```
+SOLICITADA -> ACEPTADA (48hs para pagar) -> PAGADA -> FINALIZADA
+           -> RECHAZADA                 -> VENCIDA
+SOLICITADA/ACEPTADA -> CANCELADA (por el cliente, antes de pagar)
+```
+
+Un `@Scheduled` (`SchedulerService`) vence automaticamente las reservas
+`ACEPTADA` cuyas 48hs para pagar se cumplieron, y cierra los chats 48hs
+despues de finalizada la estadia.
+
+### Pagos
+
+`PagoService` trabaja en modo simulado (no hay SDK de Mercado Pago instalado
+todavia): genera una preferencia falsa y el propio frontend dispara la
+confirmacion en `pagar-reserva.html`. Antes de poder cobrar, el anfitrion
+tiene que haber configurado un alias/CVU o conectado su cuenta real via
+OAuth (`mercadopago.html` / `MercadoPagoController`) — sin plata real
+involucrada mientras `MP_CLIENT_ID`/`MP_CLIENT_SECRET` esten vacias.
+
+### Amenities
+
+Catalogo modular (`Amenity`, relacion muchos-a-muchos con `Alojamiento`) en
+vez de un set fijo de booleanos. Se precarga un catalogo base al arrancar
+(`DataSeeder`).
+
+---
+
+## Roles y permisos
 
 | Rol | Capacidades |
 |---|---|
-| ADMINISTRADOR | Gestion total: usuarios, alojamientos, reservas, reportes, logs |
-| ANFITRION | Publica y gestiona sus alojamientos, acepta/rechaza reservas, chatea, ve sus estadisticas |
-| CLIENTE | Busca y reserva alojamientos, paga, chatea, deja reviews, ve su historial |
+| **ADMINISTRADOR** | Gestion total: usuarios, baja logica de alojamientos, reportes, logs de auditoria, catalogo de amenities |
+| **ANFITRION** | Publicar/editar alojamientos, aceptar o rechazar solicitudes, chatear con huespedes, resenarlos, ver estadisticas de ingresos |
+| **CLIENTE** | Buscar y solicitar reservas, pagar, chatear con el anfitrion, dejar reviews, ver su historial |
 
-## Modelo de datos (resumen)
+---
 
-- **Alojamiento** (abstracta, herencia JPA `JOINED`) -> `Casa`, `Departamento`, `Hotel`
-- **Amenity**: catalogo de comodidades, relacion muchos-a-muchos con Alojamiento
-- **Reserva**: maquina de estados `SOLICITADA -> ACEPTADA (48hs para pagar) -> PAGADA -> FINALIZADA`
-  (con `RECHAZADA`, `CANCELADA`, `VENCIDA` como estados terminales alternativos)
-- **Pago**: traza el pago de Mercado Pago de una reserva (hoy en modo simulado)
-- **Review**: reseña de un cliente sobre UNA estadia puntual (no sobre el alojamiento en general)
-- **ReviewHuesped**: reseña que el anfitrion deja sobre el huesped
-- **Chat / Mensaje**: 1 chat por reserva, se abre al pagar, se cierra 48hs despues de finalizada la estadia
-- **Notificacion**: eventos automaticos (solicitud creada, aceptada, pago confirmado, etc.)
-- **Log**: auditoria de acciones, visible solo para el admin
-- **Reporte**: un usuario puede reportar a otro usuario o a un alojamiento
+## Frontend
 
-## Nota sobre el pago
+Paginas HTML minimas (sin frameworks ni CSS de mas) servidas como estaticos
+desde `src/main/resources/static/`, con un unico helper JS compartido
+(`js/api.js`) para manejar el token JWT y las llamadas a la API. Pensado asi
+a proposito para que sirva de base limpia sobre la que trabajar HTML/CSS/JS
+desde cero.
 
-Todavia no hay credenciales de Mercado Pago cargadas: `PagoService` trabaja en
-modo simulado (el "checkout" es un boton que el propio frontend dispara). Esta
-aislado en un unico archivo para que conectar el SDK real de Mercado Pago no
-requiera tocar el resto del flujo de reservas/chat/notificaciones.
+---
+
+## Documentacion de la API
+
+`http://localhost:8080/swagger-ui/index.html`
+
+---
 
 ## Licencia
 

@@ -33,8 +33,7 @@ public class UsuarioRegistroDTO {
     @NotNull(message = "Campo Obligatorio")
     private TipoUsuario tipoUsuario;
 
-    // Opcionales por rol
-    private String metodoPago;  // CLIENTE
+    // Opcional por rol
     private String matricula;   // ADMINISTRADOR
 
 }

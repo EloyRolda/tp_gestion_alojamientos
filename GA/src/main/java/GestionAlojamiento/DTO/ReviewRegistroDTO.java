@@ -5,9 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/// La reseña siempre se liga a una RESERVA puntual (FINALIZADA y del cliente logueado),
+/// La resena siempre se liga a una RESERVA puntual (FINALIZADA y del cliente logueado),
 /// de ahi se derivan el alojamiento y el cliente: no se piden por separado para
-/// evitar que alguien reseñe una estadia que no es suya.
+/// evitar que alguien resene una estadia que no es suya.
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagar reserva</title>
+    <style>
+        body { font-family: sans-serif; max-width: 400px; margin: 0 auto; padding: 20px; }
+    </style>
+</head>
+<body>
+<p><a href="/mis-reservas.html">Volver a mis reservas</a></p>
+<h1>Pagar reserva</h1>
+
+<p><strong>Modo simulado:</strong> todavia no hay credenciales reales de Mercado Pago cargadas.
+Este boton reemplaza al checkout real hasta que se conecten.</p>
+
+<div id="resumen">Cargando...</div>
+
+<button id="btnPagar">Simular pago aprobado</button>
+<button id="btnRechazar">Simular pago rechazado</button>
+<p id="mensaje"></p>
+
+<script src="/js/api.js"></script>
+<script>
+    requireLogin();
+    const idReserva = new URLSearchParams(location.search).get("id");
+
+    async function cargar() {
+        const reserva = await apiJson("/Reserva/mostrar/" + idReserva);
+        document.getElementById("resumen").innerHTML = `
+            ${reserva.alojamiento.titulo}<br>
+            ${reserva.fechaInicio} a ${reserva.fechaFin} - ${reserva.cantidadPersonas} personas<br>
+            Total a pagar: $${reserva.precioTotal}
+        `;
+    }
+    cargar();
+
+    async function pagar(aprobado) {
+        const mensaje = document.getElementById("mensaje");
+        try {
+            await apiJson("/Pago/generar/" + idReserva, "POST");
+            await apiJson("/Pago/confirmar", "POST", { idReserva: Number(idReserva), aprobado });
+            mensaje.textContent = aprobado ? "Pago aprobado. Reserva confirmada." : "Pago rechazado.";
+            setTimeout(() => window.location.href = "/mis-reservas.html", 1500);
+        } catch (e) {
+            mensaje.textContent = "Error: " + e.message;
+        }
+    }
+
+    document.getElementById("btnPagar").addEventListener("click", () => pagar(true));
+    document.getElementById("btnRechazar").addEventListener("click", () => pagar(false));
+</script>
+</body>
+</html>

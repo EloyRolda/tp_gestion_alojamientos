@@ -46,7 +46,8 @@ public class SecurityConfig {
                                 "/Usuario/registrar",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/ws/**" // handshake de WebSocket: la autenticacion real ocurre en el frame CONNECT (ver WebSocketConfig)
+                                "/ws/**", // handshake de WebSocket: la autenticacion real ocurre en el frame CONNECT (ver WebSocketConfig)
+                                "/MercadoPago/callback" // navegacion del browser devuelta por Mercado Pago, no manda JWT
                         ).permitAll()
 
                         // ── CUALQUIER AUTENTICADO ─────────────────────────────
@@ -79,26 +80,18 @@ public class SecurityConfig {
 
                         // ── ALOJAMIENTOS — LISTAR/BUSCAR (todos los roles) ────
                         .requestMatchers(
-                                "/Casa/listar",         "/Casa/mostrar/**",
-                                "/Hotel/listar",        "/Hotel/mostrar/**",
-                                "/Departamento/listar", "/Departamento/mostrar/**",
                                 "/Alojamiento/listar",  "/Alojamiento/mostrar/**", "/Alojamiento/buscar",
                                 "/Amenity/listar"
                         ).hasAnyRole("ADMIN", "ANFITRION", "CLIENTE")
 
                         // ── ALOJAMIENTOS — PROPIOS (admin + anfitrion) ────────
-                        .requestMatchers(
-                                "/Casa/listar/propios",
-                                "/Hotel/listar/propios",
-                                "/Departamento/listar/propios"
-                        ).hasAnyRole("ADMIN", "ANFITRION")
+                        .requestMatchers("/Alojamiento/listar/propios")
+                                .hasAnyRole("ADMIN", "ANFITRION")
 
-                        // ── ALOJAMIENTOS — REGISTRAR / MODIFICAR / PUBLICAR ───
+                        // ── ALOJAMIENTOS — REGISTRAR / MODIFICAR / BAJA / PUBLICAR ───
                         .requestMatchers(
-                                "/Casa/registrar",         "/Casa/actualizar",         "/Casa/eliminar/**",
-                                "/Hotel/registrar",        "/Hotel/actualizar",        "/Hotel/eliminar/**",
-                                "/Departamento/registrar", "/Departamento/actualizar", "/Departamento/eliminar/**",
-                                "/Alojamiento/*/publicar", "/Alojamiento/*/despublicar"
+                                "/Alojamiento/registrar", "/Alojamiento/actualizar", "/Alojamiento/eliminar/**",
+                                "/Alojamiento/*/publicar", "/Alojamiento/*/despublicar", "/Alojamiento/*/reactivar"
                         ).hasAnyRole("ADMIN", "ANFITRION")
 
                         // ── RESERVAS ──────────────────────────────────────────
@@ -139,6 +132,10 @@ public class SecurityConfig {
                         // ── NOTIFICACIONES / CHAT / ESTADISTICAS (propios, se valida en el service) ──
                         .requestMatchers("/Notificacion/**", "/Chat/**", "/Estadisticas/**")
                                 .hasAnyRole("ADMIN", "ANFITRION", "CLIENTE")
+
+                        // ── CUENTA DE COBRO (MERCADO PAGO) DEL ANFITRION ──────
+                        .requestMatchers("/MercadoPago/mi-cuenta", "/MercadoPago/alias", "/MercadoPago/conectar")
+                                .hasAnyRole("ADMIN", "ANFITRION")
 
                         .anyRequest().authenticated()
                 )

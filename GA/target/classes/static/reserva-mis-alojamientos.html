@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservas de mis alojamientos</title>
+    <style>
+        body { font-family: sans-serif; max-width: 700px; margin: 0 auto; padding: 20px; }
+        .reserva { border: 1px solid #ccc; padding: 10px; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+<p><a href="/home.html">Volver al panel</a></p>
+<h1>Reservas de mis alojamientos</h1>
+
+<div id="lista"></div>
+<p id="mensaje"></p>
+
+<script src="/js/api.js"></script>
+<script>
+    requireLogin();
+
+    async function cargar() {
+        const mensaje = document.getElementById("mensaje");
+        try {
+            const reservas = await apiJson("/Reserva/listar/anfitrion");
+            mostrar(reservas);
+        } catch (e) {
+            mensaje.textContent = "Error: " + e.message;
+        }
+    }
+
+    function mostrar(reservas) {
+        const lista = document.getElementById("lista");
+        if (reservas.length === 0) {
+            lista.innerHTML = "<p>Todavia no recibiste solicitudes.</p>";
+            return;
+        }
+
+        lista.innerHTML = reservas.map(r => {
+            const acciones = [`<a href="/detalle-alojamiento.html?id=${r.alojamiento.id}">Ver alojamiento</a>`];
+
+            if (r.estado === "SOLICITADA") {
+                acciones.push(`<button onclick="aceptar(${r.id})">Aceptar</button>`);
+                acciones.push(`<button onclick="rechazar(${r.id})">Rechazar</button>`);
+            }
+            if (r.estado === "PAGADA") {
+                acciones.push(`<a href="/mis-chats.html">Ir al chat</a>`);
+                const fin = new Date(r.fechaFin);
+                if (fin < new Date()) {
+                    acciones.push(`<button onclick="finalizar(${r.id})">Marcar estadia finalizada</button>`);
+                }
+            }
+            if (r.estado === "FINALIZADA") {
+                acciones.push(`<a href="/resenar-huesped.html?idReserva=${r.id}">Resenar al huesped</a>`);
+            }
+
+            return `<div class="reserva">
+                <strong>Reserva #${r.id}</strong> - ${r.alojamiento.titulo} - <em>${r.estado}</em><br>
+                Cliente: ${r.cliente.nombre} (${r.cliente.email})<br>
+                ${r.fechaInicio} a ${r.fechaFin} - ${r.cantidadPersonas} personas - $${r.precioTotal}<br>
+                Mensaje del cliente: "${r.mensajeSolicitud || "-"}"<br>
+                ${acciones.join(" | ")}
+            </div>`;
+        }).join("");
+    }
+
+    async function aceptar(id) {
+        try { await apiJson(`/Reserva/${id}/aceptar`, "PATCH"); cargar(); }
+        catch (e) { alert("Error: " + e.message); }
+    }
+
+    async function rechazar(id) {
+        const motivo = prompt("Motivo del rechazo (opcional):") || "";
+        try { await apiJson(`/Reserva/${id}/rechazar`, "PATCH", { motivo }); cargar(); }
+        catch (e) { alert("Error: " + e.message); }
+    }
+
+    async function finalizar(id) {
+        if (!confirm("Marcar esta estadia como finalizada?")) return;
+        try { await apiJson(`/Reserva/finalizar/${id}`, "PATCH"); cargar(); }
+        catch (e) { alert("Error: " + e.message); }
+    }
+
+    cargar();
+</script>
+</body>
+</html>

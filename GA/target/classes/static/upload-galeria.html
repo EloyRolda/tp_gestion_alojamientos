@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir fotos</title>
+    <style>
+        body { font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; }
+        img { width: 100px; height: 100px; object-fit: cover; margin: 4px; }
+    </style>
+</head>
+<body>
+<h1>Subir fotos</h1>
+<p>Se necesitan al menos 3 fotos para poder publicar el alojamiento (maximo 10).</p>
+
+<input type="file" id="archivos" accept="image/*" multiple>
+<button id="btnSubir">Subir fotos seleccionadas</button>
+<p id="mensaje"></p>
+
+<div id="preview"></div>
+
+<p><a id="linkContinuar" href="#">Ir al alojamiento</a></p>
+
+<script src="/js/api.js"></script>
+<script>
+    requireLogin();
+    const params = new URLSearchParams(location.search);
+    const galleryId = params.get("galleryId");
+    const idAlojamiento = params.get("idAlojamiento");
+
+    if (!galleryId) window.location.href = "/listar-alojamientos.html";
+    document.getElementById("linkContinuar").href = idAlojamiento ? `/detalle-alojamiento.html?id=${idAlojamiento}` : "/listar-alojamientos.html";
+
+    async function cargarExistentes() {
+        const imagenes = await apiJson(`/gallery/${galleryId}/images`);
+        document.getElementById("preview").innerHTML = imagenes.map(img => `<img src="${img.url}" alt="${img.alt || ""}">`).join("");
+    }
+    cargarExistentes();
+
+    document.getElementById("btnSubir").addEventListener("click", async () => {
+        const mensaje = document.getElementById("mensaje");
+        const archivos = document.getElementById("archivos").files;
+        if (archivos.length === 0) {
+            mensaje.textContent = "Elegi al menos una foto.";
+            return;
+        }
+
+        let exitosas = 0;
+        for (const archivo of archivos) {
+            const formData = new FormData();
+            formData.append("file", archivo);
+            formData.append("alt", archivo.name);
+            formData.append("galleryId", galleryId);
+            try {
+                const respuesta = await apiFetch("/gallery/upload", { method: "POST", body: formData });
+                if (respuesta.ok) exitosas++;
+            } catch (e) { /* seguimos con las demas */ }
+        }
+
+        mensaje.textContent = `${exitosas} de ${archivos.length} fotos subidas.`;
+        cargarExistentes();
+    });
+</script>
+</body>
+</html>

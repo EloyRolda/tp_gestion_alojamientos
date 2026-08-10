@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="53a2eb38-1005-40a2-a90d-6a86cd046e33" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/tp_gestion_alojamientos.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/GA/.env.example" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/.gitattributes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/logs/ga-app.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/logs/ga-app.log.2026-06-08.0.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Config/DataSeeder.java" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Config/DataSeeder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/DTO/CasaModificarDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/DTO/CasaRegistroDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/DTO/DepartamentoModificarDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/DTO/DepartamentoRegistroDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/DTO/HotelModificarDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/DTO/HotelRegistroDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/DTO/ReservaModificarDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/DTO/ReservaRegistroDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/DTO/ReviewRegistroDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/DTO/ReviewRegistroDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/DTO/UsuarioModificarDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/DTO/UsuarioModificarDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/DTO/UsuarioRegistroDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/DTO/UsuarioRegistroDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Model/Alojamiento.java" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Model/Alojamiento.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Model/Casa.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Model/Departamento.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Model/Enums/TipoEstado.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Model/Enums/TipoInmueble.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Model/Hotel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Model/Pago.java" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Model/Pago.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Model/Reserva.java" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Model/Reserva.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Model/Review.java" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Model/Review.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Model/ReviewHuesped.java" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Model/ReviewHuesped.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Model/Servicio.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Model/Usuario.java" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Model/Usuario.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Repository/AlojamientoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Repository/AlojamientoRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Repository/CasaRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Repository/DepartamentoRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Repository/HotelRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Repository/ServicioRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/RestController/AlojamientoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/RestController/AlojamientoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/RestController/CasaController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/RestController/DepartamentoController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/RestController/HotelController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/RestController/ReviewHuespedController.java" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/RestController/ReviewHuespedController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Service/AlojamientoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Service/AlojamientoService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Service/CasaService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Service/DepartamentoService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Service/GalleryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Service/GalleryService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Service/HotelService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Service/PagoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Service/PagoService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Service/ReservaService.java" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Service/ReservaService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Service/ReviewHuespedService.java" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Service/ReviewHuespedService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Service/ReviewService.java" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Service/ReviewService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Service/ServicioService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Service/UsuarioService.java" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/java/GestionAlojamiento/Service/UsuarioService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/resources/static/actualizar-casa.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/resources/static/actualizar-departamento.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/resources/static/actualizar-hotel.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/resources/static/actualizar-perfil.html" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/resources/static/actualizar-perfil.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/resources/static/actualizar-reserva.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/resources/static/detalle-alojamiento.html" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/resources/static/detalle-alojamiento.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/resources/static/editar-galeria.html" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/resources/static/editar-galeria.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/resources/static/eliminar-usuario.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/resources/static/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/resources/static/home.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/resources/static/js/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/resources/static/js/api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/resources/static/listar-alojamientos.html" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/resources/static/listar-alojamientos.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/resources/static/listar-amenities.html" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/resources/static/listar-amenities.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/resources/static/listar-logs.html" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/resources/static/listar-logs.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/resources/static/listar-reportes.html" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/resources/static/listar-reportes.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/resources/static/mi-perfil.html" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/resources/static/mi-perfil.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/resources/static/registrar-casa.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/resources/static/registrar-departamento.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/resources/static/registrar-hotel.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/resources/static/registrarse.html" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/resources/static/registrarse.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GA/src/main/resources/static/reportar.html" beforeDir="false" afterPath="$PROJECT_DIR$/GA/src/main/resources/static/reportar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logs/ga-app.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/logs/ga-app.log.2026-06-08.0.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/logs/ga-app.log.2026-06-09.0.gz" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3E0azXA7Lzmfwo4eEuqWDelkPqZ" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "Spring Boot.GaApplication.executor": "Run",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "2nd-encounter",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/eloyr/Documents/GitHub/tp_gestion_alojamientos",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration name="GaApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="ALTERNATIVE_JRE_PATH" value="ms-21" />
+      <envs>
+        <env name="CLOUDINARY_API_KEY" value="339997258176158" />
+        <env name="CLOUDINARY_API_SECRET" value="5Bnql6Q6OsI0avl3pvXCFyQ5cfQ" />
+        <env name="CLOUDINARY_CLOUD_NAME" value="dhnarjk6c" />
+        <env name="DB_HOST" value="localhost" />
+        <env name="DB_NAME" value="newgestiondb" />
+        <env name="DB_PASSWORD" value="" />
+        <env name="DB_PORT" value="3306" />
+        <env name="DB_USER" value="root" />
+        <env name="JWT_SECRET" value="miClaveSecretaSuperLarga1234567890abcdef" />
+      </envs>
+      <module name="GA" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="GestionAlojamiento.GaApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-37e91769500f-intellij.indexing.shared.core-IU-261.24374.151" />
+        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-IU-261.24374.151" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="53a2eb38-1005-40a2-a90d-6a86cd046e33" name="Changes" comment="" />
+      <created>1779318203387</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1779318203387</updated>
+      <workItem from="1779318204584" duration="215000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

@@ -2,6 +2,7 @@ package GestionAlojamiento.Service;
 
 import GestionAlojamiento.Exception.IdNoEncontradoException;
 import GestionAlojamiento.Exception.ParametroInvalidoException;
+import GestionAlojamiento.Model.CuentaMercadoPago;
 import GestionAlojamiento.Model.Enums.CategoriaNotificacion;
 import GestionAlojamiento.Model.Enums.EstadoPago;
 import GestionAlojamiento.Model.Enums.EstadoReserva;
@@ -23,11 +24,18 @@ import java.util.UUID;
 ///   1) generarPreferencia(): hoy arma un "init_point" falso. En produccion,
 ///      aca se llama a la SDK de Mercado Pago (com.mercadopago:sdk-java) con
 ///      las credenciales (MP_ACCESS_TOKEN) y se devuelve el init_point real
-///      que te da la API para redirigir al checkout.
+///      que te da la API para redirigir al checkout. Si el anfitrion tiene la
+///      cuenta CONECTADA por OAuth (ver MercadoPagoCuentaService), la preferencia
+///      real se arma en modo "marketplace" usando su collectorId para que el
+///      cobro le llegue directo a el (menos la comision de la plataforma).
 ///   2) confirmar(): hoy lo dispara el propio frontend simulando el resultado.
 ///      En produccion, este metodo lo tiene que llamar el controller que
 ///      recibe el WEBHOOK de Mercado Pago (POST /Pago/webhook), verificando
 ///      la firma del payload antes de confirmar.
+///
+///  Antes de generar cualquier preferencia (real o simulada) se exige que el
+///  anfitrion tenga cargado al menos un alias o su cuenta conectada -- sin eso
+///  no hay a donde mandarle la plata, ni siquiera de forma manual.
 /// ---------------------------------------------------------------------------
 @Service
 @RequiredArgsConstructor
@@ -38,6 +46,7 @@ public class PagoService {
     private final ChatService chatService;
     private final NotificacionService notificacionService;
     private final LogService logService;
+    private final MercadoPagoCuentaService mercadoPagoCuentaService;
 
     /// Genera (o recupera) la preferencia de pago de una reserva ACEPTADA y devuelve
     /// el link al que el cliente deberia ser redirigido para pagar.
@@ -52,12 +61,18 @@ public class PagoService {
             throw new ParametroInvalidoException("Solo se puede pagar una reserva ACEPTADA.");
         }
 
+        // Sin esto, no hay a donde mandarle la plata al anfitrion (ni siquiera a mano).
+        CuentaMercadoPago cuentaAnfitrion = mercadoPagoCuentaService.exigirCuentaConfigurada(reserva.getAlojamiento().getAnfitrion());
+
         Pago pago = pagoRepository.findByReservaId(idReserva).orElseGet(Pago::new);
         pago.setReserva(reserva);
         pago.setMonto(reserva.getPrecioTotal());
         pago.setEstado(EstadoPago.PENDIENTE);
         pago.setPreferenceId("SIMULADO-" + UUID.randomUUID());
         pago.setFechaCreacion(LocalDateTime.now());
+        pago.setDestinoCobro(Boolean.TRUE.equals(cuentaAnfitrion.getConectado())
+                ? "Cuenta de Mercado Pago conectada (OAuth)"
+                : "Alias manual: " + cuentaAnfitrion.getAlias());
 
         return pagoRepository.save(pago);
     }

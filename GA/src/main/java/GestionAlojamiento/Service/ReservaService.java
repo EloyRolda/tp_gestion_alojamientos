@@ -143,7 +143,7 @@ public class ReservaService {
     @Transactional
     public Reserva aceptar(Long idReserva, String emailAnfitrion) {
         Reserva reserva = obtenerPorId(idReserva);
-        Usuario anfitrion = validarAnfitrionDueño(reserva, emailAnfitrion);
+        Usuario anfitrion = validarAnfitrionDueno(reserva, emailAnfitrion);
 
         if (reserva.getEstado() != EstadoReserva.SOLICITADA) {
             throw new ParametroInvalidoException("Solo se pueden aceptar solicitudes en estado SOLICITADA.");
@@ -172,7 +172,7 @@ public class ReservaService {
     @Transactional
     public Reserva rechazar(Long idReserva, String emailAnfitrion, String motivo) {
         Reserva reserva = obtenerPorId(idReserva);
-        Usuario anfitrion = validarAnfitrionDueño(reserva, emailAnfitrion);
+        Usuario anfitrion = validarAnfitrionDueno(reserva, emailAnfitrion);
 
         if (reserva.getEstado() != EstadoReserva.SOLICITADA) {
             throw new ParametroInvalidoException("Solo se pueden rechazar solicitudes en estado SOLICITADA.");
@@ -239,7 +239,7 @@ public class ReservaService {
 
     //------------------------ FINALIZAR ------------------------
 
-    /// Cierra una estadia ya terminada (fecha_fin en el pasado). Solo el anfitrion dueño o un admin.
+    /// Cierra una estadia ya terminada (fecha_fin en el pasado). Solo el anfitrion dueno o un admin.
     @Transactional
     public Reserva finalizar(Long id, String emailSolicitante) {
         Reserva reserva = obtenerPorId(id);
@@ -333,7 +333,7 @@ public class ReservaService {
 
     //------------------------ PRIVADOS ------------------------
 
-    private Usuario validarAnfitrionDueño(Reserva reserva, String emailAnfitrion) {
+    private Usuario validarAnfitrionDueno(Reserva reserva, String emailAnfitrion) {
         Usuario anfitrion = usuarioService.obtenerPorEmail(emailAnfitrion);
         boolean esAdmin = anfitrion.getTipoUsuario() == GestionAlojamiento.Model.Enums.TipoUsuario.ADMINISTRADOR;
         boolean esDuenio = reserva.getAlojamiento().getAnfitrion().getId().equals(anfitrion.getId());

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitar reserva</title>
+    <style>
+        body { font-family: sans-serif; max-width: 450px; margin: 0 auto; padding: 20px; }
+        form { display: flex; flex-direction: column; gap: 8px; }
+    </style>
+</head>
+<body>
+<p><a id="linkVolver" href="/listar-alojamientos.html">Volver al alojamiento</a></p>
+<h1>Solicitar reserva</h1>
+<p id="infoAlojamiento">Cargando...</p>
+
+<p>Fechas ya ocupadas: <span id="fechasOcupadas">-</span></p>
+
+<form id="formReserva">
+    <label for="fechaInicio">Fecha de inicio</label>
+    <input type="date" id="fechaInicio" required>
+
+    <label for="fechaFin">Fecha de fin</label>
+    <input type="date" id="fechaFin" required>
+
+    <label for="cantidadPersonas">Cantidad de personas</label>
+    <input type="number" id="cantidadPersonas" min="1" required>
+
+    <label for="mensaje">Contale al anfitrion por que te gustaria hospedarte alli</label>
+    <textarea id="mensaje" required maxlength="1000"></textarea>
+
+    <p id="precioEstimado"></p>
+
+    <button type="submit">Enviar solicitud</button>
+</form>
+<p id="mensajeResultado"></p>
+
+<script src="/js/api.js"></script>
+<script>
+    requireLogin();
+    const idAlojamiento = new URLSearchParams(location.search).get("idAlojamiento");
+    if (!idAlojamiento) window.location.href = "/listar-alojamientos.html";
+    document.getElementById("linkVolver").href = `/detalle-alojamiento.html?id=${idAlojamiento}`;
+
+    const hoy = new Date().toISOString().split("T")[0];
+    document.getElementById("fechaInicio").min = hoy;
+    document.getElementById("fechaFin").min = hoy;
+
+    let alojamiento = null;
+
+    async function cargar() {
+        alojamiento = await apiJson("/Alojamiento/mostrar/" + idAlojamiento);
+        document.getElementById("infoAlojamiento").textContent =
+            `${alojamiento.titulo} — $${alojamiento.precioNoche}/noche — capacidad ${alojamiento.capacidad} personas`;
+
+        const ocupadas = await apiJson("/Reserva/disponibilidad/" + idAlojamiento);
+        document.getElementById("fechasOcupadas").textContent = ocupadas.length
+            ? ocupadas.map(r => `${r.fechaInicio} a ${r.fechaFin}`).join(", ")
+            : "ninguna";
+    }
+    cargar();
+
+    function actualizarPrecio() {
+        const inicio = document.getElementById("fechaInicio").value;
+        const fin = document.getElementById("fechaFin").value;
+        const contenedor = document.getElementById("precioEstimado");
+        if (!alojamiento || !inicio || !fin) { contenedor.textContent = ""; return; }
+        const dias = Math.round((new Date(fin) - new Date(inicio)) / (1000 * 60 * 60 * 24));
+        if (dias <= 0) { contenedor.textContent = ""; return; }
+        contenedor.textContent = `Precio estimado: $${(alojamiento.precioNoche * dias).toFixed(2)} (${dias} noches)`;
+    }
+    document.getElementById("fechaInicio").addEventListener("change", actualizarPrecio);
+    document.getElementById("fechaFin").addEventListener("change", actualizarPrecio);
+
+    document.getElementById("formReserva").addEventListener("submit", async (evento) => {
+        evento.preventDefault();
+        const mensajeResultado = document.getElementById("mensajeResultado");
+        mensajeResultado.textContent = "";
+
+        const datos = {
+            idAlojamiento: Number(idAlojamiento),
+            fechaInicio: document.getElementById("fechaInicio").value,
+            fechaFin: document.getElementById("fechaFin").value,
+            cantidadPersonas: parseInt(document.getElementById("cantidadPersonas").value),
+            mensajeSolicitud: document.getElementById("mensaje").value
+        };
+
+        try {
+            await apiJson("/Reserva/solicitar", "POST", datos);
+            mensajeResultado.textContent = "Solicitud enviada. Te va a llegar una notificacion cuando el anfitrion responda.";
+            setTimeout(() => window.location.href = "/mis-reservas.html", 1500);
+        } catch (e) {
+            mensajeResultado.textContent = "Error: " + e.message;
+        }
+    });
+</script>
+</body>
+</html>

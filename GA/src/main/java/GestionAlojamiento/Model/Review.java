@@ -34,9 +34,9 @@ public class Review {
     @Column(name = "fecha", nullable = false)
     private LocalDateTime fecha; // No deberia modificarse pasadas 48hs, ver ReviewService.
 
-    /// La reseña es de UNA estadia puntual, no del alojamiento en general:
+    /// La resena es de UNA estadia puntual, no del alojamiento en general:
     /// por eso se liga 1 a 1 con la Reserva (FINALIZADA) que la origino, y no
-    /// hay unicidad por cliente+alojamiento (un cliente puede reseñar cada
+    /// hay unicidad por cliente+alojamiento (un cliente puede resenar cada
     /// estadia distinta que haya tenido en el mismo lugar).
     @OneToOne
     @JoinColumn(name = "id_reserva", nullable = false, unique = true)

@@ -1,5 +1,6 @@
 package GestionAlojamiento.Model;
 
+import GestionAlojamiento.Model.Enums.TipoAlojamiento;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
@@ -15,28 +16,35 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
-/// Clase base de todo alojamiento publicable (Casa, Departamento u Hotel).
-/// Usa herencia JPA real (JOINED): cada subtipo tiene su propia tabla con SOLO
-/// sus columnas particulares, y comparte esta tabla "alojamiento" para los datos
-/// comunes. Esto permite:
-///   - Listar/filtrar TODOS los alojamientos mezclados (estilo Airbnb) desde
-///     AlojamientoRepository sin tocar las tablas de cada subtipo.
-///   - Evitar la logica de mapeo triplicada que existia antes en cada Service.
+/// Tabla UNICA para los 3 tipos de alojamiento (reemplaza a la vieja herencia
+/// JOINED con Casa/Departamento/Hotel como tablas separadas). El motivo del
+/// cambio: de los 9 campos que antes eran "especificos por subtipo", 7 eran
+/// simples booleanos "tiene/no tiene" (patio, pileta, parrilla, ascensor,
+/// desayuno, limpieza) que ya duplicaban lo que el catalogo de Amenity hace
+/// mejor (modular, sin migraciones para agregar uno nuevo). Sacando esos
+/// booleanos, lo unico que quedaba genuinamente distinto por tipo era "piso"
+/// (Departamento) y "estrellas" (Hotel): dos columnas nullable no justifican
+/// 3 tablas y un JOIN en cada lectura. "tipo" reemplaza al discriminador de
+/// herencia; agregar un tipo de alojamiento nuevo a futuro es agregar un
+/// valor al enum TipoAlojamiento, sin migraciones de esquema.
 @Getter
 @Setter
 @ToString(exclude = {"amenities"})
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "tipo_alojamiento", discriminatorType = DiscriminatorType.STRING, length = 20)
 @Table(name = "alojamiento")
-public abstract class Alojamiento {
+public class Alojamiento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_alojamiento")
     private Long id;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo", nullable = false, updatable = false, length = 20)
+    private TipoAlojamiento tipo;
 
     @Column(name = "titulo", length = 150, nullable = false)
     private String titulo;
@@ -66,7 +74,17 @@ public abstract class Alojamiento {
     @Column(name = "cant_banios", nullable = false)
     private Integer cantBanios;
 
-    /// Baja logica: la usa el dueño o el admin para "borrar" sin perder historial de reservas/reviews.
+    /// Solo aplica (y es obligatorio) cuando tipo = DEPARTAMENTO. Nullable para los demas tipos.
+    @Column(name = "piso")
+    private Integer piso;
+
+    /// Solo aplica (y es obligatorio) cuando tipo = HOTEL. Nullable para los demas tipos.
+    @Min(value = 0, message = "Valor minimo de 0 estrellas")
+    @jakarta.validation.constraints.Max(value = 5, message = "Valor maximo de 5 estrellas")
+    @Column(name = "estrellas")
+    private Integer estrellas;
+
+    /// Baja logica: la usa el dueno o el admin para "borrar" sin perder historial de reservas/reviews.
     @Column(name = "activo")
     private Boolean activo = true;
 
@@ -91,10 +109,4 @@ public abstract class Alojamiento {
             inverseJoinColumns = @JoinColumn(name = "id_amenity")
     )
     private Set<Amenity> amenities = new HashSet<>();
-
-    /// Nombre de subtipo en base a la clase real (CASA, DEPARTAMENTO, HOTEL), util para el frontend.
-    @Transient
-    public String getTipo() {
-        return this.getClass().getSimpleName().toUpperCase();
-    }
 }

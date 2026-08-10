@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dejar review</title>
+    <style>
+        body { font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; }
+        form { display: flex; flex-direction: column; gap: 8px; }
+        li { margin-bottom: 6px; }
+    </style>
+</head>
+<body>
+<p><a href="/mis-reservas.html">Volver a mis reservas</a></p>
+<h1>Dejar review</h1>
+
+<div id="seleccion">
+    <p>Elegi una estadia finalizada para resenar:</p>
+    <ul id="listaElegibles"></ul>
+</div>
+
+<form id="formReview" style="display:none">
+    <p id="tituloAlojamiento"></p>
+    <label for="puntuacion">Puntuacion (0 a 5)</label>
+    <input type="number" id="puntuacion" min="0" max="5" required>
+
+    <label for="comentario">Comentario</label>
+    <textarea id="comentario" required maxlength="2000"></textarea>
+
+    <button type="submit">Publicar review</button>
+</form>
+<p id="mensaje"></p>
+
+<script src="/js/api.js"></script>
+<script>
+    requireLogin();
+    let idReserva = new URLSearchParams(location.search).get("idReserva");
+
+    let elegiblesActuales = [];
+
+    async function cargar() {
+        const usuario = await apiJson("/Usuario/me");
+        const [reservas, reviews] = await Promise.all([
+            apiJson("/Reserva/listar/propios"),
+            apiJson("/Review/cliente/" + usuario.id)
+        ]);
+
+        const reservasConReview = new Set(reviews.map(r => r.reserva.id));
+        elegiblesActuales = reservas.filter(r => r.estado === "FINALIZADA" && !reservasConReview.has(r.id));
+
+        if (idReserva) {
+            const indice = elegiblesActuales.findIndex(r => r.id === Number(idReserva));
+            if (indice !== -1) { mostrarFormulario(indice); return; }
+        }
+
+        if (elegiblesActuales.length === 0) {
+            document.getElementById("listaElegibles").innerHTML = "<li>No tenes estadias finalizadas para resenar.</li>";
+            return;
+        }
+
+        document.getElementById("listaElegibles").innerHTML = elegiblesActuales.map((r, indice) =>
+            `<li><a href="#" onclick="mostrarFormulario(${indice}); return false;">
+                ${r.alojamiento.titulo} (${r.fechaInicio} a ${r.fechaFin})
+            </a></li>`
+        ).join("");
+    }
+
+    let reservaSeleccionada = null;
+    function mostrarFormulario(indice) {
+        reservaSeleccionada = elegiblesActuales[indice];
+        document.getElementById("seleccion").style.display = "none";
+        document.getElementById("formReview").style.display = "flex";
+        document.getElementById("tituloAlojamiento").textContent = "Estadia en: " + reservaSeleccionada.alojamiento.titulo;
+    }
+
+    document.getElementById("formReview").addEventListener("submit", async (evento) => {
+        evento.preventDefault();
+        const mensaje = document.getElementById("mensaje");
+        try {
+            await apiJson("/Review/registrar", "POST", {
+                idReserva: reservaSeleccionada.id,
+                puntuacion: parseInt(document.getElementById("puntuacion").value),
+                comentario: document.getElementById("comentario").value
+            });
+            mensaje.textContent = "Review publicada.";
+            setTimeout(() => window.location.href = "/mis-reviews.html", 1200);
+        } catch (e) {
+            mensaje.textContent = "Error: " + e.message;
+        }
+    });
+
+    cargar();
+</script>
+</body>
+</html>

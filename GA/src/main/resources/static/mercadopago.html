@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuenta de cobro</title>
+    <style>
+        body { font-family: sans-serif; max-width: 450px; margin: 0 auto; padding: 20px; }
+        form { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .estado { border: 1px solid #ccc; padding: 8px; margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+<p><a href="/home.html">Volver al panel</a></p>
+<h1>Cuenta de cobro (Mercado Pago)</h1>
+<p>Sin esto configurado, los clientes no van a poder pagarte las reservas.</p>
+
+<div class="estado" id="estado">Cargando...</div>
+
+<h2>Opcion 1: Alias o CVU (manual)</h2>
+<p>Uso informativo: el administrador te liquida por fuera del sistema mientras no haya conexion automatica.</p>
+<form id="formAlias">
+    <label for="alias">Tu alias o CVU</label>
+    <input type="text" id="alias" required maxlength="100">
+    <button type="submit">Guardar alias</button>
+</form>
+
+<h2>Opcion 2: Conectar tu cuenta (automatico)</h2>
+<p>Con esto, el cobro te llega directo a tu cuenta de Mercado Pago sin intervencion manual. Requiere que la plataforma tenga la conexion habilitada.</p>
+<button id="btnConectar">Conectar con Mercado Pago</button>
+
+<p id="mensaje"></p>
+
+<script src="/js/api.js"></script>
+<script>
+    requireLogin();
+
+    async function cargarEstado() {
+        const cuenta = await apiJson("/MercadoPago/mi-cuenta");
+        const estado = document.getElementById("estado");
+        if (cuenta.conectadoPorOauth) {
+            estado.textContent = "Cuenta conectada automaticamente (desde " + cuenta.fechaConexion + ").";
+        } else if (cuenta.alias) {
+            estado.textContent = "Alias cargado: " + cuenta.alias + " (liquidacion manual).";
+        } else {
+            estado.textContent = "Todavia no configuraste ninguna forma de cobro.";
+        }
+        if (cuenta.alias) {
+            document.getElementById("alias").value = cuenta.alias;
+        }
+    }
+    cargarEstado();
+
+    document.getElementById("formAlias").addEventListener("submit", async (evento) => {
+        evento.preventDefault();
+        const mensaje = document.getElementById("mensaje");
+        try {
+            await apiJson("/MercadoPago/alias", "PUT", { alias: document.getElementById("alias").value });
+            mensaje.textContent = "Alias guardado.";
+            cargarEstado();
+        } catch (e) {
+            mensaje.textContent = "Error: " + e.message;
+        }
+    });
+
+    document.getElementById("btnConectar").addEventListener("click", async () => {
+        const mensaje = document.getElementById("mensaje");
+        try {
+            const respuesta = await apiJson("/MercadoPago/conectar");
+            window.location.href = respuesta.url;
+        } catch (e) {
+            mensaje.textContent = "Error: " + e.message;
+        }
+    });
+</script>
+</body>
+</html>

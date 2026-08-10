@@ -23,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReviewService {
 
-    /// Ventana para poder editar/borrar una reseña ya publicada.
+    /// Ventana para poder editar/borrar una resena ya publicada.
     public static final long HORAS_LIMITE_EDICION = 48;
 
     private final ReviewRepository reviewRepository;
@@ -52,8 +52,8 @@ public class ReviewService {
     }
 
     //---------------------------------------- CREAR ----------------------------------------
-    /// Se reseña una ESTADIA puntual (la reserva), no el alojamiento en abstracto: por eso
-    /// un mismo cliente puede dejar varias reseñas del mismo lugar si se hospedo mas de una vez.
+    /// Se resena una ESTADIA puntual (la reserva), no el alojamiento en abstracto: por eso
+    /// un mismo cliente puede dejar varias resenas del mismo lugar si se hospedo mas de una vez.
     @Transactional
     public Review crear(ReviewRegistroDTO dto, String emailCliente) {
 
@@ -64,10 +64,10 @@ public class ReviewService {
             throw new ParametroInvalidoException("Esta reserva no te pertenece.");
         }
         if (reserva.getEstado() != EstadoReserva.FINALIZADA) {
-            throw new ParametroInvalidoException("Solo podes reseñar estadias ya finalizadas.");
+            throw new ParametroInvalidoException("Solo podes resenar estadias ya finalizadas.");
         }
         if (reviewRepository.existsByReservaId(reserva.getId())) {
-            throw new ParametroInvalidoException("Ya dejaste una reseña para esta estadia.");
+            throw new ParametroInvalidoException("Ya dejaste una resena para esta estadia.");
         }
 
         validarPuntuacion(dto.getPuntuacion());
@@ -97,7 +97,7 @@ public class ReviewService {
     }
 
     //---------------------------------------- MODIFICAR ----------------------------------------
-    /// Una reseña solo se puede editar dentro de las 48hs de haberse creado (y solo su autor).
+    /// Una resena solo se puede editar dentro de las 48hs de haberse creado (y solo su autor).
     @Transactional
     public Review modificar(ReviewModificarDTO dto, String emailSolicitante) {
 
@@ -123,18 +123,18 @@ public class ReviewService {
         boolean esAdmin = solicitante.getTipoUsuario() == TipoUsuario.ADMINISTRADOR;
         boolean esAutor = review.getCliente().getId().equals(solicitante.getId());
         if (!esAdmin && !esAutor) {
-            throw new ParametroInvalidoException("No autorizado sobre esta reseña.");
+            throw new ParametroInvalidoException("No autorizado sobre esta resena.");
         }
     }
 
     private void validarVentanaEdicion(Review review, Usuario solicitante) {
         boolean esAdmin = solicitante.getTipoUsuario() == TipoUsuario.ADMINISTRADOR;
         if (esAdmin) {
-            return; // el admin puede moderar reseñas fuera de la ventana (ej: por un reporte).
+            return; // el admin puede moderar resenas fuera de la ventana (ej: por un reporte).
         }
         long horasTranscurridas = Duration.between(review.getFecha(), LocalDateTime.now()).toHours();
         if (horasTranscurridas > HORAS_LIMITE_EDICION) {
-            throw new ParametroInvalidoException("Ya pasaron las " + HORAS_LIMITE_EDICION + "hs para editar esta reseña.");
+            throw new ParametroInvalidoException("Ya pasaron las " + HORAS_LIMITE_EDICION + "hs para editar esta resena.");
         }
     }
 

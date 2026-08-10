@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificaciones</title>
+    <style>
+        body { font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; }
+        .noti { border: 1px solid #ccc; padding: 8px; margin-bottom: 6px; }
+        .noleida { font-weight: bold; }
+    </style>
+</head>
+<body>
+<p><a href="/home.html">Volver al panel</a></p>
+<h1>Notificaciones</h1>
+<button id="btnMarcarTodas">Marcar todas como leidas</button>
+<div id="lista"></div>
+
+<script src="/js/api.js"></script>
+<script>
+    requireLogin();
+
+    async function cargar() {
+        const notificaciones = await apiJson("/Notificacion/listar");
+        document.getElementById("lista").innerHTML = notificaciones.map(n => `
+            <div class="noti ${n.leida ? "" : "noleida"}">
+                [${n.categoria}] ${n.mensaje}
+                <br><small>${n.fecha.replace("T", " ").split(".")[0]}</small>
+                ${n.leida ? "" : `<br><button onclick="marcarLeida(${n.id})">Marcar como leida</button>`}
+            </div>
+        `).join("") || "<p>No tenes notificaciones.</p>";
+    }
+
+    async function marcarLeida(id) {
+        await apiFetch(`/Notificacion/${id}/marcar-leida`, { method: "PATCH" });
+        cargar();
+    }
+
+    document.getElementById("btnMarcarTodas").addEventListener("click", async () => {
+        await apiFetch("/Notificacion/marcar-todas-leidas", { method: "PATCH" });
+        cargar();
+    });
+
+    cargar();
+</script>
+</body>
+</html>

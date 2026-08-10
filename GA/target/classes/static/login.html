@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesion</title>
+    <style>
+        body { display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: sans-serif; }
+        form { display: flex; flex-direction: column; gap: 10px; width: 260px; }
+        #error { color: red; display: none; }
+    </style>
+</head>
+<body>
+<form id="formLogin">
+    <h1>Iniciar sesion</h1>
+    <p id="error"></p>
+
+    <label for="email">Email</label>
+    <input type="email" id="email" required autocomplete="email">
+
+    <label for="password">Contrasena</label>
+    <input type="password" id="password" required autocomplete="current-password">
+
+    <button type="submit">Ingresar</button>
+    <a href="/registrarse.html">Registrarme</a>
+</form>
+
+<script>
+    document.getElementById("formLogin").addEventListener("submit", async (evento) => {
+        evento.preventDefault();
+        const error = document.getElementById("error");
+        error.style.display = "none";
+
+        try {
+            const respuesta = await fetch("/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email: document.getElementById("email").value,
+                    password: document.getElementById("password").value
+                })
+            });
+
+            if (!respuesta.ok) {
+                throw new Error("Email o contrasena incorrectos");
+            }
+
+            const datos = await respuesta.json();
+            localStorage.setItem("token", datos.token);
+            window.location.href = "/home.html";
+        } catch (e) {
+            error.textContent = e.message;
+            error.style.display = "block";
+        }
+    });
+</script>
+</body>
+</html>

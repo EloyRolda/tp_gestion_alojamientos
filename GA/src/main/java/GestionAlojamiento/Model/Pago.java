@@ -49,4 +49,10 @@ public class Pago {
 
     @Column(name = "fecha_acreditacion")
     private LocalDateTime fechaAcreditacion;
+
+    /// Snapshot de a donde deberia haber ido la plata (alias o "OAuth: cuenta conectada"),
+    /// tomado en el momento de generar la preferencia. Sirve de trazabilidad/auditoria
+    /// aunque el pago este en modo simulado.
+    @Column(name = "destino_cobro", length = 150)
+    private String destinoCobro;
 }

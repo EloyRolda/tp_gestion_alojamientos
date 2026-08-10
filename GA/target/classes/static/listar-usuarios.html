@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuarios</title>
+    <style>
+        body { font-family: sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; font-size: 14px; }
+    </style>
+</head>
+<body>
+<p><a href="/home.html">Volver al panel</a></p>
+<h1>Usuarios</h1>
+
+<label for="filtroTipo">Filtrar por tipo</label>
+<select id="filtroTipo">
+    <option value="todos">Todos</option>
+    <option value="clientes">Clientes</option>
+    <option value="anfitriones">Anfitriones</option>
+    <option value="administradores">Administradores</option>
+</select>
+
+<table>
+    <thead>
+    <tr><th>Id</th><th>Nombre</th><th>Email</th><th>Telefono</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+</table>
+<p id="mensaje"></p>
+
+<script src="/js/api.js"></script>
+<script>
+    requireLogin();
+
+    const ENDPOINTS = {
+        todos: "/Usuario/listar",
+        clientes: "/Usuario/listar/clientes",
+        anfitriones: "/Usuario/listar/anfitriones",
+        administradores: "/Usuario/listar/administradores"
+    };
+
+    async function cargar() {
+        const tipo = document.getElementById("filtroTipo").value;
+        const mensaje = document.getElementById("mensaje");
+        mensaje.textContent = "";
+        try {
+            const usuarios = await apiJson(ENDPOINTS[tipo]);
+            renderizar(usuarios);
+        } catch (e) {
+            mensaje.textContent = "Error: " + e.message;
+        }
+    }
+
+    function renderizar(usuarios) {
+        document.getElementById("tbody").innerHTML = usuarios.map(u => `
+            <tr>
+                <td>${u.id}</td>
+                <td>${u.nombre}</td>
+                <td>${u.email}</td>
+                <td>${u.telefono ?? "-"}</td>
+                <td>${u.tipoUsuario}</td>
+                <td>${u.activo ? "Activo" : "Inactivo"}</td>
+                <td>
+                    <a href="/admin-editar-usuario.html?id=${u.id}">Editar</a>
+                    ${u.activo ? `&nbsp;<button onclick="desactivar(${u.id})">Dar de baja</button>` : ""}
+                    &nbsp;<a href="/reportar.html?tipo=usuario&id=${u.id}">Reportar</a>
+                </td>
+            </tr>
+        `).join("");
+    }
+
+    async function desactivar(id) {
+        if (!confirm("Dar de baja a este usuario?")) return;
+        try {
+            await apiFetch("/Usuario/eliminar/" + id, { method: "DELETE" });
+            cargar();
+        } catch (e) {
+            document.getElementById("mensaje").textContent = "Error: " + e.message;
+        }
+    }
+
+    document.getElementById("filtroTipo").addEventListener("change", cargar);
+    cargar();
+</script>
+</body>
+</html>

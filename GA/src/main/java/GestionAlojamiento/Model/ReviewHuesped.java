@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-/// La contracara de Review: la reseña breve que el ANFITRION deja sobre el
+/// La contracara de Review: la resena breve que el ANFITRION deja sobre el
 /// HUESPED al finalizar la estadia (una por reserva, igual que la del cliente).
 @Data
 @NoArgsConstructor

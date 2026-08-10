@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar usuario</title>
+    <style>
+        body { font-family: sans-serif; max-width: 400px; margin: 0 auto; padding: 20px; }
+        form { display: flex; flex-direction: column; gap: 10px; }
+    </style>
+</head>
+<body>
+<p><a href="/listar-usuarios.html">Volver al listado</a></p>
+<h1>Editar usuario</h1>
+<p>Dejar en blanco los campos que no se quieren cambiar.</p>
+
+<form id="formEditar">
+    <label for="nombre">Nombre</label>
+    <input type="text" id="nombre">
+
+    <label for="email">Email</label>
+    <input type="email" id="email">
+
+    <label for="password">Nueva contrasena</label>
+    <input type="password" id="password" minlength="6">
+
+    <label for="telefono">Telefono</label>
+    <input type="text" id="telefono">
+
+    <label for="activo">Estado</label>
+    <select id="activo">
+        <option value="">Sin cambios</option>
+        <option value="true">Activo</option>
+        <option value="false">Inactivo</option>
+    </select>
+
+    <button type="submit">Guardar cambios</button>
+</form>
+<p id="mensaje"></p>
+
+<script src="/js/api.js"></script>
+<script>
+    requireLogin();
+    const id = new URLSearchParams(location.search).get("id");
+    if (!id) {
+        document.getElementById("mensaje").textContent = "Falta el id del usuario en la URL (?id=).";
+    }
+
+    document.getElementById("formEditar").addEventListener("submit", async (evento) => {
+        evento.preventDefault();
+        const mensaje = document.getElementById("mensaje");
+        mensaje.textContent = "";
+
+        const datos = { id: Number(id) };
+        const nombre = document.getElementById("nombre").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        const telefono = document.getElementById("telefono").value.trim();
+        const activo = document.getElementById("activo").value;
+
+        if (nombre) datos.nombre = nombre;
+        if (email) datos.email = email;
+        if (password) datos.password = password;
+        if (telefono) datos.telefono = telefono;
+        if (activo) datos.activo = activo === "true";
+
+        try {
+            await apiJson("/Usuario/actualizar/admin", "PUT", datos);
+            mensaje.textContent = "Usuario actualizado.";
+        } catch (e) {
+            mensaje.textContent = "Error: " + e.message;
+        }
+    });
+</script>
+</body>
+</html>

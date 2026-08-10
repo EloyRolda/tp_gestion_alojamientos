@@ -59,7 +59,7 @@ public class Reserva {
     @Column(name = "fecha_limite_pago")
     private LocalDateTime fechaLimitePago;
 
-    /// Momento en que se cerro la estadia (FINALIZADA), usado para la ventana de reseña/cierre de chat.
+    /// Momento en que se cerro la estadia (FINALIZADA), usado para la ventana de resena/cierre de chat.
     @Column(name = "fecha_finalizacion")
     private LocalDateTime fechaFinalizacion;
 

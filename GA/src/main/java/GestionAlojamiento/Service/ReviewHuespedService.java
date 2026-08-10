@@ -29,7 +29,7 @@ public class ReviewHuespedService {
 
     public ReviewHuesped obtenerPorId(Long id) {
         return reviewHuespedRepository.findById(id)
-                .orElseThrow(() -> new IdNoEncontradoException("Reseña de huesped no encontrada: " + id));
+                .orElseThrow(() -> new IdNoEncontradoException("Resena de huesped no encontrada: " + id));
     }
 
     @Transactional
@@ -41,10 +41,10 @@ public class ReviewHuespedService {
             throw new ParametroInvalidoException("Esta reserva no es de uno de tus alojamientos.");
         }
         if (reserva.getEstado() != EstadoReserva.FINALIZADA) {
-            throw new ParametroInvalidoException("Solo podes reseñar huespedes de estadias ya finalizadas.");
+            throw new ParametroInvalidoException("Solo podes resenar huespedes de estadias ya finalizadas.");
         }
         if (reviewHuespedRepository.existsByReservaId(reserva.getId())) {
-            throw new ParametroInvalidoException("Ya reseñaste al huesped de esta estadia.");
+            throw new ParametroInvalidoException("Ya resenaste al huesped de esta estadia.");
         }
 
         ReviewHuesped review = new ReviewHuesped();

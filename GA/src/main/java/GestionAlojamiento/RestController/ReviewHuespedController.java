@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/// Reseña breve que el ANFITRION deja sobre el HUESPED al finalizar la estadia.
+/// Resena breve que el ANFITRION deja sobre el HUESPED al finalizar la estadia.
 @RestController
 @RequestMapping("/ReviewHuesped")
 @RequiredArgsConstructor

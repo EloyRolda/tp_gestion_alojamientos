@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis reviews</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .review { border: 1px solid #ccc; padding: 10px; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+<p><a href="/home.html">Volver al panel</a></p>
+<h1>Mis reviews</h1>
+<div id="lista"></div>
+<p id="mensaje"></p>
+
+<script src="/js/api.js"></script>
+<script>
+    requireLogin();
+
+    async function cargar() {
+        const usuario = await apiJson("/Usuario/me");
+        const reviews = await apiJson("/Review/cliente/" + usuario.id);
+        const lista = document.getElementById("lista");
+
+        if (reviews.length === 0) {
+            lista.innerHTML = "<p>Todavia no dejaste ninguna review.</p>";
+            return;
+        }
+
+        lista.innerHTML = reviews.map(r => `
+            <div class="review">
+                <strong>${r.alojamiento.titulo}</strong> - ${"*".repeat(r.puntuacion)}${"-".repeat(5 - r.puntuacion)} - ${r.fecha.split("T")[0]}
+                <p>${r.comentario}</p>
+                <a href="/editar-review.html?id=${r.id}">Editar</a>
+                <button onclick="eliminar(${r.id})">Eliminar</button>
+            </div>
+        `).join("");
+    }
+
+    async function eliminar(id) {
+        if (!confirm("Eliminar esta review?")) return;
+        try {
+            await apiFetch("/Review/eliminar/" + id, { method: "DELETE" });
+            cargar();
+        } catch (e) {
+            document.getElementById("mensaje").textContent = "Error: " + e.message;
+        }
+    }
+
+    cargar();
+</script>
+</body>
+</html>

@@ -20,7 +20,6 @@ public class UsuarioModificarDTO {
     private String password;
     private Boolean activo;
 
-    // Campos opcionales  rol
-    private String metodoPago;  // CLIENTE
+    // Campo opcional por rol
     private String matricula;   // ADMINISTRADOR
 }

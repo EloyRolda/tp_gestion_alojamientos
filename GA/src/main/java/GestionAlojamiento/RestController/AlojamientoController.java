@@ -1,8 +1,12 @@
 package GestionAlojamiento.RestController;
 
+import GestionAlojamiento.DTO.AlojamientoModificarDTO;
+import GestionAlojamiento.DTO.AlojamientoRegistroDTO;
 import GestionAlojamiento.Model.Alojamiento;
+import GestionAlojamiento.Model.Gallery;
 import GestionAlojamiento.Service.AlojamientoService;
 import GestionAlojamiento.Service.GalleryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -10,10 +14,11 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.List;
 
-/// Listado/busqueda UNIFICADA de alojamientos (mezcla Casa/Departamento/Hotel),
-/// gracias a la herencia JPA JOINED de Alojamiento. Es el endpoint que usa el
-/// listado publico estilo Airbnb; los endpoints /Casa, /Departamento y /Hotel
-/// siguen existiendo para el CRUD especifico de cada subtipo.
+/// Controller UNICO para los 3 tipos de alojamiento (reemplaza a los viejos
+/// CasaController/DepartamentoController/HotelController). Alojamiento paso a
+/// ser una tabla unica (ver Alojamiento.java) en vez de una jerarquia de
+/// herencia con una tabla por tipo, asi que ya no hace falta un controller
+/// por subtipo: el "tipo" es solo un campo mas del alta/edicion.
 @RestController
 @RequestMapping("/Alojamiento")
 @RequiredArgsConstructor
@@ -25,6 +30,11 @@ public class AlojamientoController {
     @GetMapping("/listar")
     public List<Alojamiento> listarTodos() {
         return alojamientoService.listarTodos();
+    }
+
+    @GetMapping("/listar/propios")
+    public List<Alojamiento> listarPropios(Authentication auth) {
+        return alojamientoService.listarPorAnfitrion(auth.getName());
     }
 
     @GetMapping("/mostrar/{id}")
@@ -45,15 +55,43 @@ public class AlojamientoController {
         return alojamientoService.buscarPublico(ciudad, capacidadMinima, precioMin, precioMax, tipo);
     }
 
-    /// El anfitrion publica su alojamiento (queda visible en /buscar) una vez que
-    /// cumple el minimo de fotos exigido.
+    /// Crea el alojamiento y su galeria vacia en el mismo paso (se orquesta aca,
+    /// no dentro del Service, para no crear una dependencia circular con GalleryService).
+    @PostMapping("/registrar")
+    public Alojamiento registrar(@Valid @RequestBody AlojamientoRegistroDTO dto) {
+        Alojamiento alojamiento = alojamientoService.crear(dto);
+        Gallery gallery = new Gallery(null, dto.getTitulo(), alojamiento);
+        galleryService.createGallery(gallery);
+        return alojamiento;
+    }
+
+    @PutMapping("/actualizar")
+    public Alojamiento actualizar(@Valid @RequestBody AlojamientoModificarDTO dto, Authentication auth) {
+        return alojamientoService.modificar(dto, auth.getName());
+    }
+
+    @DeleteMapping("/eliminar/{id}")
+    public void eliminar(@PathVariable Long id, Authentication auth) {
+        alojamientoService.desactivar(id, auth.getName());
+    }
+
+    /// El anfitrion (o el admin) publica el alojamiento (queda visible en /buscar)
+    /// una vez que cumple el minimo de fotos exigido.
     @PatchMapping("/{id}/publicar")
     public void publicar(@PathVariable Long id, Authentication auth) {
         galleryService.publicar(id, auth.getName());
     }
 
     @PatchMapping("/{id}/despublicar")
-    public void despublicar(@PathVariable Long id) {
-        galleryService.despublicar(id);
+    public void despublicar(@PathVariable Long id, Authentication auth) {
+        galleryService.despublicar(id, auth.getName());
+    }
+
+    /// El anfitrion (o el admin) reactiva un alojamiento que estaba dado de baja.
+    /// Queda inactivo->activo pero SIN publicar: hay que volver a publicarlo a mano
+    /// (asi no reaparece de golpe en el listado publico sin que el anfitrion lo revise).
+    @PatchMapping("/{id}/reactivar")
+    public void reactivar(@PathVariable Long id, Authentication auth) {
+        alojamientoService.reactivar(id, auth.getName());
     }
 }

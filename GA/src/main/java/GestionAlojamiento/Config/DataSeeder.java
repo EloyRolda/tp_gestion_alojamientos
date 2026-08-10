@@ -44,10 +44,11 @@ public class DataSeeder implements CommandLineRunner {
         crearSiNoExiste("Camaras de seguridad", CategoriaAmenity.SEGURIDAD);
         crearSiNoExiste("Alarma", CategoriaAmenity.SEGURIDAD);
         crearSiNoExiste("Detector de humo", CategoriaAmenity.SEGURIDAD);
-        crearSiNoExiste("Apto para niños", CategoriaAmenity.FAMILIA);
+        crearSiNoExiste("Apto para ninos", CategoriaAmenity.FAMILIA);
         crearSiNoExiste("Cuna disponible", CategoriaAmenity.FAMILIA);
         crearSiNoExiste("Desayuno incluido", CategoriaAmenity.SERVICIOS);
         crearSiNoExiste("Limpieza incluida", CategoriaAmenity.SERVICIOS);
+        crearSiNoExiste("Expensas incluidas", CategoriaAmenity.SERVICIOS);
         crearSiNoExiste("Se admiten mascotas", CategoriaAmenity.MASCOTAS);
     }
 
