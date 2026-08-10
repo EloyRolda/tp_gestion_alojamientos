@@ -9,11 +9,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class HotelModificarDTO {
 
     @NotNull(message = "Campo Obligatorio")
@@ -65,9 +65,6 @@ public class HotelModificarDTO {
     @Min(value = 0, message = "Valor Invalido")
     private Integer altura;
 
-    //[SERVICIO]
-    private Boolean tieneCocina;
-    private Boolean tieneLavarropa;
-    private Boolean tieneWifi;
-    private Boolean tieneEstacionamiento;
+    //[AMENITIES]
+    private List<Long> amenityIds;
 }

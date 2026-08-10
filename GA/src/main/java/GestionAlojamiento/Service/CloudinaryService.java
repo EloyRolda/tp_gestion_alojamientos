@@ -16,12 +16,17 @@ public class CloudinaryService {
 
     private final Cloudinary cloudinary;
 
-    public Map upload(MultipartFile file) {
+    /// Sube un archivo a una carpeta especifica de Cloudinary (ej: "alojamientos/12", "usuarios/7").
+    /// Cada entidad organiza sus propias imagenes en su propia carpeta en vez de
+    /// mandar todo a una carpeta generica "imagenes" como antes.
+    public Map upload(MultipartFile file, String folder) {
         try {
-            Map result = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("folder", "imagenes", "resource_type", "auto",
-                    "transformation", new Transformation().width(600).height(600).crop("pad").quality("auto"), "format", "webp")
+            return cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
+                    "folder", folder,
+                    "resource_type", "auto",
+                    "transformation", new Transformation().width(800).height(800).crop("limit").quality("auto"),
+                    "format", "webp")
             );
-            return result;
         } catch (IOException e) {
             throw new RuntimeException("Error uploading at cloudinary", e);
         }
@@ -29,11 +34,9 @@ public class CloudinaryService {
 
     public void delete(String publicId) {
         try {
-            Map result = cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+            cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
         } catch (IOException e) {
             throw new RuntimeException("Error deleting at Cloudinary", e);
         }
     }
-
-
 }

@@ -5,11 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-//Lombok
+/// La reseña siempre se liga a una RESERVA puntual (FINALIZADA y del cliente logueado),
+/// de ahi se derivan el alojamiento y el cliente: no se piden por separado para
+/// evitar que alguien reseñe una estadia que no es suya.
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class ReviewRegistroDTO {
 
     @Max(value = 5, message = "El valor maximo es 5")
@@ -22,8 +23,5 @@ public class ReviewRegistroDTO {
     private String comentario;
 
     @NotNull(message = "Campo Obligatorio")
-    private Long idCliente;
-
-    @NotNull(message = "Campo Obligatorio")
-    private Long idAlojamiento;
+    private Long idReserva;
 }

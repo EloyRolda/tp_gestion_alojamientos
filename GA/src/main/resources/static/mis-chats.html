@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis chats</title>
+    <style>
+        body { font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; }
+        .chat { border: 1px solid #ccc; padding: 8px; margin-bottom: 6px; }
+    </style>
+</head>
+<body>
+<p><a href="/home.html">Volver al panel</a></p>
+<h1>Mis chats</h1>
+<div id="lista"></div>
+
+<script src="/js/api.js"></script>
+<script>
+    requireLogin();
+
+    apiJson("/Chat/listar/propios").then(chats => {
+        document.getElementById("lista").innerHTML = chats.map(c => `
+            <div class="chat">
+                Reserva #${c.reserva.id} - ${c.reserva.alojamiento.titulo}<br>
+                Con: ${c.anfitrion.nombre} / ${c.cliente.nombre}<br>
+                Estado: ${c.activo ? "abierto" : "cerrado"}<br>
+                <a href="/chat.html?id=${c.id}">Abrir chat</a>
+            </div>
+        `).join("") || "<p>No tenes chats todavia (se abren cuando se confirma el pago de una reserva).</p>";
+    });
+</script>
+</body>
+</html>

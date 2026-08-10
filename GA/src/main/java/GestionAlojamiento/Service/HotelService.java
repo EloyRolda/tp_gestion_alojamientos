@@ -3,8 +3,9 @@ package GestionAlojamiento.Service;
 import GestionAlojamiento.DTO.HotelModificarDTO;
 import GestionAlojamiento.DTO.HotelRegistroDTO;
 import GestionAlojamiento.Exception.IdNoEncontradoException;
-import GestionAlojamiento.Model.*;
-import GestionAlojamiento.Model.Enums.TipoInmueble;
+import GestionAlojamiento.Model.Direccion;
+import GestionAlojamiento.Model.Gallery;
+import GestionAlojamiento.Model.Hotel;
 import GestionAlojamiento.Repository.HotelRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +20,8 @@ public class HotelService {
     private final HotelRepository hotelRepository;
     private final UsuarioService usuarioService;
     private final AlojamientoService alojamientoService;
+    private final AmenityService amenityService;
     private final GalleryService galleryService;
-    private final ReservaService reservaService;
-    private final ReviewService reviewService;
 
     //---------------------------------------- LISTAR ----------------------------------------
     public List<Hotel> listarTodos() {
@@ -29,12 +29,12 @@ public class HotelService {
     }
 
     public Hotel obtenerPorId(Long id) {
-        return hotelRepository.findById(id).orElseThrow(() -> new IdNoEncontradoException("Error, id de hotel no encontrado en la base de datos."));
+        return hotelRepository.findById(id)
+                .orElseThrow(() -> new IdNoEncontradoException("Error, id de hotel no encontrado en la base de datos."));
     }
 
-    /// Recibe un id de un anfitrion y devuelve una lista de los hotel es que posee.
     public List<Hotel> listarPorAnfitrion(String correoAnfitrion) {
-        return hotelRepository.findByAlojamientoAnfitrionEmail(correoAnfitrion);
+        return hotelRepository.findByAnfitrionEmail(correoAnfitrion);
     }
 
     //---------------------------------------- CREAR ----------------------------------------
@@ -46,24 +46,23 @@ public class HotelService {
         hotel.setIncluyeDesayuno(dto.isIncluyeDesayuno());
         hotel.setIncluyeLimpieza(dto.isIncluyeLimpieza());
 
-        hotel.setAlojamiento(mapearAlojamiento(dto));
+        mapearComun(hotel, dto);
+        hotel.setAnfitrion(usuarioService.obtenerAnfitrionPorId(dto.getIdAnfitrion()));
+        hotel.setActivo(true);
 
-        Gallery gallery = new Gallery(null, dto.getTitulo(), hotel.getAlojamiento());
+        Hotel guardado = hotelRepository.save(hotel);
+
+        Gallery gallery = new Gallery(null, dto.getTitulo(), guardado);
         galleryService.createGallery(gallery);
 
-        return hotelRepository.save(hotel);
+        return guardado;
     }
 
-    //---------------------------------------- BORRAR ----------------------------------------
+    //---------------------------------------- BORRAR (BAJA LOGICA) ----------------------------------------
     @Transactional
-    public void borrarPorId(Long id_hotel) {
-        Hotel hotel = hotelRepository.findById(id_hotel)
-                .orElseThrow(() -> new IdNoEncontradoException("Error, el id de HOTEL no se encuentra en la base de datos:" + id_hotel));
-        Alojamiento alojamiento = hotel.getAlojamiento();
-        reservaService.borrarPorAlojamientoId(alojamiento.getId());
-        reviewService.borrarPorAlojamiento(alojamiento);
-        galleryService.borrarPorAlojamientoId(alojamiento.getId());
-        hotelRepository.deleteById(id_hotel);
+    public void borrarPorId(Long idHotel) {
+        obtenerPorId(idHotel);
+        alojamientoService.desactivar(idHotel);
     }
 
     //---------------------------------------- MODIFICAR ----------------------------------------
@@ -80,90 +79,65 @@ public class HotelService {
         if (dto.getIncluyeLimpieza() != null) {
             hotel.setIncluyeLimpieza(dto.getIncluyeLimpieza());
         }
-        hotel.setAlojamiento(alojamientoService.modificarObjeto(hotel.getAlojamiento(), mapearAlojamiento(dto)));
+
+        Hotel cambiosComunes = new Hotel();
+        mapearComunModificar(cambiosComunes, dto);
+        if (dto.getAnfitrion_id() != null) {
+            cambiosComunes.setAnfitrion(usuarioService.obtenerAnfitrionPorId(dto.getAnfitrion_id()));
+        }
+        if (dto.getActivo() != null) {
+            cambiosComunes.setActivo(dto.getActivo());
+        }
+
+        alojamientoService.modificarObjeto(hotel, cambiosComunes);
+
         return hotelRepository.save(hotel);
     }
 
     //---------------------------------------- MAPEOS DTO [PRIVADOS] ----------------------------------------
 
-    private Alojamiento mapearAlojamiento(HotelModificarDTO dto) {
+    private void mapearComun(Hotel hotel, HotelRegistroDTO dto) {
+        hotel.setTitulo(dto.getTitulo());
+        hotel.setDescripcion(dto.getDescripcion());
+        hotel.setPrecioNoche(dto.getPrecioNoche());
+        hotel.setCapacidad(dto.getCapacidad());
+        hotel.setCantAmbientes(dto.getCantAmbientes());
+        hotel.setCantHabitaciones(dto.getCantHabitaciones());
+        hotel.setCantCamas(dto.getCantCamas());
+        hotel.setCantBanios(dto.getCantBanios());
+        hotel.setAmenities(amenityService.resolver(dto.getAmenityIds()));
 
-        Direccion direccion = new Direccion(
+        hotel.setDireccion(new Direccion(
                 null,
-                dto.getPais(),
-                dto.getProvincia(),
+                dto.getPais().toLowerCase(),
+                dto.getProvincia().toLowerCase(),
                 dto.getCodigoPostal(),
                 dto.getCiudad(),
-                dto.getCalle(),
+                dto.getCalle().toLowerCase(),
                 dto.getAltura()
-        );
-
-        Servicio servicio = new Servicio(
-                null,
-                dto.getTieneCocina(),
-                dto.getTieneLavarropa(),
-                dto.getTieneWifi(),
-                dto.getTieneEstacionamiento()
-        );
-
-        Usuario anfitrion = null;
-        if (dto.getAnfitrion_id() != null) {
-            anfitrion = usuarioService.obtenerAnfitrionPorId(dto.getAnfitrion_id());
-        }
-
-        return new Alojamiento(
-                null,
-                dto.getTitulo(),
-                dto.getDescripcion(),
-                dto.getPrecioNoche(),
-                dto.getCapacidad(),
-                dto.getCantAmbientes(),
-                dto.getCantHabitaciones(),
-                dto.getCantCamas(),
-                dto.getCantBanios(),
-                dto.getActivo(),
-                TipoInmueble.HOTEL,
-                anfitrion,
-                direccion,
-                servicio
-        );
+        ));
     }
 
-    private Alojamiento mapearAlojamiento(HotelRegistroDTO dto) {
+    private void mapearComunModificar(Hotel cambios, HotelModificarDTO dto) {
+        cambios.setTitulo(dto.getTitulo());
+        cambios.setDescripcion(dto.getDescripcion());
+        cambios.setPrecioNoche(dto.getPrecioNoche());
+        cambios.setCapacidad(dto.getCapacidad());
+        cambios.setCantAmbientes(dto.getCantAmbientes());
+        cambios.setCantHabitaciones(dto.getCantHabitaciones());
+        cambios.setCantCamas(dto.getCantCamas());
+        cambios.setCantBanios(dto.getCantBanios());
+        if (dto.getAmenityIds() != null) {
+            cambios.setAmenities(amenityService.resolver(dto.getAmenityIds()));
+        }
 
-        Direccion direccion = new Direccion(
-                null,
-                dto.getPais(),
-                dto.getProvincia(),
-                dto.getCodigoPostal(),
-                dto.getCiudad(),
-                dto.getCalle(),
-                dto.getAltura()
-        );
-
-        Servicio servicio = new Servicio(
-                null,
-                dto.isTieneCocina(),
-                dto.isTieneLavarropa(),
-                dto.isTieneWifi(),
-                dto.isTieneEstacionamiento()
-        );
-
-        return new Alojamiento(
-                null,
-                dto.getTitulo(),
-                dto.getDescripcion(),
-                dto.getPrecioNoche(),
-                dto.getCapacidad(),
-                dto.getCantAmbientes(),
-                dto.getCantHabitaciones(),
-                dto.getCantCamas(),
-                dto.getCantBanios(),
-                true,
-                TipoInmueble.HOTEL,
-                usuarioService.obtenerAnfitrionPorId(dto.getIdAnfitrion()),
-                direccion,
-                servicio
-        );
+        Direccion direccion = new Direccion();
+        direccion.setPais(dto.getPais());
+        direccion.setProvincia(dto.getProvincia());
+        direccion.setCodigoPostal(dto.getCodigoPostal());
+        direccion.setCiudad(dto.getCiudad());
+        direccion.setCalle(dto.getCalle());
+        direccion.setAltura(dto.getAltura());
+        cambios.setDireccion(direccion);
     }
 }

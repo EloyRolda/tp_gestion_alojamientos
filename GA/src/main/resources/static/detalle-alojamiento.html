@@ -3,842 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalle Alojamiento</title>
+    <title>Detalle del alojamiento</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap');
-
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        :root {
-            --bg: #0a0f1e;
-            --surface: #111827;
-            --surface2: #1a2435;
-            --border: #1e2d45;
-            --accent: #3b82f6;
-            --accent-glow: rgba(59, 130, 246, 0.15);
-            --text: #e2e8f0;
-            --muted: #64748b;
-            --error: #f87171;
-            --delete: #7f1d1d;
-            --delete-text: #fca5a5;
-        }
-
-        body {
-            background: var(--bg);
-            font-family: 'DM Sans', sans-serif;
-            color: var(--text);
-            min-height: 100vh;
-        }
-
-        /* HEADER */
-        header {
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 16px 32px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-icon {
-            width: 38px;
-            height: 38px;
-            background: linear-gradient(135deg, var(--accent), #6366f1);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-
-        .app-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .btn-back {
-            background: transparent;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 8px 14px;
-            color: var(--muted);
-            font-family: 'DM Sans', sans-serif;
-            font-size: 13px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            transition: all 0.2s;
-        }
-
-        .btn-back:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
-        .logout-link {
-            color: #fca5a5;
-            text-decoration: none;
-            font-size: 13px;
-            transition: color 0.2s;
-        }
-
-        .logout-link:hover {
-            color: #f87171;
-        }
-
-        /* MAIN */
-        main {
-            padding: 32px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        /* LOADING */
-        #loadingOverlay {
-            position: fixed;
-            inset: 0;
-            background: var(--bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            transition: opacity 0.3s;
-        }
-
-        .spinner {
-            width: 32px;
-            height: 32px;
-            border: 3px solid var(--border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* DETAIL CARD */
-        .detail-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            overflow: hidden;
-            margin-bottom: 24px;
-            animation: fadeUp 0.4s ease both;
-        }
-
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(14px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .detail-head {
-            padding: 24px 28px 20px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-
-        .aloj-titulo {
-            font-family: 'Playfair Display', serif;
-            font-size: 26px;
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
-
-        .aloj-estado {
-            font-size: 11px;
-            font-weight: 700;
-            padding: 3px 10px;
-            border-radius: 20px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        .estado-activo {
-            background: rgba(52, 211, 153, 0.15);
-            color: #6ee7b7;
-            border: 1px solid rgba(52, 211, 153, 0.25);
-        }
-
-        .estado-inactivo {
-            background: rgba(100, 116, 139, 0.15);
-            color: #94a3b8;
-            border: 1px solid rgba(100, 116, 139, 0.25);
-        }
-
-        .detail-body {
-            padding: 24px 28px;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .info-item {
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 14px 16px;
-        }
-
-        .info-label {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--muted);
-            letter-spacing: 0.6px;
-            text-transform: uppercase;
-            margin-bottom: 6px;
-        }
-
-        .info-value {
-            font-size: 15px;
-            font-weight: 500;
-        }
-
-        .aloj-desc {
-            font-size: 14px;
-            color: #94a3b8;
-            line-height: 1.7;
-            border-top: 1px solid var(--border);
-            padding-top: 16px;
-            margin-top: 4px;
-            margin-bottom: 20px;
-        }
-
-        /* TOGGLE BUTTON */
-        .toggle-detalles-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: transparent;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 9px 16px;
-            color: var(--muted);
-            font-family: 'DM Sans', sans-serif;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            user-select: none;
-        }
-
-        .toggle-detalles-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            background: var(--accent-glow);
-        }
-
-        .toggle-detalles-btn .toggle-arrow {
-            display: inline-block;
-            transition: transform 0.25s ease;
-            line-height: 1;
-        }
-
-        .toggle-detalles-btn.open .toggle-arrow {
-            transform: rotate(180deg);
-        }
-
-        /* DETAILS PANEL — animated with max-height trick */
-        .mas-detalles-panel {
-            overflow: hidden;
-            max-height: 0;
-            opacity: 0;
-            transition: max-height 0.4s ease, opacity 0.3s ease, margin-top 0.3s ease;
-            margin-top: 0;
-        }
-
-        .mas-detalles-panel.open {
-            max-height: 900px;
-            opacity: 1;
-            margin-top: 20px;
-        }
-
-        .mas-detalles-panel .info-grid {
-            margin-bottom: 12px;
-        }
-
-        .mas-detalles-panel .info-grid:last-child {
-            margin-bottom: 0;
-        }
-
-        /* GALLERY */
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 10px;
-            margin-bottom: 24px;
-        }
-
-        .gallery-img {
-            aspect-ratio: 1;
-            object-fit: cover;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            width: 100%;
-            transition: transform 0.2s;
-            cursor: pointer;
-        }
-
-        .gallery-img:hover {
-            transform: scale(1.03);
-        }
-
-        /* ACTIONS */
-        .actions-row {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 32px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--accent), #6366f1);
-            border: none;
-            border-radius: 9px;
-            padding: 11px 22px;
-            color: #fff;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: opacity 0.2s, transform 0.1s;
-        }
-
-        .btn-primary:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-
-        .btn-edit-aloj {
-            background: rgba(59, 130, 246, 0.12);
-            border: 1px solid rgba(59, 130, 246, 0.25);
-            color: #93c5fd;
-            border-radius: 9px;
-            padding: 11px 22px;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s;
-        }
-
-        .btn-edit-aloj:hover {
-            background: rgba(59, 130, 246, 0.22);
-        }
-
-        .btn-delete-aloj {
-            background: rgba(127, 29, 29, 0.35);
-            border: 1px solid rgba(252, 165, 165, 0.2);
-            color: var(--delete-text);
-            border-radius: 9px;
-            padding: 11px 22px;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s;
-        }
-
-        .btn-delete-aloj:hover {
-            background: rgba(127, 29, 29, 0.55);
-        }
-
-        /* REVIEWS */
-        .section-title {
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1.2px;
-            text-transform: uppercase;
-            color: var(--muted);
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .review-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px 20px;
-            margin-bottom: 12px;
-            transition: border-color 0.2s;
-            animation: fadeUp 0.4s ease both;
-        }
-
-        .review-card:hover {
-            border-color: #2d3f5c;
-        }
-
-        .review-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 8px;
-        }
-
-        .review-author {
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .review-date {
-            font-size: 12px;
-            color: var(--muted);
-        }
-
-        .stars {
-            font-size: 14px;
-            letter-spacing: 1px;
-            margin-bottom: 6px;
-        }
-
-        .stars .filled {
-            color: #fbbf24;
-        }
-
-        .stars .empty {
-            color: var(--border);
-        }
-
-        .review-comment {
-            font-size: 14px;
-            color: #94a3b8;
-            line-height: 1.6;
-            border-left: 2px solid var(--border);
-            padding-left: 12px;
-            font-style: italic;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 24px;
-            color: var(--muted);
-        }
-
-        .empty-state .empty-icon {
-            font-size: 36px;
-            margin-bottom: 12px;
-        }
-
-        .empty-state p {
-            font-size: 14px;
-        }
-
-        /* LIGHTBOX */
-        .lightbox {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.92);
-            z-index: 200;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.2s ease;
-        }
-
-        .lightbox.open {
-            display: flex;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        .lb-img {
-            max-width: 90vw;
-            max-height: 85vh;
-            border-radius: 10px;
-            object-fit: contain;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
-        }
-
-        .lb-btn {
-            position: fixed;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 50%;
-            width: 44px;
-            height: 44px;
-            color: #fff;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-            z-index: 201;
-        }
-
-        .lb-btn:hover {
-            background: rgba(255, 255, 255, 0.18);
-        }
-
-        .lb-prev {
-            left: 16px;
-        }
-
-        .lb-next {
-            right: 16px;
-        }
-
-        .lb-close {
-            position: fixed;
-            top: 16px;
-            right: 16px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 50%;
-            width: 38px;
-            height: 38px;
-            color: #fff;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-            z-index: 201;
-        }
-
-        .lb-close:hover {
-            background: rgba(200, 50, 50, 0.4);
-        }
-
-        .lb-counter {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.5);
-            z-index: 201;
-        }
+        body { font-family: sans-serif; max-width: 700px; margin: 0 auto; padding: 20px; }
+        img { width: 140px; height: 140px; object-fit: cover; margin: 4px; }
+        dt { font-weight: bold; margin-top: 6px; }
+        .review { border: 1px solid #ccc; padding: 8px; margin-bottom: 6px; }
     </style>
 </head>
 <body>
+<p><a href="/listar-alojamientos.html">Volver al listado</a></p>
+<h1 id="titulo">Cargando...</h1>
 
-<div id="loadingOverlay">
-    <div class="spinner"></div>
-</div>
+<dl id="datos"></dl>
 
-<header>
-    <div class="header-left">
-        <div class="logo-icon">🏠</div>
-        <span class="app-title">Gestión Alojamiento</span>
-    </div>
-    <div class="header-right">
-        <a href="/listar-alojamientos.html" class="btn-back">← Volver</a>
-        <a href="#" onclick="cerrarSesion()" class="logout-link">Cerrar sesión</a>
-    </div>
-</header>
+<h2>Amenities</h2>
+<ul id="amenities"></ul>
 
-<main id="mainContent" style="display:none">
-    <div class="detail-card" id="detailCard">
-        <div class="detail-head" id="detailHead">
-            <div>
-                <div class="aloj-titulo" id="titulo">Cargando...</div>
-            </div>
-        </div>
-        <div class="detail-body" id="detailBody"></div>
-    </div>
+<h2>Fotos</h2>
+<div id="galeria"></div>
 
-    <div class="section-title" id="galeriaTitulo" style="display:none">🖼️ Galería</div>
-    <div class="gallery-grid" id="galeriaGrid"></div>
+<div id="acciones"></div>
+<p><a href="/reportar.html?tipo=alojamiento&id=" id="linkReportar">Reportar este alojamiento</a></p>
 
-    <div class="actions-row" id="acciones"></div>
+<h2>Reviews</h2>
+<div id="reviews"></div>
 
-    <div class="section-title">⭐ Reseñas</div>
-    <div id="reviews"></div>
-</main>
-
+<script src="/js/api.js"></script>
 <script>
-    if (!localStorage.getItem('token')) window.location.href = '/login.html';
+    requireLogin();
+    const id = new URLSearchParams(location.search).get("id");
+    let usuario, alojamiento;
 
-    function cerrarSesion() {
-        localStorage.removeItem('token');
-        window.location.href = '/login.html';
+    async function cargar() {
+        usuario = await apiJson("/Usuario/me");
+        alojamiento = await apiJson("/Alojamiento/mostrar/" + id);
+
+        document.getElementById("titulo").textContent = alojamiento.titulo;
+        document.getElementById("linkReportar").href = `/reportar.html?tipo=alojamiento&id=${id}`;
+
+        const dir = alojamiento.direccion;
+        const filas = [
+            ["Tipo", alojamiento.tipo],
+            ["Precio por noche", "$" + alojamiento.precioNoche],
+            ["Capacidad", alojamiento.capacidad + " personas"],
+            ["Ambientes", alojamiento.cantAmbientes],
+            ["Habitaciones", alojamiento.cantHabitaciones],
+            ["Camas", alojamiento.cantCamas],
+            ["Banios", alojamiento.cantBanios],
+            ["Direccion", dir ? `${dir.calle} ${dir.altura}, ${dir.ciudad}, ${dir.provincia}, ${dir.pais}` : "-"],
+            ["Anfitrion", alojamiento.anfitrion ? alojamiento.anfitrion.nombre : "-"],
+            ["Descripcion", alojamiento.descripcion || "-"],
+            ["Estado", alojamiento.activo ? (alojamiento.publicado ? "Publicado" : "Sin publicar") : "Dado de baja"]
+        ];
+
+        if (alojamiento.tipo === "CASA") {
+            filas.push(["Patio", alojamiento.tienePatio ? "Si" : "No"]);
+            filas.push(["Pileta", alojamiento.tienePileta ? "Si" : "No"]);
+            filas.push(["Parrilla", alojamiento.tieneParrilla ? "Si" : "No"]);
+        } else if (alojamiento.tipo === "HOTEL") {
+            filas.push(["Estrellas", alojamiento.estrellas]);
+            filas.push(["Desayuno incluido", alojamiento.incluyeDesayuno ? "Si" : "No"]);
+            filas.push(["Limpieza incluida", alojamiento.incluyeLimpieza ? "Si" : "No"]);
+        } else if (alojamiento.tipo === "DEPARTAMENTO") {
+            filas.push(["Piso", alojamiento.piso]);
+            filas.push(["Ascensor", alojamiento.tieneAscensor ? "Si" : "No"]);
+            filas.push(["Expensas incluidas", alojamiento.expensasIncluidas ? "Si" : "No"]);
+        }
+
+        document.getElementById("datos").innerHTML = filas.map(([e, v]) => `<dt>${e}</dt><dd>${v ?? "-"}</dd>`).join("");
+
+        document.getElementById("amenities").innerHTML = (alojamiento.amenities || []).map(a => `<li>${a.nombre}</li>`).join("") || "<li>Sin amenities cargados</li>";
+
+        const acciones = document.getElementById("acciones");
+        const esDueno = usuario.tipoUsuario === "ANFITRION" && alojamiento.anfitrion && alojamiento.anfitrion.id === usuario.id;
+
+        if (usuario.tipoUsuario === "CLIENTE") {
+            acciones.innerHTML = `<a href="/registrar-reserva.html?idAlojamiento=${id}">Solicitar reserva</a>`;
+        } else if (esDueno || usuario.tipoUsuario === "ADMINISTRADOR") {
+            let html = `<a href="/actualizar-${alojamiento.tipo.toLowerCase()}.html?id=${id}">Editar</a>
+                | <a href="/editar-galeria.html?id=${id}">Galeria</a>
+                | <button onclick="eliminar()">Dar de baja</button>`;
+            if (esDueno && !alojamiento.publicado) {
+                html += ` | <button onclick="publicar()">Publicar</button>`;
+            }
+            acciones.innerHTML = html;
+        }
     }
 
-    const params = new URLSearchParams(location.search);
-    const id = params.get('id');
-    const tipo = params.get('tipo') || 'casas';
-    let usuario = null;
+    async function eliminar() {
+        if (!confirm("Dar de baja este alojamiento?")) return;
+        await apiFetch(`/${alojamiento.tipo.charAt(0) + alojamiento.tipo.slice(1).toLowerCase()}/eliminar/${id}`, { method: "DELETE" });
+        window.location.href = "/listar-alojamientos.html";
+    }
 
-    async function cargarUsuario() {
+    async function publicar() {
         try {
-            const resp = await fetch('/Usuario/me', {headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}});
-            if (resp.ok) usuario = await resp.json();
+            const respuesta = await apiFetch(`/Alojamiento/${id}/publicar`, { method: "PATCH" });
+            if (!respuesta.ok) throw new Error(await respuesta.text());
+            cargar();
         } catch (e) {
+            alert("No se pudo publicar: " + e.message);
         }
-    }
-
-    async function cargarAlojamiento() {
-        let url = tipo === 'casas' ? `/Casa/mostrar/${id}` : tipo === 'hoteles' ? `/Hotel/mostrar/${id}` : `/Departamento/mostrar/${id}`;
-
-        const resp = await fetch(url, {headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}});
-        if (!resp.ok) {
-            document.getElementById('detailBody').innerHTML = '<p style="color:var(--error)">Error al cargar el alojamiento.</p>';
-            return;
-        }
-
-        const data = await resp.json();
-        const a = data.alojamiento || data;
-
-        document.getElementById('titulo').innerText = a.titulo || 'Sin título';
-
-        const activo = a.activo !== false;
-        document.getElementById('detailHead').innerHTML = `
-            <div><div class="aloj-titulo">${a.titulo || 'Sin título'}</div></div>
-            <span class="aloj-estado ${activo ? 'estado-activo' : 'estado-inactivo'}">
-                ${activo ? '✅ Activo' : '❌ Inactivo'}
-            </span>`;
-
-        const dir = a.direccion;
-        const direccionSimple = dir ? [dir.calle, dir.altura, dir.ciudad].filter(Boolean).join(' ') : null;
-        const direccionCompleta = dir ? [dir.calle, dir.altura, dir.ciudad, dir.provincia, dir.pais, dir.codigoPostal].filter(Boolean).join(', ') : null;
-        const srv = a.servicio || {};
-
-        const extrasHTML = tipo === 'casas' ? `
-            <div class="info-item"><div class="info-label">🌿 Patio</div><div class="info-value">${data.tienePatio ? '✅ Sí' : '❌ No'}</div></div>
-            <div class="info-item"><div class="info-label">🏊 Pileta</div><div class="info-value">${data.tienePileta ? '✅ Sí' : '❌ No'}</div></div>
-            <div class="info-item"><div class="info-label">🔥 Parrilla</div><div class="info-value">${data.tieneParrilla ? '✅ Sí' : '❌ No'}</div></div>`
-            : tipo === 'hoteles' ? `
-            <div class="info-item"><div class="info-label">⭐ Estrellas</div><div class="info-value">${'★'.repeat(data.estrellas || 0) || '—'}</div></div>
-            <div class="info-item"><div class="info-label">🍳 Desayuno</div><div class="info-value">${data.incluyeDesayuno ? '✅ Incluido' : '❌ No'}</div></div>
-            <div class="info-item"><div class="info-label">🧹 Limpieza</div><div class="info-value">${data.incluyeLimpieza ? '✅ Incluida' : '❌ No'}</div></div>`
-                : tipo === 'departamentos' ? `
-            <div class="info-item"><div class="info-label">🏢 Piso</div><div class="info-value">${data.piso ?? '—'}</div></div>
-            <div class="info-item"><div class="info-label">🛗 Ascensor</div><div class="info-value">${data.tieneAscensor ? '✅ Sí' : '❌ No'}</div></div>
-            <div class="info-item"><div class="info-label">🧾 Expensas</div><div class="info-value">${data.expensasIncluidas ? '✅ Incluidas' : '❌ No'}</div></div>`
-                    : '';
-
-        document.getElementById('detailBody').innerHTML = `
-            <!-- Vista reducida -->
-            <div class="info-grid">
-                ${direccionSimple ? `<div class="info-item"><div class="info-label">📍 Dirección</div><div class="info-value">${direccionSimple}</div></div>` : ''}
-                ${a.precioNoche ? `<div class="info-item"><div class="info-label">💰 Precio</div><div class="info-value">$${parseFloat(a.precioNoche).toLocaleString('es-AR')} / noche</div></div>` : ''}
-                ${a.capacidad ? `<div class="info-item"><div class="info-label">👥 Capacidad</div><div class="info-value">${a.capacidad} personas</div></div>` : ''}
-            </div>
-            ${a.descripcion ? `<div class="aloj-desc">${a.descripcion}</div>` : ''}
-
-            <!-- Botón toggle -->
-            <button class="toggle-detalles-btn" id="toggleBtn" onclick="toggleDetalles()">
-                <span id="toggleLabel">Ver más detalles</span>
-                <span class="toggle-arrow">▼</span>
-            </button>
-
-            <!-- Panel expandible -->
-            <div id="masDetalles" class="mas-detalles-panel">
-                <div class="info-grid">
-                    ${a.cantAmbientes ? `<div class="info-item"><div class="info-label">🏠 Ambientes</div><div class="info-value">${a.cantAmbientes}</div></div>` : ''}
-                    ${a.cantHabitaciones ? `<div class="info-item"><div class="info-label">🛏️ Habitaciones</div><div class="info-value">${a.cantHabitaciones}</div></div>` : ''}
-                    ${a.cantCamas ? `<div class="info-item"><div class="info-label">🛌 Camas</div><div class="info-value">${a.cantCamas}</div></div>` : ''}
-                    ${a.cantBanios ? `<div class="info-item"><div class="info-label">🚿 Baños</div><div class="info-value">${a.cantBanios}</div></div>` : ''}
-                    ${a.anfitrion?.nombre ? `<div class="info-item"><div class="info-label">👤 Anfitrión</div><div class="info-value">${a.anfitrion.nombre}</div></div>` : ''}
-                    ${direccionCompleta ? `<div class="info-item" style="grid-column:span 2"><div class="info-label">📍 Dirección completa</div><div class="info-value">${direccionCompleta}</div></div>` : ''}
-                </div>
-                <div class="info-grid">
-                    <div class="info-item"><div class="info-label">🍳 Cocina</div><div class="info-value">${srv.tieneCocina ? '✅ Sí' : '❌ No'}</div></div>
-                    <div class="info-item"><div class="info-label">📶 WiFi</div><div class="info-value">${srv.tieneWifi ? '✅ Sí' : '❌ No'}</div></div>
-                    <div class="info-item"><div class="info-label">🧺 Lavarropa</div><div class="info-value">${srv.tieneLavarropa ? '✅ Sí' : '❌ No'}</div></div>
-                    <div class="info-item"><div class="info-label">🚗 Estacionamiento</div><div class="info-value">${srv.tieneEstacionamiento ? '✅ Sí' : '❌ No'}</div></div>
-                    ${extrasHTML}
-                </div>
-            </div>`;
-
-        // Botones de acción
-        const acciones = document.getElementById('acciones');
-        if (usuario) {
-            if (usuario.tipoUsuario === 'CLIENTE') {
-                acciones.innerHTML = `<a class="btn-primary" href="/registrar-reserva.html?idAlojamiento=${id}&tipo=${tipo}">📅 Reservar</a>`;
-            }
-            if (usuario.tipoUsuario === 'ADMINISTRADOR' || (usuario.tipoUsuario === 'ANFITRION' && a.anfitrion?.id === usuario.id)) {
-                acciones.innerHTML = `
-                  <a class="btn-edit-aloj" href="/actualizar-${tipo.slice(0, -1)}.html?id=${a.id}">✏️ Editar</a>
-                  <a class="btn-edit-aloj" href="/editar-galeria.html?id=${a.id}&tipo=${tipo}">🖼️ Galería</a>
-                  <button class="btn-delete-aloj" onclick="eliminarAlojamiento()">🗑️ Eliminar</button>`;
-            }
-        }
-    }
-
-    // ── TOGGLE ──
-    function toggleDetalles() {
-        const panel = document.getElementById('masDetalles');
-        const btn = document.getElementById('toggleBtn');
-        const label = document.getElementById('toggleLabel');
-        const isOpen = panel.classList.contains('open');
-
-        panel.classList.toggle('open', !isOpen);
-        btn.classList.toggle('open', !isOpen);
-        label.textContent = isOpen ? 'Ver más detalles' : 'Ver menos';
-    }
-
-    async function cargarReviews() {
-        const resp = await fetch(`/Review/alojamiento/${id}`, {headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}});
-        if (!resp.ok) {
-            document.getElementById('reviews').innerHTML = '<p style="color:var(--muted)">No se pudieron cargar las reseñas.</p>';
-            return;
-        }
-
-        const reviews = await resp.json();
-        if (reviews.length === 0) {
-            document.getElementById('reviews').innerHTML = `<div class="empty-state"><div class="empty-icon">💬</div><p>Sin reseñas todavía.</p></div>`;
-            return;
-        }
-        document.getElementById('reviews').innerHTML = reviews.map((r, i) => {
-            const filled = '★'.repeat(r.puntuacion);
-            const empty = '☆'.repeat(5 - r.puntuacion);
-            const fecha = r.fecha ? r.fecha.split('T')[0] : '';
-            return `<div class="review-card" style="animation-delay:${i * 0.06}s">
-                <div class="review-top">
-                    <span class="review-author">${r.cliente?.nombre || 'Usuario'}</span>
-                    ${fecha ? `<span class="review-date">${fecha}</span>` : ''}
-                </div>
-                <div class="stars"><span class="filled">${filled}</span><span class="empty">${empty}</span></div>
-                ${r.comentario ? `<div class="review-comment">${r.comentario}</div>` : ''}
-            </div>`;
-        }).join('');
-    }
-
-    async function eliminarAlojamiento() {
-        if (!confirm('¿Eliminar este alojamiento?')) return;
-        const url = tipo === 'casas' ? `/Casa/eliminar/${id}` : tipo === 'hoteles' ? `/Hotel/eliminar/${id}` : `/Departamento/eliminar/${id}`;
-        const resp = await fetch(url, {
-            method: 'DELETE',
-            headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}
-        });
-        if (resp.ok) window.location.href = '/listar-alojamientos.html';
-        else alert('No se pudo eliminar');
     }
 
     async function cargarGaleria() {
         try {
-            const gResp = await fetch(`/gallery/alojamiento/${id}`, {headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}});
-            if (!gResp.ok) return;
-            const gallery = await gResp.json();
-            const iResp = await fetch(`/gallery/${gallery.id}/images`, {headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}});
-            if (!iResp.ok) return;
-            const images = await iResp.json();
-            if (images.length === 0) return;
-            lbImages = images;
-            document.getElementById('galeriaTitulo').style.display = 'block';
-            document.getElementById('galeriaGrid').innerHTML = images.map((img, i) => `<img class="gallery-img" src="${img.url}" alt="${img.alt || ''}" onclick="lbAbrir(${i})">`).join('');
+            const gallery = await apiJson("/gallery/alojamiento/" + id);
+            const imagenes = await apiJson(`/gallery/${gallery.id}/images`);
+            document.getElementById("galeria").innerHTML = imagenes.map(img => `<img src="${img.url}" alt="${img.alt || ""}">`).join("") || "Sin fotos";
         } catch (e) {
+            document.getElementById("galeria").textContent = "Sin fotos";
         }
     }
 
-    async function init() {
-        await cargarUsuario();
-        await cargarAlojamiento();
-        await cargarGaleria();
-        await cargarReviews();
-        const overlay = document.getElementById('loadingOverlay');
-        overlay.style.opacity = '0';
-        setTimeout(() => {
-            overlay.style.display = 'none';
-            document.getElementById('mainContent').style.display = 'block';
-        }, 300);
+    async function cargarReviews() {
+        const reviews = await apiJson("/Review/alojamiento/" + id);
+        document.getElementById("reviews").innerHTML = reviews.map(r => `
+            <div class="review">
+                <strong>${r.cliente ? r.cliente.nombre : "Usuario"}</strong> - ${"*".repeat(r.puntuacion)}${"-".repeat(5 - r.puntuacion)}
+                <br>${r.comentario}
+            </div>
+        `).join("") || "<p>Sin reviews todavia.</p>";
     }
 
-    // LIGHTBOX
-    let lbImages = [], lbIndex = 0;
-
-    function lbAbrir(i) {
-        lbIndex = i;
-        lbActualizar();
-        document.getElementById('lightbox').classList.add('open');
-        document.addEventListener('keydown', lbTeclado);
-    }
-
-    function lbCerrar() {
-        document.getElementById('lightbox').classList.remove('open');
-        document.removeEventListener('keydown', lbTeclado);
-    }
-
-    function lbMover(d) {
-        lbIndex = (lbIndex + d + lbImages.length) % lbImages.length;
-        lbActualizar();
-    }
-
-    function lbActualizar() {
-        document.getElementById('lbImg').src = lbImages[lbIndex].url;
-        document.getElementById('lbImg').alt = lbImages[lbIndex].alt || '';
-        document.getElementById('lbCounter').textContent = `${lbIndex + 1} / ${lbImages.length}`;
-    }
-
-    function lbTeclado(e) {
-        if (e.key === 'ArrowRight') lbMover(1);
-        if (e.key === 'ArrowLeft') lbMover(-1);
-        if (e.key === 'Escape') lbCerrar();
-    }
-
-    init();
+    cargar().then(() => { cargarGaleria(); cargarReviews(); });
 </script>
-
-<div class="lightbox" id="lightbox" onclick="lbCerrar()">
-    <button class="lb-close" onclick="lbCerrar()">✕</button>
-    <button class="lb-btn lb-prev" onclick="lbMover(-1); event.stopPropagation()">‹</button>
-    <img class="lb-img" id="lbImg" src="" alt="" onclick="event.stopPropagation()">
-    <button class="lb-btn lb-next" onclick="lbMover(1); event.stopPropagation()">›</button>
-    <span class="lb-counter" id="lbCounter"></span>
-</div>
 </body>
 </html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportar</title>
+    <style>
+        body { font-family: sans-serif; max-width: 400px; margin: 0 auto; padding: 20px; }
+        form { display: flex; flex-direction: column; gap: 8px; }
+    </style>
+</head>
+<body>
+<p><a href="/home.html">Volver al panel</a></p>
+<h1>Reportar</h1>
+<p id="objetivo"></p>
+
+<form id="formReportar">
+    <label for="descripcion">Descripcion del problema</label>
+    <textarea id="descripcion" required maxlength="2000"></textarea>
+    <button type="submit">Enviar reporte</button>
+</form>
+<p id="mensaje"></p>
+
+<script src="/js/api.js"></script>
+<script>
+    requireLogin();
+    const params = new URLSearchParams(location.search);
+    const tipo = params.get("tipo"); // "usuario" o "alojamiento"
+    const id = params.get("id");
+
+    if (!tipo || !id) {
+        document.getElementById("objetivo").textContent = "Falta indicar que se quiere reportar (parametros tipo/id en la URL).";
+        document.getElementById("formReportar").style.display = "none";
+    } else {
+        document.getElementById("objetivo").textContent = `Vas a reportar el ${tipo} #${id}.`;
+    }
+
+    document.getElementById("formReportar").addEventListener("submit", async (evento) => {
+        evento.preventDefault();
+        const mensaje = document.getElementById("mensaje");
+
+        const datos = { descripcion: document.getElementById("descripcion").value };
+        if (tipo === "usuario") datos.idUsuarioReportado = Number(id);
+        if (tipo === "alojamiento") datos.idAlojamientoReportado = Number(id);
+
+        try {
+            await apiJson("/Reporte/registrar", "POST", datos);
+            mensaje.textContent = "Reporte enviado. Gracias por avisarnos.";
+        } catch (e) {
+            mensaje.textContent = "Error: " + e.message;
+        }
+    });
+</script>
+</body>
+</html>

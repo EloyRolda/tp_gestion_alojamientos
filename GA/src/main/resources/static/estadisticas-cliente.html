@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis estadisticas</title>
+    <style>
+        body { font-family: sans-serif; max-width: 400px; margin: 0 auto; padding: 20px; }
+        dt { font-weight: bold; margin-top: 8px; }
+    </style>
+</head>
+<body>
+<p><a href="/home.html">Volver al panel</a></p>
+<h1>Mis estadisticas</h1>
+<dl id="datos"></dl>
+
+<script src="/js/api.js"></script>
+<script>
+    requireLogin();
+
+    apiJson("/Estadisticas/cliente").then(e => {
+        document.getElementById("datos").innerHTML = `
+            <dt>Reservas totales</dt><dd>${e.cantidadReservasTotales}</dd>
+            <dt>Estadias finalizadas</dt><dd>${e.cantidadEstadiasFinalizadas}</dd>
+            <dt>Canceladas / vencidas / rechazadas</dt><dd>${e.cantidadCanceladasOVencidas}</dd>
+            <dt>Gasto total</dt><dd>$${e.gastoTotal}</dd>
+        `;
+    });
+</script>
+</body>
+</html>

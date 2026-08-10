@@ -14,9 +14,11 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +26,7 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CloudinaryService cloudinaryService;
 
     //---------------------------------------- LISTAR ----------------------------------------
 
@@ -184,5 +187,23 @@ public class UsuarioService {
         return u;
     }
 
+    //---------------------------------------- FOTO DE PERFIL ----------------------------------------
+
+    /// Sube (o reemplaza) la foto de perfil del usuario en su propia carpeta de Cloudinary ("usuarios/{id}").
+    @Transactional
+    public Usuario actualizarFoto(Long id, MultipartFile archivo) {
+        Usuario usuario = obtenerPorId(id);
+
+        // Si ya tenia una foto anterior, la borramos de Cloudinary para no acumular basura.
+        if (usuario.getFotoPublicId() != null) {
+            cloudinaryService.delete(usuario.getFotoPublicId());
+        }
+
+        Map resultado = cloudinaryService.upload(archivo, "usuarios/" + id);
+        usuario.setFotoUrl((String) resultado.get("secure_url"));
+        usuario.setFotoPublicId((String) resultado.get("public_id"));
+
+        return usuarioRepository.save(usuario);
+    }
 
 }

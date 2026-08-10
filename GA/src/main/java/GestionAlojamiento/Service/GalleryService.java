@@ -1,10 +1,10 @@
 package GestionAlojamiento.Service;
 
 import GestionAlojamiento.Exception.IdNoEncontradoException;
+import GestionAlojamiento.Exception.ParametroInvalidoException;
 import GestionAlojamiento.Model.Alojamiento;
 import GestionAlojamiento.Model.Gallery;
 import GestionAlojamiento.Repository.GalleryRepository;
-//Amongus
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -13,6 +13,9 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 @RequiredArgsConstructor
 public class GalleryService {
+
+    /// Minimo de fotos exigido por el anfitrion para poder publicar un alojamiento (visible en el listado publico).
+    public static final int MINIMO_IMAGENES_PARA_PUBLICAR = 3;
 
     private final GalleryRepository galleryRepository;
     private final AlojamientoService alojamientoService;
@@ -49,6 +52,36 @@ public class GalleryService {
     /// Crea una nueva galería
     public Gallery createGallery(Gallery gallery) {
         return galleryRepository.save(gallery);
+    }
+
+    /// Carpeta de Cloudinary para las imagenes de este alojamiento.
+    public String carpetaCloudinary(Long idAlojamiento) {
+        return "alojamientos/" + idAlojamiento;
+    }
+
+    /// El anfitrion intenta publicar (hacer visible en el listado) su alojamiento.
+    /// Solo se permite si tiene al menos MINIMO_IMAGENES_PARA_PUBLICAR fotos cargadas
+    /// (el precio ya es obligatorio a nivel de columna, no hace falta validarlo aca).
+    public void publicar(Long idAlojamiento, String emailAnfitrion) {
+        Alojamiento alojamiento = alojamientoService.obtenerPorId(idAlojamiento);
+
+        if (!alojamiento.getAnfitrion().getEmail().equals(emailAnfitrion)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Este alojamiento no te pertenece");
+        }
+
+        Gallery gallery = getGalleryByAlojamiento(idAlojamiento);
+        int cantidadImagenes = imageService.obtainByGallery(gallery.getId()).size();
+
+        if (cantidadImagenes < MINIMO_IMAGENES_PARA_PUBLICAR) {
+            throw new ParametroInvalidoException(
+                    "Necesitas al menos " + MINIMO_IMAGENES_PARA_PUBLICAR + " fotos para publicar el alojamiento (tenes " + cantidadImagenes + ").");
+        }
+
+        alojamientoService.actualizarPublicado(idAlojamiento, true);
+    }
+
+    public void despublicar(Long idAlojamiento) {
+        alojamientoService.actualizarPublicado(idAlojamiento, false);
     }
 
     /// Borra la galería asociada a un alojamiento (usado al eliminar un alojamiento)

@@ -3,10 +3,10 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
+import java.util.List;
 
-
-//Lombok
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,10 +21,7 @@ public class HotelRegistroDTO {
     @NotNull(message = "Campo obligatorio")
     private Integer estrellas;
 
-    @NotNull(message = "Campo obligatorio")
     private boolean incluyeLimpieza;
-
-    @NotNull(message = "Campo obligatorio")
     private boolean incluyeDesayuno;
 
     //[ALOJAMIENTO]
@@ -80,9 +77,6 @@ public class HotelRegistroDTO {
     @Min(value = 0, message = "Valor Invalido")
     private Integer altura;
 
-    //[SERVICIO]
-    private boolean tieneCocina;
-    private boolean tieneLavarropa;
-    private boolean tieneWifi;
-    private boolean tieneEstacionamiento;
+    //[AMENITIES]
+    private List<Long> amenityIds;
 }

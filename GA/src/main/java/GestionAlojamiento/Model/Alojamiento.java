@@ -1,25 +1,37 @@
 package GestionAlojamiento.Model;
 
-import GestionAlojamiento.Model.Enums.TipoInmueble;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
-//Lombok
-@Data
-@AllArgsConstructor
+/// Clase base de todo alojamiento publicable (Casa, Departamento u Hotel).
+/// Usa herencia JPA real (JOINED): cada subtipo tiene su propia tabla con SOLO
+/// sus columnas particulares, y comparte esta tabla "alojamiento" para los datos
+/// comunes. Esto permite:
+///   - Listar/filtrar TODOS los alojamientos mezclados (estilo Airbnb) desde
+///     AlojamientoRepository sin tocar las tablas de cada subtipo.
+///   - Evitar la logica de mapeo triplicada que existia antes en cada Service.
+@Getter
+@Setter
+@ToString(exclude = {"amenities"})
+@EqualsAndHashCode(of = "id")
 @NoArgsConstructor
-//JPA
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "tipo_alojamiento", discriminatorType = DiscriminatorType.STRING, length = 20)
 @Table(name = "alojamiento")
-public class Alojamiento {
+public abstract class Alojamiento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,12 +66,15 @@ public class Alojamiento {
     @Column(name = "cant_banios", nullable = false)
     private Integer cantBanios;
 
+    /// Baja logica: la usa el dueño o el admin para "borrar" sin perder historial de reservas/reviews.
     @Column(name = "activo")
-    private Boolean activo;
+    private Boolean activo = true;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "tipo", nullable = false)
-    private TipoInmueble tipoInmueble;
+    /// Un alojamiento recien creado no aparece en el listado publico hasta que
+    /// cumple los requisitos minimos para publicarse (precio ya es obligatorio
+    /// a nivel de columna, y como minimo 3 fotos en la galeria). Ver AlojamientoService.publicar().
+    @Column(name = "publicado", nullable = false)
+    private Boolean publicado = false;
 
     @ManyToOne
     @JoinColumn(name = "id_anfitrion")
@@ -69,8 +84,17 @@ public class Alojamiento {
     @JoinColumn(name = "id_direccion")
     private Direccion direccion;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "id_servicio")
-    private Servicio servicio;
+    @ManyToMany
+    @JoinTable(
+            name = "alojamiento_amenity",
+            joinColumns = @JoinColumn(name = "id_alojamiento"),
+            inverseJoinColumns = @JoinColumn(name = "id_amenity")
+    )
+    private Set<Amenity> amenities = new HashSet<>();
 
+    /// Nombre de subtipo en base a la clase real (CASA, DEPARTAMENTO, HOTEL), util para el frontend.
+    @Transient
+    public String getTipo() {
+        return this.getClass().getSimpleName().toUpperCase();
+    }
 }

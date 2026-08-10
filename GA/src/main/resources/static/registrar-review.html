@@ -3,487 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dejar Review</title>
+    <title>Dejar review</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap');
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        :root {
-            --bg: #0a0f1e; --surface: #111827; --surface2: #1a2435;
-            --border: #1e2d45; --accent: #3b82f6; --accent-glow: rgba(59,130,246,0.2);
-            --text: #e2e8f0; --muted: #64748b; --error: #f87171; --success: #4ade80; --star: #fbbf24;
-        }
-        body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); min-height: 100vh; }
-
-        /* ── HEADER ── */
-        header {
-            background: var(--surface); border-bottom: 1px solid var(--border);
-            padding: 16px 32px; display: flex; align-items: center;
-            justify-content: space-between; position: sticky; top: 0; z-index: 10;
-        }
-        .header-left { display: flex; align-items: center; gap: 12px; }
-        .logo-icon {
-            width: 38px; height: 38px;
-            background: linear-gradient(135deg, #d97706, #f59e0b);
-            border-radius: 10px; display: flex; align-items: center;
-            justify-content: center; font-size: 18px;
-        }
-        .app-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; }
-        .header-right { display: flex; align-items: center; gap: 16px; }
-        .btn-back {
-            background: transparent; border: 1px solid var(--border); border-radius: 8px;
-            padding: 8px 14px; color: var(--muted); font-family: 'DM Sans', sans-serif;
-            font-size: 13px; cursor: pointer; text-decoration: none; transition: all 0.2s;
-        }
-        .btn-back:hover { border-color: var(--accent); color: var(--accent); }
-        .logout-link { color: #fca5a5; text-decoration: none; font-size: 13px; transition: color 0.2s; }
-        .logout-link:hover { color: #f87171; }
-
-        /* ── LOADING ── */
-        #loadingOverlay {
-            position: fixed; inset: 0; background: var(--bg);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 100; transition: opacity 0.3s;
-        }
-        .spinner {
-            width: 32px; height: 32px; border: 3px solid var(--border);
-            border-top-color: var(--accent); border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* ── MAIN ── */
-        main { padding: 40px 20px; max-width: 640px; margin: 0 auto; }
-
-        .page-title {
-            font-family: 'Playfair Display', serif; font-size: 24px;
-            margin-bottom: 6px;
-        }
-        .page-subtitle { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
-
-        /* ── STEP INDICATOR ── */
-        .steps {
-            display: flex; align-items: center; gap: 8px;
-            margin-bottom: 32px; font-size: 13px;
-        }
-        .step {
-            display: flex; align-items: center; gap: 6px;
-            color: var(--muted); transition: color 0.2s;
-        }
-        .step.active { color: var(--text); font-weight: 600; }
-        .step.done { color: var(--success); }
-        .step-num {
-            width: 24px; height: 24px; border-radius: 50%;
-            border: 1.5px solid currentColor;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 11px; font-weight: 700; flex-shrink: 0;
-        }
-        .step-sep { color: var(--border); flex-shrink: 0; }
-
-        /* ── ALOJAMIENTO CARDS ── */
-        .section-label {
-            font-size: 11px; font-weight: 700; letter-spacing: 1.1px;
-            text-transform: uppercase; color: var(--muted);
-            margin-bottom: 14px;
-        }
-        .aloj-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
-
-        .aloj-card {
-            background: var(--surface); border: 1.5px solid var(--border);
-            border-radius: 12px; padding: 16px 18px;
-            cursor: pointer; transition: border-color 0.2s, background 0.2s;
-            display: flex; align-items: center; gap: 14px;
-        }
-        .aloj-card:hover { border-color: #2d3f5c; background: var(--surface2); }
-        .aloj-card.selected {
-            border-color: var(--accent);
-            background: rgba(59,130,246,0.06);
-        }
-        .aloj-card-icon {
-            width: 42px; height: 42px; border-radius: 10px; flex-shrink: 0;
-            background: var(--surface2); display: flex; align-items: center;
-            justify-content: center; font-size: 20px;
-            border: 1px solid var(--border);
-        }
-        .aloj-card.selected .aloj-card-icon {
-            background: rgba(59,130,246,0.12);
-            border-color: rgba(59,130,246,0.3);
-        }
-        .aloj-card-info { flex: 1; min-width: 0; }
-        .aloj-card-title { font-size: 14px; font-weight: 600; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .aloj-card-meta { font-size: 12px; color: var(--muted); }
-        .aloj-card-check {
-            width: 20px; height: 20px; border-radius: 50%;
-            border: 1.5px solid var(--border); flex-shrink: 0;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 11px; color: transparent; transition: all 0.2s;
-        }
-        .aloj-card.selected .aloj-card-check {
-            background: var(--accent); border-color: var(--accent);
-            color: #fff;
-        }
-
-        /* ── EMPTY STATE ── */
-        .empty-state {
-            text-align: center; padding: 48px 24px;
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: 12px; color: var(--muted);
-        }
-        .empty-state .empty-icon { font-size: 40px; margin-bottom: 14px; }
-        .empty-state p { font-size: 14px; line-height: 1.6; }
-
-        /* ── FORM ── */
-        #formSection { display: none; animation: fadeUp 0.35s ease both; }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-
-        .selected-preview {
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: 10px; padding: 14px 16px; margin-bottom: 24px;
-            display: flex; align-items: center; gap: 12px;
-        }
-        .selected-preview-icon { font-size: 20px; }
-        .selected-preview-name { font-size: 14px; font-weight: 600; }
-        .selected-preview-meta { font-size: 12px; color: var(--muted); }
-        .btn-change {
-            margin-left: auto; background: transparent;
-            border: 1px solid var(--border); border-radius: 6px;
-            padding: 5px 10px; color: var(--muted); font-family: 'DM Sans', sans-serif;
-            font-size: 12px; cursor: pointer; transition: all 0.2s; flex-shrink: 0;
-        }
-        .btn-change:hover { border-color: var(--accent); color: var(--accent); }
-
-        .field { margin-bottom: 22px; }
-        label {
-            display: block; font-size: 12px; font-weight: 500; color: var(--muted);
-            margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.6px;
-        }
-        textarea {
-            width: 100%; background: var(--bg); border: 1px solid var(--border);
-            border-radius: 10px; padding: 12px 14px; color: var(--text);
-            font-family: 'DM Sans', sans-serif; font-size: 14px;
-            outline: none; resize: vertical; min-height: 110px;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
-        textarea::placeholder { color: var(--muted); }
-
-        /* Estrellas interactivas */
-        .stars-row { display: flex; gap: 8px; }
-        .star-opt input[type="radio"] { display: none; }
-        .star-opt label {
-            font-size: 32px; cursor: pointer; color: var(--border);
-            transition: color 0.15s, transform 0.1s;
-            display: block; line-height: 1;
-            text-transform: none; letter-spacing: 0;
-        }
-        .stars-row:has(.star-opt:nth-child(1) input:checked) .star-opt:nth-child(1) label { color: var(--star); }
-        .stars-row:has(.star-opt:nth-child(2) input:checked) .star-opt:nth-child(1) label,
-        .stars-row:has(.star-opt:nth-child(2) input:checked) .star-opt:nth-child(2) label { color: var(--star); }
-        .stars-row:has(.star-opt:nth-child(3) input:checked) .star-opt:nth-child(1) label,
-        .stars-row:has(.star-opt:nth-child(3) input:checked) .star-opt:nth-child(2) label,
-        .stars-row:has(.star-opt:nth-child(3) input:checked) .star-opt:nth-child(3) label { color: var(--star); }
-        .stars-row:has(.star-opt:nth-child(4) input:checked) .star-opt:nth-child(1) label,
-        .stars-row:has(.star-opt:nth-child(4) input:checked) .star-opt:nth-child(2) label,
-        .stars-row:has(.star-opt:nth-child(4) input:checked) .star-opt:nth-child(3) label,
-        .stars-row:has(.star-opt:nth-child(4) input:checked) .star-opt:nth-child(4) label { color: var(--star); }
-        .stars-row:has(.star-opt:nth-child(5) input:checked) .star-opt label { color: var(--star); }
-        .star-opt label:hover { transform: scale(1.15); color: var(--star) !important; }
-
-        .msg { border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 18px; display: none; }
-        .msg.error   { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: var(--error); }
-        .msg.success { background: rgba(74,222,128,0.1);  border: 1px solid rgba(74,222,128,0.3);  color: var(--success); }
-
-        .btn {
-            width: 100%; background: linear-gradient(135deg, #d97706, #f59e0b);
-            border: none; border-radius: 10px; padding: 14px; color: #fff;
-            font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600;
-            cursor: pointer; transition: opacity 0.2s, transform 0.1s; margin-top: 4px;
-        }
-        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        body { font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; }
+        form { display: flex; flex-direction: column; gap: 8px; }
+        li { margin-bottom: 6px; }
     </style>
 </head>
 <body>
+<p><a href="/mis-reservas.html">Volver a mis reservas</a></p>
+<h1>Dejar review</h1>
 
-<div id="loadingOverlay"><div class="spinner"></div></div>
+<div id="seleccion">
+    <p>Elegi una estadia finalizada para resenar:</p>
+    <ul id="listaElegibles"></ul>
+</div>
 
-<header>
-    <div class="header-left">
-        <div class="logo-icon">⭐</div>
-        <span class="app-title">Gestión Alojamiento</span>
-    </div>
-    <div class="header-right">
-        <a href="/mis-reviews.html" class="btn-back">← Volver</a>
-        <a href="#" onclick="cerrarSesion()" class="logout-link">Cerrar sesión</a>
-    </div>
-</header>
+<form id="formReview" style="display:none">
+    <p id="tituloAlojamiento"></p>
+    <label for="puntuacion">Puntuacion (0 a 5)</label>
+    <input type="number" id="puntuacion" min="0" max="5" required>
 
-<main id="mainContent" style="display:none">
-    <div class="page-title">Dejar una review</div>
-    <p class="page-subtitle">Solo podés reseñar alojamientos donde ya completaste una estadía confirmada.</p>
+    <label for="comentario">Comentario</label>
+    <textarea id="comentario" required maxlength="2000"></textarea>
 
-    <!-- Indicador de pasos -->
-    <div class="steps">
-        <div class="step active" id="step1">
-            <span class="step-num">1</span>
-            <span>Elegí el alojamiento</span>
-        </div>
-        <span class="step-sep">›</span>
-        <div class="step" id="step2">
-            <span class="step-num">2</span>
-            <span>Escribí tu reseña</span>
-        </div>
-    </div>
+    <button type="submit">Publicar review</button>
+</form>
+<p id="mensaje"></p>
 
-    <!-- PASO 1: Lista de alojamientos disponibles para reseñar -->
-    <div id="selectionSection">
-        <div class="section-label">Tus estadías finalizadas</div>
-        <div class="aloj-list" id="alojList">
-            <!-- se llena dinámicamente -->
-        </div>
-    </div>
-
-    <!-- PASO 2: Formulario de review -->
-    <div id="formSection">
-        <!-- Preview del alojamiento seleccionado -->
-        <div class="selected-preview" id="selectedPreview">
-            <span class="selected-preview-icon" id="selectedIcon"></span>
-            <div>
-                <div class="selected-preview-name" id="selectedName"></div>
-                <div class="selected-preview-meta" id="selectedMeta"></div>
-            </div>
-            <button class="btn-change" onclick="volverASeleccion()">Cambiar</button>
-        </div>
-
-        <div class="msg" id="msg"></div>
-
-        <div class="field">
-            <label>Puntuación</label>
-            <div class="stars-row" id="starsRow">
-                <div class="star-opt"><input type="radio" name="puntuacion" id="p1" value="1"><label for="p1">★</label></div>
-                <div class="star-opt"><input type="radio" name="puntuacion" id="p2" value="2"><label for="p2">★</label></div>
-                <div class="star-opt"><input type="radio" name="puntuacion" id="p3" value="3"><label for="p3">★</label></div>
-                <div class="star-opt"><input type="radio" name="puntuacion" id="p4" value="4"><label for="p4">★</label></div>
-                <div class="star-opt"><input type="radio" name="puntuacion" id="p5" value="5"><label for="p5">★</label></div>
-            </div>
-        </div>
-
-        <div class="field">
-            <label for="comentario">Comentario</label>
-            <textarea id="comentario" placeholder="Contá tu experiencia..."></textarea>
-        </div>
-
-        <button class="btn" id="submitBtn" onclick="enviar()">Publicar review</button>
-    </div>
-</main>
-
+<script src="/js/api.js"></script>
 <script>
-    if (!localStorage.getItem('token')) window.location.href = '/login.html';
+    requireLogin();
+    let idReserva = new URLSearchParams(location.search).get("idReserva");
 
-    function cerrarSesion() {
-        localStorage.removeItem('token');
-        window.location.href = '/login.html';
+    let elegiblesActuales = [];
+
+    async function cargar() {
+        const usuario = await apiJson("/Usuario/me");
+        const [reservas, reviews] = await Promise.all([
+            apiJson("/Reserva/listar/propios"),
+            apiJson("/Review/cliente/" + usuario.id)
+        ]);
+
+        const reservasConReview = new Set(reviews.map(r => r.reserva.id));
+        elegiblesActuales = reservas.filter(r => r.estado === "FINALIZADA" && !reservasConReview.has(r.id));
+
+        if (idReserva) {
+            const indice = elegiblesActuales.findIndex(r => r.id === Number(idReserva));
+            if (indice !== -1) { mostrarFormulario(indice); return; }
+        }
+
+        if (elegiblesActuales.length === 0) {
+            document.getElementById("listaElegibles").innerHTML = "<li>No tenes estadias finalizadas para resenar.</li>";
+            return;
+        }
+
+        document.getElementById("listaElegibles").innerHTML = elegiblesActuales.map((r, indice) =>
+            `<li><a href="#" onclick="mostrarFormulario(${indice}); return false;">
+                ${r.alojamiento.titulo} (${r.fechaInicio} a ${r.fechaFin})
+            </a></li>`
+        ).join("");
     }
 
-    const TIPO_ICON = { CASA: '🏠', HOTEL: '🏨', DEPARTAMENTO: '🏢' };
-
-    let idCliente = null;
-    let alojamientoSeleccionado = null; // { id, titulo, tipo, reservaFin }
-
-    function authHeaders() {
-        return {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + localStorage.getItem('token')
-        };
+    let reservaSeleccionada = null;
+    function mostrarFormulario(indice) {
+        reservaSeleccionada = elegiblesActuales[indice];
+        document.getElementById("seleccion").style.display = "none";
+        document.getElementById("formReview").style.display = "flex";
+        document.getElementById("tituloAlojamiento").textContent = "Estadia en: " + reservaSeleccionada.alojamiento.titulo;
     }
 
-    async function init() {
+    document.getElementById("formReview").addEventListener("submit", async (evento) => {
+        evento.preventDefault();
+        const mensaje = document.getElementById("mensaje");
         try {
-            // Cargar usuario
-            const meResp = await fetch('/Usuario/me', { headers: authHeaders() });
-            if (!meResp.ok) { window.location.href = '/login.html'; return; }
-            const usuario = await meResp.json();
-            idCliente = usuario.id;
-
-            // Cargar reservas y reviews del cliente en paralelo
-            const [resResp, revResp] = await Promise.all([
-                fetch('/Reserva/listar/propios', { headers: authHeaders() }),
-                fetch(`/Review/cliente/${idCliente}`, { headers: authHeaders() })
-            ]);
-            const reservas = resResp.ok ? await resResp.json() : [];
-            const reviews  = revResp.ok ? await revResp.json() : [];
-
-            // IDs de alojamientos donde el usuario ya dejó review
-            const yaReseniados = new Set(reviews.map(r => r.alojamiento?.id));
-
-            const hoy = new Date();
-            hoy.setHours(0, 0, 0, 0);
-
-            // Filtrar: CONFIRMADA, fechaFin ya pasó, y sin review previa
-            const elegibles = reservas.filter(r => {
-                if ( r.tipoEstado !== 'FINALIZADA') return false;
-                const fin = new Date(r.fechaFin + 'T00:00:00');
-                if (fin >= hoy) return false;
-                if (yaReseniados.has(r.alojamiento?.id)) return false;
-                return true;
+            await apiJson("/Review/registrar", "POST", {
+                idReserva: reservaSeleccionada.id,
+                puntuacion: parseInt(document.getElementById("puntuacion").value),
+                comentario: document.getElementById("comentario").value
             });
-
-            // Deduplicar por alojamiento (si reservó varias veces, mostrar una vez)
-            const vistos = new Set();
-            const unicos = elegibles.filter(r => {
-                const idAloj = r.alojamiento?.id;
-                if (vistos.has(idAloj)) return false;
-                vistos.add(idAloj);
-                return true;
-            });
-
-            renderLista(unicos);
+            mensaje.textContent = "Review publicada.";
+            setTimeout(() => window.location.href = "/mis-reviews.html", 1200);
         } catch (e) {
-            document.getElementById('alojList').innerHTML =
-                '<p style="color:var(--error);font-size:14px">Error cargando tus estadías.</p>';
-        } finally {
-            const overlay = document.getElementById('loadingOverlay');
-            overlay.style.opacity = '0';
-            setTimeout(() => {
-                overlay.style.display = 'none';
-                document.getElementById('mainContent').style.display = 'block';
-            }, 300);
+            mensaje.textContent = "Error: " + e.message;
         }
-    }
+    });
 
-    function renderLista(reservas) {
-        const list = document.getElementById('alojList');
-        if (reservas.length === 0) {
-            list.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-icon">🏡</div>
-                    <p>No tenés estadías finalizadas disponibles para reseñar.<br>
-                    Solo podés dejar una review tras completar una reserva confirmada.</p>
-                </div>`;
-            return;
-        }
-
-        list.innerHTML = reservas.map(r => {
-            const a = r.alojamiento;
-            const tipo = a?.tipoInmueble || 'CASA';
-            const icon = TIPO_ICON[tipo] || '🏠';
-            const titulo = a?.titulo || 'Alojamiento';
-            const ciudad = a?.direccion?.ciudad || '';
-            const fin = r.fechaFin || '';
-            return `
-            <div class="aloj-card" onclick='seleccionar(event, ${a.id}, ${JSON.stringify(titulo)}, ${JSON.stringify(tipo)}, ${JSON.stringify(ciudad)}, ${JSON.stringify(fin)})'>    <div class="aloj-card-icon">${icon}</div>
-                <div class="aloj-card-info">
-                    <div class="aloj-card-title">${titulo}</div>
-                    <div class="aloj-card-meta">${ciudad ? '📍 ' + ciudad + ' · ' : ''}Estadía hasta ${fin}</div>
-                </div>
-                <div class="aloj-card-check">✓</div>
-            </div>`;
-        }).join('');
-    }
-
-    function seleccionar(idAloj, titulo, tipo, ciudad, fechaFin) {
-        alojamientoSeleccionado = { id: idAloj, titulo, tipo, ciudad, fechaFin };
-
-        // Marcar card seleccionada
-        document.querySelectorAll('.aloj-card').forEach(c => c.classList.remove('selected'));
-        event.currentTarget.classList.add('selected');
-
-        // Pequeño delay para que se vea el efecto antes de pasar al paso 2
-        setTimeout(() => mostrarFormulario(), 220);
-    }
-
-    function mostrarFormulario() {
-        const a = alojamientoSeleccionado;
-        document.getElementById('selectedIcon').textContent = TIPO_ICON[a.tipo] || '🏠';
-        document.getElementById('selectedName').textContent = a.titulo;
-        document.getElementById('selectedMeta').textContent =
-            (a.ciudad ? '📍 ' + a.ciudad + ' · ' : '') + 'Estadía hasta ' + a.fechaFin;
-
-        // Reset form
-        document.querySelectorAll('input[name="puntuacion"]').forEach(r => r.checked = false);
-        document.getElementById('comentario').value = '';
-        document.getElementById('msg').style.display = 'none';
-
-        // Pasos
-        document.getElementById('step1').classList.remove('active');
-        document.getElementById('step1').classList.add('done');
-        document.getElementById('step1').querySelector('.step-num').textContent = '✓';
-        document.getElementById('step2').classList.add('active');
-
-        document.getElementById('selectionSection').style.display = 'none';
-        const form = document.getElementById('formSection');
-        form.style.display = 'block';
-        // re-trigger animation
-        form.style.animation = 'none';
-        form.offsetHeight;
-        form.style.animation = '';
-    }
-
-    function volverASeleccion() {
-        alojamientoSeleccionado = null;
-        document.getElementById('formSection').style.display = 'none';
-        document.getElementById('selectionSection').style.display = 'block';
-
-        document.getElementById('step1').classList.add('active');
-        document.getElementById('step1').classList.remove('done');
-        document.getElementById('step1').querySelector('.step-num').textContent = '1';
-        document.getElementById('step2').classList.remove('active');
-
-        document.querySelectorAll('.aloj-card').forEach(c => c.classList.remove('selected'));
-    }
-
-    async function enviar() {
-        const btn = document.getElementById('submitBtn');
-        const msg = document.getElementById('msg');
-        msg.style.display = 'none';
-
-        const puntuacionEl = document.querySelector('input[name="puntuacion"]:checked');
-        if (!puntuacionEl) {
-            mostrarMsg('error', 'Por favor seleccioná una puntuación.');
-            return;
-        }
-        const comentario = document.getElementById('comentario').value.trim();
-        if (!comentario) {
-            mostrarMsg('error', 'El comentario no puede estar vacío.');
-            return;
-        }
-
-        const datos = {
-            idCliente,
-            idAlojamiento: alojamientoSeleccionado.id,
-            puntuacion:    parseInt(puntuacionEl.value),
-            comentario
-        };
-
-        btn.disabled = true; btn.textContent = 'Publicando...';
-        try {
-            const resp = await fetch('/Review/registrar', {
-                method: 'POST',
-                headers: authHeaders(),
-                body: JSON.stringify(datos)
-            });
-            const texto = await resp.text();
-            if (resp.ok) {
-                mostrarMsg('success', '¡Review publicada correctamente! Redirigiendo...');
-                btn.disabled = true;
-                setTimeout(() => window.location.href = '/mis-reviews.html', 2000);
-            } else {
-                mostrarMsg('error', 'Error: ' + texto);
-                btn.disabled = false; btn.textContent = 'Publicar review';
-            }
-        } catch {
-            mostrarMsg('error', 'No se pudo conectar con el servidor.');
-            btn.disabled = false; btn.textContent = 'Publicar review';
-        }
-    }
-
-    function mostrarMsg(tipo, texto) {
-        const msg = document.getElementById('msg');
-        msg.className = 'msg ' + tipo;
-        msg.textContent = texto;
-        msg.style.display = 'block';
-    }
-
-    init();
+    cargar();
 </script>
 </body>
 </html>

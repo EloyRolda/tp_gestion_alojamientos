@@ -52,7 +52,8 @@ public class GalleryController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        Map result = cloudinaryService.upload(file);
+        String carpeta = galleryService.carpetaCloudinary(gallery.getAlojamiento().getId());
+        Map result = cloudinaryService.upload(file, carpeta);
         Image image = new Image(null, alt, (String) result.get("secure_url"), (String) result.get("public_id"), gallery);
         return ResponseEntity.status(HttpStatus.CREATED).body(imageService.createImage(image));
     }

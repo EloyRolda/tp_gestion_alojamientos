@@ -20,10 +20,4 @@ public class ReviewModificarDTO {
 
     @Size(max = 2000, message = "El comentario es muy largo")
     private String comentario;
-
-    @Min(value = 1, message = "Id invalido")
-    private Long idCliente;
-
-    @Min(value = 1, message = "Id invalido")
-    private Long idAlojamiento;
 }

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes</title>
+    <style>
+        body { font-family: sans-serif; max-width: 700px; margin: 0 auto; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 6px 8px; font-size: 13px; text-align: left; }
+    </style>
+</head>
+<body>
+<p><a href="/home.html">Volver al panel</a></p>
+<h1>Reportes</h1>
+
+<label for="filtro">Filtrar</label>
+<select id="filtro">
+    <option value="todos">Todos</option>
+    <option value="pendientes">Solo pendientes</option>
+</select>
+
+<table>
+    <thead><tr><th>Id</th><th>Reportante</th><th>Reportado</th><th>Descripcion</th><th>Estado</th><th>Fecha</th><th>Accion</th></tr></thead>
+    <tbody id="tbody"></tbody>
+</table>
+
+<script src="/js/api.js"></script>
+<script>
+    requireLogin();
+
+    async function cargar() {
+        const filtro = document.getElementById("filtro").value;
+        const url = filtro === "pendientes" ? "/Reporte/listar/pendientes" : "/Reporte/listar";
+        const reportes = await apiJson(url);
+
+        document.getElementById("tbody").innerHTML = reportes.map(r => {
+            const reportado = r.usuarioReportado
+                ? "Usuario: " + r.usuarioReportado.nombre
+                : "Alojamiento: " + r.alojamientoReportado.titulo;
+
+            return `<tr>
+                <td>${r.id}</td>
+                <td>${r.reportante.nombre}</td>
+                <td>${reportado}</td>
+                <td>${r.descripcion}</td>
+                <td>${r.estado}</td>
+                <td>${r.fecha.split("T")[0]}</td>
+                <td>
+                    <select onchange="cambiarEstado(${r.id}, this.value)">
+                        <option value="">Cambiar estado</option>
+                        <option value="PENDIENTE">Pendiente</option>
+                        <option value="REVISADO">Revisado</option>
+                        <option value="RESUELTO">Resuelto</option>
+                        <option value="DESESTIMADO">Desestimado</option>
+                    </select>
+                </td>
+            </tr>`;
+        }).join("") || "<tr><td colspan='7'>Sin reportes</td></tr>";
+    }
+
+    async function cambiarEstado(id, nuevoEstado) {
+        if (!nuevoEstado) return;
+        try {
+            await apiFetch(`/Reporte/${id}/estado?nuevoEstado=${nuevoEstado}`, { method: "PATCH" });
+            cargar();
+        } catch (e) {
+            alert("Error: " + e.message);
+        }
+    }
+
+    document.getElementById("filtro").addEventListener("change", cargar);
+    cargar();
+</script>
+</body>
+</html>

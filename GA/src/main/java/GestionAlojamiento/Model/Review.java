@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,11 +12,10 @@ import java.time.LocalDateTime;
 
 //Lombok
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 //JPA
 @Entity
-@Table(name = "review", uniqueConstraints = {@UniqueConstraint(name = "uq_review_cliente_aloj", columnNames = {"id_cliente", "id_alojamiento"})})// Los usuarios/cliente pueden dejar solamente una review por alojamiento
+@Table(name = "review")
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,15 +31,23 @@ public class Review {
     @Column(name = "comentario", nullable = false, columnDefinition = "TEXT")
     private String comentario;
 
-    @Column(name = "fecha", nullable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime fecha;//No deberia poder modificarse en el service.
+    @Column(name = "fecha", nullable = false)
+    private LocalDateTime fecha; // No deberia modificarse pasadas 48hs, ver ReviewService.
+
+    /// La reseña es de UNA estadia puntual, no del alojamiento en general:
+    /// por eso se liga 1 a 1 con la Reserva (FINALIZADA) que la origino, y no
+    /// hay unicidad por cliente+alojamiento (un cliente puede reseñar cada
+    /// estadia distinta que haya tenido en el mismo lugar).
+    @OneToOne
+    @JoinColumn(name = "id_reserva", nullable = false, unique = true)
+    private Reserva reserva;
 
     @ManyToOne
-    @JoinColumn(name = "id_cliente")
+    @JoinColumn(name = "id_cliente", nullable = false)
     private Usuario cliente;
 
     @ManyToOne
-    @JoinColumn(name = "id_alojamiento")
+    @JoinColumn(name = "id_alojamiento", nullable = false)
     private Alojamiento alojamiento;
 
 }

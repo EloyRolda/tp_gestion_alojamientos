@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -116,6 +117,13 @@ public class UsuarioController {
     public ResponseEntity<?> eliminar(@PathVariable Long id) {
         usuarioService.borrarPorId(id);
         return ResponseEntity.ok("Usuario desactivado correctamente");
+    }
+
+    /// El usuario logueado sube/reemplaza su propia foto de perfil (carpeta "usuarios/{id}" en Cloudinary).
+    @PostMapping(value = "/foto", consumes = "multipart/form-data")
+    public ResponseEntity<Usuario> subirFoto(@RequestParam("file") MultipartFile file, Authentication auth) {
+        Usuario usuarioLogueado = usuarioService.obtenerPorEmail(auth.getName());
+        return ResponseEntity.ok(usuarioService.actualizarFoto(usuarioLogueado.getId(), file));
     }
 
 }

@@ -6,6 +6,7 @@ import GestionAlojamiento.Model.Review;
 import GestionAlojamiento.Service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,17 +29,18 @@ public class ReviewController {
     }
 
     @PostMapping("/registrar")
-    public Review crear(@RequestBody @Valid ReviewRegistroDTO reviewRegistroDTO) {
-        return reviewService.crear(reviewRegistroDTO);
+    public Review crear(@RequestBody @Valid ReviewRegistroDTO dto, Authentication auth) {
+        return reviewService.crear(dto, auth.getName());
     }
+
     @PutMapping("/actualizar")
-    public Review modificar(@RequestBody @Valid ReviewModificarDTO dto) {
-        return reviewService.modificar(dto);
+    public Review modificar(@RequestBody @Valid ReviewModificarDTO dto, Authentication auth) {
+        return reviewService.modificar(dto, auth.getName());
     }
 
     @DeleteMapping("/eliminar/{id}")
-    public String eliminar(@PathVariable Long id) {
-        reviewService.borrarPorId(id);
+    public String eliminar(@PathVariable Long id, Authentication auth) {
+        reviewService.borrarPorId(id, auth.getName());
         return "La review fue eliminada correctamente.";
     }
 

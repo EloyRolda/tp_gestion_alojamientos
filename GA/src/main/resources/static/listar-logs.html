@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logs</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 6px 8px; font-size: 13px; text-align: left; }
+    </style>
+</head>
+<body>
+<p><a href="/home.html">Volver al panel</a></p>
+<h1>Logs del sistema</h1>
+
+<table>
+    <thead><tr><th>Fecha</th><th>Usuario</th><th>Accion</th><th>Entidad</th><th>Id entidad</th><th>Detalle</th></tr></thead>
+    <tbody id="tbody"></tbody>
+</table>
+
+<script src="/js/api.js"></script>
+<script>
+    requireLogin();
+
+    apiJson("/Log/listar").then(logs => {
+        document.getElementById("tbody").innerHTML = logs.map(l => `
+            <tr>
+                <td>${l.fecha.replace("T", " ").split(".")[0]}</td>
+                <td>${l.usuario ? l.usuario.nombre : "-"}</td>
+                <td>${l.accion}</td>
+                <td>${l.entidad}</td>
+                <td>${l.idEntidad ?? "-"}</td>
+                <td>${l.detalle ?? "-"}</td>
+            </tr>
+        `).join("") || "<tr><td colspan='6'>Sin registros</td></tr>";
+    });
+</script>
+</body>
+</html>

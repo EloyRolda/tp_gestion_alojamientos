@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amenities</title>
+    <style>
+        body { font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 6px 8px; font-size: 13px; text-align: left; }
+        form { display: flex; gap: 6px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+<p><a href="/home.html">Volver al panel</a></p>
+<h1>Amenities</h1>
+
+<table>
+    <thead><tr><th>Nombre</th><th>Categoria</th><th></th></tr></thead>
+    <tbody id="tbody"></tbody>
+</table>
+
+<h2>Agregar amenity</h2>
+<form id="formAgregar">
+    <input type="text" id="nombre" placeholder="Nombre" required>
+    <select id="categoria" required>
+        <option value="COCINA">Cocina</option>
+        <option value="BANIO">Banio</option>
+        <option value="HABITACION">Habitacion</option>
+        <option value="CLIMATIZACION">Climatizacion</option>
+        <option value="ENTRETENIMIENTO">Entretenimiento</option>
+        <option value="CONECTIVIDAD">Conectividad</option>
+        <option value="LAVADERO">Lavadero</option>
+        <option value="TRANSPORTE">Transporte</option>
+        <option value="EXTERIOR">Exterior</option>
+        <option value="PILETA_SPA">Pileta / Spa</option>
+        <option value="SEGURIDAD">Seguridad</option>
+        <option value="ACCESIBILIDAD">Accesibilidad</option>
+        <option value="FAMILIA">Familia</option>
+        <option value="SERVICIOS">Servicios</option>
+        <option value="MASCOTAS">Mascotas</option>
+    </select>
+    <button type="submit">Agregar</button>
+</form>
+<p id="mensaje"></p>
+
+<script src="/js/api.js"></script>
+<script>
+    requireLogin();
+
+    async function cargar() {
+        const amenities = await apiJson("/Amenity/listar");
+        document.getElementById("tbody").innerHTML = amenities.map(a => `
+            <tr>
+                <td>${a.nombre}</td>
+                <td>${a.categoria}</td>
+                <td><button onclick="eliminar(${a.id})">Eliminar</button></td>
+            </tr>
+        `).join("");
+    }
+    cargar();
+
+    async function eliminar(id) {
+        if (!confirm("Eliminar este amenity?")) return;
+        try {
+            await apiFetch("/Amenity/eliminar/" + id, { method: "DELETE" });
+            cargar();
+        } catch (e) {
+            alert("Error: " + e.message);
+        }
+    }
+
+    document.getElementById("formAgregar").addEventListener("submit", async (evento) => {
+        evento.preventDefault();
+        const mensaje = document.getElementById("mensaje");
+        try {
+            await apiJson("/Amenity/registrar", "POST", {
+                nombre: document.getElementById("nombre").value,
+                categoria: document.getElementById("categoria").value
+            });
+            document.getElementById("nombre").value = "";
+            cargar();
+        } catch (e) {
+            mensaje.textContent = "Error: " + e.message;
+        }
+    });
+</script>
+</body>
+</html>

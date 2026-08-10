@@ -45,11 +45,12 @@ public class SecurityConfig {
                                 "/auth/login",
                                 "/Usuario/registrar",
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/ws/**" // handshake de WebSocket: la autenticacion real ocurre en el frame CONNECT (ver WebSocketConfig)
                         ).permitAll()
 
                         // ── CUALQUIER AUTENTICADO ─────────────────────────────
-                        .requestMatchers("/Usuario/me").authenticated()
+                        .requestMatchers("/Usuario/me", "/Usuario/foto").authenticated()
 
                         // ── SOLO ADMIN — ENDPOINTS ────────────────────────────
                         .requestMatchers(
@@ -60,7 +61,14 @@ public class SecurityConfig {
                                 "/Usuario/eliminar/**",
                                 "/Usuario/registrar/administrador",
                                 "/Usuario/actualizar/admin",
-                                "/Reserva/listar"
+                                "/Reserva/listar",
+                                "/Log/**",
+                                "/Reporte/listar",
+                                "/Reporte/listar/pendientes",
+                                "/Reporte/*/estado",
+                                "/Amenity/registrar",
+                                "/Amenity/eliminar/**",
+                                "/Chat/listar"
                         ).hasRole("ADMIN")
 
                         // ── ADMIN y el propio usuario ──────────────────────────
@@ -69,11 +77,13 @@ public class SecurityConfig {
                                 "/Usuario/actualizar"
                         ).hasAnyRole("ADMIN", "CLIENTE", "ANFITRION")
 
-                        // ── ALOJAMIENTOS — LISTAR (todos los roles) ───────────
+                        // ── ALOJAMIENTOS — LISTAR/BUSCAR (todos los roles) ────
                         .requestMatchers(
                                 "/Casa/listar",         "/Casa/mostrar/**",
                                 "/Hotel/listar",        "/Hotel/mostrar/**",
-                                "/Departamento/listar", "/Departamento/mostrar/**"
+                                "/Departamento/listar", "/Departamento/mostrar/**",
+                                "/Alojamiento/listar",  "/Alojamiento/mostrar/**", "/Alojamiento/buscar",
+                                "/Amenity/listar"
                         ).hasAnyRole("ADMIN", "ANFITRION", "CLIENTE")
 
                         // ── ALOJAMIENTOS — PROPIOS (admin + anfitrion) ────────
@@ -83,38 +93,52 @@ public class SecurityConfig {
                                 "/Departamento/listar/propios"
                         ).hasAnyRole("ADMIN", "ANFITRION")
 
-                        // ── ALOJAMIENTOS — REGISTRAR / MODIFICAR ─────────────
+                        // ── ALOJAMIENTOS — REGISTRAR / MODIFICAR / PUBLICAR ───
                         .requestMatchers(
-                                "/Casa/registrar",
-                                "/Hotel/registrar",
-                                "/Departamento/registrar"
-                        ).hasAnyRole("ADMIN", "ANFITRION")
-
-                        .requestMatchers(
-                                "/Casa/actualizar",         "/Casa/eliminar/**",
-                                "/Hotel/actualizar",        "/Hotel/eliminar/**",
-                                "/Departamento/actualizar", "/Departamento/eliminar/**"
+                                "/Casa/registrar",         "/Casa/actualizar",         "/Casa/eliminar/**",
+                                "/Hotel/registrar",        "/Hotel/actualizar",        "/Hotel/eliminar/**",
+                                "/Departamento/registrar", "/Departamento/actualizar", "/Departamento/eliminar/**",
+                                "/Alojamiento/*/publicar", "/Alojamiento/*/despublicar"
                         ).hasAnyRole("ADMIN", "ANFITRION")
 
                         // ── RESERVAS ──────────────────────────────────────────
-                        .requestMatchers("/Reserva/listar/propios").hasAnyRole("ADMIN", "CLIENTE")
-                        .requestMatchers("/Reserva/listar/anfitrion").hasAnyRole("ADMIN", "ANFITRION")
-                        .requestMatchers("/Reserva/mostrar/**").hasAnyRole("ADMIN", "ANFITRION", "CLIENTE")
-                        .requestMatchers("/Reserva/registrar").hasAnyRole("ADMIN", "CLIENTE")
-                        .requestMatchers("/Reserva/actualizar", "/Reserva/eliminar/**").hasAnyRole("ADMIN", "CLIENTE")
-                        .requestMatchers("/Reserva/finalizar/**").hasAnyRole("ADMIN", "ANFITRION")
+                        .requestMatchers("/Reserva/listar/propios", "/Reserva/solicitar", "/Reserva/*/cancelar")
+                                .hasAnyRole("ADMIN", "CLIENTE")
+                        .requestMatchers(
+                                "/Reserva/listar/anfitrion",
+                                "/Reserva/solicitudes/pendientes",
+                                "/Reserva/*/aceptar",
+                                "/Reserva/*/rechazar",
+                                "/Reserva/finalizar/**",
+                                "/Reserva/anfitrion/ingresos-por-mes",
+                                "/ReviewHuesped/registrar"
+                        ).hasAnyRole("ADMIN", "ANFITRION")
+                        .requestMatchers("/Reserva/mostrar/**", "/Reserva/disponibilidad/**")
+                                .hasAnyRole("ADMIN", "ANFITRION", "CLIENTE")
+
                         // ── REVIEWS ───────────────────────────────────────────
                         .requestMatchers(
                                 "/Review/listar",
                                 "/Review/mostrar/**",
-                                "/Review/alojamiento/**"
+                                "/Review/alojamiento/**",
+                                "/ReviewHuesped/huesped/**"
                         ).hasAnyRole("ADMIN", "ANFITRION", "CLIENTE")
-                        .requestMatchers("/Review/cliente/**").hasAnyRole("ADMIN", "CLIENTE")
-                        .requestMatchers("/Review/registrar").hasAnyRole("ADMIN", "CLIENTE")
                         .requestMatchers(
+                                "/Review/cliente/**",
+                                "/Review/registrar",
                                 "/Review/actualizar",
                                 "/Review/eliminar/**"
                         ).hasAnyRole("ADMIN", "CLIENTE")
+
+                        // ── PAGO (simulado) ───────────────────────────────────
+                        .requestMatchers("/Pago/**").hasAnyRole("ADMIN", "CLIENTE")
+
+                        // ── REPORTES (cualquier autenticado puede reportar) ───
+                        .requestMatchers("/Reporte/registrar").hasAnyRole("ADMIN", "ANFITRION", "CLIENTE")
+
+                        // ── NOTIFICACIONES / CHAT / ESTADISTICAS (propios, se valida en el service) ──
+                        .requestMatchers("/Notificacion/**", "/Chat/**", "/Estadisticas/**")
+                                .hasAnyRole("ADMIN", "ANFITRION", "CLIENTE")
 
                         .anyRequest().authenticated()
                 )

@@ -6,8 +6,9 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.math.BigDecimal;
 
+import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -21,11 +22,8 @@ public class DepartamentoModificarDTO {
     private Long anfitrion_id;
 
     private Integer piso;
-
     private Boolean tieneAscensor;
-
     private Boolean expensasIncluidas;
-
     private Boolean activo;
 
     //[ALOJAMIENTO]
@@ -63,9 +61,6 @@ public class DepartamentoModificarDTO {
     @Min(value = 0, message = "Valor Invalido")
     private Integer altura;
 
-    //[SERVICIO]
-    private Boolean tieneCocina;
-    private Boolean tieneLavarropa;
-    private Boolean tieneWifi;
-    private Boolean tieneEstacionamiento;
+    //[AMENITIES]
+    private List<Long> amenityIds;
 }

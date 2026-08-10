@@ -3,8 +3,10 @@ package GestionAlojamiento.Service;
 import GestionAlojamiento.DTO.CasaModificarDTO;
 import GestionAlojamiento.DTO.CasaRegistroDTO;
 import GestionAlojamiento.Exception.IdNoEncontradoException;
-import GestionAlojamiento.Model.*;
-import GestionAlojamiento.Model.Enums.TipoInmueble;
+import GestionAlojamiento.Model.Casa;
+import GestionAlojamiento.Model.Direccion;
+import GestionAlojamiento.Model.Gallery;
+import GestionAlojamiento.Model.Usuario;
 import GestionAlojamiento.Repository.CasaRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +21,8 @@ public class CasaService {
     private final CasaRepository casaRepository;
     private final UsuarioService usuarioService;
     private final AlojamientoService alojamientoService;
+    private final AmenityService amenityService;
     private final GalleryService galleryService;
-    private final ReservaService reservaService;
-    private final ReviewService reviewService;
 
     //---------------------------------------- LISTAR ----------------------------------------
     public List<Casa> listar() {
@@ -29,12 +30,13 @@ public class CasaService {
     }
 
     public Casa obtenerPorId(Long id) {
-        return casaRepository.findById(id).orElseThrow(() -> new IdNoEncontradoException("Error, el id de la casa no se encuentra en la base de datos."));
+        return casaRepository.findById(id)
+                .orElseThrow(() -> new IdNoEncontradoException("Error, el id de la casa no se encuentra en la base de datos."));
     }
 
-    /// Recibe un id de un anfitrion y devuelve una lista de casas que posee.
+    /// Recibe el correo de un anfitrion y devuelve la lista de casas que posee.
     public List<Casa> listarPorAnfitrion(String correoAnfitrion) {
-        return casaRepository.findByAlojamientoAnfitrionEmail(correoAnfitrion);
+        return casaRepository.findByAnfitrionEmail(correoAnfitrion);
     }
 
     //---------------------------------------- CREAR ----------------------------------------
@@ -46,33 +48,31 @@ public class CasaService {
         casa.setTienePileta(dto.isTienePileta());
         casa.setTieneParrilla(dto.isTieneParrilla());
 
-        casa.setAlojamiento(mapearAlojamiento(dto));
+        mapearComun(casa, dto);
+        casa.setAnfitrion(usuarioService.obtenerAnfitrionPorId(dto.getIdAnfitrion()));
+        casa.setActivo(true);
 
-        Gallery gallery = new Gallery(null, dto.getTitulo(), casa.getAlojamiento());
+        Casa guardada = casaRepository.save(casa);
+
+        Gallery gallery = new Gallery(null, dto.getTitulo(), guardada);
         galleryService.createGallery(gallery);
 
-        return casaRepository.save(casa);
+        return guardada;
     }
 
-    //---------------------------------------- BORRAR ----------------------------------------
+    //---------------------------------------- BORRAR (BAJA LOGICA) ----------------------------------------
     @Transactional
-    public void borrarPorId(Long id_casa) {
-        Casa casa = casaRepository.findById(id_casa)
-                .orElseThrow(() -> new IdNoEncontradoException("Error, el id de CASA no se encuentra en la base de datos:" + id_casa));
-        Alojamiento alojamiento = casa.getAlojamiento();
-        reservaService.borrarPorAlojamientoId(alojamiento.getId());
-        reviewService.borrarPorAlojamiento(alojamiento);
-        galleryService.borrarPorAlojamientoId(alojamiento.getId());
-        casaRepository.deleteById(id_casa);
+    public void borrarPorId(Long idCasa) {
+        obtenerPorId(idCasa); // valida existencia
+        alojamientoService.desactivar(idCasa);
     }
 
     //---------------------------------------- MODIFICAR ----------------------------------------
     @Transactional
     public Casa modificar(CasaModificarDTO dto) {
 
-        Alojamiento dtoAlojamiento = mapearAlojamiento(dto);
-
         Casa casa = obtenerPorId(dto.getIdCasa());
+
         if (dto.getTienePatio() != null) {
             casa.setTienePatio(dto.getTienePatio());
         }
@@ -83,91 +83,69 @@ public class CasaService {
             casa.setTieneParrilla(dto.getTieneParrilla());
         }
 
-        casa.setAlojamiento(alojamientoService.modificarObjeto(casa.getAlojamiento(), dtoAlojamiento));
+        Casa cambiosComunes = new Casa();
+        mapearComunModificar(cambiosComunes, dto);
+        if (dto.getAnfitrion_id() != null) {
+            cambiosComunes.setAnfitrion(usuarioService.obtenerAnfitrionPorId(dto.getAnfitrion_id()));
+        }
+        if (dto.getActivo() != null) {
+            cambiosComunes.setActivo(dto.getActivo());
+        }
+
+        alojamientoService.modificarObjeto(casa, cambiosComunes);
 
         return casaRepository.save(casa);
     }
 
     //---------------------------------------- MAPEOS DTO [PRIVADOS] ----------------------------------------
 
-    private Alojamiento mapearAlojamiento(CasaModificarDTO dto) {
+    private void mapearComun(Casa casa, CasaRegistroDTO dto) {
+        casa.setTitulo(dto.getTitulo());
+        casa.setDescripcion(dto.getDescripcion());
+        casa.setPrecioNoche(dto.getPrecioNoche());
+        casa.setCapacidad(dto.getCapacidad());
+        casa.setCantAmbientes(dto.getCantAmbientes());
+        casa.setCantHabitaciones(dto.getCantHabitaciones());
+        casa.setCantCamas(dto.getCantCamas());
+        casa.setCantBanios(dto.getCantBanios());
+        casa.setAmenities(amenityService.resolver(dto.getAmenityIds()));
 
-        Direccion direccion = new Direccion(
+        casa.setDireccion(new Direccion(
                 null,
-                dto.getPais(),
-                dto.getProvincia(),
+                dto.getPais().toLowerCase(),
+                dto.getProvincia().toLowerCase(),
                 dto.getCodigoPostal(),
                 dto.getCiudad(),
-                dto.getCalle(),
+                dto.getCalle().toLowerCase(),
                 dto.getAltura()
-        );
-
-        Servicio servicio = new Servicio(
-                null,
-                dto.getTieneCocina(),
-                dto.getTieneLavarropa(),
-                dto.getTieneWifi(),
-                dto.getTieneEstacionamiento()
-        );
-
-        Usuario anfitrion = null;
-        if (dto.getAnfitrion_id() != null) {
-            anfitrion = usuarioService.obtenerAnfitrionPorId(dto.getAnfitrion_id());
-        }
-
-        return new Alojamiento(
-                null,
-                dto.getTitulo(),
-                dto.getDescripcion(),
-                dto.getPrecioNoche(),
-                dto.getCapacidad(),
-                dto.getCantAmbientes(),
-                dto.getCantHabitaciones(),
-                dto.getCantCamas(),
-                dto.getCantBanios(),
-                dto.getActivo(),
-                TipoInmueble.CASA,
-                anfitrion,
-                direccion,
-                servicio
-        );
+        ));
     }
 
-    private Alojamiento mapearAlojamiento(CasaRegistroDTO dto) {
+    private void mapearComunModificar(Casa cambios, CasaModificarDTO dto) {
+        cambios.setTitulo(dto.getTitulo());
+        cambios.setDescripcion(dto.getDescripcion());
+        cambios.setPrecioNoche(dto.getPrecioNoche());
+        cambios.setCapacidad(dto.getCapacidad());
+        cambios.setCantAmbientes(dto.getCantAmbientes());
+        cambios.setCantHabitaciones(dto.getCantHabitaciones());
+        cambios.setCantCamas(dto.getCantCamas());
+        cambios.setCantBanios(dto.getCantBanios());
+        if (dto.getAmenityIds() != null) {
+            cambios.setAmenities(amenityService.resolver(dto.getAmenityIds()));
+        }
 
-        Direccion direccion = new Direccion(
-                null,
-                dto.getPais(),
-                dto.getProvincia(),
-                dto.getCodigoPostal(),
-                dto.getCiudad(),
-                dto.getCalle(),
-                dto.getAltura()
-        );
-
-        Servicio servicio = new Servicio(
-                null,
-                dto.isTieneCocina(),
-                dto.isTieneLavarropa(),
-                dto.isTieneWifi(),
-                dto.isTieneEstacionamiento()
-        );
-
-        return new Alojamiento(
-                null,
-                dto.getTitulo(),
-                dto.getDescripcion(),
-                dto.getPrecioNoche(),
-                dto.getCapacidad(),
-                dto.getCantAmbientes(),
-                dto.getCantHabitaciones(),
-                dto.getCantCamas(),
-                dto.getCantBanios(),
-                true,
-                TipoInmueble.CASA,
-                usuarioService.obtenerAnfitrionPorId(dto.getIdAnfitrion()),
-                direccion,
-                servicio
-        );
+        if (dto.getPais() != null || dto.getProvincia() != null || dto.getCodigoPostal() != null
+                || dto.getCiudad() != null || dto.getCalle() != null || dto.getAltura() != null) {
+            Direccion direccion = new Direccion();
+            direccion.setPais(dto.getPais());
+            direccion.setProvincia(dto.getProvincia());
+            direccion.setCodigoPostal(dto.getCodigoPostal());
+            direccion.setCiudad(dto.getCiudad());
+            direccion.setCalle(dto.getCalle());
+            direccion.setAltura(dto.getAltura());
+            cambios.setDireccion(direccion);
+        } else {
+            cambios.setDireccion(new Direccion());
+        }
     }
 }

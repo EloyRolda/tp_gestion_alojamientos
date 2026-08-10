@@ -61,8 +61,7 @@ public class DepartamentoController {
 
         Departamento departamento = departamentoService.obtenerPorId(id);
 
-        if (!departamento.getAlojamiento()
-                .getAnfitrion()
+        if (!departamento.getAnfitrion()
                 .getId()
                 .equals(usuarioLogueado.getId()) && usuarioLogueado.getTipoUsuario() != TipoUsuario.ADMINISTRADOR) {
 

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resenar huesped</title>
+    <style>
+        body { font-family: sans-serif; max-width: 400px; margin: 0 auto; padding: 20px; }
+        form { display: flex; flex-direction: column; gap: 8px; }
+    </style>
+</head>
+<body>
+<p><a href="/reserva-mis-alojamientos.html">Volver</a></p>
+<h1>Resenar huesped</h1>
+
+<form id="formReview">
+    <label for="comentario">Comentario breve</label>
+    <textarea id="comentario" required maxlength="800"></textarea>
+    <button type="submit">Publicar</button>
+</form>
+<p id="mensaje"></p>
+
+<script src="/js/api.js"></script>
+<script>
+    requireLogin();
+    const idReserva = new URLSearchParams(location.search).get("idReserva");
+
+    document.getElementById("formReview").addEventListener("submit", async (evento) => {
+        evento.preventDefault();
+        const mensaje = document.getElementById("mensaje");
+        try {
+            await apiJson("/ReviewHuesped/registrar", "POST", {
+                idReserva: Number(idReserva),
+                comentario: document.getElementById("comentario").value
+            });
+            mensaje.textContent = "Review publicada.";
+            setTimeout(() => window.location.href = "/reserva-mis-alojamientos.html", 1200);
+        } catch (e) {
+            mensaje.textContent = "Error: " + e.message;
+        }
+    });
+</script>
+</body>
+</html>

@@ -7,10 +7,10 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
+import java.util.List;
 
-
-//Lombok
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,13 +19,9 @@ public class CasaRegistroDTO {
     @Min(value = 1, message = "Id invalido")
     private Long idAnfitrion;
 
-    @NotNull(message = "Campo Obligatorio")
     private boolean tienePatio;
-    @NotNull(message = "Campo Obligatorio")
     private boolean tienePileta;
-    @NotNull(message = "Campo Obligatorio")
     private boolean tieneParrilla;
-
 
     //[ALOJAMIENTO]
     @NotNull(message = "Campo obligatorio")
@@ -68,7 +64,6 @@ public class CasaRegistroDTO {
     private String provincia;
 
     @NotBlank(message = "Campo obligatorio")
-    @Min(value = 0, message = "Valor Invalido")
     private String codigoPostal;
 
     @NotBlank(message = "Campo obligatorio")
@@ -81,14 +76,6 @@ public class CasaRegistroDTO {
     @Min(value = 0, message = "Valor Invalido")
     private Integer altura;
 
-    //[SERVICIO]
-
-    private boolean tieneCocina;
-
-    private boolean tieneLavarropa;
-
-    private boolean tieneWifi;
-
-    private boolean tieneEstacionamiento;
-
+    //[AMENITIES] ids del catalogo (GET /Amenity/listar)
+    private List<Long> amenityIds;
 }

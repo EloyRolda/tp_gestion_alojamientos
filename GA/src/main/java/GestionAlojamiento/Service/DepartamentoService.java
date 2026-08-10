@@ -3,8 +3,9 @@ package GestionAlojamiento.Service;
 import GestionAlojamiento.DTO.DepartamentoModificarDTO;
 import GestionAlojamiento.DTO.DepartamentoRegistroDTO;
 import GestionAlojamiento.Exception.IdNoEncontradoException;
-import GestionAlojamiento.Model.*;
-import GestionAlojamiento.Model.Enums.TipoInmueble;
+import GestionAlojamiento.Model.Departamento;
+import GestionAlojamiento.Model.Direccion;
+import GestionAlojamiento.Model.Gallery;
 import GestionAlojamiento.Repository.DepartamentoRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +20,8 @@ public class DepartamentoService {
     private final DepartamentoRepository departamentoRepository;
     private final UsuarioService usuarioService;
     private final AlojamientoService alojamientoService;
+    private final AmenityService amenityService;
     private final GalleryService galleryService;
-    private final ReservaService reservaService;
-    private final ReviewService reviewService;
 
     //---------------------------------------- LISTAR ----------------------------------------
     public List<Departamento> listarTodos() {
@@ -29,12 +29,12 @@ public class DepartamentoService {
     }
 
     public Departamento obtenerPorId(Long id) {
-        return departamentoRepository.findById(id).orElseThrow(() -> new IdNoEncontradoException("Error, id no encontrado en la base de datos."));
+        return departamentoRepository.findById(id)
+                .orElseThrow(() -> new IdNoEncontradoException("Error, id no encontrado en la base de datos."));
     }
 
-    /// Recibe un id de un anfitrion y devuelve una lista de los hoteles que posee.
     public List<Departamento> listarPorAnfitrion(String correoAnfitrion) {
-        return departamentoRepository.findByAlojamientoAnfitrionEmail(correoAnfitrion);
+        return departamentoRepository.findByAnfitrionEmail(correoAnfitrion);
     }
 
     //---------------------------------------- CREAR ----------------------------------------
@@ -46,24 +46,23 @@ public class DepartamentoService {
         departamento.setExpensasIncluidas(dto.isExpensasIncluidas());
         departamento.setPiso(dto.getPiso());
 
-        departamento.setAlojamiento(mapearAlojamiento(dto));
+        mapearComun(departamento, dto);
+        departamento.setAnfitrion(usuarioService.obtenerAnfitrionPorId(dto.getIdAnfitrion()));
+        departamento.setActivo(true);
 
-        Gallery gallery = new Gallery(null, dto.getTitulo(), departamento.getAlojamiento());
+        Departamento guardado = departamentoRepository.save(departamento);
+
+        Gallery gallery = new Gallery(null, dto.getTitulo(), guardado);
         galleryService.createGallery(gallery);
 
-        return departamentoRepository.save(departamento);
+        return guardado;
     }
 
-    //---------------------------------------- BORRAR ----------------------------------------
+    //---------------------------------------- BORRAR (BAJA LOGICA) ----------------------------------------
     @Transactional
-    public void borrarPorId(Long id_departamento) {
-        Departamento departamento = departamentoRepository.findById(id_departamento)
-                .orElseThrow(() -> new IdNoEncontradoException("Error, el id de DEPARTAMENTO no se encuentra en la base de datos:" + id_departamento));
-        Alojamiento alojamiento = departamento.getAlojamiento();
-        reservaService.borrarPorAlojamientoId(alojamiento.getId());
-        reviewService.borrarPorAlojamiento(alojamiento);
-        galleryService.borrarPorAlojamientoId(alojamiento.getId());
-        departamentoRepository.deleteById(id_departamento);
+    public void borrarPorId(Long idDepartamento) {
+        obtenerPorId(idDepartamento);
+        alojamientoService.desactivar(idDepartamento);
     }
 
     //---------------------------------------- MODIFICAR ----------------------------------------
@@ -82,91 +81,64 @@ public class DepartamentoService {
             departamento.setExpensasIncluidas(dto.getExpensasIncluidas());
         }
 
-        departamento.setAlojamiento(alojamientoService.modificarObjeto(departamento.getAlojamiento(), mapearAlojamiento(dto)));
+        Departamento cambiosComunes = new Departamento();
+        mapearComunModificar(cambiosComunes, dto);
+        if (dto.getAnfitrion_id() != null) {
+            cambiosComunes.setAnfitrion(usuarioService.obtenerAnfitrionPorId(dto.getAnfitrion_id()));
+        }
+        if (dto.getActivo() != null) {
+            cambiosComunes.setActivo(dto.getActivo());
+        }
+
+        alojamientoService.modificarObjeto(departamento, cambiosComunes);
 
         return departamentoRepository.save(departamento);
     }
 
     //---------------------------------------- MAPEOS DTO [PRIVADOS] ----------------------------------------
 
-    private Alojamiento mapearAlojamiento(DepartamentoModificarDTO dto) {
+    private void mapearComun(Departamento departamento, DepartamentoRegistroDTO dto) {
+        departamento.setTitulo(dto.getTitulo());
+        departamento.setDescripcion(dto.getDescripcion());
+        departamento.setPrecioNoche(dto.getPrecioNoche());
+        departamento.setCapacidad(dto.getCapacidad());
+        departamento.setCantAmbientes(dto.getCantAmbientes());
+        departamento.setCantHabitaciones(dto.getCantHabitaciones());
+        departamento.setCantCamas(dto.getCantCamas());
+        departamento.setCantBanios(dto.getCantBanios());
+        departamento.setAmenities(amenityService.resolver(dto.getAmenityIds()));
 
-        Direccion direccion = new Direccion(
+        departamento.setDireccion(new Direccion(
                 null,
-                dto.getPais(),
-                dto.getProvincia(),
+                dto.getPais().toLowerCase(),
+                dto.getProvincia().toLowerCase(),
                 dto.getCodigoPostal(),
                 dto.getCiudad(),
-                dto.getCalle(),
+                dto.getCalle().toLowerCase(),
                 dto.getAltura()
-        );
-
-        Servicio servicio = new Servicio(
-                null,
-                dto.getTieneCocina(),
-                dto.getTieneLavarropa(),
-                dto.getTieneWifi(),
-                dto.getTieneEstacionamiento()
-        );
-
-        Usuario anfitrion = null;
-        if (dto.getAnfitrion_id() != null) {
-            anfitrion = usuarioService.obtenerAnfitrionPorId(dto.getAnfitrion_id());
-        }
-
-        return new Alojamiento(
-                null,
-                dto.getTitulo(),
-                dto.getDescripcion(),
-                dto.getPrecioNoche(),
-                dto.getCapacidad(),
-                dto.getCantAmbientes(),
-                dto.getCantHabitaciones(),
-                dto.getCantCamas(),
-                dto.getCantBanios(),
-                dto.getActivo(),
-                TipoInmueble.DEPARTAMENTO,
-                anfitrion,
-                direccion,
-                servicio
-        );
+        ));
     }
 
-    private Alojamiento mapearAlojamiento(DepartamentoRegistroDTO dto) {
+    private void mapearComunModificar(Departamento cambios, DepartamentoModificarDTO dto) {
+        cambios.setTitulo(dto.getTitulo());
+        cambios.setDescripcion(dto.getDescripcion());
+        cambios.setPrecioNoche(dto.getPrecioNoche());
+        cambios.setCapacidad(dto.getCapacidad());
+        cambios.setCantAmbientes(dto.getCantAmbientes());
+        cambios.setCantHabitaciones(dto.getCantHabitaciones());
+        cambios.setCantCamas(dto.getCantCamas());
+        cambios.setCantBanios(dto.getCantBanios());
+        if (dto.getAmenityIds() != null) {
+            cambios.setAmenities(amenityService.resolver(dto.getAmenityIds()));
+        }
 
-        Direccion direccion = new Direccion(
-                null,
-                dto.getPais(),
-                dto.getProvincia(),
-                dto.getCodigoPostal(),
-                dto.getCiudad(),
-                dto.getCalle(),
-                dto.getAltura()
-        );
-
-        Servicio servicio = new Servicio(
-                null,
-                dto.isTieneCocina(),
-                dto.isTieneLavarropa(),
-                dto.isTieneWifi(),
-                dto.isTieneEstacionamiento()
-        );
-
-        return new Alojamiento(
-                null,
-                dto.getTitulo(),
-                dto.getDescripcion(),
-                dto.getPrecioNoche(),
-                dto.getCapacidad(),
-                dto.getCantAmbientes(),
-                dto.getCantHabitaciones(),
-                dto.getCantCamas(),
-                dto.getCantBanios(),
-                true,
-                TipoInmueble.DEPARTAMENTO,
-                usuarioService.obtenerAnfitrionPorId(dto.getIdAnfitrion()),
-                direccion,
-                servicio
-        );
+        Direccion direccion = new Direccion();
+        direccion.setPais(dto.getPais());
+        direccion.setProvincia(dto.getProvincia());
+        direccion.setCodigoPostal(dto.getCodigoPostal());
+        direccion.setCiudad(dto.getCiudad());
+        direccion.setCalle(dto.getCalle());
+        direccion.setAltura(dto.getAltura());
+        cambios.setDireccion(direccion);
     }
 }

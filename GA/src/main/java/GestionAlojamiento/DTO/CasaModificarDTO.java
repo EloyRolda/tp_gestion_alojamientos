@@ -8,13 +8,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 
-
-//Lombok
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class CasaModificarDTO {
 
     @NotNull(message = "Id obligatorio")
@@ -22,13 +20,10 @@ public class CasaModificarDTO {
     private Long idCasa;
 
     private Boolean tienePatio;
-
     private Boolean tienePileta;
-
     private Boolean tieneParrilla;
 
     //[ALOJAMIENTO]
-
     @Min(value = 1, message = "Valor Invalido")
     private Integer cantAmbientes;
 
@@ -53,30 +48,19 @@ public class CasaModificarDTO {
     private BigDecimal precioNoche;
 
     private Boolean activo;
+
     //[DIRECCION]
-
     private String pais;
-
     private String provincia;
-
     private String codigoPostal;
-
     private String ciudad;
-
     private String calle;
 
     @Min(value = 0, message = "Valor Invalido")
     private Integer altura;
 
-    //[SERVICIO]
-
-    private Boolean tieneCocina;
-
-    private Boolean tieneLavarropa;
-
-    private Boolean tieneWifi;
-
-    private Boolean tieneEstacionamiento;
+    //[AMENITIES]
+    private List<Long> amenityIds;
 
     private Long anfitrion_id;
 }

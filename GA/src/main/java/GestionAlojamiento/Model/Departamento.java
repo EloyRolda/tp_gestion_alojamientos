@@ -1,21 +1,17 @@
 package GestionAlojamiento.Model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-//Lombok
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
-//JPA
 @Entity
+@DiscriminatorValue("DEPARTAMENTO")
 @Table(name = "departamento")
-public class Departamento {
-    @Id
-    @Column(name = "id_departamento")
-    private Long id;
+public class Departamento extends Alojamiento {
 
     //A fines practicos no contemplamos plantas negativas.
     @Column(name = "piso", nullable = false)
@@ -26,9 +22,4 @@ public class Departamento {
 
     @Column(name = "expensas_incluidas", nullable = false)
     private boolean expensasIncluidas;
-
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @MapsId
-    @JoinColumn(name = "id_alojamiento")
-    private Alojamiento alojamiento;
 }

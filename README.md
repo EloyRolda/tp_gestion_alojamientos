@@ -1,111 +1,103 @@
-# Gestión de Alojamiento (GA)
+# Gestion de Alojamiento (GA)
 
-Sistema web para la gestión de alojamientos turísticos que permite registrar, consultar y reservar propiedades como hoteles, casas y departamentos.
-
----
-
-## > Descripción
-
-La aplicación expone una API REST con autenticación basada en roles. Los usuarios pueden registrarse como **clientes**, **anfitriones** o **administradores**, cada uno con permisos diferenciados. Los anfitriones publican sus propiedades, los clientes realizan reservas y dejan reseñas, y los administradores gestionan todo el sistema.
+Sistema web tipo Airbnb para gestion de alojamientos turisticos: busqueda con
+filtros, solicitud de reserva con aprobacion del anfitrion, pago (simulado,
+listo para Mercado Pago), chat en tiempo real por reserva, notificaciones,
+reviews, reportes y estadisticas para anfitriones y clientes.
 
 ---
 
-## > Tecnologías
+## Tecnologias
 
-| Tecnología | Versión | Uso |
-|---|---|---|
-| **Java** | 21 | Lenguaje principal |
-| **Spring Boot** | 3.2.5 | Framework principal |
-| **Spring Security** | — | Autenticación y autorización por roles |
-| **Spring Data JPA** | — | Persistencia y acceso a datos |
-| **MySQL** | — | Base de datos relacional |
-| **Lombok** | — | Reducción de boilerplate |
-| **Bean Validation** | — | Validación de entidades y DTOs |
-| **SpringDoc OpenAPI (Swagger)** | 2.5.0 | Documentación interactiva de la API |
-| **Maven** | — | Gestión de dependencias y build |
-| **HTML / CSS / JS** | — | Frontend estático |
+| Tecnologia | Uso |
+|---|---|
+| Java 21 + Spring Boot 3.2.5 | Backend |
+| Spring Security + JWT | Autenticacion y autorizacion por roles |
+| Spring Data JPA + MySQL | Persistencia |
+| Spring WebSocket (STOMP) | Chat en tiempo real |
+| Cloudinary | Almacenamiento de imagenes (carpeta por entidad) |
+| Lombok / Bean Validation | Reduccion de boilerplate y validaciones |
+| SpringDoc OpenAPI (Swagger) | Documentacion interactiva |
+| HTML / CSS / JS (vanilla) | Frontend estatico minimo |
 
 ---
 
-## > Estructura del proyecto
+## Como ejecutar
+
+### Requisitos
+- Java 21+
+- Maven (o el `mvnw` incluido)
+- MySQL en ejecucion
+
+### 1. Variables de entorno
+Copiar `GA/.env.example` a `GA/.env` (o cargar esas mismas variables en tu IDE:
+Run Configuration -> Environment variables) con los datos de tu base y tus
+credenciales. Sin esto la app no arranca (falla con
+`Could not resolve placeholder`).
+
+### 2. Base de datos
+No hace falta correr ningun script SQL a mano: con `spring.jpa.hibernate.ddl-auto=update`
+Hibernate genera el esquema a partir de las entidades la primera vez que
+arranca la app. Solo hay que tener la base `newgestiondb` creada (vacia) en MySQL.
+
+### 3. Levantar el backend
+```bash
+cd GA
+./mvnw spring-boot:run
+```
+
+### 4. Acceder
+- Frontend: `http://localhost:8080`
+- Swagger: `http://localhost:8080/swagger-ui/index.html`
+
+---
+
+## Estructura del backend
 
 ```
 src/main/java/GestionAlojamiento/
-├── Config/          # Seguridad (Spring Security, UserDetailsService)
-├── DTO/             # Objetos de transferencia de datos (registro y modificación)
+├── Config/          # Seguridad (JWT, roles), WebSocket, seed de amenities
+├── DTO/             # Objetos de transferencia (registro/modificacion)
 ├── Exception/       # Manejo global de excepciones
-├── Model/           # Entidades JPA (Alojamiento, Casa, Hotel, Departamento, Usuario, Reserva, Review...)
-│   └── Enums/       # TipoInmueble, TipoUsuario, TipoEstado
-├── Repository/      # Interfaces JPA Repository
-├── RestController/  # Endpoints REST
-└── Service/         # Lógica de negocio
-src/main/resources/static/   # Páginas HTML del frontend
+├── Model/           # Entidades JPA
+│   └── Enums/       # EstadoReserva, CategoriaAmenity, EstadoPago, etc.
+├── Repository/       # Interfaces Spring Data JPA
+├── RestController/   # Endpoints REST
+└── Service/          # Logica de negocio (cada Service solo llama a OTROS
+                       # Services para datos que no son suyos, nunca a un
+                       # Repository ajeno)
+src/main/resources/static/   # Frontend: HTML minimo + js/api.js (helper de fetch)
 ```
 
----
-
-## > Roles y permisos
+## Roles
 
 | Rol | Capacidades |
 |---|---|
-| **ADMIN** | Acceso total: gestión de usuarios, alojamientos, reservas y reseñas |
-| **ANFITRION** | Registrar y gestionar sus propias propiedades |
-| **CLIENTE** | Hacer reservas y dejar reseñas |
+| ADMINISTRADOR | Gestion total: usuarios, alojamientos, reservas, reportes, logs |
+| ANFITRION | Publica y gestiona sus alojamientos, acepta/rechaza reservas, chatea, ve sus estadisticas |
+| CLIENTE | Busca y reserva alojamientos, paga, chatea, deja reviews, ve su historial |
 
----
+## Modelo de datos (resumen)
 
-## > Entidades principales
+- **Alojamiento** (abstracta, herencia JPA `JOINED`) -> `Casa`, `Departamento`, `Hotel`
+- **Amenity**: catalogo de comodidades, relacion muchos-a-muchos con Alojamiento
+- **Reserva**: maquina de estados `SOLICITADA -> ACEPTADA (48hs para pagar) -> PAGADA -> FINALIZADA`
+  (con `RECHAZADA`, `CANCELADA`, `VENCIDA` como estados terminales alternativos)
+- **Pago**: traza el pago de Mercado Pago de una reserva (hoy en modo simulado)
+- **Review**: reseña de un cliente sobre UNA estadia puntual (no sobre el alojamiento en general)
+- **ReviewHuesped**: reseña que el anfitrion deja sobre el huesped
+- **Chat / Mensaje**: 1 chat por reserva, se abre al pagar, se cierra 48hs despues de finalizada la estadia
+- **Notificacion**: eventos automaticos (solicitud creada, aceptada, pago confirmado, etc.)
+- **Log**: auditoria de acciones, visible solo para el admin
+- **Reporte**: un usuario puede reportar a otro usuario o a un alojamiento
 
-- **Alojamiento** — entidad base con herencia hacia `Casa`, `Hotel` y `Departamento`
-- **Usuario** — con soporte para anfitriones (matrícula) y clientes (método de pago)
-- **Reserva** — vincula un cliente con un alojamiento en un rango de fechas
-- **Review** — reseña de un cliente sobre un alojamiento
-- **Dirección** y **Servicio** — datos complementarios del alojamiento
+## Nota sobre el pago
 
----
+Todavia no hay credenciales de Mercado Pago cargadas: `PagoService` trabaja en
+modo simulado (el "checkout" es un boton que el propio frontend dispara). Esta
+aislado en un unico archivo para que conectar el SDK real de Mercado Pago no
+requiera tocar el resto del flujo de reservas/chat/notificaciones.
 
-## > Cómo ejecutar
+## Licencia
 
-### Requisitos previos
-- Java 21+
-- Maven
-- MySQL en ejecución [XAMPP]
-
-### Pasos
-
-1. Clonar el repositorio y acceder al directorio:
-   ```bash
-   git clone https://github.com/EloyRolda/tp_gestion_alojamientos
-   cd GA
-   ```
-
-2. Configurar la base de datos en `src/main/resources/application.properties`:
-   ```properties
-   spring.datasource.url=jdbc:mysql://localhost:3306/gestion_alojamiento
-   spring.datasource.username=  [tu_usuario]
-   spring.datasource.password=  [tu_password]
-   spring.jpa.hibernate.ddl-auto=update
-   ```
-
-3. Compilar y ejecutar:
-   ```bash
-   ./mvnw spring-boot:run
-   ```
-
-4. Acceder a la aplicación en `http://localhost:8080`
-
----
-
-## > Documentación de la API
-
-Una vez levantada la aplicación, la documentación interactiva (Swagger UI) está disponible en:
-
-```
-http://localhost:8080/swagger-ui/index.html
-```
-
----
-
-## > Licencia
-
-Proyecto académico.
+Proyecto academico.

@@ -55,6 +55,11 @@ public class Usuario {
     @Column(name = "matricula", nullable = true)
     private String matricula;
 
+    // Foto de perfil (Cloudinary, carpeta usuarios/{id})
+    @Column(name = "foto_url", length = 255)
+    private String fotoUrl;
+
+    @Column(name = "foto_public_id", length = 255)
+    private String fotoPublicId;
 
 }
-

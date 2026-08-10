@@ -61,8 +61,7 @@ public class CasaController {
 
         Casa casa = casaService.obtenerPorId(id);
 
-        if (!casa.getAlojamiento()
-                .getAnfitrion()
+        if (!casa.getAnfitrion()
                 .getId()
                 .equals(usuarioLogueado.getId()) && usuarioLogueado.getTipoUsuario() != TipoUsuario.ADMINISTRADOR) {
 
