@@ -31,3 +31,18 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Compilación y empaquetado (Maven)
+target/
+*.jar
+*.war
+
+# Configuraciones de IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Logs del sistema
+*.log
