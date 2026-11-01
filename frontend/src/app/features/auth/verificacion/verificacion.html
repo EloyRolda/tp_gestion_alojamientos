@@ -1,0 +1,39 @@
+<section class="stack verificacion">
+  <h1>Verificar cuenta</h1>
+
+  @switch (estado()) {
+    @case ('verificando') {
+      <p>Verificando tu cuenta...</p>
+    }
+    @case ('exito') {
+      <p class="card">{{ mensaje() }}</p>
+      <a routerLink="/login" class="btn">Ir a iniciar sesion</a>
+    }
+    @case ('error') {
+      <p class="text-danger">{{ mensaje() }}</p>
+    }
+  }
+
+  @if (estado() === 'inicial' || estado() === 'error') {
+    <div class="stack stack--tight">
+      <p class="text-muted">¿El enlace vencio o nunca te llego el correo? Pedi uno nuevo.</p>
+
+      @if (reenviado()) {
+        <p class="card">Se reenvio el correo de verificacion.</p>
+      } @else {
+        <form class="stack" (submit)="$event.preventDefault(); reenviar()">
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" type="email" required [ngModel]="email()" (ngModelChange)="email.set($event)" name="email" />
+          </div>
+          @if (errorReenvio()) {
+            <p class="text-danger">{{ errorReenvio() }}</p>
+          }
+          <button type="submit" class="btn" [disabled]="reenviando()">
+            {{ reenviando() ? 'Enviando...' : 'Reenviar correo de verificacion' }}
+          </button>
+        </form>
+      }
+    </div>
+  }
+</section>

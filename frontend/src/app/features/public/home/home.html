@@ -1,0 +1,21 @@
+<section class="stack">
+  <header class="stack stack--tight">
+    <h1>Encontra tu proximo alojamiento</h1>
+    <p class="text-muted">Alojamientos disponibles ahora mismo en AlojaME.</p>
+    <a routerLink="/buscar" class="btn">Ver todos / buscar</a>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando alojamientos...</p>
+  } @else if (error()) {
+    <p class="text-danger">{{ error() }}</p>
+  } @else if (destacados().length === 0) {
+    <p class="text-muted">Todavia no hay alojamientos publicados.</p>
+  } @else {
+    <div class="grid-auto">
+      @for (alojamiento of destacados(); track alojamiento.idAlojamiento) {
+        <app-alojamiento-card [alojamiento]="alojamiento" />
+      }
+    </div>
+  }
+</section>

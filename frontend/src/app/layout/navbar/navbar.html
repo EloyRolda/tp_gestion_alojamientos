@@ -1,0 +1,29 @@
+<header class="navbar">
+  <div class="navbar__bar container">
+    <a routerLink="/" class="navbar__brand" (click)="cerrarMenu()">AlojaME</a>
+
+    <button
+      type="button"
+      class="navbar__toggle"
+      (click)="toggleMenu()"
+      [attr.aria-expanded]="menuAbierto()"
+      aria-controls="navbar-menu"
+    >
+      <span class="visually-hidden">Abrir menu</span>
+      <span aria-hidden="true">&#9776;</span>
+    </button>
+
+    <nav id="navbar-menu" class="navbar__menu" [class.navbar__menu--abierto]="menuAbierto()">
+      <a routerLink="/" routerLinkActive="navbar__link--activo" [routerLinkActiveOptions]="{ exact: true }" (click)="cerrarMenu()">Inicio</a>
+      <a routerLink="/buscar" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Buscar</a>
+
+      @if (!estaLogueado()) {
+        <a routerLink="/login" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Iniciar sesion</a>
+        <a routerLink="/registro" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Registrarse</a>
+      } @else {
+        <span class="navbar__saludo">Hola, {{ usuario()?.nombre ?? '...' }}</span>
+        <button type="button" class="btn" (click)="cerrarSesion()">Cerrar sesion</button>
+      }
+    </nav>
+  </div>
+</header>

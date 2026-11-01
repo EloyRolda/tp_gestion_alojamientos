@@ -1,0 +1,191 @@
+/* ============================================================
+   AlojaME -- estilos globales.
+
+   Deliberadamente SIN estetica final: cero paleta de colores, cero
+   tipografia custom, cero sombras/decoracion. Lo unico que se resuelve
+   aca es la ESTRUCTURA (como se acomoda y reordena todo segun el
+   tamaño de pantalla), que es lo que exige "responsive" y lo que evita
+   tener que reconstruir cada vista cuando llegue el maquetado real
+   (Lote 5, con las imagenes de referencia).
+
+   Breakpoints fijos de la app (mobile-first, usar siempre estos dos,
+   no inventar otros salvo que una vista puntual realmente lo necesite):
+     - sin media query  -> mobile (base)
+     - min-width: 600px  -> tablet
+     - min-width: 1024px -> desktop
+   ============================================================ */
+
+:root {
+  /* Escala de espaciado -- unica fuente de verdad para margin/padding/gap. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+
+  /* Ancho maximo de contenido. */
+  --container-max-width: 1200px;
+
+  /* Placeholders neutros en escala de grises -- no es la paleta final,
+     solo lo minimo para que las cajas/bordes se distingan mientras se
+     arma la estructura. Se reemplazan en el Lote 5, sin tocar markup. */
+  --color-text: #1a1a1a;
+  --color-text-muted: #595959;
+  --color-bg: #ffffff;
+  --color-bg-muted: #f2f2f2;
+  --color-border: #d0d0d0;
+  --color-danger: #8a1f1f;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--color-text);
+  background: var(--color-bg);
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+figure {
+  margin: 0;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* ---------- utilidades de layout (el set chico que reusa toda la app) ---------- */
+
+/* Contenedor centrado con ancho maximo y gutter lateral. */
+.container {
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin-inline: auto;
+  padding-inline: var(--space-3);
+}
+
+/* Apilado vertical con espaciado consistente entre hijos directos. */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.stack--tight {
+  gap: var(--space-2);
+}
+
+/* Agrupado horizontal que wrappea solo cuando no entra. */
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+/* Grilla que reacomoda columnas sola, sin una regla por breakpoint.
+   Pensada para listados de tarjetas (alojamientos, etc). */
+.grid-auto {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-4);
+}
+
+/* Tablas de listados: contenedor con scroll horizontal en mobile en vez
+   de romper el layout o reescribir la tabla con JS. */
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.card {
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: var(--space-3);
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+.text-danger {
+  color: var(--color-danger);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Campo de formulario basico, consistente en toda la app. */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.field input,
+.field select,
+.field textarea {
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-bg);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-bg-muted);
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

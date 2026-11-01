@@ -1,0 +1,22 @@
+.detalle__galeria img {
+  border-radius: 4px;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.detalle__datos {
+  font-size: 0.9rem;
+}
+
+.detalle__reserva {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.detalle__precio {
+  font-weight: 700;
+  font-size: 1.2rem;
+}

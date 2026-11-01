@@ -1,0 +1,64 @@
+@if (cargando()) {
+  <p>Cargando alojamiento...</p>
+} @else if (error()) {
+  <p class="text-danger">{{ error() }}</p>
+} @else if (alojamiento(); as a) {
+  <article class="stack">
+    <header class="stack stack--tight">
+      <h1>{{ a.titulo }}</h1>
+      <p class="text-muted">
+        {{ a.direccion.calle }} {{ a.direccion.altura }}, {{ a.direccion.ciudad }}, {{ a.direccion.provincia }},
+        {{ a.direccion.pais }}
+      </p>
+      <p class="text-muted">Publicado por {{ a.anfitrion.nombre }} {{ a.anfitrion.apellido }}</p>
+    </header>
+
+    @if (imagenes().length > 0) {
+      <div class="grid-auto detalle__galeria">
+        @for (imagen of imagenes(); track imagen.id) {
+          <img [src]="imagen.url" [alt]="imagen.alt" />
+        }
+      </div>
+    }
+
+    <section class="cluster detalle__datos">
+      <span class="card">{{ a.tipoAlojamiento.nombreTipo }}</span>
+      <span class="card">Hasta {{ a.capacidad }} huespedes</span>
+      <span class="card">{{ a.cantAmbientes }} ambiente(s)</span>
+      <span class="card">{{ a.cantHabitaciones }} habitacion(es)</span>
+      <span class="card">{{ a.cantBanios }} baño(s)</span>
+    </section>
+
+    <p>{{ a.descripcion }}</p>
+
+    @if (servicios().length > 0) {
+      <section class="stack stack--tight">
+        <h2>Servicios</h2>
+        <div class="cluster">
+          @for (s of servicios(); track s.idServicioXAlojamiento) {
+            <span class="card">{{ s.servicio.nombreServicio }}</span>
+          }
+        </div>
+      </section>
+    }
+
+    <section class="detalle__reserva card">
+      <p class="detalle__precio">${{ a.precioNoche }} <span class="text-muted">/ noche</span></p>
+      <button type="button" class="btn" (click)="reservar()">Reservar</button>
+    </section>
+
+    <section class="stack stack--tight">
+      <h2>Reseñas</h2>
+      @if (reviews().length === 0) {
+        <p class="text-muted">Este alojamiento todavia no tiene reseñas.</p>
+      } @else {
+        @for (review of reviews(); track review.idReview) {
+          <article class="card">
+            <p><strong>{{ review.nombreCliente }}</strong> &middot; {{ review.puntuacion }}/5 &middot; {{ review.fecha | date: 'dd/MM/yyyy' }}</p>
+            <p>{{ review.comentario }}</p>
+          </article>
+        }
+      }
+    </section>
+  </article>
+}
