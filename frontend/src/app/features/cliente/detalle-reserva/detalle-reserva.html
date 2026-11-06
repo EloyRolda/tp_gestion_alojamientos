@@ -1,0 +1,95 @@
+<section class="stack">
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else if (error()) {
+    <p class="text-danger">{{ error() }}</p>
+  } @else if (reserva()) {
+    @let r = reserva()!;
+
+    <div class="cluster no-print" style="justify-content: space-between;">
+      <a routerLink="/mis-reservas" class="text-muted">&larr; Volver a mis reservas</a>
+      <button type="button" class="btn" (click)="imprimir()">Imprimir comprobante</button>
+    </div>
+
+    <article class="stack card comprobante">
+      <h1>Reserva #{{ r.idReserva }}</h1>
+      <p class="text-muted">Estado: <strong>{{ r.estadoReserva }}</strong></p>
+
+      <section class="stack stack--tight">
+        <h2>Alojamiento</h2>
+        <p>{{ r.alojamiento.titulo }}</p>
+      </section>
+
+      <section class="stack stack--tight">
+        <h2>Estadia</h2>
+        <p>Check-in: {{ r.fechaInicio | date: 'dd/MM/yyyy' }}</p>
+        <p>Check-out: {{ r.fechaFin | date: 'dd/MM/yyyy' }}</p>
+        <p>{{ noches(r) }} {{ noches(r) === 1 ? 'noche' : 'noches' }} &times; {{ r.precioNochePactado | number }} = <strong>{{ total(r) | number }}</strong></p>
+      </section>
+
+      @if (r.pago) {
+        <section class="stack stack--tight">
+          <h2>Pago</h2>
+          <p>Monto base (anfitrion): {{ r.pago.montoBase | number }}</p>
+          <p>Comision plataforma: {{ r.pago.comisionPlataforma | number }}</p>
+          <p>Comision MercadoPago: {{ r.pago.comisionMercadopago | number }}</p>
+          <p>Total a pagar: <strong>{{ r.pago.montoTotalCliente | number }}</strong></p>
+          <p>Estado del pago: <strong>{{ r.pago.estado }}</strong></p>
+          @if (r.pago.fechaLimitePago && r.pago.estado === 'PENDIENTE') {
+            <p class="text-muted">Plazo para pagar: {{ r.pago.fechaLimitePago | date: 'dd/MM/yyyy HH:mm' }}</p>
+          }
+          @if (r.pago.fechaPago) {
+            <p class="text-muted">Pagado el: {{ r.pago.fechaPago | date: 'dd/MM/yyyy HH:mm' }}</p>
+          }
+
+          @if (r.pago.estado === 'PENDIENTE' && r.pago.urlCheckout) {
+            <a [href]="r.pago.urlCheckout" class="btn no-print" target="_blank" rel="noopener">Pagar ahora con MercadoPago</a>
+          }
+        </section>
+      }
+
+      <div class="no-print">
+        @if (puedeCancelar(r)) {
+          <button type="button" class="btn" (click)="cancelar()" [disabled]="cancelando()">
+            {{ cancelando() ? 'Cancelando...' : 'Cancelar reserva' }}
+          </button>
+        }
+        @if (errorCancelar()) {
+          <p class="text-danger">{{ errorCancelar() }}</p>
+        }
+      </div>
+    </article>
+
+    @if (puedeResenar(r)) {
+      <section class="stack card no-print">
+        <h2>Dejar una reseña</h2>
+        @if (reviewEnviada()) {
+          <p>¡Gracias por tu reseña!</p>
+        } @else {
+          <form class="stack" (submit)="$event.preventDefault(); enviarReview()">
+            <div class="field">
+              <label for="puntuacion">Puntuacion (1 a 5)</label>
+              <select id="puntuacion" [ngModel]="puntuacion()" (ngModelChange)="puntuacion.set($event)" name="puntuacion">
+                @for (n of [1, 2, 3, 4, 5]; track n) {
+                  <option [value]="n">{{ n }}</option>
+                }
+              </select>
+            </div>
+            <div class="field">
+              <label for="comentario">Comentario</label>
+              <textarea id="comentario" required maxlength="2000" rows="4" [ngModel]="comentario()" (ngModelChange)="comentario.set($event)" name="comentario"></textarea>
+            </div>
+            @if (errorReview()) {
+              <p class="text-danger">{{ errorReview() }}</p>
+            }
+            <button type="submit" class="btn" [disabled]="enviandoReview()">
+              {{ enviandoReview() ? 'Enviando...' : 'Enviar reseña' }}
+            </button>
+          </form>
+        }
+      </section>
+    } @else if (r.estadoReserva === 'FINALIZADA' && r.tieneReview) {
+      <p class="text-muted no-print">Ya dejaste una reseña para esta reserva.</p>
+    }
+  }
+</section>

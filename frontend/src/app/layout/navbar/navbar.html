@@ -21,6 +21,11 @@
         <a routerLink="/login" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Iniciar sesion</a>
         <a routerLink="/registro" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Registrarse</a>
       } @else {
+        @if (rol() === 'CLIENTE' || rol() === 'ADMIN') {
+          <a routerLink="/mis-reservas" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Mis reservas</a>
+          <a routerLink="/mis-gastos" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Mis gastos</a>
+        }
+        <a routerLink="/perfil" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Mi perfil</a>
         <span class="navbar__saludo">Hola, {{ usuario()?.nombre ?? '...' }}</span>
         <button type="button" class="btn" (click)="cerrarSesion()">Cerrar sesion</button>
       }

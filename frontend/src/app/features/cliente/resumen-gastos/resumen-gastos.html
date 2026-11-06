@@ -1,0 +1,24 @@
+<section class="stack resumen-gastos">
+  <h1>Mis gastos</h1>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else if (error()) {
+    <p class="text-danger">{{ error() }}</p>
+  } @else if (resumen()) {
+    <div class="grid-auto">
+      <div class="card">
+        <p class="text-muted">Reservas realizadas</p>
+        <p><strong>{{ resumen()!.cantidadReservas }}</strong></p>
+      </div>
+      <div class="card">
+        <p class="text-muted">Total gastado</p>
+        <p><strong>{{ resumen()!.montoTotalGastado | number }}</strong></p>
+      </div>
+      <div class="card">
+        <p class="text-muted">Promedio por estadia</p>
+        <p><strong>{{ resumen()!.montoPromedioPorEstadia != null ? (resumen()!.montoPromedioPorEstadia | number) : '-' }}</strong></p>
+      </div>
+    </div>
+  }
+</section>

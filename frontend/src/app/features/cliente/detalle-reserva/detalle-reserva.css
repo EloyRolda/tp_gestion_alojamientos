@@ -1,0 +1,13 @@
+.comprobante {
+  max-width: 640px;
+  margin-inline: auto;
+}
+
+/* Vista imprimible del comprobante (RF40): al imprimir, se oculta todo lo
+   que no es el comprobante en si (navegacion, botones de accion, formulario
+   de reseña) via la clase .no-print. */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

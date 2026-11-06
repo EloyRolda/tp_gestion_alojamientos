@@ -17,6 +17,7 @@ export class Navbar {
 
   readonly estaLogueado = this.auth.estaLogueado;
   readonly usuario = this.auth.usuario;
+  readonly rol = this.auth.rol;
   readonly menuAbierto = signal(false);
 
   toggleMenu(): void {

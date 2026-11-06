@@ -1,0 +1,22 @@
+<section class="stack pago-resultado">
+  @switch (estado()) {
+    @case ('exito') {
+      <h1>¡Pago recibido!</h1>
+      <p>Tu pago fue aprobado por MercadoPago. Puede demorar unos minutos en reflejarse como confirmado.</p>
+    }
+    @case ('pendiente') {
+      <h1>Pago pendiente</h1>
+      <p>Tu pago quedo pendiente de aprobacion en MercadoPago (por ejemplo, pago en efectivo o transferencia). Te avisaremos cuando se confirme.</p>
+    }
+    @case ('error') {
+      <h1>El pago no se pudo completar</h1>
+      <p>Algo fallo durante el pago. Podes volver a intentarlo desde el detalle de tu reserva.</p>
+    }
+    @default {
+      <h1>Resultado del pago</h1>
+      <p>No se recibio informacion del resultado del pago.</p>
+    }
+  }
+
+  <a routerLink="/mis-reservas" class="btn">Ver mis reservas</a>
+</section>

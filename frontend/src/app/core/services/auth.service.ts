@@ -80,6 +80,12 @@ export class AuthService {
     this.usuarioSignal.set(null);
   }
 
+  /// Para despues de editar el perfil (SCRUM-28): refresca el signal "usuario"
+  /// con lo que quedo guardado, sin tener que loguearse de nuevo.
+  refrescarPerfil(): Observable<Usuario> {
+    return this.cargarPerfil();
+  }
+
   private cargarPerfil(): Observable<Usuario> {
     return this.http.get<Usuario>(`${API_BASE_URL}/Usuario/me`).pipe(
       tap((u) => this.usuarioSignal.set(u)),
