@@ -1,18 +1,20 @@
 /* ============================================================
    AlojaME -- estilos globales.
 
-   Deliberadamente SIN estetica final: cero paleta de colores, cero
-   tipografia custom, cero sombras/decoracion. Lo unico que se resuelve
-   aca es la ESTRUCTURA (como se acomoda y reordena todo segun el
-   tamaño de pantalla), que es lo que exige "responsive" y lo que evita
-   tener que reconstruir cada vista cuando llegue el maquetado real
-   (Lote 5, con las imagenes de referencia).
+   Base responsive mobile-first (Lote 5). Resuelve la ESTRUCTURA: como se
+   acomoda y reordena todo segun el ancho de pantalla, con controles
+   comodos para el dedo. La paleta sigue siendo neutra.
 
-   Breakpoints fijos de la app (mobile-first, usar siempre estos dos,
-   no inventar otros salvo que una vista puntual realmente lo necesite):
-     - sin media query  -> mobile (base)
-     - min-width: 600px  -> tablet
-     - min-width: 1024px -> desktop
+   Breakpoints de la app (usar siempre estos, no inventar otros salvo que
+   una vista puntual realmente lo necesite):
+     - sin media query   -> mobile (base, se prueba en 360px)
+     - min-width: 768px  -> tablet
+     - min-width: 1024px -> desktop (se prueba en 1280px)
+
+   Reglas que garantiza esta hoja para todas las vistas:
+     - ningun elemento genera scroll horizontal en 360px;
+     - botones, inputs y selects miden al menos 44px de alto (--tap-size);
+     - los inputs usan 16px de fuente, asi el celular no hace zoom al tocarlos.
    ============================================================ */
 
 :root {
@@ -22,13 +24,15 @@
   --space-3: 16px;
   --space-4: 24px;
   --space-5: 32px;
+  --space-6: 48px;
 
   /* Ancho maximo de contenido. */
   --container-max-width: 1200px;
 
-  /* Placeholders neutros en escala de grises -- no es la paleta final,
-     solo lo minimo para que las cajas/bordes se distingan mientras se
-     arma la estructura. Se reemplazan en el Lote 5, sin tocar markup. */
+  /* Alto minimo de cualquier control tactil (recomendacion de accesibilidad). */
+  --tap-size: 44px;
+
+  /* Placeholders neutros en escala de grises -- no es la paleta final. */
   --color-text: #1a1a1a;
   --color-text-muted: #595959;
   --color-bg: #ffffff;
@@ -49,11 +53,20 @@ body {
   padding: 0;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 1rem;
   color: var(--color-text);
   background: var(--color-bg);
   line-height: 1.5;
+  /* Palabras o datos largos (emails, ids externos, URLs) cortan en vez de
+     ensanchar la pagina. */
+  overflow-wrap: anywhere;
 }
 
 h1,
@@ -63,6 +76,22 @@ h4,
 p,
 figure {
   margin: 0;
+}
+
+/* Tipografia fluida: crece con el ancho de pantalla entre un minimo y un maximo. */
+h1 {
+  font-size: clamp(1.6rem, 1.2rem + 2vw, 2.25rem);
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: clamp(1.3rem, 1.1rem + 1vw, 1.6rem);
+  line-height: 1.25;
+}
+
+h3 {
+  font-size: clamp(1.1rem, 1rem + 0.5vw, 1.25rem);
+  line-height: 1.3;
 }
 
 ul,
@@ -76,8 +105,14 @@ a {
   color: inherit;
 }
 
-img {
+img,
+video,
+iframe,
+svg {
   max-width: 100%;
+}
+
+img {
   height: auto;
   display: block;
 }
@@ -88,6 +123,14 @@ select,
 textarea {
   font: inherit;
   color: inherit;
+}
+
+/* 16px en los campos evita el zoom automatico de los navegadores mobile. */
+input:not([type='checkbox']):not([type='radio']),
+select,
+textarea {
+  font-size: 16px;
+  max-width: 100%;
 }
 
 /* ---------- utilidades de layout (el set chico que reusa toda la app) ---------- */
@@ -105,6 +148,7 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  min-width: 0;
 }
 
 .stack--tight {
@@ -120,15 +164,16 @@ textarea {
 }
 
 /* Grilla que reacomoda columnas sola, sin una regla por breakpoint.
-   Pensada para listados de tarjetas (alojamientos, etc). */
+   Pensada para listados de tarjetas (alojamientos, etc). El min() evita
+   que una tarjeta de 240px desborde en pantallas mas angostas. */
 .grid-auto {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+  gap: var(--space-3);
 }
 
-/* Tablas de listados: contenedor con scroll horizontal en mobile en vez
-   de romper el layout o reescribir la tabla con JS. */
+/* Tablas de listados: en desktop, contenedor con scroll horizontal si hiciera
+   falta. En mobile las tablas marcadas con .table-cards se ven como tarjetas. */
 .table-scroll {
   width: 100%;
   overflow-x: auto;
@@ -138,6 +183,7 @@ textarea {
   border: 1px solid var(--color-border);
   border-radius: 4px;
   padding: var(--space-3);
+  min-width: 0;
 }
 
 .text-muted {
@@ -157,35 +203,95 @@ textarea {
   white-space: nowrap;
 }
 
-/* Campo de formulario basico, consistente en toda la app. */
+/* ---------- formularios ---------- */
+
+/* Campo de formulario basico, consistente en toda la app: siempre ocupa el
+   ancho disponible y tiene alto tactil. */
 .field {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
+  min-width: 0;
 }
 
-.field input,
+.field input:not([type='checkbox']):not([type='radio']),
 .field select,
 .field textarea {
-  padding: var(--space-2);
+  width: 100%;
+  min-height: var(--tap-size);
+  padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: 4px;
   background: var(--color-bg);
 }
+
+.field textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* Checkboxes y radios: el label completo es el area tactil. */
+label:has(> input[type='checkbox']),
+label:has(> input[type='radio']) {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap-size);
+  cursor: pointer;
+}
+
+input[type='checkbox'],
+input[type='radio'] {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+fieldset {
+  min-width: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: var(--space-3);
+  margin: 0;
+}
+
+/* ---------- botones ---------- */
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-1);
+  min-height: var(--tap-size);
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: 4px;
   background: var(--color-bg-muted);
   cursor: pointer;
+  text-align: center;
+  text-decoration: none;
 }
 
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Foco visible para quien navega con teclado. */
+:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+}
+
+/* ---------- tablet y desktop ---------- */
+
+@media (min-width: 768px) {
+  .container {
+    padding-inline: var(--space-4);
+  }
+
+  .grid-auto {
+    gap: var(--space-4);
+  }
 }
