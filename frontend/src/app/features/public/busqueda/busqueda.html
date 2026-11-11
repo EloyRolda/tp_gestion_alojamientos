@@ -1,81 +1,109 @@
 <section class="stack">
   <h1>Buscar alojamientos</h1>
 
-  <form class="stack filtros" (submit)="$event.preventDefault()">
-    <div class="field">
-      <label for="texto">Titulo o ciudad</label>
-      <input id="texto" type="text" [ngModel]="texto()" (ngModelChange)="texto.set($event)" name="texto" />
-    </div>
+  <div class="busqueda">
+    <form class="filtros" (submit)="$event.preventDefault()" aria-label="Filtros de busqueda">
+      <div class="field">
+        <label for="texto">Titulo o ciudad</label>
+        <input
+          id="texto"
+          type="search"
+          enterkeyhint="search"
+          [ngModel]="texto()"
+          (ngModelChange)="texto.set($event)"
+          name="texto"
+        />
+      </div>
 
-    <div class="cluster">
-      <div class="field">
-        <label for="precioMin">Precio minimo</label>
-        <input
-          id="precioMin"
-          type="number"
-          min="0"
-          [ngModel]="precioMin()"
-          (ngModelChange)="precioMin.set($event)"
-          name="precioMin"
-        />
-      </div>
-      <div class="field">
-        <label for="precioMax">Precio maximo</label>
-        <input
-          id="precioMax"
-          type="number"
-          min="0"
-          [ngModel]="precioMax()"
-          (ngModelChange)="precioMax.set($event)"
-          name="precioMax"
-        />
-      </div>
-      <div class="field">
-        <label for="capacidadMin">Huespedes (minimo)</label>
-        <input
-          id="capacidadMin"
-          type="number"
-          min="1"
-          [ngModel]="capacidadMin()"
-          (ngModelChange)="capacidadMin.set($event)"
-          name="capacidadMin"
-        />
-      </div>
-    </div>
+      <button
+        type="button"
+        class="btn filtros__toggle"
+        aria-controls="filtros-panel"
+        [attr.aria-expanded]="filtrosAbiertos()"
+        (click)="alternarFiltros()"
+      >
+        {{ filtrosAbiertos() ? 'Ocultar filtros' : 'Mas filtros' }}
+        @if (filtrosActivos() > 0) {
+          <span class="filtros__contador">({{ filtrosActivos() }} activos)</span>
+        }
+      </button>
 
-    @if (serviciosDisponibles().length > 0) {
-      <fieldset class="field">
-        <legend>Servicios</legend>
-        <div class="cluster">
-          @for (servicio of serviciosDisponibles(); track servicio.idServicio) {
-            <label class="filtros__checkbox">
-              <input
-                type="checkbox"
-                [checked]="serviciosSeleccionados().has(servicio.idServicio)"
-                (change)="toggleServicio(servicio.idServicio)"
-              />
-              {{ servicio.nombreServicio }}
-            </label>
+      <div id="filtros-panel" class="filtros__panel" [class.filtros__panel--abierto]="filtrosAbiertos()">
+        <div class="filtros__rango">
+          <div class="field">
+            <label for="precioMin">Precio minimo</label>
+            <input
+              id="precioMin"
+              type="number"
+              inputmode="numeric"
+              min="0"
+              [ngModel]="precioMin()"
+              (ngModelChange)="precioMin.set($event)"
+              name="precioMin"
+            />
+          </div>
+          <div class="field">
+            <label for="precioMax">Precio maximo</label>
+            <input
+              id="precioMax"
+              type="number"
+              inputmode="numeric"
+              min="0"
+              [ngModel]="precioMax()"
+              (ngModelChange)="precioMax.set($event)"
+              name="precioMax"
+            />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="capacidadMin">Huespedes (minimo)</label>
+          <input
+            id="capacidadMin"
+            type="number"
+            inputmode="numeric"
+            min="1"
+            [ngModel]="capacidadMin()"
+            (ngModelChange)="capacidadMin.set($event)"
+            name="capacidadMin"
+          />
+        </div>
+
+        @if (serviciosDisponibles().length > 0) {
+          <fieldset class="filtros__servicios">
+            <legend>Servicios</legend>
+            @for (servicio of serviciosDisponibles(); track servicio.idServicio) {
+              <label>
+                <input
+                  type="checkbox"
+                  [checked]="serviciosSeleccionados().has(servicio.idServicio)"
+                  (change)="toggleServicio(servicio.idServicio)"
+                />
+                {{ servicio.nombreServicio }}
+              </label>
+            }
+          </fieldset>
+        }
+
+        <button type="button" class="btn" (click)="limpiarFiltros()">Limpiar filtros</button>
+      </div>
+    </form>
+
+    <div class="busqueda__resultados stack">
+      @if (cargando()) {
+        <p>Cargando alojamientos...</p>
+      } @else if (error()) {
+        <p class="text-danger">{{ error() }}</p>
+      } @else if (resultados().length === 0) {
+        <p class="text-muted">No hay alojamientos que coincidan con los filtros.</p>
+      } @else {
+        <p class="text-muted" aria-live="polite">{{ resultados().length }} resultado(s)</p>
+        <div class="grid-auto">
+          @for (alojamiento of resultados(); track alojamiento.idAlojamiento) {
+            <app-alojamiento-card [alojamiento]="alojamiento" />
           }
         </div>
-      </fieldset>
-    }
-
-    <button type="button" class="btn" (click)="limpiarFiltros()">Limpiar filtros</button>
-  </form>
-
-  @if (cargando()) {
-    <p>Cargando alojamientos...</p>
-  } @else if (error()) {
-    <p class="text-danger">{{ error() }}</p>
-  } @else if (resultados().length === 0) {
-    <p class="text-muted">No hay alojamientos que coincidan con los filtros.</p>
-  } @else {
-    <p class="text-muted">{{ resultados().length }} resultado(s)</p>
-    <div class="grid-auto">
-      @for (alojamiento of resultados(); track alojamiento.idAlojamiento) {
-        <app-alojamiento-card [alojamiento]="alojamiento" />
       }
     </div>
-  }
+  </div>
 </section>

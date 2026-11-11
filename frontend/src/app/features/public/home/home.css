@@ -1,3 +1,30 @@
+/* Inicio responsive (SCRUM-52): en mobile el titulo y el boton se apilan y el
+   boton ocupa todo el ancho; desde tablet el boton queda a la derecha. */
+
 :host {
   display: block;
+}
+
+.home__hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-block: var(--space-3);
+}
+
+.home__cta {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .home__hero {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .home__cta {
+    width: auto;
+    flex-shrink: 0;
+  }
 }

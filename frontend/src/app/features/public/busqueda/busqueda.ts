@@ -14,6 +14,11 @@ import { AlojamientoCard } from '../../../shared/alojamiento-card/alojamiento-ca
 /// PLAN_LOTES_FRONTEND.md. Para poder filtrar por servicio, se trae una vez
 /// (en paralelo, al cargar la pagina) que servicios tiene cada alojamiento;
 /// de ahi en mas filtrar es instantaneo, sin pegarle de nuevo a la API.
+///
+/// Responsive (SCRUM-52): en mobile y tablet la busqueda por texto queda
+/// siempre visible y el resto de los filtros se pliega detras de un boton que
+/// muestra cuantos hay activos; en desktop los filtros son una barra lateral
+/// fija a la izquierda de la grilla de resultados.
 @Component({
   selector: 'app-busqueda',
   standalone: true,
@@ -38,11 +43,23 @@ export class Busqueda {
   readonly capacidadMin = signal<number | null>(null);
   readonly serviciosSeleccionados = signal<Set<number>>(new Set());
 
+  /// Solo tiene efecto debajo de 1024px: en desktop el panel siempre se ve.
+  readonly filtrosAbiertos = signal(false);
+
+  /// Filtros aplicados ademas del texto, para mostrarlos en el boton plegado.
+  readonly filtrosActivos = computed(() => {
+    let cantidad = this.serviciosSeleccionados().size;
+    if (this.tieneValor(this.precioMin())) cantidad++;
+    if (this.tieneValor(this.precioMax())) cantidad++;
+    if (this.tieneValor(this.capacidadMin())) cantidad++;
+    return cantidad;
+  });
+
   readonly resultados = computed<Alojamiento[]>(() => {
     const texto = this.texto().trim().toLowerCase();
-    const precioMin = this.precioMin();
-    const precioMax = this.precioMax();
-    const capacidadMin = this.capacidadMin();
+    const precioMin = this.tieneValor(this.precioMin()) ? this.precioMin() : null;
+    const precioMax = this.tieneValor(this.precioMax()) ? this.precioMax() : null;
+    const capacidadMin = this.tieneValor(this.capacidadMin()) ? this.capacidadMin() : null;
     const serviciosSel = this.serviciosSeleccionados();
     const mapaServicios = this.serviciosPorAlojamiento();
 
@@ -89,12 +106,21 @@ export class Busqueda {
     this.serviciosSeleccionados.set(actuales);
   }
 
+  alternarFiltros(): void {
+    this.filtrosAbiertos.update((abierto) => !abierto);
+  }
+
   limpiarFiltros(): void {
     this.texto.set('');
     this.precioMin.set(null);
     this.precioMax.set(null);
     this.capacidadMin.set(null);
     this.serviciosSeleccionados.set(new Set());
+  }
+
+  /// Un input numerico vaciado por el usuario llega como null o como ''.
+  private tieneValor(valor: number | null | string): valor is number {
+    return valor !== null && valor !== '';
   }
 
   private cargarServiciosDeTodos(lista: Alojamiento[]): void {

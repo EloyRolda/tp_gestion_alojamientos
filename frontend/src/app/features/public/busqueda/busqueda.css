@@ -1,11 +1,88 @@
+/* Busqueda responsive (SCRUM-52).
+   - Mobile y tablet: filtros arriba de los resultados; el texto siempre a la
+     vista y el resto plegado detras de "Mas filtros".
+   - Desktop (>= 1024px): barra lateral de filtros fija + grilla de resultados. */
+
+.busqueda {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.busqueda__resultados {
+  min-width: 0;
+}
+
 .filtros {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: 4px;
   padding: var(--space-3);
 }
 
-.filtros__checkbox {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
+.filtros__toggle {
+  width: 100%;
+}
+
+.filtros__contador {
+  color: var(--color-text-muted);
+}
+
+.filtros__panel {
+  display: none;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.filtros__panel--abierto {
+  display: flex;
+}
+
+/* Precio minimo y maximo, uno al lado del otro: son un rango. */
+.filtros__rango {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.filtros__servicios {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(140px, 100%), 1fr));
+  gap: 0 var(--space-2);
+}
+
+.filtros__panel > .btn {
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .busqueda {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .filtros {
+    position: sticky;
+    top: var(--space-3);
+    /* Si hubiera muchos servicios, el panel scrollea solo en vez de quedar
+       cortado fuera de la pantalla. */
+    max-height: calc(100vh - 2 * var(--space-3));
+    overflow-y: auto;
+  }
+
+  .filtros__toggle {
+    display: none;
+  }
+
+  .filtros__panel,
+  .filtros__panel--abierto {
+    display: flex;
+  }
+
+  .filtros__servicios {
+    grid-template-columns: 1fr;
+  }
 }
