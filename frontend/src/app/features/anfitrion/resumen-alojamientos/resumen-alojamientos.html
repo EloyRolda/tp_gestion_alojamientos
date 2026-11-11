@@ -8,6 +8,21 @@
   } @else if (resumen().length === 0) {
     <p class="text-muted">Todavia no publicaste ningun alojamiento.</p>
   } @else {
+    <div class="kpi-grid">
+      <div class="kpi">
+        <p class="kpi__etiqueta">Alojamientos</p>
+        <p class="kpi__valor">{{ resumen().length }}</p>
+      </div>
+      <div class="kpi">
+        <p class="kpi__etiqueta">Ingresos totales</p>
+        <p class="kpi__valor">{{ ingresosTotales() | number }}</p>
+      </div>
+      <div class="kpi">
+        <p class="kpi__etiqueta">Reservas</p>
+        <p class="kpi__valor">{{ reservasTotales() }}</p>
+      </div>
+    </div>
+
     <div class="table-scroll">
       <table class="tabla table-cards">
         <thead>

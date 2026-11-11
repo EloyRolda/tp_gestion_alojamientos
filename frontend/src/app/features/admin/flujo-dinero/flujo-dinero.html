@@ -1,0 +1,107 @@
+<section class="stack">
+  <h1>Flujo de dinero</h1>
+
+  @if (error()) {
+    <p class="text-danger">{{ error() }}</p>
+  }
+
+  <form class="form-inline card" (submit)="$event.preventDefault(); aplicarFiltroFechas()" aria-label="Filtrar por fechas">
+    <div class="field">
+      <label for="desde">Desde</label>
+      <input id="desde" type="date" [ngModel]="desde()" (ngModelChange)="desde.set($event)" name="desde" />
+    </div>
+    <div class="field">
+      <label for="hasta">Hasta</label>
+      <input id="hasta" type="date" [ngModel]="hasta()" (ngModelChange)="hasta.set($event)" name="hasta" />
+    </div>
+    <button type="submit" class="btn">Filtrar</button>
+  </form>
+
+  @if (cargandoFlujo()) {
+    <p>Cargando...</p>
+  } @else if (flujo()) {
+    <div class="kpi-grid">
+      <div class="kpi">
+        <p class="kpi__etiqueta">Total facturado</p>
+        <p class="kpi__valor">{{ flujo()!.totalFacturado | number }}</p>
+      </div>
+      <div class="kpi">
+        <p class="kpi__etiqueta">Comision plataforma</p>
+        <p class="kpi__valor">{{ flujo()!.totalComisionPlataforma | number }}</p>
+      </div>
+      <div class="kpi">
+        <p class="kpi__etiqueta">Comision MercadoPago</p>
+        <p class="kpi__valor">{{ flujo()!.totalComisionMercadopago | number }}</p>
+      </div>
+      <div class="kpi">
+        <p class="kpi__etiqueta">Liquidado a anfitriones</p>
+        <p class="kpi__valor">{{ flujo()!.totalLiquidadoAnfitriones | number }}</p>
+      </div>
+      <div class="kpi">
+        <p class="kpi__etiqueta">Reembolsado a clientes</p>
+        <p class="kpi__valor">{{ flujo()!.totalReembolsadoClientes | number }}</p>
+      </div>
+      <div class="kpi">
+        <p class="kpi__etiqueta">Cantidad de pagos</p>
+        <p class="kpi__valor">{{ flujo()!.cantidadPagos }}</p>
+      </div>
+    </div>
+  }
+
+  <section class="stack">
+    <div class="flujo__encabezado">
+      <h2>Ingresos mensuales</h2>
+      <div class="field">
+        <label for="anio">Año</label>
+        <input id="anio" type="number" inputmode="numeric" min="2000" [ngModel]="anio()" (ngModelChange)="anio.set($event); cambiarAnio()" name="anio" />
+      </div>
+    </div>
+
+    @if (cargandoIngresos()) {
+      <p>Cargando...</p>
+    } @else {
+      <p class="text-muted">Total del año: <strong>{{ totalAnual() | number }}</strong></p>
+      <!-- Una fila por mes con una barra proporcional al mes de mayor
+           facturacion: se lee igual en un celular que en desktop. -->
+      <ol class="meses" aria-label="Facturacion por mes">
+        @for (i of ingresosMensuales(); track i.mes) {
+          <li class="meses__fila">
+            <span class="meses__nombre">{{ meses[i.mes - 1] }}</span>
+            <span class="meses__barra" aria-hidden="true">
+              <span class="meses__relleno" [style.width.%]="porcentajeDelMaximo(i.totalFacturado)"></span>
+            </span>
+            <span class="meses__monto">{{ i.totalFacturado | number }}</span>
+          </li>
+        }
+      </ol>
+    }
+  </section>
+
+  <section class="stack">
+    <h2>Cancelaciones por motivo</h2>
+    @if (cargandoCancelaciones()) {
+      <p>Cargando...</p>
+    } @else if (cancelaciones().length === 0) {
+      <p class="text-muted">Sin cancelaciones en el rango seleccionado.</p>
+    } @else {
+      <div class="table-scroll">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Motivo</th>
+              <th>Cantidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of cancelaciones(); track c.motivo) {
+              <tr>
+                <td>{{ c.motivo }}</td>
+                <td>{{ c.cantidad }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</section>

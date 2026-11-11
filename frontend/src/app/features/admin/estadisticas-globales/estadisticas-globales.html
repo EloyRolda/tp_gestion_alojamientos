@@ -1,0 +1,52 @@
+<section class="stack">
+  <h1>Estadisticas globales</h1>
+
+  @if (error()) {
+    <p class="text-danger">{{ error() }}</p>
+  }
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else {
+    <div class="rankings">
+      <section class="stack card">
+        <h2>Top por ingresos</h2>
+        @if (porIngresos().length === 0) {
+          <p class="text-muted">Sin datos.</p>
+        } @else {
+          <ol class="ranking">
+            @for (a of porIngresos(); track a.idAlojamiento) {
+              <li><span class="ranking__titulo">{{ a.titulo }}</span> <span class="ranking__valor">{{ a.valor | number }}</span></li>
+            }
+          </ol>
+        }
+      </section>
+
+      <section class="stack card">
+        <h2>Top por cantidad de reservas</h2>
+        @if (porReservas().length === 0) {
+          <p class="text-muted">Sin datos.</p>
+        } @else {
+          <ol class="ranking">
+            @for (a of porReservas(); track a.idAlojamiento) {
+              <li><span class="ranking__titulo">{{ a.titulo }}</span> <span class="ranking__valor">{{ a.valor }}</span></li>
+            }
+          </ol>
+        }
+      </section>
+
+      <section class="stack card">
+        <h2>Top por rating</h2>
+        @if (porRating().length === 0) {
+          <p class="text-muted">Sin datos.</p>
+        } @else {
+          <ol class="ranking">
+            @for (a of porRating(); track a.idAlojamiento) {
+              <li><span class="ranking__titulo">{{ a.titulo }}</span> <span class="ranking__valor">{{ a.valor | number: '1.1-1' }}</span></li>
+            }
+          </ol>
+        }
+      </section>
+    </div>
+  }
+</section>

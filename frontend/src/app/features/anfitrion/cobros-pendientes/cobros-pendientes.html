@@ -9,7 +9,16 @@
   } @else if (cobros().length === 0) {
     <p class="text-muted">No tenes cobros pendientes.</p>
   } @else {
-    <p class="card">Total pendiente de cobro: <strong>{{ totalPendiente() | number }}</strong></p>
+    <div class="kpi-grid">
+      <div class="kpi">
+        <p class="kpi__etiqueta">Total pendiente de cobro</p>
+        <p class="kpi__valor">{{ totalPendiente() | number }}</p>
+      </div>
+      <div class="kpi">
+        <p class="kpi__etiqueta">Reservas por liquidar</p>
+        <p class="kpi__valor">{{ cobros().length }}</p>
+      </div>
+    </div>
 
     <div class="table-scroll">
       <table class="tabla table-cards">
