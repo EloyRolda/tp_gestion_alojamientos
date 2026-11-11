@@ -6,8 +6,8 @@
   } @else if (reserva()) {
     @let r = reserva()!;
 
-    <div class="cluster no-print" style="justify-content: space-between;">
-      <a routerLink="/mis-reservas" class="text-muted">&larr; Volver a mis reservas</a>
+    <div class="page-header no-print">
+      <a routerLink="/mis-reservas" class="link-volver">&larr; Volver a mis reservas</a>
       <button type="button" class="btn" (click)="imprimir()">Imprimir comprobante</button>
     </div>
 
@@ -22,25 +22,39 @@
 
       <section class="stack stack--tight">
         <h2>Estadia</h2>
-        <p>Check-in: {{ r.fechaInicio | date: 'dd/MM/yyyy' }}</p>
-        <p>Check-out: {{ r.fechaFin | date: 'dd/MM/yyyy' }}</p>
-        <p>{{ noches(r) }} {{ noches(r) === 1 ? 'noche' : 'noches' }} &times; {{ r.precioNochePactado | number }} = <strong>{{ total(r) | number }}</strong></p>
+        <dl class="datos">
+          <dt>Check-in</dt>
+          <dd>{{ r.fechaInicio | date: 'dd/MM/yyyy' }}</dd>
+          <dt>Check-out</dt>
+          <dd>{{ r.fechaFin | date: 'dd/MM/yyyy' }}</dd>
+          <dt>{{ noches(r) }} {{ noches(r) === 1 ? 'noche' : 'noches' }} &times; {{ r.precioNochePactado | number }}</dt>
+          <dd><strong>{{ total(r) | number }}</strong></dd>
+        </dl>
       </section>
 
       @if (r.pago) {
         <section class="stack stack--tight">
           <h2>Pago</h2>
-          <p>Monto base (anfitrion): {{ r.pago.montoBase | number }}</p>
-          <p>Comision plataforma: {{ r.pago.comisionPlataforma | number }}</p>
-          <p>Comision MercadoPago: {{ r.pago.comisionMercadopago | number }}</p>
-          <p>Total a pagar: <strong>{{ r.pago.montoTotalCliente | number }}</strong></p>
-          <p>Estado del pago: <strong>{{ r.pago.estado }}</strong></p>
-          @if (r.pago.fechaLimitePago && r.pago.estado === 'PENDIENTE') {
-            <p class="text-muted">Plazo para pagar: {{ r.pago.fechaLimitePago | date: 'dd/MM/yyyy HH:mm' }}</p>
-          }
-          @if (r.pago.fechaPago) {
-            <p class="text-muted">Pagado el: {{ r.pago.fechaPago | date: 'dd/MM/yyyy HH:mm' }}</p>
-          }
+          <dl class="datos">
+            <dt>Monto base (anfitrion)</dt>
+            <dd>{{ r.pago.montoBase | number }}</dd>
+            <dt>Comision plataforma</dt>
+            <dd>{{ r.pago.comisionPlataforma | number }}</dd>
+            <dt>Comision MercadoPago</dt>
+            <dd>{{ r.pago.comisionMercadopago | number }}</dd>
+            <dt>Total a pagar</dt>
+            <dd><strong>{{ r.pago.montoTotalCliente | number }}</strong></dd>
+            <dt>Estado del pago</dt>
+            <dd><strong>{{ r.pago.estado }}</strong></dd>
+            @if (r.pago.fechaLimitePago && r.pago.estado === 'PENDIENTE') {
+              <dt>Plazo para pagar</dt>
+              <dd>{{ r.pago.fechaLimitePago | date: 'dd/MM/yyyy HH:mm' }}</dd>
+            }
+            @if (r.pago.fechaPago) {
+              <dt>Pagado el</dt>
+              <dd>{{ r.pago.fechaPago | date: 'dd/MM/yyyy HH:mm' }}</dd>
+            }
+          </dl>
 
           @if (r.pago.estado === 'PENDIENTE' && r.pago.urlCheckout) {
             <a [href]="r.pago.urlCheckout" class="btn no-print" target="_blank" rel="noopener">Pagar ahora con MercadoPago</a>
@@ -48,7 +62,7 @@
         </section>
       }
 
-      <div class="no-print">
+      <div class="form-actions no-print">
         @if (puedeCancelar(r)) {
           <button type="button" class="btn" (click)="cancelar()" [disabled]="cancelando()">
             {{ cancelando() ? 'Cancelando...' : 'Cancelar reserva' }}

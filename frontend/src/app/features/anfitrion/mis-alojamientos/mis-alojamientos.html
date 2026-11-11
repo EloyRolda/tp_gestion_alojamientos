@@ -1,0 +1,32 @@
+<section class="stack">
+  <div class="page-header">
+    <h1>Mis alojamientos</h1>
+    <a routerLink="/anfitrion/alojamientos/nuevo" class="btn">Publicar alojamiento</a>
+  </div>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else if (error()) {
+    <p class="text-danger">{{ error() }}</p>
+  } @else if (alojamientos().length === 0) {
+    <p class="text-muted">Todavia no publicaste ningun alojamiento.</p>
+  } @else {
+    <div class="grid-auto">
+      @for (a of alojamientos(); track a.idAlojamiento) {
+        <div class="card stack stack--tight">
+          <h2>{{ a.titulo }}</h2>
+          <p class="text-muted">{{ a.tipoAlojamiento.nombreTipo }} · {{ a.direccion.ciudad }}, {{ a.direccion.provincia }}</p>
+          <p>{{ a.precioNoche | number }} / noche</p>
+          <p>Estado: <strong>{{ a.activo ? 'Activo' : 'Inactivo' }}</strong></p>
+          <div class="acciones-fila">
+            <a [routerLink]="['/anfitrion/alojamientos', a.idAlojamiento, 'editar']" class="btn">Editar</a>
+            <a [routerLink]="['/anfitrion/alojamientos', a.idAlojamiento, 'galeria']" class="btn">Galeria</a>
+            <button type="button" class="btn" (click)="toggleActivo(a)" [disabled]="cambiandoEstado() === a.idAlojamiento">
+              {{ a.activo ? 'Desactivar' : 'Activar' }}
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</section>

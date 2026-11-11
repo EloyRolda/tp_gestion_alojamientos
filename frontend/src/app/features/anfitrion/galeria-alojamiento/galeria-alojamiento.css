@@ -1,0 +1,45 @@
+/* Galeria del anfitrion responsive (SCRUM-57): miniaturas de a dos en
+   mobile (se ven varias fotos a la vez) y mas columnas segun el ancho; el
+   boton Eliminar ocupa el ancho de su foto. */
+
+.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(150px, 45%), 1fr));
+  gap: var(--space-3) var(--space-2);
+}
+
+.galeria__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.galeria__item img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.galeria__alt {
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.galeria__item .btn {
+  margin-top: auto;
+}
+
+.galeria__subir {
+  max-width: 640px;
+}
+
+@media (min-width: 768px) {
+  .galeria {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-3);
+  }
+}

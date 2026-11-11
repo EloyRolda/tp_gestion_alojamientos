@@ -1,0 +1,76 @@
+<section class="stack">
+  <a routerLink="/anfitrion/reservas" class="link-volver">&larr; Volver a reservas recibidas</a>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else if (error() && !reserva()) {
+    <p class="text-danger">{{ error() }}</p>
+  } @else if (reserva()) {
+    @let r = reserva()!;
+
+    <article class="stack card">
+      <h1>Reserva #{{ r.idReserva }}</h1>
+      <p class="text-muted">Estado: <strong>{{ r.estadoReserva }}</strong></p>
+
+      <section class="stack stack--tight">
+        <h2>Alojamiento</h2>
+        <p>{{ r.alojamiento.titulo }}</p>
+      </section>
+
+      <section class="stack stack--tight">
+        <h2>Cliente</h2>
+        <p>{{ r.cliente.nombre }} {{ r.cliente.apellido }}</p>
+      </section>
+
+      <section class="stack stack--tight">
+        <h2>Estadia</h2>
+        <dl class="datos">
+          <dt>Check-in</dt>
+          <dd>{{ r.fechaInicio | date: 'dd/MM/yyyy' }}</dd>
+          <dt>Check-out</dt>
+          <dd>{{ r.fechaFin | date: 'dd/MM/yyyy' }}</dd>
+          <dt>{{ noches(r) }} {{ noches(r) === 1 ? 'noche' : 'noches' }} &times; {{ r.precioNochePactado | number }}</dt>
+          <dd><strong>{{ total(r) | number }}</strong></dd>
+        </dl>
+      </section>
+
+      @if (r.pago) {
+        <section class="stack stack--tight">
+          <h2>Pago</h2>
+          <dl class="datos">
+            <dt>Monto base (lo que vos recibis)</dt>
+            <dd>{{ r.pago.montoBase | number }}</dd>
+            <dt>Estado del pago</dt>
+            <dd><strong>{{ r.pago.estado }}</strong></dd>
+            @if (r.pago.fechaTransferencia) {
+              <dt>Transferido el</dt>
+              <dd>{{ r.pago.fechaTransferencia | date: 'dd/MM/yyyy HH:mm' }}</dd>
+            }
+          </dl>
+        </section>
+      }
+
+      @if (error()) {
+        <p class="text-danger">{{ error() }}</p>
+      }
+
+      <div class="form-actions">
+        @if (puedeConfirmar(r)) {
+          <button type="button" class="btn" (click)="confirmar()" [disabled]="procesando()">
+            {{ procesando() ? 'Procesando...' : 'Confirmar reserva' }}
+          </button>
+        }
+        @if (puedeFinalizar(r)) {
+          <button type="button" class="btn" (click)="finalizar()" [disabled]="procesando()">
+            {{ procesando() ? 'Procesando...' : 'Finalizar estadia' }}
+          </button>
+        }
+        @if (puedeCancelar(r)) {
+          <button type="button" class="btn" (click)="cancelar()" [disabled]="procesando()">
+            {{ procesando() ? 'Procesando...' : 'Cancelar reserva' }}
+          </button>
+        }
+      </div>
+    </article>
+  }
+</section>
