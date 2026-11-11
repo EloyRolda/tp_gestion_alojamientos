@@ -39,7 +39,7 @@
 		</dependency>
 		<!-- /actuator/prometheus no se registra solo con el starter de arriba,
 		     aunque "prometheus" este en management.endpoints.web.exposure.include
-		     (ver gotcha en CLAUDE.md): hace falta este registry ademas. -->
+		     hace falta este registry ademas. -->
 		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-registry-prometheus</artifactId>

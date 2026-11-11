@@ -1,6 +1,6 @@
 # AlojaME — Frontend
 
-Aplicación web de AlojaME construida íntegramente en **Angular 22**. Consume por HTTP la API REST real del backend Spring Boot (`../tp-final-alojamiento`): no usa APIs simuladas ni json-server.
+Aplicación web de AlojaME construida íntegramente en **Angular 22**. Consume por HTTP la API REST del backend Spring Boot (`../GA`): no usa APIs simuladas ni json-server.
 
 ## Requisitos
 

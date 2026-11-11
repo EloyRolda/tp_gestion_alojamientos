@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
-import { UsuarioService, UsuarioModificar } from '../../../core/services/usuario.service';
+import { UsuarioService, UsuarioModificar, AliasCobroInfo } from '../../../core/services/usuario.service';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
 
 interface FormPerfil {
@@ -22,10 +22,12 @@ const FORM_VACIO: FormPerfil = {
   password: '',
 };
 
-/// SCRUM-28 / RF04, RF05. Ver y editar los datos personales del cliente logueado.
-/// La contraseña queda en blanco a proposito (nunca se precarga): si se deja
-/// vacia, no se manda en el PUT (UsuarioModificarDTO acepta todos los campos
-/// opcionales, solo pisa lo que venga no-nulo).
+/// SCRUM-28 / RF04, RF05. Ver y editar los datos personales del usuario logueado
+/// (cualquier rol). La contraseña queda en blanco a proposito (nunca se
+/// precarga): si se deja vacia, no se manda en el PUT (UsuarioModificarDTO
+/// acepta todos los campos opcionales, solo pisa lo que venga no-nulo).
+/// Para ANFITRION/ADMIN suma el alias de cobro (CBU/CVU/alias) con el flujo de
+/// 2 pasos validar->confirmar que ya existia en el backend sin UI (Lote 4.1).
 @Component({
   selector: 'app-mi-perfil',
   standalone: true,
@@ -43,6 +45,15 @@ export class MiPerfil {
   readonly error = signal<string | null>(null);
   readonly exito = signal(false);
 
+  readonly rol = this.auth.rol;
+  readonly aliasCobroActual = signal<string | null>(null);
+  readonly aliasCobroValor = signal('');
+  readonly aliasCobroInfo = signal<AliasCobroInfo | null>(null);
+  readonly aliasCobroPaso = signal<'ingresar' | 'confirmar'>('ingresar');
+  readonly aliasCobroCargando = signal(false);
+  readonly aliasCobroError = signal<string | null>(null);
+  readonly aliasCobroExito = signal(false);
+
   constructor() {
     this.auth.refrescarPerfil().subscribe({
       next: (u) => {
@@ -54,6 +65,7 @@ export class MiPerfil {
           telefono: u.telefono,
           password: '',
         });
+        this.aliasCobroActual.set(u.aliasCobro);
         this.cargando.set(false);
       },
       error: (err) => {
@@ -96,5 +108,57 @@ export class MiPerfil {
         this.error.set(extraerMensajeError(err));
       },
     });
+  }
+
+  actualizarAliasCobroValor(valor: string): void {
+    this.aliasCobroValor.set(valor);
+  }
+
+  /// Paso 1: valida el alias/CBU/CVU contra el backend sin guardar nada todavia.
+  validarAliasCobro(): void {
+    this.aliasCobroError.set(null);
+    this.aliasCobroExito.set(false);
+    this.aliasCobroCargando.set(true);
+
+    this.usuarioService.validarAliasCobro(this.aliasCobroValor()).subscribe({
+      next: (info) => {
+        this.aliasCobroCargando.set(false);
+        this.aliasCobroInfo.set(info);
+        if (info.valido) {
+          this.aliasCobroPaso.set('confirmar');
+        }
+      },
+      error: (err) => {
+        this.aliasCobroCargando.set(false);
+        this.aliasCobroError.set(extraerMensajeError(err));
+      },
+    });
+  }
+
+  /// Paso 2: recien aca se persiste en el usuario logueado.
+  confirmarAliasCobro(): void {
+    this.aliasCobroError.set(null);
+    this.aliasCobroCargando.set(true);
+
+    this.usuarioService.confirmarAliasCobro(this.aliasCobroValor()).subscribe({
+      next: () => {
+        this.aliasCobroCargando.set(false);
+        this.aliasCobroExito.set(true);
+        this.aliasCobroActual.set(this.aliasCobroValor());
+        this.aliasCobroPaso.set('ingresar');
+        this.aliasCobroValor.set('');
+        this.aliasCobroInfo.set(null);
+      },
+      error: (err) => {
+        this.aliasCobroCargando.set(false);
+        this.aliasCobroError.set(extraerMensajeError(err));
+      },
+    });
+  }
+
+  cancelarAliasCobro(): void {
+    this.aliasCobroPaso.set('ingresar');
+    this.aliasCobroInfo.set(null);
+    this.aliasCobroError.set(null);
   }
 }

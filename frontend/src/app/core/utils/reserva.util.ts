@@ -1,6 +1,6 @@
 /// Mismo calculo que PagoService.calcularMontoBase() en el backend (noches *
-/// precio_noche_pactado, nunca Reserva.getPrecioTotal() -- ver gotcha #1 de
-/// CLAUDE.md). Se centraliza aca para no repetirlo en cada componente que
+/// precio_noche_pactado, nunca Reserva.getPrecioTotal(), que puede venir null).
+/// Se centraliza aca para no repetirlo en cada componente que
 /// necesita mostrar un total: formulario de reserva, listado, detalle, resumen.
 export function calcularNoches(fechaInicio: string, fechaFin: string): number {
   const inicio = new Date(fechaInicio);

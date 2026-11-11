@@ -86,6 +86,15 @@ export class AuthService {
     return this.cargarPerfil();
   }
 
+  /// Reemplaza el JWT guardado sin pasar por /auth/login. Necesario cuando el
+  /// propio usuario cambia su email (UsuarioController.actualizar devuelve el
+  /// token nuevo en el header "X-New-Token"): el token viejo tiene como subject
+  /// el email anterior, y sin reemplazarlo el usuario queda deslogueado en el
+  /// siguiente request (ver UsuarioService.actualizar).
+  actualizarToken(token: string): void {
+    this.guardarSesion(token);
+  }
+
   private cargarPerfil(): Observable<Usuario> {
     return this.http.get<Usuario>(`${API_BASE_URL}/Usuario/me`).pipe(
       tap((u) => this.usuarioSignal.set(u)),

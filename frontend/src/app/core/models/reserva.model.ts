@@ -18,8 +18,8 @@ export interface UsuarioResumen {
 }
 
 /// Espejo de ReservaResponseDTO. "precioTotal" puede venir null (columna
-/// GENERATED de MariaDB que Hibernate no refresca en memoria tras el insert --
-/// ver gotcha #1 de CLAUDE.md): nunca confiar en este campo para mostrar el
+/// GENERATED de MariaDB que Hibernate no refresca en memoria tras el insert):
+/// nunca confiar en este campo para mostrar el
 /// total, se recalcula en el cliente con calcularNoches/calcularTotal
 /// (reserva.util.ts), igual que hace el propio backend (PagoService.calcularMontoBase).
 export interface Reserva {

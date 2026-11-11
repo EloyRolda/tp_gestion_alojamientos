@@ -14,6 +14,25 @@ export class ReservaService {
     return this.http.get<Reserva[]>(`${API_BASE_URL}/Reserva/listar/propios`);
   }
 
+  /// Reservas de TODOS los alojamientos del anfitrion logueado (ver SCRUM-38/39).
+  listarPorAnfitrion(): Observable<Reserva[]> {
+    return this.http.get<Reserva[]>(`${API_BASE_URL}/Reserva/listar/anfitrion`);
+  }
+
+  /// TODAS las reservas de la plataforma, de cualquier cliente/anfitrion
+  /// (SCRUM-45 / RF24, exclusivo ADMIN -- ver SecurityConfig).
+  listarTodas(): Observable<Reserva[]> {
+    return this.http.get<Reserva[]>(`${API_BASE_URL}/Reserva/listar`);
+  }
+
+  confirmar(id: number): Observable<Reserva> {
+    return this.http.patch<Reserva>(`${API_BASE_URL}/Reserva/confirmar/${id}`, {});
+  }
+
+  finalizar(id: number): Observable<Reserva> {
+    return this.http.patch<Reserva>(`${API_BASE_URL}/Reserva/finalizar/${id}`, {});
+  }
+
   obtener(id: number): Observable<Reserva> {
     return this.http.get<Reserva>(`${API_BASE_URL}/Reserva/mostrar/${id}`);
   }

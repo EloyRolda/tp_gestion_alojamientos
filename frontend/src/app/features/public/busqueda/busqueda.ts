@@ -10,8 +10,7 @@ import { AlojamientoCard } from '../../../shared/alojamiento-card/alojamiento-ca
 
 /// SCRUM-23 / RF14, RF39. El backend no expone query params de filtro
 /// (/Alojamiento/listar siempre devuelve todo), asi que el filtro es
-/// client-side sobre la lista completa -- decision tomada y documentada en
-/// PLAN_LOTES_FRONTEND.md. Para poder filtrar por servicio, se trae una vez
+/// client-side sobre la lista completa. Para poder filtrar por servicio, se trae una vez
 /// (en paralelo, al cargar la pagina) que servicios tiene cada alojamiento;
 /// de ahi en mas filtrar es instantaneo, sin pegarle de nuevo a la API.
 ///
