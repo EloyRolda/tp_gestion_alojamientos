@@ -24,7 +24,7 @@
         <form class="stack" (submit)="$event.preventDefault(); reenviar()">
           <div class="field">
             <label for="email">Email</label>
-            <input id="email" type="email" required [ngModel]="email()" (ngModelChange)="email.set($event)" name="email" />
+            <input id="email" autocomplete="email" type="email" required [ngModel]="email()" (ngModelChange)="email.set($event)" name="email" />
           </div>
           @if (errorReenvio()) {
             <p class="text-danger">{{ errorReenvio() }}</p>

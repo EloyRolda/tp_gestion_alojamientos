@@ -8,7 +8,7 @@
     <p class="text-muted">{{ alojamiento()!.precioNoche | number }} por noche</p>
 
     <form class="stack" (submit)="$event.preventDefault(); reservar()">
-      <div class="cluster">
+      <div class="form-grid">
         <div class="field">
           <label for="fechaInicio">Check-in</label>
           <input

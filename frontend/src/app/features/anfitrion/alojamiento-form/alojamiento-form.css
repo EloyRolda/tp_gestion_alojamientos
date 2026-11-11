@@ -1,0 +1,22 @@
+/* Alta/edicion de alojamiento responsive (SCRUM-54): una columna en mobile;
+   desde tablet los datos numericos y la direccion van en grilla. */
+
+.alojamiento-form {
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+.alojamiento-form__servicios {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(160px, 100%), 1fr));
+  gap: 0 var(--space-2);
+}
+
+.alojamiento-form__servicio-asignado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding-block: var(--space-1);
+  border-bottom: 1px solid var(--color-bg-muted);
+}

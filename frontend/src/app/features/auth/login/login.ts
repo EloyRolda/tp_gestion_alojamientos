@@ -24,13 +24,21 @@ export class Login {
   readonly enviando = signal(false);
   readonly error = signal<string | null>(null);
 
+  /// Solo se vuelve a rutas internas de la app ("/algo", nunca "//otro-sitio"
+  /// ni una URL absoluta): returnUrl llega de la query string y lo puede armar
+  /// cualquiera.
+  private destinoSeguro(): string {
+    const destino = this.returnUrl();
+    return destino && destino.startsWith('/') && !destino.startsWith('//') ? destino : '/';
+  }
+
   enviar(): void {
     this.error.set(null);
     this.enviando.set(true);
     this.auth.login(this.identificador(), this.password()).subscribe({
       next: () => {
         this.enviando.set(false);
-        this.router.navigateByUrl(this.returnUrl() || '/');
+        this.router.navigateByUrl(this.destinoSeguro());
       },
       error: (err) => {
         this.enviando.set(false);

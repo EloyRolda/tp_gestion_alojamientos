@@ -5,29 +5,31 @@
     <p>Cargando...</p>
   } @else {
     <form class="stack" (submit)="$event.preventDefault(); guardar()">
-      <div class="field">
-        <label for="nombre">Nombre</label>
-        <input id="nombre" type="text" required [ngModel]="form().nombre" (ngModelChange)="actualizarCampo('nombre', $event)" name="nombre" />
-      </div>
-      <div class="field">
-        <label for="apellido">Apellido</label>
-        <input id="apellido" type="text" required [ngModel]="form().apellido" (ngModelChange)="actualizarCampo('apellido', $event)" name="apellido" />
-      </div>
-      <div class="field">
-        <label for="usuarioLogin">Usuario</label>
-        <input id="usuarioLogin" type="text" required [ngModel]="form().usuarioLogin" (ngModelChange)="actualizarCampo('usuarioLogin', $event)" name="usuarioLogin" />
-      </div>
-      <div class="field">
-        <label for="email">Email</label>
-        <input id="email" type="email" required [ngModel]="form().email" (ngModelChange)="actualizarCampo('email', $event)" name="email" />
-      </div>
-      <div class="field">
-        <label for="telefono">Telefono</label>
-        <input id="telefono" type="tel" required [ngModel]="form().telefono" (ngModelChange)="actualizarCampo('telefono', $event)" name="telefono" />
-      </div>
-      <div class="field">
-        <label for="password">Nueva contraseña (opcional)</label>
-        <input id="password" type="password" minlength="6" placeholder="Dejar en blanco para no cambiarla" [ngModel]="form().password" (ngModelChange)="actualizarCampo('password', $event)" name="password" />
+      <div class="form-grid">
+        <div class="field">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" autocomplete="given-name" type="text" required [ngModel]="form().nombre" (ngModelChange)="actualizarCampo('nombre', $event)" name="nombre" />
+        </div>
+        <div class="field">
+          <label for="apellido">Apellido</label>
+          <input id="apellido" autocomplete="family-name" type="text" required [ngModel]="form().apellido" (ngModelChange)="actualizarCampo('apellido', $event)" name="apellido" />
+        </div>
+        <div class="field">
+          <label for="usuarioLogin">Usuario</label>
+          <input id="usuarioLogin" autocomplete="username" type="text" required [ngModel]="form().usuarioLogin" (ngModelChange)="actualizarCampo('usuarioLogin', $event)" name="usuarioLogin" />
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" autocomplete="email" type="email" required [ngModel]="form().email" (ngModelChange)="actualizarCampo('email', $event)" name="email" />
+        </div>
+        <div class="field">
+          <label for="telefono">Telefono</label>
+          <input id="telefono" autocomplete="tel" type="tel" required [ngModel]="form().telefono" (ngModelChange)="actualizarCampo('telefono', $event)" name="telefono" />
+        </div>
+        <div class="field">
+          <label for="password">Nueva contraseña (opcional)</label>
+          <input id="password" autocomplete="new-password" type="password" minlength="6" placeholder="Dejar en blanco para no cambiarla" [ngModel]="form().password" (ngModelChange)="actualizarCampo('password', $event)" name="password" />
+        </div>
       </div>
 
       @if (error()) {
@@ -41,5 +43,68 @@
         {{ guardando() ? 'Guardando...' : 'Guardar cambios' }}
       </button>
     </form>
+
+    @if (rol() === 'ANFITRION' || rol() === 'ADMIN') {
+      <section class="stack card" aria-labelledby="alias-cobro-titulo">
+        <h2 id="alias-cobro-titulo">Alias de cobro</h2>
+        <p class="text-muted">
+          Es la cuenta (alias, CBU o CVU) a la que te transferimos cuando cobras una reserva.
+        </p>
+
+        @if (aliasCobroActual()) {
+          <p>Alias/CBU/CVU actual: <strong>{{ aliasCobroActual() }}</strong></p>
+        } @else {
+          <p class="text-muted">Todavia no registraste un alias de cobro.</p>
+        }
+
+        @if (aliasCobroPaso() === 'ingresar') {
+          <div class="field">
+            <label for="aliasCobroValor">Nuevo alias, CBU o CVU</label>
+            <input
+              id="aliasCobroValor"
+              type="text"
+              class="input-alias-cobro"
+              autocomplete="off"
+              autocapitalize="none"
+              spellcheck="false"
+              [ngModel]="aliasCobroValor()"
+              (ngModelChange)="actualizarAliasCobroValor($event)"
+            />
+          </div>
+          <button
+            type="button"
+            class="btn"
+            [disabled]="aliasCobroCargando() || !aliasCobroValor().trim()"
+            (click)="validarAliasCobro()"
+          >
+            {{ aliasCobroCargando() ? 'Validando...' : 'Validar' }}
+          </button>
+        } @else {
+          <p>
+            Tipo: <strong>{{ aliasCobroInfo()?.tipo }}</strong>
+            @if (aliasCobroInfo()?.banco) {
+              · Banco: <strong>{{ aliasCobroInfo()?.banco }}</strong>
+            }
+          </p>
+          <p>{{ aliasCobroInfo()?.mensaje }}</p>
+          <p>¿Confirmas que quieres guardar <strong>{{ aliasCobroValor() }}</strong> como tu alias de cobro?</p>
+          <div class="form-actions">
+            <button type="button" class="btn" [disabled]="aliasCobroCargando()" (click)="confirmarAliasCobro()">
+              {{ aliasCobroCargando() ? 'Confirmando...' : 'Confirmar' }}
+            </button>
+            <button type="button" class="btn" [disabled]="aliasCobroCargando()" (click)="cancelarAliasCobro()">
+              Cancelar
+            </button>
+          </div>
+        }
+
+        @if (aliasCobroError()) {
+          <p class="text-danger">{{ aliasCobroError() }}</p>
+        }
+        @if (aliasCobroExito()) {
+          <p class="card">Alias de cobro actualizado correctamente.</p>
+        }
+      </section>
+    }
   }
 </section>

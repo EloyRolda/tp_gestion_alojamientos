@@ -1,22 +1,159 @@
-.detalle__galeria img {
-  border-radius: 4px;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
+/* Detalle de alojamiento responsive (SCRUM-53).
+   - Mobile: una columna; galeria en carrusel horizontal (una foto por vez,
+     se desliza con el dedo); precio y "Reservar" fijos al pie de la pantalla.
+   - Tablet (>= 768px): galeria en mosaico (foto principal grande).
+   - Desktop (>= 1024px): contenido + columna lateral de reserva que acompana
+     el scroll. */
+
+/* ---------- galeria ---------- */
+
+.detalle__galeria {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 88%;
+  gap: var(--space-2);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
 }
 
-.detalle__datos {
+.detalle__galeria--unica {
+  grid-auto-columns: 100%;
+}
+
+.detalle__galeria img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 4px;
+  scroll-snap-align: start;
+}
+
+.detalle__galeria-ayuda {
   font-size: 0.9rem;
 }
 
+/* ---------- datos y servicios ---------- */
+
+.detalle__datos,
+.detalle__servicios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.detalle__datos li,
+.detalle__servicios li {
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 0.95rem;
+}
+
+/* Respeta los saltos de linea que escribio el anfitrion. */
+.detalle__descripcion {
+  white-space: pre-line;
+}
+
+/* ---------- cuerpo y reserva ---------- */
+
+.detalle__cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.detalle__principal {
+  min-width: 0;
+}
+
+/* Mobile: barra de reserva pegada al pie mientras se recorre el detalle. */
 .detalle__reserva {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  flex-wrap: wrap;
+  margin-inline: calc(-1 * var(--space-3));
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg);
 }
 
 .detalle__precio {
   font-weight: 700;
   font-size: 1.2rem;
+  white-space: nowrap;
+}
+
+.detalle__precio-unidad {
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
+.detalle__reservar {
+  flex: 0 1 180px;
+}
+
+@media (min-width: 768px) {
+  /* De 2 a 4 fotos: grilla pareja. */
+  .detalle__galeria {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-auto-columns: auto;
+    overflow-x: visible;
+  }
+
+  /* 5 o mas fotos: mosaico con la principal ocupando la mitad izquierda. */
+  .detalle__galeria--mosaico {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .detalle__galeria--mosaico img:first-child {
+    grid-column: span 2;
+    grid-row: span 2;
+    height: 100%;
+    aspect-ratio: auto;
+  }
+
+  .detalle__galeria--unica img {
+    aspect-ratio: 16 / 9;
+    max-height: 480px;
+  }
+
+  .detalle__galeria-ayuda {
+    display: none;
+  }
+
+  .detalle__reserva {
+    margin-inline: calc(-1 * var(--space-4));
+    padding-inline: var(--space-4);
+  }
+}
+
+@media (min-width: 1024px) {
+  .detalle__cuerpo {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    align-items: start;
+    gap: var(--space-5);
+  }
+
+  .detalle__reserva {
+    top: var(--space-3);
+    bottom: auto;
+    flex-direction: column;
+    align-items: stretch;
+    margin-inline: 0;
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+  }
+
+  .detalle__reservar {
+    flex: none;
+    width: 100%;
+  }
 }

@@ -13,6 +13,11 @@ import { extraerMensajeError } from '../../../core/utils/http-error.util';
 
 /// SCRUM-24 / RF15, RF16, RF17, RF35. "id" se bindea solo desde la ruta
 /// :id gracias a withComponentInputBinding() (app.config.ts).
+///
+/// Responsive (SCRUM-53): en mobile todo va en una columna, la galeria es un
+/// carrusel horizontal y el precio + "Reservar" quedan fijos abajo de la
+/// pantalla; desde tablet la galeria es un mosaico, y en desktop la reserva
+/// pasa a una columna lateral que acompana el scroll.
 @Component({
   selector: 'app-detalle-alojamiento',
   standalone: true,
@@ -51,7 +56,8 @@ export class DetalleAlojamiento {
 
     const rutaReserva = ['/alojamientos', idAlojamiento, 'reservar'];
     if (!this.auth.estaLogueado()) {
-      this.router.navigate(['/login'], { queryParams: { returnUrl: '/' + rutaReserva.join('/') } });
+      const returnUrl = this.router.serializeUrl(this.router.createUrlTree(rutaReserva));
+      this.router.navigate(['/login'], { queryParams: { returnUrl } });
       return;
     }
     this.router.navigate(rutaReserva);

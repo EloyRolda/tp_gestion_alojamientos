@@ -1,0 +1,131 @@
+<section class="stack alojamiento-form">
+  <h1>{{ esEdicion() ? 'Editar alojamiento' : 'Publicar alojamiento' }}</h1>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else {
+    <form class="stack" (submit)="$event.preventDefault(); guardar()">
+      <div class="field">
+        <label for="titulo">Titulo</label>
+        <input id="titulo" type="text" autocomplete="off" required [ngModel]="form().titulo" (ngModelChange)="actualizarCampo('titulo', $event)" name="titulo" />
+      </div>
+      <div class="field">
+        <label for="descripcion">Descripcion</label>
+        <textarea id="descripcion" rows="4" [ngModel]="form().descripcion" (ngModelChange)="actualizarCampo('descripcion', $event)" name="descripcion"></textarea>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label for="precioNoche">Precio por noche</label>
+          <input id="precioNoche" type="number" inputmode="decimal" min="0.01" step="0.01" required [ngModel]="form().precioNoche" (ngModelChange)="actualizarCampo('precioNoche', $event)" name="precioNoche" />
+        </div>
+        <div class="field">
+          <label for="capacidad">Capacidad (huespedes)</label>
+          <input id="capacidad" type="number" inputmode="numeric" min="1" required [ngModel]="form().capacidad" (ngModelChange)="actualizarCampo('capacidad', $event)" name="capacidad" />
+        </div>
+      </div>
+      <div class="form-grid form-grid--3">
+        <div class="field">
+          <label for="cantAmbientes">Ambientes</label>
+          <input id="cantAmbientes" type="number" inputmode="numeric" min="1" required [ngModel]="form().cantAmbientes" (ngModelChange)="actualizarCampo('cantAmbientes', $event)" name="cantAmbientes" />
+        </div>
+        <div class="field">
+          <label for="cantHabitaciones">Habitaciones</label>
+          <input id="cantHabitaciones" type="number" inputmode="numeric" min="1" required [ngModel]="form().cantHabitaciones" (ngModelChange)="actualizarCampo('cantHabitaciones', $event)" name="cantHabitaciones" />
+        </div>
+        <div class="field">
+          <label for="cantBanios">Baños</label>
+          <input id="cantBanios" type="number" inputmode="numeric" min="1" required [ngModel]="form().cantBanios" (ngModelChange)="actualizarCampo('cantBanios', $event)" name="cantBanios" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="nombreTipoAlojamiento">Tipo de alojamiento</label>
+        <input id="nombreTipoAlojamiento" type="text" autocomplete="off" required list="tipos-catalogo" [ngModel]="form().nombreTipoAlojamiento" (ngModelChange)="actualizarCampo('nombreTipoAlojamiento', $event)" name="nombreTipoAlojamiento" />
+        <datalist id="tipos-catalogo">
+          @for (t of tipos(); track t.idTipoAlojamiento) {
+            <option [value]="t.nombreTipo"></option>
+          }
+        </datalist>
+      </div>
+
+      @if (!esEdicion()) {
+        <fieldset class="field">
+          <legend>Direccion</legend>
+          <div class="form-grid">
+            <div class="field">
+              <label for="dir-pais">Pais</label>
+              <input id="dir-pais" type="text" autocomplete="country-name" required [ngModel]="direccion().pais" (ngModelChange)="actualizarDireccion('pais', $event)" name="pais" />
+            </div>
+            <div class="field">
+              <label for="dir-provincia">Provincia</label>
+              <input id="dir-provincia" type="text" autocomplete="address-level1" required [ngModel]="direccion().provincia" (ngModelChange)="actualizarDireccion('provincia', $event)" name="provincia" />
+            </div>
+            <div class="field">
+              <label for="dir-ciudad">Ciudad</label>
+              <input id="dir-ciudad" type="text" autocomplete="address-level2" required [ngModel]="direccion().ciudad" (ngModelChange)="actualizarDireccion('ciudad', $event)" name="ciudad" />
+            </div>
+            <div class="field">
+              <label for="dir-calle">Calle</label>
+              <input id="dir-calle" type="text" autocomplete="address-line1" required [ngModel]="direccion().calle" (ngModelChange)="actualizarDireccion('calle', $event)" name="calle" />
+            </div>
+            <div class="field">
+              <label for="dir-altura">Altura</label>
+              <input id="dir-altura" type="number" autocomplete="off" inputmode="numeric" min="0" required [ngModel]="direccion().altura" (ngModelChange)="actualizarDireccion('altura', $event)" name="altura" />
+            </div>
+            <div class="field">
+              <label for="dir-codigoPostal">Codigo postal</label>
+              <input id="dir-codigoPostal" type="text" autocomplete="postal-code" required [ngModel]="direccion().codigoPostal" (ngModelChange)="actualizarDireccion('codigoPostal', $event)" name="codigoPostal" />
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend>Servicios / comodidades</legend>
+          <div class="stack stack--tight">
+            <div class="alojamiento-form__servicios">
+            @for (s of catalogoServicios(); track s.idServicio) {
+              <label>
+                <input type="checkbox" [checked]="serviciosElegidos().has(s.nombreServicio)" (change)="toggleServicioElegido(s.nombreServicio)" />
+                {{ s.nombreServicio }}
+              </label>
+            }
+            </div>
+            <div class="input-accion">
+              <input type="text" aria-label="Otro servicio" autocomplete="off" placeholder="Agregar otro servicio..." [ngModel]="servicioNuevo()" (ngModelChange)="servicioNuevo.set($event)" name="servicioNuevo" />
+              <button type="button" class="btn" (click)="agregarServicioLibre()">Agregar</button>
+            </div>
+          </div>
+        </fieldset>
+      } @else {
+        <fieldset class="field">
+          <legend>Direccion (no editable)</legend>
+          <p class="text-muted">{{ direccion().calle }} {{ direccion().altura }}, {{ direccion().ciudad }}, {{ direccion().provincia }}, {{ direccion().pais }} ({{ direccion().codigoPostal }})</p>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend>Servicios / comodidades</legend>
+          <div class="stack stack--tight">
+            @for (sxa of serviciosAsignados(); track sxa.idServicioXAlojamiento) {
+              <div class="alojamiento-form__servicio-asignado">
+                <span>{{ sxa.servicio.nombreServicio }}</span>
+                <button type="button" class="btn" (click)="quitarServicioEnEdicion(sxa)">Quitar</button>
+              </div>
+            }
+            <div class="input-accion">
+              <input type="text" aria-label="Servicio a agregar" autocomplete="off" placeholder="Agregar servicio..." [ngModel]="servicioAAgregar()" (ngModelChange)="servicioAAgregar.set($event)" name="servicioAAgregar" />
+              <button type="button" class="btn" (click)="agregarServicioEnEdicion()" [disabled]="agregandoServicio()">Agregar</button>
+            </div>
+          </div>
+        </fieldset>
+      }
+
+      @if (error()) {
+        <p class="text-danger">{{ error() }}</p>
+      }
+
+      <button type="submit" class="btn" [disabled]="enviando()">
+        {{ enviando() ? 'Guardando...' : (esEdicion() ? 'Guardar cambios' : 'Publicar') }}
+      </button>
+      <a routerLink="/anfitrion/alojamientos" class="text-muted">Volver a mis alojamientos</a>
+    </form>
+  }
+</section>
