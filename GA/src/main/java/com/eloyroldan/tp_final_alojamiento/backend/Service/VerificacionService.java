@@ -78,13 +78,17 @@ public class VerificacionService {
     }
 
     /// Genera y envia un nuevo token, por si el original vencio o no llego.
+    /// A proposito NUNCA informa si el email existe, si ya esta verificado, o si
+    /// el envio tuvo exito: las 3 situaciones devuelven la misma respuesta
+    /// generica desde el Controller. Antes tiraba excepciones distintas segun el
+    /// caso ("Usuario no encontrado", "Esta cuenta ya fue verificada") — eso
+    /// convertia este endpoint publico (sin login) en un oraculo para enumerar
+    /// que emails estan registrados y cuales ya verificaron su cuenta.
     @Transactional
     public void reenviarVerificacion(String email) {
-        Usuario usuario = usuarioService.obtenerPorIdentificador(email);
-        if (usuario.getEmailVerificado()) {
-            throw new ParametroInvalidoException("Esta cuenta ya fue verificada.");
-        }
-        generarYEnviar(usuario);
+        usuarioService.buscarPorEmail(email)
+                .filter(usuario -> !usuario.getEmailVerificado())
+                .ifPresent(this::generarYEnviar);
     }
 
     private String construirHtml(String nombre, String link) {

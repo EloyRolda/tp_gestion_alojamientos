@@ -3,6 +3,7 @@ package com.eloyroldan.tp_final_alojamiento.backend.Config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -27,6 +28,14 @@ import java.util.List;
 /// hasAnyRole. El chequeo de "es el dueño del recurso" (ej: un cliente solo
 /// puede cancelar SU reserva) no vive aca — eso lo resuelve cada Service/
 /// Controller puntual, esto solo filtra por ROL, no por pertenencia.
+///
+/// Los GET de solo lectura para navegar el catalogo sin cuenta (listar/mostrar
+/// Alojamiento, sus servicios, Galeria, Review por alojamiento, y los catalogos
+/// TipoAlojamiento/Servicio) son permitAll a proposito: modelo tipo Airbnb,
+/// se navega libre y el login solo hace falta para publicar, reservar o
+/// cualquier operacion de escritura. Donde un mismo path sirve lectura y
+/// escritura (ej. "/Alojamiento/*/servicios": GET lista, POST agrega) el
+/// permitAll esta acotado con HttpMethod.GET, nunca al path entero.
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -91,30 +100,36 @@ public class SecurityConfig {
                         .requestMatchers("/Direccion/mostrar/**", "/Direccion/buscar").hasAnyRole("ADMIN", "ANFITRION")
 
                         // ── TIPO ALOJAMIENTO ─────────────────────────────────
-                        .requestMatchers("/TipoAlojamiento/listar").hasAnyRole("ADMIN", "ANFITRION", "CLIENTE")
-                        .requestMatchers("/TipoAlojamiento/reemplazar", "/TipoAlojamiento/eliminar/**").hasRole("ADMIN")
+                        // Lectura publica a proposito (modelo Airbnb: se navega el
+                        // catalogo de alojamientos sin cuenta, el login solo hace
+                        // falta para publicar, reservar o cualquier escritura).
+                        .requestMatchers(HttpMethod.GET, "/TipoAlojamiento/listar").permitAll()
+                        .requestMatchers("/TipoAlojamiento/crear", "/TipoAlojamiento/reemplazar", "/TipoAlojamiento/eliminar/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/TipoAlojamiento/*").hasRole("ADMIN")
 
                         // ── SERVICIO ─────────────────────────────────────────
-                        .requestMatchers("/Servicio/listar").hasAnyRole("ADMIN", "ANFITRION", "CLIENTE")
-                        .requestMatchers("/Servicio/reemplazar", "/Servicio/eliminar/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/Servicio/listar").permitAll()
+                        .requestMatchers("/Servicio/crear", "/Servicio/reemplazar", "/Servicio/eliminar/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/Servicio/*").hasRole("ADMIN")
 
                         // ── ALOJAMIENTO ──────────────────────────────────────
-                        .requestMatchers(
+                        .requestMatchers(HttpMethod.GET,
                                 "/Alojamiento/listar", "/Alojamiento/mostrar/**",
                                 "/Alojamiento/*/servicios"
-                        ).hasAnyRole("ADMIN", "ANFITRION", "CLIENTE")
+                        ).permitAll()
                         .requestMatchers("/Alojamiento/listar/propios").hasAnyRole("ADMIN", "ANFITRION")
                         .requestMatchers("/Alojamiento/registrar").hasAnyRole("ADMIN", "ANFITRION")
+                        .requestMatchers(HttpMethod.POST, "/Alojamiento/*/servicios").hasAnyRole("ADMIN", "ANFITRION", "CLIENTE")
                         .requestMatchers(
                                 "/Alojamiento/actualizar", "/Alojamiento/eliminar/**",
                                 "/Alojamiento/*/servicios/**"
                         ).hasAnyRole("ADMIN", "ANFITRION")
 
                         // ── GALERIA ──────────────────────────────────────────
-                        .requestMatchers(
+                        .requestMatchers(HttpMethod.GET,
                                 "/Galeria/alojamiento/**",
                                 "/Galeria/*/imagenes"
-                        ).hasAnyRole("ADMIN", "ANFITRION", "CLIENTE")
+                        ).permitAll()
                         .requestMatchers("/Galeria/upload", "/Galeria/imagen/**").hasAnyRole("ADMIN", "ANFITRION")
 
                         // ── RESERVA ──────────────────────────────────────────
@@ -138,10 +153,8 @@ public class SecurityConfig {
 
                         // ── REVIEW ───────────────────────────────────────────
                         .requestMatchers("/Review/listar").hasRole("ADMIN")
-                        .requestMatchers(
-                                "/Review/mostrar/**",
-                                "/Review/alojamiento/**"
-                        ).hasAnyRole("ADMIN", "ANFITRION", "CLIENTE")
+                        .requestMatchers(HttpMethod.GET, "/Review/alojamiento/**").permitAll()
+                        .requestMatchers("/Review/mostrar/**").hasAnyRole("ADMIN", "ANFITRION", "CLIENTE")
                         .requestMatchers("/Review/cliente/**", "/Review/registrar", "/Review/eliminar/**")
                             .hasAnyRole("ADMIN", "CLIENTE")
 
@@ -176,6 +189,11 @@ public class SecurityConfig {
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
+        // Sin esto el browser descarta el header antes de que el JS del front lo
+        // vea (setAllowedHeaders es para headers de REQUEST, no de response) — lo
+        // usa UsuarioController.actualizar para reemitir el JWT cuando el propio
+        // usuario cambia su email.
+        config.setExposedHeaders(List.of("X-New-Token"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;

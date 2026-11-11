@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -61,6 +62,14 @@ public class UsuarioService {
     public Usuario obtenerPorIdentificador(String identificador) {
         return usuarioRepository.findByEmailOrUsuarioLoginOrTelefono(identificador, identificador, identificador)
                 .orElseThrow(() -> new UnautorizedExeption("Usuario no encontrado: " + identificador));
+    }
+
+    /// A diferencia de obtenerPorIdentificador, no tira excepcion si no existe.
+    /// Pensado para flujos publicos pre-login (ej: reenviar verificacion) donde
+    /// filtrar "existe/no existe" por el tipo de error seria un oraculo de
+    /// enumeracion de usuarios.
+    public Optional<Usuario> buscarPorEmail(String email) {
+        return usuarioRepository.findByEmail(email.toLowerCase());
     }
 
     public Usuario obtenerAnfitrionPorId(Long id) {

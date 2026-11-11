@@ -7,11 +7,14 @@ import com.eloyroldan.tp_final_alojamiento.backend.DTO.UsuarioModificarDTO;
 import com.eloyroldan.tp_final_alojamiento.backend.DTO.UsuarioRegistroDTO;
 import com.eloyroldan.tp_final_alojamiento.backend.Exception.ParametroInvalidoException;
 import com.eloyroldan.tp_final_alojamiento.backend.Model.Usuario;
+import com.eloyroldan.tp_final_alojamiento.backend.Service.JwtService;
 import com.eloyroldan.tp_final_alojamiento.backend.Service.UsuarioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +25,8 @@ import java.util.List;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
+    private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
 
     @GetMapping("/me")
     public ResponseEntity<UsuarioResponseDTO> me(Authentication auth) {
@@ -72,11 +77,26 @@ public class UsuarioController {
     }
 
     /// El propio usuario actualiza sus datos (el id se toma de la sesion, no del body).
+    /// Si cambia su propio email, el JWT que todavia tiene en el browser quedo con
+    /// el email VIEJO como subject (CustomUserDetailsService siempre usa el email
+    /// como username interno) — sin reemitirlo aca, el usuario queda deslogueado
+    /// a mitad de sesion en el siguiente request (el subject del token ya no
+    /// matchea ningun usuario). Se devuelve el token nuevo en el header
+    /// "X-New-Token" para que el front lo reemplace de forma transparente.
     @PutMapping("/actualizar")
     public ResponseEntity<UsuarioResponseDTO> actualizar(@Valid @RequestBody UsuarioModificarDTO dto, Authentication auth) {
         Usuario usuarioLogueado = usuarioService.obtenerPorIdentificador(auth.getName());
+        String emailAnterior = usuarioLogueado.getEmail();
         dto.setId(usuarioLogueado.getId());
-        return ResponseEntity.ok(UsuarioResponseDTO.desde(usuarioService.actualizarPropio(dto)));
+
+        Usuario actualizado = usuarioService.actualizarPropio(dto);
+
+        ResponseEntity.BodyBuilder respuesta = ResponseEntity.ok();
+        if (!actualizado.getEmail().equalsIgnoreCase(emailAnterior)) {
+            UserDetails nuevoUserDetails = userDetailsService.loadUserByUsername(actualizado.getEmail());
+            respuesta.header("X-New-Token", jwtService.generateToken(nuevoUserDetails));
+        }
+        return respuesta.body(UsuarioResponseDTO.desde(actualizado));
     }
 
     /// El admin puede editar a cualquier usuario por id, incluyendo activar/desactivar.

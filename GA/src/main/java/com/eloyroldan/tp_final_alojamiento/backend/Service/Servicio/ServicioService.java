@@ -42,6 +42,33 @@ public class ServicioService {
                         Servicio.builder().nombreServicio(normalizado).build()));
     }
 
+    /// Alta explicita del admin (a diferencia de obtenerOcrear, que la usa
+    /// ServicioxAlojamientoService al publicar y es idempotente): si ya existe
+    /// un servicio con ese nombre, avisa en vez de devolver el existente en silencio.
+    @Transactional
+    public Servicio crear(String nombre) {
+        String normalizado = normalizar(nombre);
+        if (servicioRepository.existsByNombreServicioIgnoreCase(normalizado)) {
+            throw new ParametroInvalidoException("Ya existe un servicio con ese nombre.");
+        }
+        return servicioRepository.save(Servicio.builder().nombreServicio(normalizado).build());
+    }
+
+    /// Renombra en el lugar (a diferencia de reemplazar, no fusiona dos
+    /// entradas existentes: solo le cambia el nombre a esta).
+    @Transactional
+    public Servicio renombrar(Long id, String nuevoNombre) {
+        Servicio servicio = obtenerPorId(id);
+        String normalizado = normalizar(nuevoNombre);
+        servicioRepository.findByNombreServicioIgnoreCase(normalizado).ifPresent(existente -> {
+            if (!existente.getIdServicio().equals(id)) {
+                throw new ParametroInvalidoException("Ya existe otro servicio con ese nombre. Para fusionarlos, use reemplazar.");
+            }
+        });
+        servicio.setNombreServicio(normalizado);
+        return servicioRepository.save(servicio);
+    }
+
     /// El admin fusiona un servicio duplicado/mal escrito (origen) dentro de otro (destino):
     /// reasigna todos los alojamientos que lo tenian y elimina el duplicado.
     @Transactional

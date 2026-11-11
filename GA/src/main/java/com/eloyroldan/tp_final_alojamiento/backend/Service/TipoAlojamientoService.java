@@ -41,6 +41,33 @@ public class TipoAlojamientoService {
                         TipoAlojamiento.builder().nombreTipo(normalizado).build()));
     }
 
+    /// Alta explicita del admin (a diferencia de obtenerOcrear, que la usa
+    /// AlojamientoService al publicar y es idempotente): si ya existe un tipo
+    /// con ese nombre, avisa en vez de devolver el existente en silencio.
+    @Transactional
+    public TipoAlojamiento crear(String nombre) {
+        String normalizado = normalizar(nombre);
+        if (tipoAlojamientoRepository.existsByNombreTipoIgnoreCase(normalizado)) {
+            throw new ParametroInvalidoException("Ya existe un tipo de alojamiento con ese nombre.");
+        }
+        return tipoAlojamientoRepository.save(TipoAlojamiento.builder().nombreTipo(normalizado).build());
+    }
+
+    /// Renombra en el lugar (a diferencia de reemplazar, no fusiona dos
+    /// entradas existentes: solo le cambia el nombre a esta).
+    @Transactional
+    public TipoAlojamiento renombrar(Long id, String nuevoNombre) {
+        TipoAlojamiento tipo = obtenerPorId(id);
+        String normalizado = normalizar(nuevoNombre);
+        tipoAlojamientoRepository.findByNombreTipoIgnoreCase(normalizado).ifPresent(existente -> {
+            if (!existente.getIdTipoAlojamiento().equals(id)) {
+                throw new ParametroInvalidoException("Ya existe otro tipo de alojamiento con ese nombre. Para fusionarlos, use reemplazar.");
+            }
+        });
+        tipo.setNombreTipo(normalizado);
+        return tipoAlojamientoRepository.save(tipo);
+    }
+
     /// El admin fusiona un tipo duplicado/mal escrito (origen) dentro de otro (destino):
     /// todos los alojamientos que usaban "origen" pasan a usar "destino", y "origen" se elimina.
     @Transactional
