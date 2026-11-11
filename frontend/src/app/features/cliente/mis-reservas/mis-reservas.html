@@ -9,7 +9,7 @@
     <p class="text-muted">Todavia no hiciste ninguna reserva. <a routerLink="/buscar">Buscar alojamientos</a></p>
   } @else {
     <div class="table-scroll">
-      <table class="stack">
+      <table class="tabla table-cards">
         <thead>
           <tr>
             <th>Alojamiento</th>
@@ -23,12 +23,12 @@
         <tbody>
           @for (r of reservas(); track r.idReserva) {
             <tr>
-              <td>{{ r.alojamiento.titulo }}</td>
-              <td>{{ r.fechaInicio | date: 'dd/MM/yyyy' }}</td>
-              <td>{{ r.fechaFin | date: 'dd/MM/yyyy' }}</td>
-              <td>{{ totalDe(r) | number }}</td>
-              <td>{{ r.estadoReserva }}</td>
-              <td><a [routerLink]="['/mis-reservas', r.idReserva]" class="btn">Ver</a></td>
+              <td data-label="Alojamiento">{{ r.alojamiento.titulo }}</td>
+              <td data-label="Check-in">{{ r.fechaInicio | date: 'dd/MM/yyyy' }}</td>
+              <td data-label="Check-out">{{ r.fechaFin | date: 'dd/MM/yyyy' }}</td>
+              <td data-label="Total">{{ totalDe(r) | number }}</td>
+              <td data-label="Estado">{{ r.estadoReserva }}</td>
+              <td class="tabla__acciones"><a [routerLink]="['/mis-reservas', r.idReserva]" class="btn">Ver</a></td>
             </tr>
           }
         </tbody>

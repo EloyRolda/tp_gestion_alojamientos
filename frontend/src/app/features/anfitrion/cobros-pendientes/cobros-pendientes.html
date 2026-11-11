@@ -1,0 +1,35 @@
+<section class="stack">
+  <h1>Cobros pendientes</h1>
+  <p class="text-muted">Reservas ya pagadas por el cliente que todavia no se liquidaron (se liquidan al finalizar la estadia).</p>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else if (error()) {
+    <p class="text-danger">{{ error() }}</p>
+  } @else if (cobros().length === 0) {
+    <p class="text-muted">No tenes cobros pendientes.</p>
+  } @else {
+    <p class="card">Total pendiente de cobro: <strong>{{ totalPendiente() | number }}</strong></p>
+
+    <div class="table-scroll">
+      <table class="tabla table-cards">
+        <thead>
+          <tr>
+            <th>Alojamiento</th>
+            <th>Fin de estadia</th>
+            <th>Monto a cobrar</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of cobros(); track c.idReserva) {
+            <tr>
+              <td data-label="Alojamiento">{{ c.tituloAlojamiento }}</td>
+              <td data-label="Fin de estadia">{{ c.fechaFinEstadia | date: 'dd/MM/yyyy' }}</td>
+              <td data-label="Monto a cobrar">{{ c.montoAcobrar | number }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

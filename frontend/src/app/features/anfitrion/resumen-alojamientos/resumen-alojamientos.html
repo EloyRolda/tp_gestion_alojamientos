@@ -1,0 +1,34 @@
+<section class="stack">
+  <h1>Resumen de mis alojamientos</h1>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else if (error()) {
+    <p class="text-danger">{{ error() }}</p>
+  } @else if (resumen().length === 0) {
+    <p class="text-muted">Todavia no publicaste ningun alojamiento.</p>
+  } @else {
+    <div class="table-scroll">
+      <table class="tabla table-cards">
+        <thead>
+          <tr>
+            <th>Alojamiento</th>
+            <th>Ingresos totales</th>
+            <th>Cantidad de reservas</th>
+            <th>Rating</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of resumen(); track r.idAlojamiento) {
+            <tr>
+              <td data-label="Alojamiento">{{ r.titulo }}</td>
+              <td data-label="Ingresos totales">{{ r.ingresosTotales | number }}</td>
+              <td data-label="Cantidad de reservas">{{ r.cantidadReservas }}</td>
+              <td data-label="Rating">{{ r.ratingPromedio != null ? (r.ratingPromedio | number: '1.1-1') : 'Sin reseñas' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

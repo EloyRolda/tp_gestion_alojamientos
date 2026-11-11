@@ -67,8 +67,9 @@ body {
   background: var(--color-bg);
   line-height: 1.5;
   /* Palabras o datos largos (emails, ids externos, URLs) cortan en vez de
-     ensanchar la pagina. */
-  overflow-wrap: anywhere;
+     ensanchar la pagina. break-word (y no anywhere) para no achicar las
+     columnas de las tablas al minimo partiendo palabras comunes. */
+  overflow-wrap: break-word;
 }
 
 h1,
@@ -174,11 +175,137 @@ textarea {
   gap: var(--space-3);
 }
 
-/* Tablas de listados: en desktop, contenedor con scroll horizontal si hiciera
-   falta. En mobile las tablas marcadas con .table-cards se ven como tarjetas. */
+/* ---------- tablas de listados (SCRUM-55) ----------
+   .tabla: estilo base comun a todos los listados.
+   .table-cards: debajo de 1024px cada fila se muestra como una tarjeta, con
+   el nombre de cada columna (atributo data-label del <td>) a la izquierda
+   del dato. La primera celda hace de titulo de la tarjeta y la celda de
+   acciones (.tabla__acciones) pone sus botones a todo el ancho. En tablet
+   las tarjetas van de a dos por fila.
+   .tabla__largo: celda con datos largos sin espacios (emails, usuarios) que
+   puede cortarse en cualquier punto en vez de ensanchar la tabla.
+   .table-scroll: red de seguridad en desktop si una tabla no entra. */
 .table-scroll {
   width: 100%;
   overflow-x: auto;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla th,
+.tabla td {
+  text-align: left;
+  vertical-align: middle;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tabla th {
+  white-space: nowrap;
+}
+
+.tabla input:not([type='checkbox']):not([type='radio']) {
+  width: 100%;
+  min-height: var(--tap-size);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+
+.tabla__largo {
+  overflow-wrap: anywhere;
+}
+
+.tabla__acciones > * {
+  margin: 2px var(--space-2) 2px 0;
+}
+
+/* Unica media query "hacia abajo" de la hoja: es el mismo corte de desktop
+   (1024px), pero asi las tarjetas no hay que deshacerlas despues. */
+@media (max-width: 1023.98px) {
+  .table-cards thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .table-cards,
+  .table-cards tbody,
+  .table-cards tr,
+  .table-cards td {
+    display: block;
+    width: 100%;
+  }
+
+  .table-cards tr {
+    margin-bottom: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+  }
+
+  .table-cards td {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--color-bg-muted);
+    text-align: right;
+    /* Dentro de la tarjeta un email largo puede cortarse en cualquier punto. */
+    overflow-wrap: anywhere;
+  }
+
+  .table-cards td[data-label]::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+    text-align: left;
+  }
+
+  .table-cards td:first-child {
+    display: block;
+    font-weight: 700;
+    text-align: left;
+  }
+
+  .table-cards td:first-child::before {
+    display: none;
+  }
+
+  .table-cards td:last-child {
+    border-bottom: 0;
+  }
+
+  .table-cards .tabla__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding-top: var(--space-3);
+    white-space: normal;
+  }
+
+  .table-cards .tabla__acciones > * {
+    flex: 1 1 120px;
+    margin: 0;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .table-cards tbody {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+
+  .table-cards tr {
+    margin-bottom: 0;
+  }
 }
 
 .card {

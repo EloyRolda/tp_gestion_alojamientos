@@ -1,0 +1,49 @@
+<section class="stack">
+  <h1>Reservas de mis alojamientos</h1>
+
+  <div class="field">
+    <label for="filtro">Filtrar por estado</label>
+    <select id="filtro" [ngModel]="filtro()" (ngModelChange)="filtro.set($event)" name="filtro">
+      @for (e of estados; track e) {
+        <option [value]="e">{{ e === 'TODAS' ? 'Todas' : e }}</option>
+      }
+    </select>
+  </div>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else if (error()) {
+    <p class="text-danger">{{ error() }}</p>
+  } @else if (reservasFiltradas().length === 0) {
+    <p class="text-muted">No hay reservas con ese filtro.</p>
+  } @else {
+    <div class="table-scroll">
+      <table class="tabla table-cards">
+        <thead>
+          <tr>
+            <th>Alojamiento</th>
+            <th>Cliente</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+            <th>Total</th>
+            <th>Estado</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of reservasFiltradas(); track r.idReserva) {
+            <tr>
+              <td data-label="Alojamiento">{{ r.alojamiento.titulo }}</td>
+              <td data-label="Cliente">{{ r.cliente.nombre }} {{ r.cliente.apellido }}</td>
+              <td data-label="Check-in">{{ r.fechaInicio | date: 'dd/MM/yyyy' }}</td>
+              <td data-label="Check-out">{{ r.fechaFin | date: 'dd/MM/yyyy' }}</td>
+              <td data-label="Total">{{ totalDe(r) | number }}</td>
+              <td data-label="Estado">{{ r.estadoReserva }}</td>
+              <td class="tabla__acciones"><a [routerLink]="['/anfitrion/reservas', r.idReserva]" class="btn">Ver</a></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

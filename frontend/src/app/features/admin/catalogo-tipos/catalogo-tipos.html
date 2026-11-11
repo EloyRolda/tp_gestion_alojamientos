@@ -47,7 +47,7 @@
     </form>
 
     <div class="table-scroll">
-      <table>
+      <table class="tabla table-cards">
         <thead>
           <tr>
             <th>Tipo</th>
@@ -58,16 +58,16 @@
           @for (t of tipos(); track t.idTipoAlojamiento) {
             <tr>
               @if (idEnEdicion() === t.idTipoAlojamiento) {
-                <td>
+                <td data-label="Tipo">
                   <input type="text" class="input-nombre-editado" [ngModel]="nombreEditado()" (ngModelChange)="nombreEditado.set($event)" />
                 </td>
-                <td class="cluster">
+                <td class="tabla__acciones">
                   <button type="button" class="btn" (click)="guardarEdicion(t.idTipoAlojamiento)" [disabled]="guardandoEdicion()">Guardar</button>
                   <button type="button" class="btn" (click)="cancelarEdicion()">Cancelar</button>
                 </td>
               } @else {
-                <td>{{ t.nombreTipo }}</td>
-                <td class="cluster">
+                <td data-label="Tipo">{{ t.nombreTipo }}</td>
+                <td class="tabla__acciones">
                   <button type="button" class="btn" (click)="empezarEdicion(t)">Editar</button>
                   <button type="button" class="btn" (click)="eliminar(t.idTipoAlojamiento)">Eliminar</button>
                 </td>

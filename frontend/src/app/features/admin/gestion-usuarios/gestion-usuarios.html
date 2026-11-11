@@ -1,0 +1,55 @@
+<section class="stack">
+  <div class="cluster" style="justify-content: space-between;">
+    <h1>Gestion de usuarios</h1>
+    <a routerLink="/admin/usuarios/nuevo-admin" class="btn">Crear administrador</a>
+  </div>
+
+  <div class="field">
+    <label for="filtro">Filtrar por tipo</label>
+    <select id="filtro" [ngModel]="filtro()" (ngModelChange)="filtro.set($event)" name="filtro">
+      @for (t of tipos; track t) {
+        <option [value]="t">{{ t === 'TODOS' ? 'Todos' : t }}</option>
+      }
+    </select>
+  </div>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else if (error()) {
+    <p class="text-danger">{{ error() }}</p>
+  } @else {
+    <div class="table-scroll">
+      <table class="tabla table-cards">
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Tipo</th>
+            <th>Registrado</th>
+            <th>Estado</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (u of usuariosFiltrados(); track u.id) {
+            <tr>
+              <td data-label="Usuario" class="tabla__largo">{{ u.usuarioLogin }}</td>
+              <td data-label="Nombre">{{ u.nombre }} {{ u.apellido }}</td>
+              <td data-label="Email" class="tabla__largo">{{ u.email }}</td>
+              <td data-label="Tipo">{{ u.tipo }}</td>
+              <td data-label="Registrado">{{ u.fechaRegistro | date: 'dd/MM/yyyy' }}</td>
+              <td data-label="Estado">{{ u.activo ? 'Activo' : 'Inactivo' }}</td>
+              <td class="tabla__acciones">
+                <a [routerLink]="['/admin/usuarios', u.id, 'editar']" class="btn">Editar</a>
+                <button type="button" class="btn" (click)="toggleActivo(u)" [disabled]="cambiandoEstado() === u.id">
+                  {{ u.activo ? 'Desactivar' : 'Activar' }}
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
