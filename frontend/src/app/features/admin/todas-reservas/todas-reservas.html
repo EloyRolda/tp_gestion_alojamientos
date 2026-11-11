@@ -1,7 +1,7 @@
 <section class="stack">
   <h1>Todas las reservas</h1>
 
-  <div class="field">
+  <div class="field field--compacto">
     <label for="filtro">Filtrar por estado</label>
     <select id="filtro" [ngModel]="filtro()" (ngModelChange)="filtro.set($event)" name="filtro">
       @for (e of estados; track e) {

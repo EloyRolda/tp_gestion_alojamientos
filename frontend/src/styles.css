@@ -445,6 +445,14 @@ textarea {
   resize: vertical;
 }
 
+/* Filtros de un listado (un select suelto): a todo el ancho en mobile, sin
+   estirarse de punta a punta en pantallas grandes. */
+@media (min-width: 768px) {
+  .field--compacto {
+    max-width: 320px;
+  }
+}
+
 /* Checkboxes y radios: el label completo es el area tactil. */
 label:has(> input[type='checkbox']),
 label:has(> input[type='radio']) {

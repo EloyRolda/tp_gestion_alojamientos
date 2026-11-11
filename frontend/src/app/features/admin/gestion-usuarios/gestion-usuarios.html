@@ -4,7 +4,7 @@
     <a routerLink="/admin/usuarios/nuevo-admin" class="btn">Crear administrador</a>
   </div>
 
-  <div class="field">
+  <div class="field field--compacto">
     <label for="filtro">Filtrar por tipo</label>
     <select id="filtro" [ngModel]="filtro()" (ngModelChange)="filtro.set($event)" name="filtro">
       @for (t of tipos; track t) {
