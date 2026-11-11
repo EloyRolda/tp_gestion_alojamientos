@@ -9,11 +9,11 @@
       [attr.aria-expanded]="menuAbierto()"
       aria-controls="navbar-menu"
     >
-      <span class="visually-hidden">Abrir menu</span>
-      <span aria-hidden="true">&#9776;</span>
+      <span class="visually-hidden">{{ menuAbierto() ? 'Cerrar menu' : 'Abrir menu' }}</span>
+      <span aria-hidden="true">{{ menuAbierto() ? '✕' : '☰' }}</span>
     </button>
 
-    <nav id="navbar-menu" class="navbar__menu" [class.navbar__menu--abierto]="menuAbierto()">
+    <nav id="navbar-menu" class="navbar__menu" aria-label="Navegacion principal" [class.navbar__menu--abierto]="menuAbierto()">
       <a routerLink="/" routerLinkActive="navbar__link--activo" [routerLinkActiveOptions]="{ exact: true }" (click)="cerrarMenu()">Inicio</a>
       <a routerLink="/buscar" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Buscar</a>
 
@@ -25,9 +25,25 @@
           <a routerLink="/mis-reservas" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Mis reservas</a>
           <a routerLink="/mis-gastos" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Mis gastos</a>
         }
+        @if (rol() === 'ANFITRION' || rol() === 'ADMIN') {
+          <a routerLink="/anfitrion/alojamientos" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Mis alojamientos</a>
+          <a routerLink="/anfitrion/reservas" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Reservas recibidas</a>
+          <a routerLink="/anfitrion/cobros-pendientes" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Cobros pendientes</a>
+          <a routerLink="/anfitrion/resumen" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Resumen</a>
+        }
+        @if (rol() === 'ADMIN') {
+          <a routerLink="/admin/usuarios" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Usuarios</a>
+          <a routerLink="/admin/catalogo-tipos" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Catalogo de tipos</a>
+          <a routerLink="/admin/catalogo-servicios" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Catalogo de servicios</a>
+          <a routerLink="/admin/reservas" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Todas las reservas</a>
+          <a routerLink="/admin/flujo-dinero" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Flujo de dinero</a>
+          <a routerLink="/admin/estadisticas" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Estadisticas</a>
+        }
         <a routerLink="/perfil" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Mi perfil</a>
-        <span class="navbar__saludo">Hola, {{ usuario()?.nombre ?? '...' }}</span>
-        <button type="button" class="btn" (click)="cerrarSesion()">Cerrar sesion</button>
+        <div class="navbar__sesion">
+          <span class="navbar__saludo">Hola, {{ usuario()?.nombre ?? '...' }}</span>
+          <button type="button" class="btn" (click)="cerrarSesion()">Cerrar sesion</button>
+        </div>
       }
     </nav>
   </div>
