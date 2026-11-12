@@ -27,14 +27,21 @@ public class AlojamientoResponseDTO {
     private UsuarioResumenDTO anfitrion;
     private DireccionResponseDTO direccion;
     private TipoAlojamientoResponseDTO tipoAlojamiento;
+    /// URL de la primera foto de la galeria, o null si todavia no tiene fotos.
+    private String imagenPrincipal;
 
     public static AlojamientoResponseDTO desde(Alojamiento a) {
+        return desde(a, null);
+    }
+
+    public static AlojamientoResponseDTO desde(Alojamiento a, String imagenPrincipal) {
         return new AlojamientoResponseDTO(
                 a.getIdAlojamiento(), a.getTitulo(), a.getDescripcion(), a.getPrecioNoche(),
                 a.getCapacidad(), a.getCantAmbientes(), a.getCantHabitaciones(), a.getCantBanios(),
                 a.getActivo(),
                 UsuarioResumenDTO.desde(a.getAnfitrion()),
                 DireccionResponseDTO.desde(a.getDireccion()),
-                TipoAlojamientoResponseDTO.desde(a.getTipoAlojamiento()));
+                TipoAlojamientoResponseDTO.desde(a.getTipoAlojamiento()),
+                imagenPrincipal);
     }
 }

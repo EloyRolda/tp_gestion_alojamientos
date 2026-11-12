@@ -11,12 +11,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collection;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class GaleriaService {
 
     private final GaleriaRepository galeriaRepository;
     private final ImagenService imagenService;
+
+    /// Foto principal (primera imagen de la galeria) de cada alojamiento, en una sola consulta.
+    public Map<Long, String> imagenPrincipalPorAlojamiento(Collection<Long> idsAlojamiento) {
+        return imagenService.primeraUrlPorAlojamiento(idsAlojamiento);
+    }
 
     /// Retorna la galeria asociada a un alojamiento (regla de app: una por alojamiento).
     public Galeria obtenerPorAlojamientoId(Long idAlojamiento) {

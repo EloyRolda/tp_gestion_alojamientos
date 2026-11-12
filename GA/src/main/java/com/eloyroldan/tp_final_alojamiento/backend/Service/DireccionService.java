@@ -48,7 +48,28 @@ public class DireccionService {
         direccion.setCalle(dto.getCalle().toLowerCase());
         direccion.setCodigoPostal(dto.getCodigoPostal());
         direccion.setAltura(dto.getAltura());
+        validarCoordenadas(dto.getLatitud(), dto.getLongitud());
+        direccion.setLatitud(dto.getLatitud());
+        direccion.setLongitud(dto.getLongitud());
         return direccionRepository.save(direccion);
+    }
+
+    @Transactional
+    /// Mueve el punto en el mapa de una direccion existente. Si la direccion es
+    /// compartida (mismo predio), el punto nuevo vale para todos sus alojamientos.
+    public Direccion actualizarCoordenadas(Long idDireccion, Double latitud, Double longitud) {
+        validarCoordenadas(latitud, longitud);
+        Direccion direccion = obtenerPorId(idDireccion);
+        direccion.setLatitud(latitud);
+        direccion.setLongitud(longitud);
+        return direccionRepository.save(direccion);
+    }
+
+    /// Latitud y longitud van siempre juntas: una sola no ubica nada en el mapa.
+    private void validarCoordenadas(Double latitud, Double longitud) {
+        if ((latitud == null) != (longitud == null)) {
+            throw new ParametroInvalidoException("La ubicacion en el mapa necesita latitud y longitud juntas.");
+        }
     }
 
     @Transactional

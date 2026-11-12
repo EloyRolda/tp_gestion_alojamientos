@@ -11,7 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -28,6 +31,19 @@ public class ImagenService {
     @Transactional
     public List<ImagenResponseDTO> listarDTOPorGaleria(Long idGaleria) {
         return listarPorGaleria(idGaleria).stream().map(ImagenResponseDTO::desde).toList();
+    }
+
+    /// Devuelve, por id de alojamiento, la URL de la primera imagen de su galeria.
+    /// Los alojamientos sin imagenes no aparecen en el mapa resultante.
+    public Map<Long, String> primeraUrlPorAlojamiento(Collection<Long> idsAlojamiento) {
+        Map<Long, String> urls = new HashMap<>();
+        if (idsAlojamiento == null || idsAlojamiento.isEmpty()) {
+            return urls;
+        }
+        for (Object[] fila : imagenRepository.findPrimeraUrlPorAlojamiento(idsAlojamiento)) {
+            urls.put((Long) fila[0], (String) fila[1]);
+        }
+        return urls;
     }
 
     public Imagen obtenerPorId(Long id) {

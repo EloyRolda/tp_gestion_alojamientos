@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /// AlojamientoService es el "hub": lo llaman DireccionService, TipoAlojamientoService
 /// y ReservaService para validaciones cruzadas. Para evitar dependencia circular en la
@@ -44,17 +45,29 @@ public class AlojamientoService {
     public List<AlojamientoResponseDTO> listarTodosDTO() {
         // JOIN FETCH: evita 1+3N consultas (N = cantidad de alojamientos) por las
         // relaciones LAZY que necesita AlojamientoResponseDTO.desde().
-        return alojamientoRepository.findActivosConDetalle().stream().map(AlojamientoResponseDTO::desde).toList();
+        return conImagenPrincipal(alojamientoRepository.findActivosConDetalle());
     }
 
     @Transactional
     public List<AlojamientoResponseDTO> listarPorAnfitrionDTO(Long idAnfitrion) {
-        return alojamientoRepository.findByAnfitrionIdConDetalle(idAnfitrion).stream().map(AlojamientoResponseDTO::desde).toList();
+        return conImagenPrincipal(alojamientoRepository.findByAnfitrionIdConDetalle(idAnfitrion));
     }
 
     @Transactional
     public AlojamientoResponseDTO obtenerDTOPorId(Long id) {
-        return AlojamientoResponseDTO.desde(obtenerPorId(id));
+        Alojamiento alojamiento = obtenerPorId(id);
+        String imagen = galeriaService.imagenPrincipalPorAlojamiento(List.of(id)).get(id);
+        return AlojamientoResponseDTO.desde(alojamiento, imagen);
+    }
+
+    /// Arma los DTOs del listado con la foto principal de cada alojamiento, resuelta en
+    /// una sola consulta agrupada (no una por fila).
+    private List<AlojamientoResponseDTO> conImagenPrincipal(List<Alojamiento> alojamientos) {
+        Map<Long, String> imagenes = galeriaService.imagenPrincipalPorAlojamiento(
+                alojamientos.stream().map(Alojamiento::getIdAlojamiento).toList());
+        return alojamientos.stream()
+                .map(a -> AlojamientoResponseDTO.desde(a, imagenes.get(a.getIdAlojamiento())))
+                .toList();
     }
 
     @Transactional
@@ -203,6 +216,10 @@ public class AlojamientoService {
         }
         if (dto.getIdDireccion() != null) {
             alojamiento.setDireccion(direccionService.obtenerPorId(dto.getIdDireccion()));
+        }
+        if (dto.getLatitud() != null || dto.getLongitud() != null) {
+            alojamiento.setDireccion(direccionService.actualizarCoordenadas(
+                    alojamiento.getDireccion().getIdDireccion(), dto.getLatitud(), dto.getLongitud()));
         }
 
         return alojamientoRepository.save(alojamiento);

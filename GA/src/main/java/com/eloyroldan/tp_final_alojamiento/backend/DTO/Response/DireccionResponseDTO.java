@@ -19,10 +19,12 @@ public class DireccionResponseDTO {
     private String ciudad;
     private String calle;
     private Integer altura;
+    private Double latitud;
+    private Double longitud;
 
     public static DireccionResponseDTO desde(Direccion d) {
         return new DireccionResponseDTO(
                 d.getIdDireccion(), d.getPais(), d.getProvincia(), d.getCodigoPostal(),
-                d.getCiudad(), d.getCalle(), d.getAltura());
+                d.getCiudad(), d.getCalle(), d.getAltura(), d.getLatitud(), d.getLongitud());
     }
 }
