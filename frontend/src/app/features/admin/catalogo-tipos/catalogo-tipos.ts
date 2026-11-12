@@ -3,6 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { CatalogoService } from '../../../core/services/catalogo.service';
 import { TipoAlojamiento } from '../../../core/models/tipo-alojamiento.model';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
+import { AvisoService } from '../../../core/services/aviso.service';
 
 /// SCRUM-43 / RF09. Catalogo de tipos de alojamiento: alta, edicion (renombrar
 /// en el lugar), fusionar duplicados (ReemplazoCatalogoDTO: todo lo que usaba
@@ -10,12 +12,13 @@ import { extraerMensajeError } from '../../../core/utils/http-error.util';
 @Component({
   selector: 'app-catalogo-tipos',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, Esqueleto],
   templateUrl: './catalogo-tipos.html',
   styleUrl: './catalogo-tipos.css',
 })
 export class CatalogoTipos {
   private readonly catalogoService = inject(CatalogoService);
+  private readonly aviso = inject(AvisoService);
 
   readonly tipos = signal<TipoAlojamiento[]>([]);
   readonly cargando = signal(true);
@@ -46,6 +49,7 @@ export class CatalogoTipos {
       next: () => {
         this.creando.set(false);
         this.nombreNuevo.set('');
+        this.aviso.mostrar('Tipo creado');
         this.cargar();
       },
       error: (err) => {
@@ -74,6 +78,7 @@ export class CatalogoTipos {
       next: () => {
         this.guardandoEdicion.set(false);
         this.idEnEdicion.set(null);
+        this.aviso.mostrar('Cambios guardados');
         this.cargar();
       },
       error: (err) => {
@@ -95,6 +100,7 @@ export class CatalogoTipos {
         this.fusionando.set(false);
         this.idOrigen.set(null);
         this.idDestino.set(null);
+        this.aviso.mostrar('Duplicados fusionados');
         this.cargar();
       },
       error: (err) => {
@@ -107,7 +113,10 @@ export class CatalogoTipos {
   eliminar(id: number): void {
     this.error.set(null);
     this.catalogoService.eliminarTipo(id).subscribe({
-      next: () => this.cargar(),
+      next: () => {
+        this.aviso.mostrar('Tipo eliminado');
+        this.cargar();
+      },
       error: (err) => this.error.set(extraerMensajeError(err)),
     });
   }

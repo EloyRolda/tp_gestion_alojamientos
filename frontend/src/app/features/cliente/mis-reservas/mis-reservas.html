@@ -2,11 +2,13 @@
   <h1>Mis reservas</h1>
 
   @if (cargando()) {
-    <p>Cargando...</p>
+    <app-esqueleto tipo="tabla" />
   } @else if (error()) {
     <p class="text-danger">{{ error() }}</p>
   } @else if (reservas().length === 0) {
-    <p class="text-muted">Todavia no hiciste ninguna reserva. <a routerLink="/buscar">Buscar alojamientos</a></p>
+    <app-vacio titulo="Todavía no tenés reservas" texto="Cuando reserves un alojamiento, lo vas a ver acá con su estado y su pago.">
+      <a routerLink="/buscar" class="btn btn--primario">Buscar alojamientos</a>
+    </app-vacio>
   } @else {
     <div class="table-scroll">
       <table class="tabla table-cards">

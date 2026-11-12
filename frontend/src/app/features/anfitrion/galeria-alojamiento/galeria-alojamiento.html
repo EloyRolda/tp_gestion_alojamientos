@@ -3,7 +3,7 @@
   <a routerLink="/anfitrion/alojamientos" class="link-volver">&larr; Volver a mis alojamientos</a>
 
   @if (cargando()) {
-    <p>Cargando...</p>
+    <app-esqueleto tipo="tarjetas" [cantidad]="3" />
   } @else {
     @if (error()) {
       <p class="text-danger">{{ error() }}</p>

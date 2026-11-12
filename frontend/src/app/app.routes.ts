@@ -15,13 +15,6 @@ import { MisReservas } from './features/cliente/mis-reservas/mis-reservas';
 import { DetalleReserva } from './features/cliente/detalle-reserva/detalle-reserva';
 import { PagoResultado } from './features/cliente/pago-resultado/pago-resultado';
 import { ResumenGastos } from './features/cliente/resumen-gastos/resumen-gastos';
-import { MisAlojamientos } from './features/anfitrion/mis-alojamientos/mis-alojamientos';
-import { AlojamientoForm } from './features/anfitrion/alojamiento-form/alojamiento-form';
-import { GaleriaAlojamiento } from './features/anfitrion/galeria-alojamiento/galeria-alojamiento';
-import { ReservasAnfitrion } from './features/anfitrion/reservas-anfitrion/reservas-anfitrion';
-import { DetalleReservaAnfitrion } from './features/anfitrion/detalle-reserva-anfitrion/detalle-reserva-anfitrion';
-import { CobrosPendientes } from './features/anfitrion/cobros-pendientes/cobros-pendientes';
-import { ResumenAlojamientos } from './features/anfitrion/resumen-alojamientos/resumen-alojamientos';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -46,14 +39,47 @@ export const routes: Routes = [
   { path: 'mis-reservas/:id', component: DetalleReserva, canActivate: [authGuard] },
   { path: 'pago-resultado', component: PagoResultado, canActivate: [authGuard] },
   { path: 'mis-gastos', component: ResumenGastos, canActivate: [roleGuard(['CLIENTE', 'ADMIN'])] },
-  { path: 'anfitrion/alojamientos', component: MisAlojamientos, canActivate: [roleGuard(['ANFITRION', 'ADMIN'])] },
-  { path: 'anfitrion/alojamientos/nuevo', component: AlojamientoForm, canActivate: [roleGuard(['ANFITRION', 'ADMIN'])] },
-  { path: 'anfitrion/alojamientos/:id/editar', component: AlojamientoForm, canActivate: [roleGuard(['ANFITRION', 'ADMIN'])] },
-  { path: 'anfitrion/alojamientos/:id/galeria', component: GaleriaAlojamiento, canActivate: [roleGuard(['ANFITRION', 'ADMIN'])] },
-  { path: 'anfitrion/reservas', component: ReservasAnfitrion, canActivate: [roleGuard(['ANFITRION', 'ADMIN'])] },
-  { path: 'anfitrion/reservas/:id', component: DetalleReservaAnfitrion, canActivate: [roleGuard(['ANFITRION', 'ADMIN'])] },
-  { path: 'anfitrion/cobros-pendientes', component: CobrosPendientes, canActivate: [roleGuard(['ANFITRION', 'ADMIN'])] },
-  { path: 'anfitrion/resumen', component: ResumenAlojamientos, canActivate: [roleGuard(['ANFITRION', 'ADMIN'])] },
+  // Anfitrion: solo lo usan ANFITRION y ADMIN, se descarga recien al entrar.
+  {
+    path: 'anfitrion/alojamientos',
+    loadComponent: () => import('./features/anfitrion/mis-alojamientos/mis-alojamientos').then((m) => m.MisAlojamientos),
+    canActivate: [roleGuard(['ANFITRION', 'ADMIN'])],
+  },
+  {
+    path: 'anfitrion/alojamientos/nuevo',
+    loadComponent: () => import('./features/anfitrion/alojamiento-form/alojamiento-form').then((m) => m.AlojamientoForm),
+    canActivate: [roleGuard(['ANFITRION', 'ADMIN'])],
+  },
+  {
+    path: 'anfitrion/alojamientos/:id/editar',
+    loadComponent: () => import('./features/anfitrion/alojamiento-form/alojamiento-form').then((m) => m.AlojamientoForm),
+    canActivate: [roleGuard(['ANFITRION', 'ADMIN'])],
+  },
+  {
+    path: 'anfitrion/alojamientos/:id/galeria',
+    loadComponent: () => import('./features/anfitrion/galeria-alojamiento/galeria-alojamiento').then((m) => m.GaleriaAlojamiento),
+    canActivate: [roleGuard(['ANFITRION', 'ADMIN'])],
+  },
+  {
+    path: 'anfitrion/reservas',
+    loadComponent: () => import('./features/anfitrion/reservas-anfitrion/reservas-anfitrion').then((m) => m.ReservasAnfitrion),
+    canActivate: [roleGuard(['ANFITRION', 'ADMIN'])],
+  },
+  {
+    path: 'anfitrion/reservas/:id',
+    loadComponent: () => import('./features/anfitrion/detalle-reserva-anfitrion/detalle-reserva-anfitrion').then((m) => m.DetalleReservaAnfitrion),
+    canActivate: [roleGuard(['ANFITRION', 'ADMIN'])],
+  },
+  {
+    path: 'anfitrion/cobros-pendientes',
+    loadComponent: () => import('./features/anfitrion/cobros-pendientes/cobros-pendientes').then((m) => m.CobrosPendientes),
+    canActivate: [roleGuard(['ANFITRION', 'ADMIN'])],
+  },
+  {
+    path: 'anfitrion/resumen',
+    loadComponent: () => import('./features/anfitrion/resumen-alojamientos/resumen-alojamientos').then((m) => m.ResumenAlojamientos),
+    canActivate: [roleGuard(['ANFITRION', 'ADMIN'])],
+  },
   // Administracion: solo la usa el rol ADMIN, se descarga recien al entrar.
   {
     path: 'admin/usuarios',

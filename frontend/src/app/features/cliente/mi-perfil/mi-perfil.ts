@@ -3,6 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { UsuarioService, UsuarioModificar, AliasCobroInfo } from '../../../core/services/usuario.service';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
+import { AvisoService } from '../../../core/services/aviso.service';
 
 interface FormPerfil {
   nombre: string;
@@ -31,12 +33,13 @@ const FORM_VACIO: FormPerfil = {
 @Component({
   selector: 'app-mi-perfil',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, Esqueleto],
   templateUrl: './mi-perfil.html',
   styleUrl: './mi-perfil.css',
 })
 export class MiPerfil {
   private readonly auth = inject(AuthService);
+  private readonly aviso = inject(AvisoService);
   private readonly usuarioService = inject(UsuarioService);
 
   readonly form = signal<FormPerfil>({ ...FORM_VACIO });
@@ -100,6 +103,7 @@ export class MiPerfil {
       next: () => {
         this.guardando.set(false);
         this.exito.set(true);
+        this.aviso.mostrar('Cambios guardados');
         this.actualizarCampo('password', '');
         this.auth.refrescarPerfil().subscribe();
       },
@@ -144,6 +148,7 @@ export class MiPerfil {
       next: () => {
         this.aliasCobroCargando.set(false);
         this.aliasCobroExito.set(true);
+        this.aviso.mostrar('Alias de cobro guardado');
         this.aliasCobroActual.set(this.aliasCobroValor());
         this.aliasCobroPaso.set('ingresar');
         this.aliasCobroValor.set('');

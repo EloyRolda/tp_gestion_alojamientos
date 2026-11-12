@@ -841,6 +841,37 @@ legend {
   }
 }
 
+/* Cada pantalla entra con un fundido corto hacia arriba, y las tarjetas de
+   una grilla aparecen escalonadas (un poco cada una). */
+.app-main > :not(router-outlet) {
+  display: block;
+  animation: vista-entra 0.28s var(--ease) both;
+}
+
+.grid-auto > * {
+  animation: vista-entra 0.35s var(--ease) both;
+}
+
+.grid-auto > :nth-child(2) {
+  animation-delay: 0.04s;
+}
+
+.grid-auto > :nth-child(3) {
+  animation-delay: 0.08s;
+}
+
+.grid-auto > :nth-child(4) {
+  animation-delay: 0.12s;
+}
+
+.grid-auto > :nth-child(5) {
+  animation-delay: 0.16s;
+}
+
+.grid-auto > :nth-child(n + 6) {
+  animation-delay: 0.2s;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

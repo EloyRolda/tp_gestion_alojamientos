@@ -1,5 +1,5 @@
 @if (cargando()) {
-  <p>Cargando alojamiento...</p>
+  <app-esqueleto tipo="detalle" />
 } @else if (error()) {
   <p class="text-danger">{{ error() }}</p>
 } @else if (alojamiento(); as a) {

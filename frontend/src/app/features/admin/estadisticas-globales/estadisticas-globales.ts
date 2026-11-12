@@ -3,13 +3,14 @@ import { DecimalPipe } from '@angular/common';
 import { EstadisticasService } from '../../../core/services/estadisticas.service';
 import { AlojamientoRanking } from '../../../core/models/estadisticas.model';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 
 /// SCRUM-48 / RF36. Rankings globales de alojamientos: por ingresos, por
 /// cantidad de reservas y por rating promedio (ver EstadisticasController.topAlojamientos).
 @Component({
   selector: 'app-estadisticas-globales',
   standalone: true,
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, Esqueleto],
   templateUrl: './estadisticas-globales.html',
   styleUrl: './estadisticas-globales.css',
 })

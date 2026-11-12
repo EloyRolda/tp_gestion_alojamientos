@@ -2,7 +2,7 @@
   <a routerLink="/admin/reservas" class="link-volver">&larr; Volver a todas las reservas</a>
 
   @if (cargando()) {
-    <p>Cargando...</p>
+    <app-esqueleto tipo="detalle" />
   } @else if (error() && !reserva()) {
     <p class="text-danger">{{ error() }}</p>
   } @else if (reserva()) {

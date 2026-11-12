@@ -6,12 +6,14 @@ import { Reserva } from '../../../core/models/reserva.model';
 import { calcularTotal } from '../../../core/utils/reserva.util';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
 import { Estado } from '../../../shared/estado/estado';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
+import { Vacio } from '../../../shared/vacio/vacio';
 
 /// SCRUM-30 / RF26. Listado de las reservas propias del cliente logueado.
 @Component({
   selector: 'app-mis-reservas',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, RouterLink, Estado],
+  imports: [DatePipe, DecimalPipe, RouterLink, Estado, Esqueleto, Vacio],
   templateUrl: './mis-reservas.html',
   styleUrl: './mis-reservas.css',
 })

@@ -1,0 +1,85 @@
+<div class="esqueleto-caja" aria-busy="true">
+  <p class="cargando-texto" role="status">
+    <app-kaza variante="maciza" fondo="var(--color-bg)" />
+    Cargando…
+  </p>
+
+  @switch (tipo()) {
+    @case ('tarjetas') {
+      <div class="grid-auto">
+        @for (i of items(); track i) {
+          <div class="esq-card">
+            <div class="esqueleto esq-media"></div>
+            <div class="esq-cuerpo">
+              <div class="esqueleto esq-linea" style="width: 85%"></div>
+              <div class="esqueleto esq-linea" style="width: 60%"></div>
+              <div class="esqueleto esq-linea" style="width: 40%"></div>
+              <div class="esqueleto esq-linea esq-linea--alta" style="width: 35%"></div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+    @case ('tabla') {
+      <div class="esq-filas">
+        @for (i of items(); track i) {
+          <div class="esq-fila">
+            <div class="esqueleto esq-linea"></div>
+            <div class="esqueleto esq-linea"></div>
+            <div class="esqueleto esq-linea"></div>
+            <div class="esqueleto esq-linea" style="width: 70%"></div>
+          </div>
+        }
+      </div>
+    }
+    @case ('kpis') {
+      <div class="kpi-grid">
+        @for (i of items(); track i) {
+          <div class="esq-kpi">
+            <div class="esqueleto esq-linea" style="width: 60%"></div>
+            <div class="esqueleto esq-linea esq-linea--valor"></div>
+          </div>
+        }
+      </div>
+    }
+    @case ('panel') {
+      <div class="kpi-grid">
+        @for (i of [0, 1, 2]; track i) {
+          <div class="esq-kpi">
+            <div class="esqueleto esq-linea" style="width: 60%"></div>
+            <div class="esqueleto esq-linea esq-linea--valor"></div>
+          </div>
+        }
+      </div>
+      <div class="esq-filas">
+        @for (i of items(); track i) {
+          <div class="esq-fila">
+            <div class="esqueleto esq-linea"></div>
+            <div class="esqueleto esq-linea"></div>
+            <div class="esqueleto esq-linea"></div>
+            <div class="esqueleto esq-linea" style="width: 70%"></div>
+          </div>
+        }
+      </div>
+    }
+    @case ('detalle') {
+      <div class="esq-detalle">
+        <div class="esqueleto esq-titulo"></div>
+        <div class="esqueleto esq-bloque"></div>
+        @for (i of items(); track i) {
+          <div class="esqueleto esq-linea" [style.width.%]="90 - i * 12"></div>
+        }
+      </div>
+    }
+    @case ('formulario') {
+      <div class="esq-formulario">
+        @for (i of items(); track i) {
+          <div class="esq-campo">
+            <div class="esqueleto esq-linea" style="width: 30%"></div>
+            <div class="esqueleto esq-input"></div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

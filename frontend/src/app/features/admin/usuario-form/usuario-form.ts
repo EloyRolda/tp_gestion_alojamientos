@@ -3,6 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { UsuarioService } from '../../../core/services/usuario.service';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
+import { AvisoService } from '../../../core/services/aviso.service';
 
 interface FormUsuario {
   nombre: string;
@@ -21,7 +23,7 @@ interface FormUsuario {
 @Component({
   selector: 'app-usuario-form',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, Esqueleto],
   templateUrl: './usuario-form.html',
   styleUrl: './usuario-form.css',
 })
@@ -29,6 +31,7 @@ export class UsuarioForm {
   readonly id = input.required<string>();
 
   private readonly usuarioService = inject(UsuarioService);
+  private readonly aviso = inject(AvisoService);
 
   readonly form = signal<FormUsuario | null>(null);
   readonly tipo = signal('');
@@ -91,6 +94,7 @@ export class UsuarioForm {
         next: () => {
           this.guardando.set(false);
           this.exito.set(true);
+          this.aviso.mostrar('Cambios guardados');
           this.actualizarCampo('password', '');
         },
         error: (err) => {

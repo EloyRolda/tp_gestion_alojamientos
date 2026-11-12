@@ -1,6 +1,6 @@
 <section class="stack formulario-reserva">
   @if (cargando()) {
-    <p>Cargando...</p>
+    <app-esqueleto tipo="formulario" [cantidad]="3" />
   } @else if (!alojamiento()) {
     <p class="text-danger">{{ error() }}</p>
   } @else {

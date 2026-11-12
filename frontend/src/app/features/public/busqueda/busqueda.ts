@@ -7,6 +7,9 @@ import { Alojamiento } from '../../../core/models/alojamiento.model';
 import { Servicio } from '../../../core/models/servicio.model';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
 import { AlojamientoCard } from '../../../shared/alojamiento-card/alojamiento-card';
+import { MapaAlojamientos } from '../../../shared/mapa-alojamientos/mapa-alojamientos';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
+import { Vacio } from '../../../shared/vacio/vacio';
 
 /// SCRUM-23 / RF14, RF39. El backend no expone query params de filtro
 /// (/Alojamiento/listar siempre devuelve todo), asi que el filtro es
@@ -18,10 +21,13 @@ import { AlojamientoCard } from '../../../shared/alojamiento-card/alojamiento-ca
 /// siempre visible y el resto de los filtros se pliega detras de un boton que
 /// muestra cuantos hay activos; en desktop los filtros son una barra lateral
 /// fija a la izquierda de la grilla de resultados.
+///
+/// Modo mapa (SCRUM-66): el componente del mapa va en un bloque @defer, asi que
+/// Leaflet no pesa en la pagina de quien solo usa la lista.
 @Component({
   selector: 'app-busqueda',
   standalone: true,
-  imports: [FormsModule, AlojamientoCard],
+  imports: [FormsModule, AlojamientoCard, MapaAlojamientos, Esqueleto, Vacio],
   templateUrl: './busqueda.html',
   styleUrl: './busqueda.css',
 })
@@ -44,6 +50,10 @@ export class Busqueda {
   readonly precioMax = signal<number | null>(null);
   readonly capacidadMin = signal<number | null>(null);
   readonly serviciosSeleccionados = signal<Set<number>>(new Set());
+
+  /// Resultados en grilla de tarjetas o en el mapa (SCRUM-66). Los dos usan la
+  /// misma lista filtrada, asi que los filtros aplican igual en ambos.
+  readonly modo = signal<'lista' | 'mapa'>('lista');
 
   /// Solo tiene efecto debajo de 1024px: en desktop el panel siempre se ve.
   readonly filtrosAbiertos = signal(false);

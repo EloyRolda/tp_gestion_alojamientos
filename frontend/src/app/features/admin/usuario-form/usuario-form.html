@@ -2,7 +2,7 @@
   <a routerLink="/admin/usuarios" class="text-muted">&larr; Volver a gestion de usuarios</a>
 
   @if (cargando()) {
-    <p>Cargando...</p>
+    <app-esqueleto tipo="formulario" [cantidad]="4" />
   } @else if (!form()) {
     <p class="text-danger">{{ error() }}</p>
   } @else {

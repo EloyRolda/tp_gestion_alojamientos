@@ -7,6 +7,8 @@ import { EstadoReserva, Reserva } from '../../../core/models/reserva.model';
 import { calcularTotal } from '../../../core/utils/reserva.util';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
 import { Estado } from '../../../shared/estado/estado';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
+import { Vacio } from '../../../shared/vacio/vacio';
 
 type FiltroEstado = EstadoReserva | 'TODAS';
 
@@ -17,7 +19,7 @@ type FiltroEstado = EstadoReserva | 'TODAS';
 @Component({
   selector: 'app-reservas-anfitrion',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, FormsModule, RouterLink, Estado],
+  imports: [DatePipe, DecimalPipe, FormsModule, RouterLink, Estado, Esqueleto, Vacio],
   templateUrl: './reservas-anfitrion.html',
   styleUrl: './reservas-anfitrion.css',
 })

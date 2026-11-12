@@ -14,11 +14,11 @@
   </div>
 
   @if (cargando()) {
-    <p>Cargando alojamientos...</p>
+    <app-esqueleto tipo="tarjetas" [cantidad]="8" />
   } @else if (error()) {
     <p class="text-danger">{{ error() }}</p>
   } @else if (destacados().length === 0) {
-    <p class="text-muted">Todavía no hay alojamientos publicados.</p>
+    <app-vacio titulo="Todavía no hay alojamientos publicados" texto="Volvé pronto: los anfitriones de Mar del Plata están sumando sus casas y departamentos." />
   } @else {
     <div class="grid-auto">
       @for (alojamiento of destacados(); track alojamiento.idAlojamiento) {

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { EstadisticasService } from '../../../core/services/estadisticas.service';
 import { CancelacionPorMotivo, FlujoDinero, IngresoMensual } from '../../../core/models/estadisticas.model';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 
 const MESES = [
   'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic',
@@ -16,7 +17,7 @@ const MESES = [
 @Component({
   selector: 'app-flujo-dinero',
   standalone: true,
-  imports: [DecimalPipe, FormsModule],
+  imports: [DecimalPipe, FormsModule, Esqueleto],
   templateUrl: './flujo-dinero.html',
   styleUrl: './flujo-dinero.css',
 })

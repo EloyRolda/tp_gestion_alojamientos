@@ -2,7 +2,7 @@
   <h1>{{ esEdicion() ? 'Editar alojamiento' : 'Publicar alojamiento' }}</h1>
 
   @if (cargando()) {
-    <p>Cargando...</p>
+    <app-esqueleto tipo="formulario" />
   } @else {
     <form class="stack" (submit)="$event.preventDefault(); guardar()">
       <div class="field">
@@ -79,6 +79,21 @@
         </fieldset>
 
         <fieldset class="field">
+          <legend>Ubicación en el mapa</legend>
+          @defer (on viewport) {
+            <app-selector-ubicacion
+              [(punto)]="ubicacion"
+              [direccionTexto]="direccionTexto()"
+              [permiteQuitar]="!teniaUbicacion()"
+            />
+          } @placeholder {
+            <div class="alojamiento-form__mapa-espera">Cargando mapa…</div>
+          } @error {
+            <p class="text-danger">No se pudo cargar el mapa. Podés publicar igual y marcar la ubicación después.</p>
+          }
+        </fieldset>
+
+        <fieldset class="field">
           <legend>Servicios / comodidades</legend>
           <div class="stack stack--tight">
             <div class="alojamiento-form__servicios">
@@ -99,6 +114,21 @@
         <fieldset class="field">
           <legend>Direccion (no editable)</legend>
           <p class="text-muted">{{ direccion().calle }} {{ direccion().altura }}, {{ direccion().ciudad }}, {{ direccion().provincia }}, {{ direccion().pais }} ({{ direccion().codigoPostal }})</p>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend>Ubicación en el mapa</legend>
+          @defer (on viewport) {
+            <app-selector-ubicacion
+              [(punto)]="ubicacion"
+              [direccionTexto]="direccionTexto()"
+              [permiteQuitar]="!teniaUbicacion()"
+            />
+          } @placeholder {
+            <div class="alojamiento-form__mapa-espera">Cargando mapa…</div>
+          } @error {
+            <p class="text-danger">No se pudo cargar el mapa. Podés publicar igual y marcar la ubicación después.</p>
+          }
         </fieldset>
 
         <fieldset class="field">

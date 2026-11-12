@@ -5,6 +5,8 @@ import { Alojamiento } from '../../../core/models/alojamiento.model';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
 import { AlojamientoCard } from '../../../shared/alojamiento-card/alojamiento-card';
 import { Kaza } from '../../../shared/kaza/kaza';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
+import { Vacio } from '../../../shared/vacio/vacio';
 
 const CANTIDAD_DESTACADOS = 8;
 
@@ -13,7 +15,7 @@ const CANTIDAD_DESTACADOS = 8;
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, AlojamientoCard, Kaza],
+  imports: [RouterLink, AlojamientoCard, Kaza, Esqueleto, Vacio],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })

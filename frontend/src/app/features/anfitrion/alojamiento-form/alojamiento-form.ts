@@ -8,6 +8,10 @@ import { DireccionInput } from '../../../core/models/direccion.model';
 import { TipoAlojamiento } from '../../../core/models/tipo-alojamiento.model';
 import { Servicio, ServicioxAlojamiento } from '../../../core/models/servicio.model';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import type { Punto } from '../../../shared/selector-ubicacion/selector-ubicacion';
+import { SelectorUbicacion } from '../../../shared/selector-ubicacion/selector-ubicacion';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
+import { AvisoService } from '../../../core/services/aviso.service';
 
 interface FormAlojamiento {
   titulo: string;
@@ -48,10 +52,14 @@ const DIRECCION_VACIA: DireccionInput = {
 /// existente, caso de uso que no se ofrece aca) -- en edicion se muestra de solo lectura.
 /// Los servicios en alta se mandan embebidos en el alta; en edicion se agregan/quitan
 /// al toque contra los endpoints dedicados (la reserva ya existe, no hay "guardar" previo).
+///
+/// Ubicacion en el mapa (SCRUM-67): opcional. En alta viaja dentro de la
+/// direccion; en edicion se puede mover el punto (no la calle) y viaja como
+/// latitud/longitud del alojamiento. El mapa se carga con @defer.
 @Component({
   selector: 'app-alojamiento-form',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, SelectorUbicacion, Esqueleto],
   templateUrl: './alojamiento-form.html',
   styleUrl: './alojamiento-form.css',
 })
@@ -59,6 +67,7 @@ export class AlojamientoForm {
   readonly id = input<string>();
 
   private readonly alojamientoService = inject(AlojamientoService);
+  private readonly aviso = inject(AvisoService);
   private readonly catalogoService = inject(CatalogoService);
   private readonly router = inject(Router);
 
@@ -66,6 +75,16 @@ export class AlojamientoForm {
 
   readonly form = signal<FormAlojamiento>({ ...FORM_VACIO });
   readonly direccion = signal<DireccionInput>({ ...DIRECCION_VACIA });
+  readonly ubicacion = signal<Punto | null>(null);
+  /// En edicion: si el alojamiento ya tenia punto, el backend solo permite moverlo.
+  readonly teniaUbicacion = signal(false);
+
+  /// Texto que usa "Buscar en el mapa": calle, altura, ciudad y provincia.
+  readonly direccionTexto = computed(() => {
+    const d = this.direccion();
+    if (!d.calle?.trim() || !d.ciudad?.trim()) return '';
+    return [`${d.calle} ${d.altura || ''}`.trim(), d.ciudad, d.provincia, d.pais].filter((x) => x && String(x).trim()).join(', ');
+  });
   readonly cargando = signal(true);
   readonly enviando = signal(false);
   readonly error = signal<string | null>(null);
@@ -137,10 +156,13 @@ export class AlojamientoForm {
         cantHabitaciones: f.cantHabitaciones ?? undefined,
         cantBanios: f.cantBanios ?? undefined,
         nombreTipoAlojamiento: f.nombreTipoAlojamiento,
+        latitud: this.ubicacion()?.latitud,
+        longitud: this.ubicacion()?.longitud,
       };
       this.alojamientoService.actualizar(dto).subscribe({
         next: (a) => {
           this.enviando.set(false);
+          this.aviso.mostrar('Cambios guardados');
           this.router.navigate(['/anfitrion/alojamientos', a.idAlojamiento, 'editar']);
         },
         error: (err) => {
@@ -160,11 +182,16 @@ export class AlojamientoForm {
         cantBanios: f.cantBanios!,
         nombreTipoAlojamiento: f.nombreTipoAlojamiento,
         nombresServicios: [...this.serviciosElegidos()],
-        direccion: this.direccion(),
+        direccion: {
+          ...this.direccion(),
+          latitud: this.ubicacion()?.latitud ?? null,
+          longitud: this.ubicacion()?.longitud ?? null,
+        },
       };
       this.alojamientoService.registrar(dto).subscribe({
         next: (a) => {
           this.enviando.set(false);
+          this.aviso.mostrar('Alojamiento publicado. Ahora sumale fotos.');
           this.router.navigate(['/anfitrion/alojamientos', a.idAlojamiento, 'galeria']);
         },
         error: (err) => {
@@ -218,6 +245,9 @@ export class AlojamientoForm {
           nombreTipoAlojamiento: a.tipoAlojamiento.nombreTipo,
         });
         this.direccion.set(a.direccion);
+        const tiene = a.direccion.latitud != null && a.direccion.longitud != null;
+        this.teniaUbicacion.set(tiene);
+        this.ubicacion.set(tiene ? { latitud: a.direccion.latitud!, longitud: a.direccion.longitud! } : null);
         this.cargando.set(false);
         this.recargarServiciosAsignados(idAlojamiento);
       },

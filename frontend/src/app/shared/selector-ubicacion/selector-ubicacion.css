@@ -1,0 +1,72 @@
+/* Selector de ubicacion del formulario de alojamiento (SCRUM-67). Estilos
+   globales a proposito: el pin lo crea Leaflet fuera de la plantilla. */
+
+.ubicacion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ubicacion__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.ubicacion__acciones > .btn {
+  flex: 1 1 160px;
+}
+
+.ubicacion__mensaje {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-azul-suave);
+  color: #1f4f7a;
+  font-size: 0.95rem;
+}
+
+.ubicacion__mapa {
+  position: relative;
+  height: clamp(260px, 45vh, 380px);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: #dce6ee;
+}
+
+.ubicacion__lienzo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  cursor: crosshair;
+  font-family: var(--font);
+}
+
+.ubicacion__coordenadas {
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Pin: gota tomate con borde blanco, apoyada en el punto exacto. */
+.pin-ubicacion {
+  background: transparent;
+  border: 0;
+}
+
+.pin-ubicacion span {
+  display: block;
+  width: 28px;
+  height: 28px;
+  border: 3px solid #ffffff;
+  border-radius: 50% 50% 50% 0;
+  background: var(--color-tomate-fuerte);
+  box-shadow: 0 3px 8px rgba(8, 7, 8, 0.35);
+  transform: rotate(-45deg);
+  cursor: grab;
+}
+
+.leaflet-touch .ubicacion .leaflet-bar a {
+  width: var(--tap-size);
+  height: var(--tap-size);
+  line-height: var(--tap-size);
+}

@@ -3,18 +3,21 @@ import { FormsModule } from '@angular/forms';
 import { CatalogoService } from '../../../core/services/catalogo.service';
 import { Servicio } from '../../../core/models/servicio.model';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
+import { AvisoService } from '../../../core/services/aviso.service';
 
 /// SCRUM-44 / RF10. Mismo criterio que SCRUM-43 (catalogo de tipos) pero para
 /// el catalogo de servicios/comodidades: alta, edicion, fusionar duplicados y eliminar.
 @Component({
   selector: 'app-catalogo-servicios',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, Esqueleto],
   templateUrl: './catalogo-servicios.html',
   styleUrl: './catalogo-servicios.css',
 })
 export class CatalogoServicios {
   private readonly catalogoService = inject(CatalogoService);
+  private readonly aviso = inject(AvisoService);
 
   readonly servicios = signal<Servicio[]>([]);
   readonly cargando = signal(true);
@@ -45,6 +48,7 @@ export class CatalogoServicios {
       next: () => {
         this.creando.set(false);
         this.nombreNuevo.set('');
+        this.aviso.mostrar('Servicio creado');
         this.cargar();
       },
       error: (err) => {
@@ -73,6 +77,7 @@ export class CatalogoServicios {
       next: () => {
         this.guardandoEdicion.set(false);
         this.idEnEdicion.set(null);
+        this.aviso.mostrar('Cambios guardados');
         this.cargar();
       },
       error: (err) => {
@@ -94,6 +99,7 @@ export class CatalogoServicios {
         this.fusionando.set(false);
         this.idOrigen.set(null);
         this.idDestino.set(null);
+        this.aviso.mostrar('Duplicados fusionados');
         this.cargar();
       },
       error: (err) => {
@@ -106,7 +112,10 @@ export class CatalogoServicios {
   eliminar(id: number): void {
     this.error.set(null);
     this.catalogoService.eliminarServicio(id).subscribe({
-      next: () => this.cargar(),
+      next: () => {
+        this.aviso.mostrar('Servicio eliminado');
+        this.cargar();
+      },
       error: (err) => this.error.set(extraerMensajeError(err)),
     });
   }

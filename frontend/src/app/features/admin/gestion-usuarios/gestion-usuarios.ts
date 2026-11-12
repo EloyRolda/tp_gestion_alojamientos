@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { UsuarioService } from '../../../core/services/usuario.service';
 import { TipoUsuario, Usuario } from '../../../core/models/usuario.model';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 
 type FiltroTipo = TipoUsuario | 'TODOS';
 
@@ -15,7 +16,7 @@ type FiltroTipo = TipoUsuario | 'TODOS';
 @Component({
   selector: 'app-gestion-usuarios',
   standalone: true,
-  imports: [DatePipe, FormsModule, RouterLink],
+  imports: [DatePipe, FormsModule, RouterLink, Esqueleto],
   templateUrl: './gestion-usuarios.html',
   styleUrl: './gestion-usuarios.css',
 })

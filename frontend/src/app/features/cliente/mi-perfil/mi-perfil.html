@@ -2,7 +2,7 @@
   <h1>Mi perfil</h1>
 
   @if (cargando()) {
-    <p>Cargando...</p>
+    <app-esqueleto tipo="formulario" [cantidad]="4" />
   } @else {
     <form class="stack" (submit)="$event.preventDefault(); guardar()">
       <div class="form-grid">

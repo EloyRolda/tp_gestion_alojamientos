@@ -3,11 +3,11 @@
   <p class="text-muted">Reservas ya pagadas por el cliente que todavia no se liquidaron (se liquidan al finalizar la estadia).</p>
 
   @if (cargando()) {
-    <p>Cargando...</p>
+    <app-esqueleto tipo="panel" [cantidad]="3" />
   } @else if (error()) {
     <p class="text-danger">{{ error() }}</p>
   } @else if (cobros().length === 0) {
-    <p class="text-muted">No tenes cobros pendientes.</p>
+    <app-vacio titulo="No tenés cobros pendientes" texto="Acá vas a ver lo que AlojaME todavía tiene que transferirte por tus estadías." />
   } @else {
     <div class="kpi-grid">
       <div class="kpi">

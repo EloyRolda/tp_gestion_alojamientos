@@ -3,12 +3,13 @@ import { DecimalPipe } from '@angular/common';
 import { EstadisticasService } from '../../../core/services/estadisticas.service';
 import { ResumenCliente } from '../../../core/models/estadisticas.model';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 
 /// SCRUM-34 / RF38. Resumen de gastos del cliente logueado.
 @Component({
   selector: 'app-resumen-gastos',
   standalone: true,
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, Esqueleto],
   templateUrl: './resumen-gastos.html',
   styleUrl: './resumen-gastos.css',
 })

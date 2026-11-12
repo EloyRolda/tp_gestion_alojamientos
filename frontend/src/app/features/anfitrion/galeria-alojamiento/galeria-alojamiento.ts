@@ -5,6 +5,8 @@ import { GaleriaService } from '../../../core/services/galeria.service';
 import { AlojamientoService } from '../../../core/services/alojamiento.service';
 import { Imagen } from '../../../core/models/galeria.model';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
+import { AvisoService } from '../../../core/services/aviso.service';
 
 const MAXIMO_IMAGENES = 10;
 
@@ -15,7 +17,7 @@ const MAXIMO_IMAGENES = 10;
 @Component({
   selector: 'app-galeria-alojamiento',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, Esqueleto],
   templateUrl: './galeria-alojamiento.html',
   styleUrl: './galeria-alojamiento.css',
 })
@@ -23,6 +25,7 @@ export class GaleriaAlojamiento {
   readonly id = input.required<string>();
 
   private readonly galeriaService = inject(GaleriaService);
+  private readonly aviso = inject(AvisoService);
   private readonly alojamientoService = inject(AlojamientoService);
 
   readonly tituloAlojamiento = signal('');
@@ -62,6 +65,7 @@ export class GaleriaAlojamiento {
         this.subiendo.set(false);
         this.archivoElegido.set(null);
         this.alt.set('');
+        this.aviso.mostrar('Foto subida');
         this.recargarImagenes(idGaleria);
       },
       error: (err) => {
@@ -73,7 +77,10 @@ export class GaleriaAlojamiento {
 
   eliminar(imagen: Imagen): void {
     this.galeriaService.eliminarImagen(imagen.id).subscribe({
-      next: () => this.recargarImagenes(imagen.idGaleria),
+      next: () => {
+        this.aviso.mostrar('Foto eliminada');
+        this.recargarImagenes(imagen.idGaleria);
+      },
       error: (err) => this.error.set(extraerMensajeError(err)),
     });
   }

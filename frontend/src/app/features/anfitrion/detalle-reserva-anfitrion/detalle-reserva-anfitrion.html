@@ -2,7 +2,7 @@
   <a routerLink="/anfitrion/reservas" class="link-volver">&larr; Volver a reservas recibidas</a>
 
   @if (cargando()) {
-    <p>Cargando...</p>
+    <app-esqueleto tipo="detalle" />
   } @else if (error() && !reserva()) {
     <p class="text-danger">{{ error() }}</p>
   } @else if (reserva()) {

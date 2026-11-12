@@ -6,6 +6,8 @@ import { Reserva } from '../../../core/models/reserva.model';
 import { calcularNoches, calcularTotal } from '../../../core/utils/reserva.util';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
 import { Estado } from '../../../shared/estado/estado';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
+import { AvisoService } from '../../../core/services/aviso.service';
 
 /// SCRUM-39 / RF20, RF23, RF25. Detalle de una reserva propia desde el lado
 /// del anfitrion: confirmar (SOLICITADA -> CONFIRMADA, dispara la preferencia
@@ -15,7 +17,7 @@ import { Estado } from '../../../shared/estado/estado';
 @Component({
   selector: 'app-detalle-reserva-anfitrion',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, RouterLink, Estado],
+  imports: [DatePipe, DecimalPipe, RouterLink, Estado, Esqueleto],
   templateUrl: './detalle-reserva-anfitrion.html',
   styleUrl: './detalle-reserva-anfitrion.css',
 })
@@ -23,6 +25,7 @@ export class DetalleReservaAnfitrion {
   readonly id = input.required<string>();
 
   private readonly reservaService = inject(ReservaService);
+  private readonly aviso = inject(AvisoService);
 
   readonly reserva = signal<Reserva | null>(null);
   readonly cargando = signal(true);
@@ -58,18 +61,18 @@ export class DetalleReservaAnfitrion {
   }
 
   confirmar(): void {
-    this.ejecutar((id) => this.reservaService.confirmar(id));
+    this.ejecutar((id) => this.reservaService.confirmar(id), 'Reserva confirmada');
   }
 
   cancelar(): void {
-    this.ejecutar((id) => this.reservaService.cancelar(id));
+    this.ejecutar((id) => this.reservaService.cancelar(id), 'Reserva cancelada');
   }
 
   finalizar(): void {
-    this.ejecutar((id) => this.reservaService.finalizar(id));
+    this.ejecutar((id) => this.reservaService.finalizar(id), 'Estadía finalizada');
   }
 
-  private ejecutar(accion: (id: number) => ReturnType<ReservaService['confirmar']>): void {
+  private ejecutar(accion: (id: number) => ReturnType<ReservaService['confirmar']>, mensajeOk: string): void {
     const r = this.reserva();
     if (!r) return;
     this.error.set(null);
@@ -77,6 +80,7 @@ export class DetalleReservaAnfitrion {
     accion(r.idReserva).subscribe({
       next: () => {
         this.procesando.set(false);
+        this.aviso.mostrar(mensajeOk);
         this.cargar(r.idReserva);
       },
       error: (err) => {

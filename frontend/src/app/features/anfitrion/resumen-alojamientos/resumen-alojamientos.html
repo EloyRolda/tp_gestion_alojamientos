@@ -2,11 +2,13 @@
   <h1>Resumen de mis alojamientos</h1>
 
   @if (cargando()) {
-    <p>Cargando...</p>
+    <app-esqueleto tipo="panel" [cantidad]="3" />
   } @else if (error()) {
     <p class="text-danger">{{ error() }}</p>
   } @else if (resumen().length === 0) {
-    <p class="text-muted">Todavia no publicaste ningun alojamiento.</p>
+    <app-vacio titulo="Todavía no publicaste ningún alojamiento" texto="Cuando publiques, vas a ver acá las reservas, los ingresos y la calificación de cada uno.">
+      <a routerLink="/anfitrion/alojamientos/nuevo" class="btn btn--primario">Publicar alojamiento</a>
+    </app-vacio>
   } @else {
     <div class="kpi-grid">
       <div class="kpi">

@@ -1,0 +1,31 @@
+<div class="ubicacion">
+  <p class="text-muted ubicacion__ayuda">
+    Tocá el mapa para marcar dónde queda el alojamiento, o buscá la dirección que cargaste. Es opcional, pero sin
+    ubicación el alojamiento no aparece en el modo mapa de la búsqueda.
+  </p>
+
+  <div class="ubicacion__acciones">
+    <button type="button" class="btn" (click)="buscarDireccion()" [disabled]="buscando()">
+      {{ buscando() ? 'Buscando…' : 'Buscar en el mapa' }}
+    </button>
+    @if (punto() && permiteQuitar()) {
+      <button type="button" class="btn" (click)="quitarPunto()">Quitar el punto</button>
+    }
+  </div>
+
+  @if (mensaje()) {
+    <p class="ubicacion__mensaje" role="status">{{ mensaje() }}</p>
+  }
+
+  <div class="ubicacion__mapa">
+    <div #contenedor class="ubicacion__lienzo" role="application" aria-label="Mapa para marcar la ubicación"></div>
+  </div>
+
+  <p class="text-muted ubicacion__coordenadas">
+    @if (punto(); as p) {
+      Punto marcado: {{ p.latitud }}, {{ p.longitud }}
+    } @else {
+      Todavía no marcaste ningún punto.
+    }
+  </p>
+</div>

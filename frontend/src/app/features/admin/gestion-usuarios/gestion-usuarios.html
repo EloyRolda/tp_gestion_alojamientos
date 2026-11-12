@@ -14,7 +14,7 @@
   </div>
 
   @if (cargando()) {
-    <p>Cargando...</p>
+    <app-esqueleto tipo="tabla" />
   } @else if (error()) {
     <p class="text-danger">{{ error() }}</p>
   } @else {

@@ -3,6 +3,8 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { EstadisticasService } from '../../../core/services/estadisticas.service';
 import { CobroPendiente } from '../../../core/models/estadisticas.model';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
+import { Vacio } from '../../../shared/vacio/vacio';
 
 /// SCRUM-40 / RF33. Reservas ya pagadas por el cliente que todavia esperan
 /// liquidarse -- se liquidan (Payout real) recien cuando el anfitrion marca
@@ -10,7 +12,7 @@ import { extraerMensajeError } from '../../../core/utils/http-error.util';
 @Component({
   selector: 'app-cobros-pendientes',
   standalone: true,
-  imports: [DatePipe, DecimalPipe],
+  imports: [DatePipe, DecimalPipe, Esqueleto, Vacio],
   templateUrl: './cobros-pendientes.html',
   styleUrl: './cobros-pendientes.css',
 })

@@ -1,6 +1,6 @@
 <section class="stack">
   @if (cargando()) {
-    <p>Cargando...</p>
+    <app-esqueleto tipo="detalle" />
   } @else if (error()) {
     <p class="text-danger">{{ error() }}</p>
   } @else if (reserva()) {

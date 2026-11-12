@@ -1,0 +1,12 @@
+<div class="mapa">
+  <div #contenedor class="mapa__lienzo" role="region" aria-label="Mapa de alojamientos"></div>
+</div>
+@if (sinUbicacion() > 0) {
+  <p class="text-muted mapa__nota">
+    @if (sinUbicacion() === 1) {
+      1 alojamiento todavía no tiene su ubicación marcada y solo aparece en la lista.
+    } @else {
+      {{ sinUbicacion() }} alojamientos todavía no tienen su ubicación marcada y solo aparecen en la lista.
+    }
+  </p>
+}

@@ -18,7 +18,7 @@
   </form>
 
   @if (cargandoFlujo()) {
-    <p>Cargando...</p>
+    <app-esqueleto tipo="kpis" [cantidad]="5" />
   } @else if (flujo()) {
     <div class="kpi-grid">
       <div class="kpi">
@@ -58,7 +58,7 @@
     </div>
 
     @if (cargandoIngresos()) {
-      <p>Cargando...</p>
+      <app-esqueleto tipo="tabla" [cantidad]="3" />
     } @else {
       <p class="text-muted">Total del año: <strong>${{ totalAnual() | number }}</strong></p>
       <!-- Una fila por mes con una barra proporcional al mes de mayor
@@ -80,7 +80,7 @@
   <section class="stack">
     <h2>Cancelaciones por motivo</h2>
     @if (cargandoCancelaciones()) {
-      <p>Cargando...</p>
+      <app-esqueleto tipo="tabla" [cantidad]="3" />
     } @else if (cancelaciones().length === 0) {
       <p class="text-muted">Sin cancelaciones en el rango seleccionado.</p>
     } @else {

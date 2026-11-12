@@ -8,6 +8,8 @@ import { Reserva } from '../../../core/models/reserva.model';
 import { calcularNoches, calcularTotal } from '../../../core/utils/reserva.util';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
 import { Estado } from '../../../shared/estado/estado';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
+import { AvisoService } from '../../../core/services/aviso.service';
 
 /// SCRUM-45/46 / RF24. Detalle de cualquier reserva de la plataforma, visto
 /// como admin: cancelar (regla automatica segun quien cancela) o reembolso
@@ -16,7 +18,7 @@ import { Estado } from '../../../shared/estado/estado';
 @Component({
   selector: 'app-detalle-reserva-admin',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, FormsModule, RouterLink, Estado],
+  imports: [DatePipe, DecimalPipe, FormsModule, RouterLink, Estado, Esqueleto],
   templateUrl: './detalle-reserva-admin.html',
   styleUrl: './detalle-reserva-admin.css',
 })
@@ -24,6 +26,7 @@ export class DetalleReservaAdmin {
   readonly id = input.required<string>();
 
   private readonly reservaService = inject(ReservaService);
+  private readonly aviso = inject(AvisoService);
   private readonly pagoService = inject(PagoService);
 
   readonly reserva = signal<Reserva | null>(null);
@@ -70,6 +73,7 @@ export class DetalleReservaAdmin {
     this.reservaService.cancelar(r.idReserva).subscribe({
       next: () => {
         this.procesando.set(false);
+        this.aviso.mostrar('Reserva cancelada');
         this.cargar(r.idReserva);
       },
       error: (err) => {
@@ -90,6 +94,7 @@ export class DetalleReservaAdmin {
       next: () => {
         this.enviandoReembolso.set(false);
         this.montoReembolso.set(null);
+        this.aviso.mostrar('Reembolso ejecutado');
         this.cargar(r.idReserva);
       },
       error: (err) => {

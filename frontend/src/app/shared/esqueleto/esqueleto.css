@@ -1,0 +1,141 @@
+/* Esqueletos de carga (SCRUM-68): bloques grises con un brillo que pasa de
+   izquierda a derecha. Con "menos movimiento" activado el brillo no corre. */
+
+:host {
+  display: block;
+}
+
+.esqueleto-caja {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cargando-texto {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.cargando-texto app-kaza {
+  width: 30px;
+  animation: flota 1.6s ease-in-out infinite;
+}
+
+.esqueleto {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-bg-muted);
+  border-radius: 8px;
+}
+
+.esqueleto::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+  animation: brillo 1.3s ease-in-out infinite;
+}
+
+.esq-linea {
+  height: 14px;
+}
+
+.esq-linea--alta {
+  height: 18px;
+  margin-top: var(--space-2);
+}
+
+.esq-linea--valor {
+  width: 45%;
+  height: 26px;
+}
+
+.esq-titulo {
+  width: 60%;
+  height: 30px;
+  border-radius: 10px;
+}
+
+.esq-bloque {
+  width: 100%;
+  aspect-ratio: 16 / 7;
+  border-radius: var(--radius);
+}
+
+.esq-input {
+  height: var(--tap-size);
+  border-radius: var(--radius-sm);
+}
+
+.esq-card,
+.esq-fila,
+.esq-kpi {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.esq-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.esq-media {
+  aspect-ratio: 4 / 3;
+  border-radius: 0;
+}
+
+.esq-cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: var(--space-3);
+}
+
+.esq-filas,
+.esq-detalle,
+.esq-formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.esq-detalle {
+  gap: var(--space-3);
+}
+
+.esq-formulario {
+  gap: var(--space-3);
+  max-width: 720px;
+}
+
+.esq-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.esq-fila {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: var(--space-3);
+  padding: var(--space-3);
+}
+
+.esq-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: var(--space-3);
+}
+
+@keyframes brillo {
+  to {
+    transform: translateX(100%);
+  }
+}

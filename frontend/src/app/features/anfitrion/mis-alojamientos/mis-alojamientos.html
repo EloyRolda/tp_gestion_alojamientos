@@ -5,11 +5,13 @@
   </div>
 
   @if (cargando()) {
-    <p>Cargando...</p>
+    <app-esqueleto tipo="tarjetas" [cantidad]="3" />
   } @else if (error()) {
     <p class="text-danger">{{ error() }}</p>
   } @else if (alojamientos().length === 0) {
-    <p class="text-muted">Todavia no publicaste ningun alojamiento.</p>
+    <app-vacio titulo="Todavía no publicaste ningún alojamiento" texto="Publicá tu casa, departamento o cabaña y empezá a recibir reservas.">
+      <a routerLink="/anfitrion/alojamientos/nuevo" class="btn btn--primario">Publicar alojamiento</a>
+    </app-vacio>
   } @else {
     <div class="grid-auto">
       @for (a of alojamientos(); track a.idAlojamiento) {

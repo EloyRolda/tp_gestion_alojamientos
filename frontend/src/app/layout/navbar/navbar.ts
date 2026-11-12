@@ -5,6 +5,7 @@ import { filter } from 'rxjs';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { Kaza } from '../../shared/kaza/kaza';
+import { AvisoService } from '../../core/services/aviso.service';
 
 /// Encabezado de la app (SCRUM-63): logo con Kaza, buscador siempre a mano y el
 /// avatar con el menu de la cuenta. El menu se arma segun el rol autenticado
@@ -19,6 +20,7 @@ import { Kaza } from '../../shared/kaza/kaza';
 })
 export class Navbar {
   private readonly auth = inject(AuthService);
+  private readonly aviso = inject(AvisoService);
   private readonly router = inject(Router);
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly botonPerfil = viewChild<ElementRef<HTMLButtonElement>>('botonPerfil');
@@ -86,6 +88,7 @@ export class Navbar {
   cerrarSesion(): void {
     this.auth.cerrarSesion();
     this.cerrarMenu();
+    this.aviso.mostrar('Cerraste sesión');
     this.router.navigate(['/']);
   }
 }

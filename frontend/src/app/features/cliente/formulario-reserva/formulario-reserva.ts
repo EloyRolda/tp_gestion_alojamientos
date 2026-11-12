@@ -7,6 +7,8 @@ import { ReservaService } from '../../../core/services/reserva.service';
 import { Alojamiento } from '../../../core/models/alojamiento.model';
 import { calcularNoches, calcularTotal } from '../../../core/utils/reserva.util';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
+import { AvisoService } from '../../../core/services/aviso.service';
 
 /// SCRUM-29 / RF18, RF19. "id" se bindea solo desde la ruta :id (withComponentInputBinding).
 /// El calculo de precio es en vivo del lado del cliente (noches * precioNoche,
@@ -17,7 +19,7 @@ import { extraerMensajeError } from '../../../core/utils/http-error.util';
 @Component({
   selector: 'app-formulario-reserva',
   standalone: true,
-  imports: [FormsModule, RouterLink, DecimalPipe],
+  imports: [FormsModule, RouterLink, DecimalPipe, Esqueleto],
   templateUrl: './formulario-reserva.html',
   styleUrl: './formulario-reserva.css',
 })
@@ -25,6 +27,7 @@ export class FormularioReserva {
   readonly id = input.required<string>();
 
   private readonly alojamientoService = inject(AlojamientoService);
+  private readonly aviso = inject(AvisoService);
   private readonly reservaService = inject(ReservaService);
   private readonly router = inject(Router);
 
@@ -82,6 +85,7 @@ export class FormularioReserva {
       .subscribe({
         next: (reserva) => {
           this.enviando.set(false);
+          this.aviso.mostrar('Solicitud enviada al anfitrión');
           this.router.navigate(['/mis-reservas', reserva.idReserva]);
         },
         error: (err) => {

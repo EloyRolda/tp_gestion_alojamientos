@@ -3,13 +3,16 @@ import { DecimalPipe } from '@angular/common';
 import { EstadisticasService } from '../../../core/services/estadisticas.service';
 import { ResumenAlojamientoAnfitrion } from '../../../core/models/estadisticas.model';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
+import { Vacio } from '../../../shared/vacio/vacio';
+import { RouterLink } from '@angular/router';
 
 /// SCRUM-41 / RF37. Un resumen por cada alojamiento propio: ingresos,
 /// cantidad de reservas y rating promedio (null si todavia no tiene reviews).
 @Component({
   selector: 'app-resumen-alojamientos',
   standalone: true,
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, Esqueleto, Vacio, RouterLink],
   templateUrl: './resumen-alojamientos.html',
   styleUrl: './resumen-alojamientos.css',
 })

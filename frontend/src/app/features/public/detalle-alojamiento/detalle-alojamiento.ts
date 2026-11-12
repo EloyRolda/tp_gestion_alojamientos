@@ -10,6 +10,7 @@ import { ServicioxAlojamiento } from '../../../core/models/servicio.model';
 import { Imagen } from '../../../core/models/galeria.model';
 import { Review } from '../../../core/models/review.model';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 
 /// SCRUM-24 / RF15, RF16, RF17, RF35. "id" se bindea solo desde la ruta
 /// :id gracias a withComponentInputBinding() (app.config.ts).
@@ -21,7 +22,7 @@ import { extraerMensajeError } from '../../../core/utils/http-error.util';
 @Component({
   selector: 'app-detalle-alojamiento',
   standalone: true,
-  imports: [DatePipe, DecimalPipe],
+  imports: [DatePipe, DecimalPipe, Esqueleto],
   templateUrl: './detalle-alojamiento.html',
   styleUrl: './detalle-alojamiento.css',
 })
