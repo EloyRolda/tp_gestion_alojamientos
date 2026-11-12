@@ -1,18 +1,24 @@
 <section class="stack">
   <header class="home__hero">
     <div class="stack stack--tight">
-      <h1>Encontra tu proximo alojamiento</h1>
-      <p class="text-muted">Alojamientos disponibles ahora mismo en AlojaME.</p>
+      <h1>Encontrá tu próximo alojamiento en Mar del Plata</h1>
+      <p class="text-muted">Casas, departamentos y cabañas de anfitriones locales, con pago seguro por MercadoPago.</p>
     </div>
-    <a routerLink="/buscar" class="btn btn--primario home__cta">Ver todos / buscar</a>
+    <app-kaza class="home__mascota" variante="trazo" sobre="claro" />
+    <a routerLink="/buscar" class="btn btn--primario home__cta">Ver todos los alojamientos</a>
   </header>
+
+  <div class="seccion-titulo">
+    <h2>Disponibles ahora</h2>
+    <a routerLink="/buscar">Ver todos</a>
+  </div>
 
   @if (cargando()) {
     <p>Cargando alojamientos...</p>
   } @else if (error()) {
     <p class="text-danger">{{ error() }}</p>
   } @else if (destacados().length === 0) {
-    <p class="text-muted">Todavia no hay alojamientos publicados.</p>
+    <p class="text-muted">Todavía no hay alojamientos publicados.</p>
   } @else {
     <div class="grid-auto">
       @for (alojamiento of destacados(); track alojamiento.idAlojamiento) {

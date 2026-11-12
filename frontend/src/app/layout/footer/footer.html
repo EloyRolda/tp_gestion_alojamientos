@@ -1,0 +1,57 @@
+<footer class="footer">
+  <div class="footer__inner container">
+    <div class="footer__marca">
+      <a routerLink="/" class="footer__logo" aria-label="AlojaME, ir al inicio">
+        <app-kaza variante="trazo" sobre="oscuro" />
+        <span class="logo-texto">Aloja<span>ME</span></span>
+      </a>
+      <p>Alojamientos temporarios de anfitriones locales en Mar del Plata, con pago protegido por MercadoPago.</p>
+    </div>
+
+    <nav class="footer__columnas" aria-label="Enlaces del sitio">
+      <div>
+        <h2>AlojaME</h2>
+        <ul>
+          <li><a routerLink="/sobre-nosotros">Sobre nosotros</a></li>
+          <li><a routerLink="/sobre-nosotros" fragment="como-funciona">Cómo funciona</a></li>
+          <li><a routerLink="/buscar">Buscar alojamientos</a></li>
+          <li><a [routerLink]="linkPublicar()">Publicá tu alojamiento</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Ayuda</h2>
+        <ul>
+          <li><a routerLink="/ayuda" fragment="ayuda">Centro de ayuda</a></li>
+          <li><a routerLink="/ayuda" fragment="cancelaciones">Cancelaciones y reembolsos</a></li>
+          <li><a routerLink="/ayuda" fragment="pagos">Pagos con MercadoPago</a></li>
+          <li><a routerLink="/ayuda" fragment="arrepentimiento">Botón de arrepentimiento</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Legales</h2>
+        <ul>
+          <li><a routerLink="/ayuda" fragment="terminos">Términos y condiciones</a></li>
+          <li><a routerLink="/ayuda" fragment="privacidad">Política de privacidad</a></li>
+          <li><a routerLink="/ayuda" fragment="accesibilidad">Accesibilidad</a></li>
+          <li>
+            <a href="https://www.argentina.gob.ar/produccion/defensadelconsumidor/formulario" target="_blank" rel="noopener">
+              Defensa de las y los Consumidores
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+
+  <div class="footer__legal">
+    <div class="footer__legal-inner container">
+      <p>Copyright &copy; {{ anio }} AlojaME. Desarrollado por EloySoft, una división de RoldaCorporation.</p>
+      <p class="footer__lugar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" />
+        </svg>
+        Mar del Plata (B7600), Provincia de Buenos Aires, Argentina
+      </p>
+    </div>
+  </div>
+</footer>

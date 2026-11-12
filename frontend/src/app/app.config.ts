@@ -1,7 +1,7 @@
 import { ApplicationConfig, LOCALE_ID, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { registerLocaleData } from '@angular/common';
 import localeEsAr from '@angular/common/locales/es-AR';
-import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
@@ -15,7 +15,13 @@ export const appConfig: ApplicationConfig = {
     // withComponentInputBinding: los parametros de ruta y query params (id,
     // token, returnUrl) se bindean directo a los input() de cada componente,
     // sin pasar por ActivatedRoute a mano en cada vista.
-    provideRouter(routes, withComponentInputBinding()),
+    // withInMemoryScrolling: cada pantalla nueva arranca arriba y los links con #
+    // (los del pie hacia Ayuda y legales) bajan hasta su seccion.
+    provideRouter(
+      routes,
+      withComponentInputBinding(),
+      withInMemoryScrolling({ scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled' }),
+    ),
     provideHttpClient(withInterceptors([authInterceptor])),
     { provide: LOCALE_ID, useValue: 'es-AR' },
   ],

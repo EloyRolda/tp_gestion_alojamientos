@@ -1,7 +1,16 @@
+/* El pie queda siempre abajo, aunque la pantalla tenga poco contenido. */
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
 /* Aire arriba y abajo del contenido: un poco menos en mobile (SCRUM-58).
    Desde tablet el avatar del encabezado sobresale 38px hacia abajo, asi que
    el contenido arranca con aire suficiente para no quedar tapado. */
 .app-main {
+  flex: 1 0 auto;
   padding-block: var(--space-4) var(--space-5);
 }
 

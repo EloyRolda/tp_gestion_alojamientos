@@ -1,30 +1,68 @@
-/* Inicio responsive (SCRUM-52): en mobile el titulo y el boton se apilan y el
-   boton ocupa todo el ancho; desde tablet el boton queda a la derecha. */
+/* Inicio (SCRUM-65): portada calida con Kaza y la grilla de alojamientos.
+   En mobile el titulo y el boton se apilan y el boton ocupa todo el ancho;
+   desde tablet Kaza aparece a la derecha y el boton queda debajo del texto. */
 
 :host {
   display: block;
 }
 
 .home__hero {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-3);
-  padding-block: var(--space-3);
+  align-items: center;
+  padding: var(--space-4);
+  border-radius: var(--radius);
+  background: var(--color-dorado-suave);
+  border: 1px solid #f6e3a6;
+}
+
+.home__hero p {
+  max-width: 46ch;
+}
+
+.home__mascota {
+  display: none;
 }
 
 .home__cta {
   width: 100%;
 }
 
+.seccion-titulo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.seccion-titulo a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-size);
+  color: var(--color-azul-fuerte);
+  font-weight: 600;
+  text-underline-offset: 3px;
+}
+
 @media (min-width: 768px) {
   .home__hero {
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: space-between;
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: var(--space-5) var(--space-6);
+  }
+
+  .home__mascota {
+    display: block;
+    grid-row: span 2;
+    grid-column: 2;
+    width: 150px;
+    animation: flota 5s ease-in-out infinite;
   }
 
   .home__cta {
     width: auto;
-    flex-shrink: 0;
+    justify-self: start;
   }
 }

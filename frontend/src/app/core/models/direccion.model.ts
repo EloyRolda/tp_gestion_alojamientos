@@ -7,6 +7,9 @@ export interface Direccion {
   ciudad: string;
   calle: string;
   altura: number;
+  /// Ubicacion en el mapa; null si el anfitrion no la marco.
+  latitud: number | null;
+  longitud: number | null;
 }
 
 /// Espejo de DireccionDTO (lo que pide AlojamientoRegistroDTO.direccion).
@@ -17,4 +20,7 @@ export interface DireccionInput {
   ciudad: string;
   calle: string;
   altura: number;
+  /// Opcionales: si se manda una, hay que mandar la otra.
+  latitud?: number | null;
+  longitud?: number | null;
 }

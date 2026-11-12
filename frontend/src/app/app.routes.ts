@@ -22,15 +22,6 @@ import { ReservasAnfitrion } from './features/anfitrion/reservas-anfitrion/reser
 import { DetalleReservaAnfitrion } from './features/anfitrion/detalle-reserva-anfitrion/detalle-reserva-anfitrion';
 import { CobrosPendientes } from './features/anfitrion/cobros-pendientes/cobros-pendientes';
 import { ResumenAlojamientos } from './features/anfitrion/resumen-alojamientos/resumen-alojamientos';
-import { GestionUsuarios } from './features/admin/gestion-usuarios/gestion-usuarios';
-import { UsuarioForm } from './features/admin/usuario-form/usuario-form';
-import { AltaAdministrador } from './features/admin/alta-administrador/alta-administrador';
-import { CatalogoTipos } from './features/admin/catalogo-tipos/catalogo-tipos';
-import { CatalogoServicios } from './features/admin/catalogo-servicios/catalogo-servicios';
-import { TodasReservas } from './features/admin/todas-reservas/todas-reservas';
-import { DetalleReservaAdmin } from './features/admin/detalle-reserva-admin/detalle-reserva-admin';
-import { FlujoDineroComponent } from './features/admin/flujo-dinero/flujo-dinero';
-import { EstadisticasGlobales } from './features/admin/estadisticas-globales/estadisticas-globales';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -41,6 +32,12 @@ export const routes: Routes = [
     component: FormularioReserva,
     canActivate: [roleGuard(['CLIENTE', 'ADMIN'])],
   },
+  // Paginas de texto: se descargan recien cuando alguien las abre.
+  {
+    path: 'sobre-nosotros',
+    loadComponent: () => import('./features/public/sobre-nosotros/sobre-nosotros').then((m) => m.SobreNosotros),
+  },
+  { path: 'ayuda', loadComponent: () => import('./features/public/ayuda/ayuda').then((m) => m.Ayuda) },
   { path: 'registro', component: Registro },
   { path: 'verificar-cuenta', component: Verificacion },
   { path: 'login', component: Login },
@@ -57,15 +54,52 @@ export const routes: Routes = [
   { path: 'anfitrion/reservas/:id', component: DetalleReservaAnfitrion, canActivate: [roleGuard(['ANFITRION', 'ADMIN'])] },
   { path: 'anfitrion/cobros-pendientes', component: CobrosPendientes, canActivate: [roleGuard(['ANFITRION', 'ADMIN'])] },
   { path: 'anfitrion/resumen', component: ResumenAlojamientos, canActivate: [roleGuard(['ANFITRION', 'ADMIN'])] },
-  { path: 'admin/usuarios', component: GestionUsuarios, canActivate: [roleGuard(['ADMIN'])] },
-  { path: 'admin/usuarios/nuevo-admin', component: AltaAdministrador, canActivate: [roleGuard(['ADMIN'])] },
-  { path: 'admin/usuarios/:id/editar', component: UsuarioForm, canActivate: [roleGuard(['ADMIN'])] },
-  { path: 'admin/catalogo-tipos', component: CatalogoTipos, canActivate: [roleGuard(['ADMIN'])] },
-  { path: 'admin/catalogo-servicios', component: CatalogoServicios, canActivate: [roleGuard(['ADMIN'])] },
-  { path: 'admin/reservas', component: TodasReservas, canActivate: [roleGuard(['ADMIN'])] },
-  { path: 'admin/reservas/:id', component: DetalleReservaAdmin, canActivate: [roleGuard(['ADMIN'])] },
-  { path: 'admin/flujo-dinero', component: FlujoDineroComponent, canActivate: [roleGuard(['ADMIN'])] },
-  { path: 'admin/estadisticas', component: EstadisticasGlobales, canActivate: [roleGuard(['ADMIN'])] },
+  // Administracion: solo la usa el rol ADMIN, se descarga recien al entrar.
+  {
+    path: 'admin/usuarios',
+    loadComponent: () => import('./features/admin/gestion-usuarios/gestion-usuarios').then((m) => m.GestionUsuarios),
+    canActivate: [roleGuard(['ADMIN'])],
+  },
+  {
+    path: 'admin/usuarios/nuevo-admin',
+    loadComponent: () => import('./features/admin/alta-administrador/alta-administrador').then((m) => m.AltaAdministrador),
+    canActivate: [roleGuard(['ADMIN'])],
+  },
+  {
+    path: 'admin/usuarios/:id/editar',
+    loadComponent: () => import('./features/admin/usuario-form/usuario-form').then((m) => m.UsuarioForm),
+    canActivate: [roleGuard(['ADMIN'])],
+  },
+  {
+    path: 'admin/catalogo-tipos',
+    loadComponent: () => import('./features/admin/catalogo-tipos/catalogo-tipos').then((m) => m.CatalogoTipos),
+    canActivate: [roleGuard(['ADMIN'])],
+  },
+  {
+    path: 'admin/catalogo-servicios',
+    loadComponent: () => import('./features/admin/catalogo-servicios/catalogo-servicios').then((m) => m.CatalogoServicios),
+    canActivate: [roleGuard(['ADMIN'])],
+  },
+  {
+    path: 'admin/reservas',
+    loadComponent: () => import('./features/admin/todas-reservas/todas-reservas').then((m) => m.TodasReservas),
+    canActivate: [roleGuard(['ADMIN'])],
+  },
+  {
+    path: 'admin/reservas/:id',
+    loadComponent: () => import('./features/admin/detalle-reserva-admin/detalle-reserva-admin').then((m) => m.DetalleReservaAdmin),
+    canActivate: [roleGuard(['ADMIN'])],
+  },
+  {
+    path: 'admin/flujo-dinero',
+    loadComponent: () => import('./features/admin/flujo-dinero/flujo-dinero').then((m) => m.FlujoDineroComponent),
+    canActivate: [roleGuard(['ADMIN'])],
+  },
+  {
+    path: 'admin/estadisticas',
+    loadComponent: () => import('./features/admin/estadisticas-globales/estadisticas-globales').then((m) => m.EstadisticasGlobales),
+    canActivate: [roleGuard(['ADMIN'])],
+  },
   { path: '403', component: Forbidden },
   { path: '**', component: NotFound },
 ];

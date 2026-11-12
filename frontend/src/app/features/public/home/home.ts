@@ -4,14 +4,16 @@ import { AlojamientoService } from '../../../core/services/alojamiento.service';
 import { Alojamiento } from '../../../core/models/alojamiento.model';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
 import { AlojamientoCard } from '../../../shared/alojamiento-card/alojamiento-card';
+import { Kaza } from '../../../shared/kaza/kaza';
 
 const CANTIDAD_DESTACADOS = 8;
 
-/// SCRUM-22 / RF14. Vista publica: listado inicial de alojamientos disponibles.
+/// SCRUM-22 / RF14. Vista publica: listado inicial de alojamientos disponibles,
+/// con una portada que presenta AlojaME y a Kaza, la mascota (SCRUM-65).
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, AlojamientoCard],
+  imports: [RouterLink, AlojamientoCard, Kaza],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })

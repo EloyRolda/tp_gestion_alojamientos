@@ -1,16 +1,16 @@
 import { Component, inject, signal } from '@angular/core';
-import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AlojamientoService } from '../../../core/services/alojamiento.service';
 import { Alojamiento } from '../../../core/models/alojamiento.model';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { AlojamientoCard } from '../../../shared/alojamiento-card/alojamiento-card';
 
 /// SCRUM-35 / RF11, RF13. Listado de los alojamientos propios del anfitrión,
 /// con accion de activar/desactivar (RF13) via PUT /Alojamiento/actualizar.
 @Component({
   selector: 'app-mis-alojamientos',
   standalone: true,
-  imports: [DecimalPipe, RouterLink],
+  imports: [RouterLink, AlojamientoCard],
   templateUrl: './mis-alojamientos.html',
   styleUrl: './mis-alojamientos.css',
 })

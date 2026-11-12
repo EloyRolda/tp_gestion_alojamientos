@@ -1,8 +1,44 @@
-<a [routerLink]="['/alojamientos', alojamiento().idAlojamiento]" class="card alojamiento-card">
-  <h3>{{ alojamiento().titulo }}</h3>
-  <p class="text-muted">
-    {{ alojamiento().direccion.ciudad }}, {{ alojamiento().direccion.provincia }}
-  </p>
-  <p class="text-muted">{{ alojamiento().tipoAlojamiento.nombreTipo }} &middot; hasta {{ alojamiento().capacidad }} huespedes</p>
-  <p class="alojamiento-card__precio">${{ alojamiento().precioNoche | number }} <span class="text-muted">/ noche</span></p>
-</a>
+<article class="alojamiento-card">
+  <div class="alojamiento-card__media">
+    @if (foto(); as src) {
+      <img
+        [src]="src"
+        [alt]="alojamiento().titulo"
+        loading="lazy"
+        decoding="async"
+        width="480"
+        height="360"
+        [class.cargada]="fotoCargada()"
+        (load)="fotoCargada.set(true)"
+      />
+    } @else {
+      <div class="alojamiento-card__sin-foto">
+        <app-kaza variante="trazo" sobre="claro" />
+        <span>Todavía sin fotos</span>
+      </div>
+    }
+    <span class="alojamiento-card__tipo">{{ alojamiento().tipoAlojamiento.nombreTipo }}</span>
+    @if (aviso()) {
+      <span class="alojamiento-card__aviso">{{ aviso() }}</span>
+    }
+  </div>
+
+  <div class="alojamiento-card__cuerpo">
+    <h3>
+      <a class="alojamiento-card__link" [routerLink]="['/alojamientos', alojamiento().idAlojamiento]">
+        {{ alojamiento().titulo }}
+      </a>
+    </h3>
+    <p class="text-muted alojamiento-card__lugar">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" />
+      </svg>
+      {{ alojamiento().direccion.ciudad }}, {{ alojamiento().direccion.provincia }}
+    </p>
+    <p class="text-muted">Hasta {{ alojamiento().capacidad }} {{ alojamiento().capacidad === 1 ? 'huésped' : 'huéspedes' }}</p>
+    <p class="alojamiento-card__precio">${{ alojamiento().precioNoche | number }} <span>/ noche</span></p>
+    <div class="alojamiento-card__acciones">
+      <ng-content select="[acciones]" />
+    </div>
+  </div>
+</article>

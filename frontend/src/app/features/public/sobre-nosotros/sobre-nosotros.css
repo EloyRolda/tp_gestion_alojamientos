@@ -1,0 +1,36 @@
+.texto {
+  max-width: 70ch;
+}
+
+.pasos {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-3);
+  counter-reset: paso;
+}
+
+.paso {
+  counter-increment: paso;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.paso::before {
+  content: counter(paso);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-dorado);
+  color: var(--color-ink);
+  font-weight: 800;
+}
+
+@media (min-width: 768px) {
+  .pasos {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

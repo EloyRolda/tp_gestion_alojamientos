@@ -22,6 +22,8 @@ export interface Alojamiento {
   anfitrion: UsuarioResumen;
   direccion: Direccion;
   tipoAlojamiento: TipoAlojamiento;
+  /// URL de la primera foto de la galeria, o null si todavia no tiene fotos.
+  imagenPrincipal: string | null;
 }
 
 /// Espejo de AlojamientoRegistroDTO. Siempre crea una direccion nueva (no se
@@ -53,4 +55,7 @@ export interface AlojamientoModificar {
   cantBanios?: number;
   activo?: boolean;
   nombreTipoAlojamiento?: string;
+  /// Punto en el mapa de la direccion actual (van siempre juntas).
+  latitud?: number;
+  longitud?: number;
 }

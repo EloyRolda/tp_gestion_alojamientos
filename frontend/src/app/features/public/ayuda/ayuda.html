@@ -1,0 +1,151 @@
+<section class="stack">
+  <div class="stack stack--tight">
+    <h1>Ayuda y legales</h1>
+    <p class="text-muted">Última actualización: 12 de noviembre de 2026</p>
+  </div>
+
+  <div class="legal">
+    <nav class="legal__indice" aria-label="Secciones">
+      <a routerLink="/ayuda" fragment="ayuda">Centro de ayuda</a>
+      <a routerLink="/ayuda" fragment="cancelaciones">Cancelaciones y reembolsos</a>
+      <a routerLink="/ayuda" fragment="pagos">Pagos con MercadoPago</a>
+      <a routerLink="/ayuda" fragment="arrepentimiento">Botón de arrepentimiento</a>
+      <a routerLink="/ayuda" fragment="terminos">Términos y condiciones</a>
+      <a routerLink="/ayuda" fragment="privacidad">Política de privacidad</a>
+      <a routerLink="/ayuda" fragment="accesibilidad">Accesibilidad</a>
+    </nav>
+
+    <div class="legal__contenido">
+      <section class="legal__seccion" id="ayuda">
+        <h2>Centro de ayuda</h2>
+        <div class="pregunta">
+          <h3>¿Cómo reservo un alojamiento?</h3>
+          <p>
+            Elegí el alojamiento, indicá las fechas y la cantidad de huéspedes y enviá la solicitud. Cuando el
+            anfitrión la confirma, tenés 48 horas para pagarla con MercadoPago.
+          </p>
+        </div>
+        <div class="pregunta">
+          <h3>¿Puedo cambiar las fechas?</h3>
+          <p>
+            Para cambiar las fechas, cancelá la reserva desde su detalle en Mis reservas y enviá una solicitud
+            nueva. Mientras la reserva está solicitada todavía no hay ningún pago, así que cancelarla no tiene
+            costo.
+          </p>
+        </div>
+        <div class="pregunta">
+          <h3>¿Cuándo cobra el anfitrión?</h3>
+          <p>
+            AlojaME retiene el pago y se lo transfiere al anfitrión una vez finalizada la estadía, al CBU, CVU o
+            alias que tenga registrado en su perfil.
+          </p>
+        </div>
+        <div class="pregunta">
+          <h3>¿Cómo publico mi alojamiento?</h3>
+          <p>
+            Registrate como anfitrión, cargá tu alias o CBU de cobro en Mi perfil y publicá tu alojamiento con
+            fotos, precio por noche, capacidad, servicios y su ubicación en el mapa.
+          </p>
+        </div>
+      </section>
+
+      <section class="legal__seccion" id="cancelaciones">
+        <h2>Cancelaciones y reembolsos</h2>
+        <ol>
+          <li>Si el anfitrión cancela la reserva, se reintegra el 100% del monto base.</li>
+          <li>Si el huésped cancela con 48 horas o más de anticipación al ingreso, se reintegra el 100% del monto base.</li>
+          <li>
+            Si el huésped cancela con menos de 48 horas, se reintegra el 65% del monto base y el 35% restante se
+            liquida al anfitrión.
+          </li>
+          <li>Una reserva confirmada que no se paga dentro de las 48 horas se cancela automáticamente, sin cargo.</li>
+        </ol>
+        <p>Las comisiones de servicio y de procesamiento del pago no son reintegrables.</p>
+      </section>
+
+      <section class="legal__seccion" id="pagos">
+        <h2>Pagos con MercadoPago</h2>
+        <p>
+          El total de cada reserva se compone del monto base fijado por el anfitrión, una comisión de servicio de
+          AlojaME del 5% y el costo estimado de procesamiento de MercadoPago del 6%. El total se muestra completo
+          antes de pagar.
+        </p>
+        <p>
+          Los pagos se procesan en el entorno seguro de MercadoPago. AlojaME no recibe ni almacena los datos de tu
+          tarjeta.
+        </p>
+      </section>
+
+      <section class="legal__seccion" id="arrepentimiento">
+        <h2>Botón de arrepentimiento</h2>
+        <p>
+          Si contrataste un servicio a través de AlojaME, podés revocar la contratación en los plazos y casos que
+          establece la normativa de defensa del consumidor. Para hacerlo, cancelá la reserva desde su detalle en
+          Mis reservas: el reintegro se calcula con la política de cancelación de esta página.
+        </p>
+        <div>
+          <a class="btn" [routerLink]="linkArrepentimiento()" [queryParams]="paramsArrepentimiento()">
+            Arrepentirme de una reserva
+          </a>
+        </div>
+      </section>
+
+      <section class="legal__seccion" id="terminos">
+        <h2>Términos y condiciones</h2>
+        <ol>
+          <li>
+            <strong>Objeto.</strong> AlojaME es una plataforma que pone en contacto a anfitriones que ofrecen
+            alojamientos temporarios en Mar del Plata con huéspedes que desean reservarlos, y gestiona el cobro y
+            la liquidación de cada reserva.
+          </li>
+          <li>
+            <strong>Cuentas.</strong> Para reservar o publicar es necesario registrarse con datos verdaderos y
+            verificar el correo electrónico. Cada persona es responsable de la confidencialidad de su contraseña.
+          </li>
+          <li>
+            <strong>Publicaciones.</strong> El anfitrión es responsable de la veracidad de la descripción, las
+            fotos, el precio, la ubicación y la disponibilidad de su alojamiento.
+          </li>
+          <li>
+            <strong>Reservas y pagos.</strong> Una reserva queda firme cuando el anfitrión la confirma y el
+            huésped completa el pago dentro de las 48 horas.
+          </li>
+          <li>
+            <strong>Reseñas.</strong> Solo pueden calificar los huéspedes de estadías finalizadas, con una reseña
+            por reserva.
+          </li>
+          <li>
+            <strong>Modificaciones.</strong> AlojaME puede actualizar estos términos; los cambios rigen desde su
+            publicación en esta página.
+          </li>
+          <li>
+            <strong>Jurisdicción.</strong> Estos términos se rigen por las leyes de la República Argentina. Ante
+            cualquier controversia son competentes los tribunales ordinarios de la ciudad de Mar del Plata.
+          </li>
+        </ol>
+      </section>
+
+      <section class="legal__seccion" id="privacidad">
+        <h2>Política de privacidad</h2>
+        <p>
+          Usamos tus datos personales (nombre, correo, teléfono y datos de cobro) solo para gestionar tu cuenta,
+          tus reservas y tus pagos. Los compartimos únicamente con los proveedores necesarios para prestar el
+          servicio: MercadoPago para los pagos, Brevo para el envío de correos y Cloudinary para las imágenes.
+        </p>
+        <p>
+          Podés consultar y corregir tus datos desde Mi perfil, y pedirle a la administración de AlojaME la baja
+          de tu cuenta, conforme a la Ley 25.326 de Protección de los Datos Personales.
+        </p>
+      </section>
+
+      <section class="legal__seccion" id="accesibilidad">
+        <h2>Accesibilidad</h2>
+        <p>
+          AlojaME se diseña para que cualquier persona pueda usarlo: textos con buen contraste, navegación
+          completa con teclado, controles de al menos 44 píxeles para usar con el dedo y adaptación a celular,
+          tablet y computadora. Si tu sistema tiene desactivadas las animaciones, el sitio las omite.
+        </p>
+      </section>
+    </div>
+  </div>
+</section>
