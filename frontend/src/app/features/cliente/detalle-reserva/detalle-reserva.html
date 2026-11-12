@@ -21,7 +21,7 @@
       </section>
 
       <section class="stack stack--tight">
-        <h2>Estadia</h2>
+        <h2>Estadía</h2>
         <dl class="datos">
           <dt>Check-in</dt>
           <dd>{{ r.fechaInicio | date: 'dd/MM/yyyy' }}</dd>
@@ -36,11 +36,11 @@
         <section class="stack stack--tight">
           <h2>Pago</h2>
           <dl class="datos">
-            <dt>Monto base (anfitrion)</dt>
+            <dt>Monto base (anfitrión)</dt>
             <dd>${{ r.pago.montoBase | number }}</dd>
-            <dt>Comision plataforma</dt>
+            <dt>Comisión plataforma</dt>
             <dd>${{ r.pago.comisionPlataforma | number }}</dd>
-            <dt>Comision MercadoPago</dt>
+            <dt>Comisión MercadoPago</dt>
             <dd>${{ r.pago.comisionMercadopago | number }}</dd>
             <dt>Total a pagar</dt>
             <dd><strong>${{ r.pago.montoTotalCliente | number }}</strong></dd>
@@ -82,7 +82,7 @@
         } @else {
           <form class="stack" (submit)="$event.preventDefault(); enviarReview()">
             <div class="field">
-              <label for="puntuacion">Puntuacion (1 a 5)</label>
+              <label for="puntuacion">Puntuación (1 a 5)</label>
               <select id="puntuacion" [ngModel]="puntuacion()" (ngModelChange)="puntuacion.set($event)" name="puntuacion">
                 @for (n of [1, 2, 3, 4, 5]; track n) {
                   <option [value]="n">{{ n }}</option>

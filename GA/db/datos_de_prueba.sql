@@ -3,8 +3,8 @@
 --
 -- Carga un catalogo de ejemplo completo para probar la app de punta a punta:
 -- 7 usuarios (3 anfitriones y 4 clientes), tipos de alojamiento, servicios,
--- 8 alojamientos con direccion, galeria e imagenes, 16 reservas en todos los
--- estados posibles, sus pagos y 5 resenas.
+-- 8 alojamientos con direccion (y su ubicacion en el mapa), galeria e imagenes,
+-- 16 reservas en todos los estados posibles, sus pagos y 5 resenas.
 --
 -- Todas las fechas son relativas al dia en que se ejecuta (CURDATE/NOW), asi
 -- que el script sirve igual hoy que dentro de unos meses.
@@ -72,7 +72,7 @@ INSERT IGNORE INTO servicio (nombre_servicio) VALUES ('Ropa de cama y toallas');
 -- 3 imagenes de ejemplo (picsum.photos) y sus servicios.
 
 -- Departamento frente al mar en Playa Grande
-INSERT INTO direccion (calle, altura, ciudad, provincia, pais, codigo_postal) VALUES ('Av. Patricio Peralta Ramos', 4800, 'Mar del Plata', 'Buenos Aires', 'Argentina', '7600');
+INSERT INTO direccion (calle, altura, ciudad, provincia, pais, codigo_postal, latitud, longitud) VALUES ('Av. Patricio Peralta Ramos', 4800, 'Mar del Plata', 'Buenos Aires', 'Argentina', '7600', -38.028, -57.533);
 SET @dir = LAST_INSERT_ID();
 INSERT INTO alojamiento (titulo, descripcion, precio_noche, capacidad, cant_ambientes, cant_habitaciones, cant_banios, activo, id_anfitrion, id_direccion, id_tipo_alojamiento)
 VALUES ('Departamento frente al mar en Playa Grande', 'Departamento luminoso a una cuadra de la playa, con balcon y vista al mar.\nIdeal para una escapada en pareja o con amigos. Cocina completa y cochera cubierta.', 45000, 4, 3, 2, 1, 1, @h_martina, @dir, (SELECT id_tipo_alojamiento FROM tipo_alojamiento WHERE nombre_tipo = 'Departamento'));
@@ -89,7 +89,7 @@ INSERT INTO servicio_x_alojamiento (id_alojamiento, id_servicio) SELECT @a1, id_
 INSERT INTO servicio_x_alojamiento (id_alojamiento, id_servicio) SELECT @a1, id_servicio FROM servicio WHERE nombre_servicio = 'Televisor smart';
 
 -- Cabaña de troncos con vista al lago
-INSERT INTO direccion (calle, altura, ciudad, provincia, pais, codigo_postal) VALUES ('Av. Bustillo', 9500, 'San Carlos de Bariloche', 'Río Negro', 'Argentina', '8400');
+INSERT INTO direccion (calle, altura, ciudad, provincia, pais, codigo_postal, latitud, longitud) VALUES ('Av. Bustillo', 9500, 'San Carlos de Bariloche', 'Río Negro', 'Argentina', '8400', -41.115, -71.405);
 SET @dir = LAST_INSERT_ID();
 INSERT INTO alojamiento (titulo, descripcion, precio_noche, capacidad, cant_ambientes, cant_habitaciones, cant_banios, activo, id_anfitrion, id_direccion, id_tipo_alojamiento)
 VALUES ('Cabaña de troncos con vista al lago', 'Cabaña cálida en el bosque, con hogar a leña y deck sobre el lago Nahuel Huapi.\nA 15 minutos del centro de Bariloche y del Cerro Catedral.', 68000, 6, 4, 3, 2, 1, @h_martina, @dir, (SELECT id_tipo_alojamiento FROM tipo_alojamiento WHERE nombre_tipo = 'Cabaña'));
@@ -107,7 +107,7 @@ INSERT INTO servicio_x_alojamiento (id_alojamiento, id_servicio) SELECT @a2, id_
 INSERT INTO servicio_x_alojamiento (id_alojamiento, id_servicio) SELECT @a2, id_servicio FROM servicio WHERE nombre_servicio = 'Admite mascotas';
 
 -- Casa con pileta en las sierras
-INSERT INTO direccion (calle, altura, ciudad, provincia, pais, codigo_postal) VALUES ('Los Algarrobos', 120, 'Villa Carlos Paz', 'Córdoba', 'Argentina', '5152');
+INSERT INTO direccion (calle, altura, ciudad, provincia, pais, codigo_postal, latitud, longitud) VALUES ('Los Algarrobos', 120, 'Villa Carlos Paz', 'Córdoba', 'Argentina', '5152', -31.4241, -64.4978);
 SET @dir = LAST_INSERT_ID();
 INSERT INTO alojamiento (titulo, descripcion, precio_noche, capacidad, cant_ambientes, cant_habitaciones, cant_banios, activo, id_anfitrion, id_direccion, id_tipo_alojamiento)
 VALUES ('Casa con pileta en las sierras', 'Casa amplia con parque, pileta y quincho. Perfecta para familias o grupos grandes.\nA 5 minutos del lago San Roque.', 82000, 8, 5, 4, 3, 1, @h_javier, @dir, (SELECT id_tipo_alojamiento FROM tipo_alojamiento WHERE nombre_tipo = 'Casa'));
@@ -125,7 +125,7 @@ INSERT INTO servicio_x_alojamiento (id_alojamiento, id_servicio) SELECT @a3, id_
 INSERT INTO servicio_x_alojamiento (id_alojamiento, id_servicio) SELECT @a3, id_servicio FROM servicio WHERE nombre_servicio = 'Lavarropas';
 
 -- Loft entre viñedos
-INSERT INTO direccion (calle, altura, ciudad, provincia, pais, codigo_postal) VALUES ('Ruta Provincial 15', 3200, 'Luján de Cuyo', 'Mendoza', 'Argentina', '5507');
+INSERT INTO direccion (calle, altura, ciudad, provincia, pais, codigo_postal, latitud, longitud) VALUES ('Ruta Provincial 15', 3200, 'Luján de Cuyo', 'Mendoza', 'Argentina', '5507', -33.036, -68.879);
 SET @dir = LAST_INSERT_ID();
 INSERT INTO alojamiento (titulo, descripcion, precio_noche, capacidad, cant_ambientes, cant_habitaciones, cant_banios, activo, id_anfitrion, id_direccion, id_tipo_alojamiento)
 VALUES ('Loft entre viñedos', 'Loft de diseño rodeado de viñedos, con vista a la cordillera.\nIncluye degustación de vinos en la bodega vecina.', 55000, 2, 1, 1, 1, 1, @h_javier, @dir, (SELECT id_tipo_alojamiento FROM tipo_alojamiento WHERE nombre_tipo = 'Loft'));
@@ -141,7 +141,7 @@ INSERT INTO servicio_x_alojamiento (id_alojamiento, id_servicio) SELECT @a4, id_
 INSERT INTO servicio_x_alojamiento (id_alojamiento, id_servicio) SELECT @a4, id_servicio FROM servicio WHERE nombre_servicio = 'Estacionamiento';
 
 -- Monoambiente luminoso en Palermo
-INSERT INTO direccion (calle, altura, ciudad, provincia, pais, codigo_postal) VALUES ('Honduras', 4700, 'Ciudad Autónoma de Buenos Aires', 'Buenos Aires', 'Argentina', '1414');
+INSERT INTO direccion (calle, altura, ciudad, provincia, pais, codigo_postal, latitud, longitud) VALUES ('Honduras', 4700, 'Ciudad Autónoma de Buenos Aires', 'Buenos Aires', 'Argentina', '1414', -34.588, -58.429);
 SET @dir = LAST_INSERT_ID();
 INSERT INTO alojamiento (titulo, descripcion, precio_noche, capacidad, cant_ambientes, cant_habitaciones, cant_banios, activo, id_anfitrion, id_direccion, id_tipo_alojamiento)
 VALUES ('Monoambiente luminoso en Palermo', 'Monoambiente moderno en Palermo Soho, cerca de bares, restaurantes y el subte.\nPerfecto para viajes de trabajo.', 32000, 2, 1, 1, 1, 1, @h_sofia, @dir, (SELECT id_tipo_alojamiento FROM tipo_alojamiento WHERE nombre_tipo = 'Monoambiente'));
@@ -157,7 +157,7 @@ INSERT INTO servicio_x_alojamiento (id_alojamiento, id_servicio) SELECT @a5, id_
 INSERT INTO servicio_x_alojamiento (id_alojamiento, id_servicio) SELECT @a5, id_servicio FROM servicio WHERE nombre_servicio = 'Lavarropas';
 
 -- Departamento colonial en el centro de Salta
-INSERT INTO direccion (calle, altura, ciudad, provincia, pais, codigo_postal) VALUES ('Caseros', 650, 'Salta', 'Salta', 'Argentina', '4400');
+INSERT INTO direccion (calle, altura, ciudad, provincia, pais, codigo_postal, latitud, longitud) VALUES ('Caseros', 650, 'Salta', 'Salta', 'Argentina', '4400', -24.788, -65.406);
 SET @dir = LAST_INSERT_ID();
 INSERT INTO alojamiento (titulo, descripcion, precio_noche, capacidad, cant_ambientes, cant_habitaciones, cant_banios, activo, id_anfitrion, id_direccion, id_tipo_alojamiento)
 VALUES ('Departamento colonial en el centro de Salta', 'Departamento en casona colonial restaurada, a dos cuadras de la plaza 9 de Julio.\nPatio interno y desayuno regional.', 38000, 3, 2, 1, 1, 1, @h_sofia, @dir, (SELECT id_tipo_alojamiento FROM tipo_alojamiento WHERE nombre_tipo = 'Departamento'));
@@ -173,7 +173,7 @@ INSERT INTO servicio_x_alojamiento (id_alojamiento, id_servicio) SELECT @a6, id_
 INSERT INTO servicio_x_alojamiento (id_alojamiento, id_servicio) SELECT @a6, id_servicio FROM servicio WHERE nombre_servicio = 'Ropa de cama y toallas';
 
 -- Casa de campo con parrilla
-INSERT INTO direccion (calle, altura, ciudad, provincia, pais, codigo_postal) VALUES ('Camino a la Movediza', 1800, 'Tandil', 'Buenos Aires', 'Argentina', '7000');
+INSERT INTO direccion (calle, altura, ciudad, provincia, pais, codigo_postal, latitud, longitud) VALUES ('Camino a la Movediza', 1800, 'Tandil', 'Buenos Aires', 'Argentina', '7000', -37.309, -59.155);
 SET @dir = LAST_INSERT_ID();
 INSERT INTO alojamiento (titulo, descripcion, precio_noche, capacidad, cant_ambientes, cant_habitaciones, cant_banios, activo, id_anfitrion, id_direccion, id_tipo_alojamiento)
 VALUES ('Casa de campo con parrilla', 'Casa de campo en las afueras de Tandil, con parque, parrilla y vista a las sierras.\nIdeal para desconectar el fin de semana.', 60000, 6, 4, 3, 2, 1, @h_javier, @dir, (SELECT id_tipo_alojamiento FROM tipo_alojamiento WHERE nombre_tipo = 'Casa'));
@@ -190,7 +190,7 @@ INSERT INTO servicio_x_alojamiento (id_alojamiento, id_servicio) SELECT @a7, id_
 INSERT INTO servicio_x_alojamiento (id_alojamiento, id_servicio) SELECT @a7, id_servicio FROM servicio WHERE nombre_servicio = 'Admite mascotas';
 
 -- Departamento en San Telmo (pausado)
-INSERT INTO direccion (calle, altura, ciudad, provincia, pais, codigo_postal) VALUES ('Defensa', 900, 'Ciudad Autónoma de Buenos Aires', 'Buenos Aires', 'Argentina', '1065');
+INSERT INTO direccion (calle, altura, ciudad, provincia, pais, codigo_postal, latitud, longitud) VALUES ('Defensa', 900, 'Ciudad Autónoma de Buenos Aires', 'Buenos Aires', 'Argentina', '1065', -34.619, -58.372);
 SET @dir = LAST_INSERT_ID();
 INSERT INTO alojamiento (titulo, descripcion, precio_noche, capacidad, cant_ambientes, cant_habitaciones, cant_banios, activo, id_anfitrion, id_direccion, id_tipo_alojamiento)
 VALUES ('Departamento en San Telmo (pausado)', 'Departamento de estilo antiguo en San Telmo. Publicación pausada por el anfitrion:\nno aparece en el buscador (sirve para probar alojamientos inactivos).', 29000, 2, 2, 1, 1, 0, @h_sofia, @dir, (SELECT id_tipo_alojamiento FROM tipo_alojamiento WHERE nombre_tipo = 'Departamento'));

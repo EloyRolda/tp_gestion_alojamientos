@@ -23,7 +23,7 @@
           <input id="email" autocomplete="email" type="email" required [ngModel]="form().email" (ngModelChange)="actualizarCampo('email', $event)" name="email" />
         </div>
         <div class="field">
-          <label for="telefono">Telefono</label>
+          <label for="telefono">Teléfono</label>
           <input id="telefono" autocomplete="tel" type="tel" required [ngModel]="form().telefono" (ngModelChange)="actualizarCampo('telefono', $event)" name="telefono" />
         </div>
         <div class="field">
@@ -54,7 +54,7 @@
         @if (aliasCobroActual()) {
           <p>Alias/CBU/CVU actual: <strong>{{ aliasCobroActual() }}</strong></p>
         } @else {
-          <p class="text-muted">Todavia no registraste un alias de cobro.</p>
+          <p class="text-muted">Todavía no registraste un alias de cobro.</p>
         }
 
         @if (aliasCobroPaso() === 'ingresar') {

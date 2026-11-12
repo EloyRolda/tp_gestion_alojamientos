@@ -23,7 +23,7 @@
       </section>
 
       <section class="stack stack--tight">
-        <h2>Estadia</h2>
+        <h2>Estadía</h2>
         <dl class="datos">
           <dt>Check-in</dt>
           <dd>{{ r.fechaInicio | date: 'dd/MM/yyyy' }}</dd>
@@ -38,7 +38,7 @@
         <section class="stack stack--tight">
           <h2>Pago</h2>
           <dl class="datos">
-            <dt>Monto base (lo que vos recibis)</dt>
+            <dt>Monto base (lo que vos recibís)</dt>
             <dd>${{ r.pago.montoBase | number }}</dd>
             <dt>Estado del pago</dt>
             <dd><app-estado [valor]="r.pago.estado" /></dd>
@@ -62,7 +62,7 @@
         }
         @if (puedeFinalizar(r)) {
           <button type="button" class="btn btn--primario" (click)="finalizar()" [disabled]="procesando()">
-            {{ procesando() ? 'Procesando...' : 'Finalizar estadia' }}
+            {{ procesando() ? 'Procesando...' : 'Finalizar estadía' }}
           </button>
         }
         @if (puedeCancelar(r)) {

@@ -23,7 +23,7 @@
       </section>
 
       <section class="stack stack--tight">
-        <h2>Estadia</h2>
+        <h2>Estadía</h2>
         <dl class="datos">
           <dt>Check-in</dt>
           <dd>{{ r.fechaInicio | date: 'dd/MM/yyyy' }}</dd>
@@ -45,7 +45,7 @@
             <dt>Estado del pago</dt>
             <dd><app-estado [valor]="r.pago.estado" /></dd>
             @if (r.pago.motivoCancelacion) {
-              <dt>Motivo de cancelacion</dt>
+              <dt>Motivo de cancelación</dt>
               <dd>{{ r.pago.motivoCancelacion }}</dd>
             }
             @if (r.pago.montoReembolsadoCliente != null) {
@@ -53,7 +53,7 @@
               <dd>${{ r.pago.montoReembolsadoCliente | number }}</dd>
             }
             @if (r.pago.montoRetenidoAnfitrion != null) {
-              <dt>Retenido para el anfitrion</dt>
+              <dt>Retenido para el anfitrión</dt>
               <dd>${{ r.pago.montoRetenidoAnfitrion | number }}</dd>
             }
           </dl>
@@ -67,7 +67,7 @@
       @if (puedeCancelar(r)) {
         <div class="form-actions">
           <button type="button" class="btn btn--peligro" (click)="cancelar()" [disabled]="procesando()">
-            {{ procesando() ? 'Procesando...' : 'Cancelar reserva (regla automatica)' }}
+            {{ procesando() ? 'Procesando...' : 'Cancelar reserva (regla automática)' }}
           </button>
         </div>
       }
@@ -76,7 +76,7 @@
     @if (puedeReembolsar(r)) {
       <section class="stack card">
         <h2>Reembolso manual</h2>
-        <p class="text-muted">Cancela la reserva con un reembolso a medida al cliente (el resto del monto base queda para el anfitrion). Usar solo para casos que no entran en las reglas automaticas.</p>
+        <p class="text-muted">Cancela la reserva con un reembolso a medida al cliente (el resto del monto base queda para el anfitrión). Usar solo para casos que no entran en las reglas automáticas.</p>
         <form class="stack" (submit)="$event.preventDefault(); enviarReembolso()">
           <div class="field">
             <label for="montoReembolso">Monto a reembolsar al cliente</label>

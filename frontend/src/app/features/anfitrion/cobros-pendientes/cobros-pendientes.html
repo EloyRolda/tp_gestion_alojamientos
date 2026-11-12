@@ -1,6 +1,6 @@
 <section class="stack">
   <h1>Cobros pendientes</h1>
-  <p class="text-muted">Reservas ya pagadas por el cliente que todavia no se liquidaron (se liquidan al finalizar la estadia).</p>
+  <p class="text-muted">Reservas ya pagadas por el cliente que todavía no se liquidaron (se liquidan al finalizar la estadía).</p>
 
   @if (cargando()) {
     <app-esqueleto tipo="panel" [cantidad]="3" />
@@ -25,7 +25,7 @@
         <thead>
           <tr>
             <th>Alojamiento</th>
-            <th>Fin de estadia</th>
+            <th>Fin de estadía</th>
             <th>Monto a cobrar</th>
           </tr>
         </thead>
@@ -33,7 +33,7 @@
           @for (c of cobros(); track c.idReserva) {
             <tr>
               <td data-label="Alojamiento">{{ c.tituloAlojamiento }}</td>
-              <td data-label="Fin de estadia">{{ c.fechaFinEstadia | date: 'dd/MM/yyyy' }}</td>
+              <td data-label="Fin de estadía">{{ c.fechaFinEstadia | date: 'dd/MM/yyyy' }}</td>
               <td data-label="Monto a cobrar">${{ c.montoAcobrar | number }}</td>
             </tr>
           }

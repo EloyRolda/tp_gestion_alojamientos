@@ -1,6 +1,7 @@
 import { Component, effect, inject, input, signal } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { Router } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { AlojamientoService } from '../../../core/services/alojamiento.service';
 import { GaleriaService } from '../../../core/services/galeria.service';
 import { ReviewService } from '../../../core/services/review.service';
@@ -33,6 +34,7 @@ export class DetalleAlojamiento {
   private readonly galeriaService = inject(GaleriaService);
   private readonly reviewService = inject(ReviewService);
   private readonly router = inject(Router);
+  private readonly titulo = inject(Title);
   protected readonly auth = inject(AuthService);
 
   readonly alojamiento = signal<Alojamiento | null>(null);
@@ -71,6 +73,8 @@ export class DetalleAlojamiento {
     this.alojamientoService.obtener(id).subscribe({
       next: (a) => {
         this.alojamiento.set(a);
+        // La pestaña muestra el nombre del alojamiento (mejor para compartir y para buscadores).
+        this.titulo.setTitle(`${a.titulo} · AlojaME`);
         this.cargando.set(false);
       },
       error: (err) => {

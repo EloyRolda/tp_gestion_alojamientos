@@ -6,11 +6,11 @@
   } @else {
     <form class="stack" (submit)="$event.preventDefault(); guardar()">
       <div class="field">
-        <label for="titulo">Titulo</label>
+        <label for="titulo">Título</label>
         <input id="titulo" type="text" autocomplete="off" required [ngModel]="form().titulo" (ngModelChange)="actualizarCampo('titulo', $event)" name="titulo" />
       </div>
       <div class="field">
-        <label for="descripcion">Descripcion</label>
+        <label for="descripcion">Descripción</label>
         <textarea id="descripcion" rows="4" [ngModel]="form().descripcion" (ngModelChange)="actualizarCampo('descripcion', $event)" name="descripcion"></textarea>
       </div>
       <div class="form-grid">
@@ -19,7 +19,7 @@
           <input id="precioNoche" type="number" inputmode="decimal" min="0.01" step="0.01" required [ngModel]="form().precioNoche" (ngModelChange)="actualizarCampo('precioNoche', $event)" name="precioNoche" />
         </div>
         <div class="field">
-          <label for="capacidad">Capacidad (huespedes)</label>
+          <label for="capacidad">Capacidad (huéspedes)</label>
           <input id="capacidad" type="number" inputmode="numeric" min="1" required [ngModel]="form().capacidad" (ngModelChange)="actualizarCampo('capacidad', $event)" name="capacidad" />
         </div>
       </div>
@@ -49,10 +49,10 @@
 
       @if (!esEdicion()) {
         <fieldset class="field">
-          <legend>Direccion</legend>
+          <legend>Dirección</legend>
           <div class="form-grid">
             <div class="field">
-              <label for="dir-pais">Pais</label>
+              <label for="dir-pais">País</label>
               <input id="dir-pais" type="text" autocomplete="country-name" required [ngModel]="direccion().pais" (ngModelChange)="actualizarDireccion('pais', $event)" name="pais" />
             </div>
             <div class="field">
@@ -72,7 +72,7 @@
               <input id="dir-altura" type="number" autocomplete="off" inputmode="numeric" min="0" required [ngModel]="direccion().altura" (ngModelChange)="actualizarDireccion('altura', $event)" name="altura" />
             </div>
             <div class="field">
-              <label for="dir-codigoPostal">Codigo postal</label>
+              <label for="dir-codigoPostal">Código postal</label>
               <input id="dir-codigoPostal" type="text" autocomplete="postal-code" required [ngModel]="direccion().codigoPostal" (ngModelChange)="actualizarDireccion('codigoPostal', $event)" name="codigoPostal" />
             </div>
           </div>
@@ -112,7 +112,7 @@
         </fieldset>
       } @else {
         <fieldset class="field">
-          <legend>Direccion (no editable)</legend>
+          <legend>Dirección (no editable)</legend>
           <p class="text-muted">{{ direccion().calle }} {{ direccion().altura }}, {{ direccion().ciudad }}, {{ direccion().provincia }}, {{ direccion().pais }} ({{ direccion().codigoPostal }})</p>
         </fieldset>
 

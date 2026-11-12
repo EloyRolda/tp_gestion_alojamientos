@@ -6,18 +6,18 @@ Trabajo Práctico Final de la Tecnicatura Universitaria en Programación (UTN �
 
 | Capa | Tecnologías |
 |---|---|
-| Frontend | Angular 22 (componentes standalone, signals, guards, interceptor HTTP), TypeScript, CSS propio |
+| Frontend | Angular 22 (componentes standalone, signals, guards, interceptor HTTP), TypeScript, CSS propio, Leaflet (mapas) |
 | Backend | Java 21, Spring Boot 3.4.3 (Web, Data JPA, Security, Validation), JWT (JJWT 0.12.6), Lombok, Springdoc OpenAPI |
 | Base de datos | MariaDB / MySQL |
-| Servicios externos | MercadoPago (Checkout Pro, reembolsos, liquidaciones), Brevo (emails transaccionales), Cloudinary (imágenes) |
+| Servicios externos | MercadoPago (Checkout Pro, reembolsos, liquidaciones), Brevo (emails transaccionales), Cloudinary (imágenes), OpenStreetMap y Nominatim (mapas y búsqueda de direcciones) |
 
 ---
 
 ## Funcionalidades por rol
 
-- **Visitante (sin cuenta):** navega el catálogo completo (listado, búsqueda con filtros, detalle, galería y reseñas) sin necesidad de iniciar sesión.
+- **Visitante (sin cuenta):** navega el catálogo completo (listado con fotos, búsqueda con filtros en lista o en mapa, detalle, galería y reseñas) sin necesidad de iniciar sesión, y consulta las páginas de ayuda y legales.
 - **Cliente:** registro con verificación de cuenta por email (token de un solo uso, 24 h), edición de perfil, reserva de alojamientos con control de superposición de fechas, pago con MercadoPago, detalle de reservas con comprobante, cancelación según la política vigente, reseñas tras una estadía finalizada y resumen de gastos.
-- **Anfitrión:** alta, edición y activación/desactivación de alojamientos, galería de imágenes en Cloudinary, servicios por alojamiento, gestión de las reservas recibidas (confirmar, cancelar, finalizar), alias/CBU/CVU de cobro validado (dígito verificador e identificación del banco), cobros pendientes de liquidar y resumen de ingresos por alojamiento.
+- **Anfitrión:** alta, edición y activación/desactivación de alojamientos (con su ubicación marcada en el mapa), galería de imágenes en Cloudinary, servicios por alojamiento, gestión de las reservas recibidas (confirmar, cancelar, finalizar), alias/CBU/CVU de cobro validado (dígito verificador e identificación del banco), cobros pendientes de liquidar y resumen de ingresos por alojamiento.
 - **Administrador:** gestión de usuarios (incluye alta de otros administradores), CRUD de los catálogos de tipos de alojamiento y servicios, todas las reservas de la plataforma, reembolsos manuales y estadísticas globales (flujo de dinero, ranking de alojamientos, cancelaciones por motivo, ingresos mensuales).
 
 ## Reglas de negocio principales
@@ -120,6 +120,7 @@ Internet ──HTTPS──> Nginx
 - **Backend:** completo y auditado en tres rondas (arquitectura, seguridad y lógica de negocio). 65 endpoints REST.
 - **Frontend:** los cuatro lotes funcionales (vistas públicas, Cliente, Anfitrión y Administrador) están terminados y verificados en vivo contra el backend, incluido un pago completo en el entorno de pruebas de MercadoPago y la subida de imágenes a Cloudinary.
 - **Responsive:** el frontend se adapta a celular, tablet y desktop (Lote 5, sprint de Jira SCRUM-49): verificado en las 33 pantallas con los cuatro perfiles en 360, 768, 1024 y 1280px, sin scroll horizontal y con controles táctiles de 44px.
+- **Identidad visual (Lote 6, sprint de Jira SCRUM-59):** paleta y tipografía propias, encabezado con buscador fijo y menú de cuenta, pie de página, páginas de ayuda y legales, fotos en los listados, búsqueda en mapa, esqueletos de carga, estados vacíos y avisos. La marca es **Kaza**, la mascota de AlojaME: una carita adentro de una casa con techo, siempre de un solo color (amarillo sobre fondos oscuros, negro sobre fondos claros).
 - **Limitaciones conocidas:** la API de liquidaciones (payouts) de MercadoPago rechaza las credenciales de prueba con `400 "Invalid signature"`; requiere una habilitación especial de la cuenta. El resto de la integración (preferencias, consulta de pagos y webhook) funciona con las mismas credenciales. No hay tests automatizados de backend por decisión de alcance.
 
 ## Documentación

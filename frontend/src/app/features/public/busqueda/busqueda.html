@@ -4,7 +4,7 @@
   <div class="busqueda">
     <form class="filtros" (submit)="$event.preventDefault()" aria-label="Filtros de búsqueda">
       <div class="field">
-        <label for="texto">Titulo o ciudad</label>
+        <label for="texto">Título o ciudad</label>
         <input
           id="texto"
           type="search"
@@ -22,7 +22,7 @@
         [attr.aria-expanded]="filtrosAbiertos()"
         (click)="alternarFiltros()"
       >
-        {{ filtrosAbiertos() ? 'Ocultar filtros' : 'Mas filtros' }}
+        {{ filtrosAbiertos() ? 'Ocultar filtros' : 'Más filtros' }}
         @if (filtrosActivos() > 0) {
           <span class="filtros__contador">({{ filtrosActivos() }} activos)</span>
         }
@@ -31,7 +31,7 @@
       <div id="filtros-panel" class="filtros__panel" [class.filtros__panel--abierto]="filtrosAbiertos()">
         <div class="filtros__rango">
           <div class="field">
-            <label for="precioMin">Precio minimo</label>
+            <label for="precioMin">Precio mínimo</label>
             <input
               id="precioMin"
               type="number"
@@ -43,7 +43,7 @@
             />
           </div>
           <div class="field">
-            <label for="precioMax">Precio maximo</label>
+            <label for="precioMax">Precio máximo</label>
             <input
               id="precioMax"
               type="number"
@@ -57,7 +57,7 @@
         </div>
 
         <div class="field">
-          <label for="capacidadMin">Huespedes (minimo)</label>
+          <label for="capacidadMin">Huéspedes (mínimo)</label>
           <input
             id="capacidadMin"
             type="number"

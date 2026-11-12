@@ -21,9 +21,14 @@ const CENTRO_MDP: L.LatLngTuple = [-38.004, -57.548];
 
 const pesos = new Intl.NumberFormat('es-AR', { maximumFractionDigits: 0 });
 
+/// Desde este zoom se ven los precios; mas lejos, cada alojamiento es un punto
+/// (con muchos resultados, los precios se pisarian entre si).
+const ZOOM_PRECIOS = 15;
+
 /// Mapa de resultados de la busqueda (SCRUM-66). Usa Leaflet con el mapa de
 /// OpenStreetMap (gratis, sin clave). Cada alojamiento con ubicacion aparece
-/// como una etiqueta con su precio; al tocarla se abre una ficha con la foto,
+/// como una etiqueta con su precio (o un punto, si el mapa esta alejado); al
+/// tocarla se abre una ficha con la foto,
 /// el nombre, el precio y un link al detalle.
 ///
 /// Este componente se carga con @defer desde la busqueda: Leaflet (y sus
@@ -72,7 +77,12 @@ export class MapaAlojamientos {
       attribution: '&copy; colaboradores de <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(this.mapa);
     this.capaMarcadores = L.layerGroup().addTo(this.mapa);
+    const mapa = this.mapa;
+    const actualizarDetalle = () =>
+      mapa.getContainer().classList.toggle('mapa--lejos', mapa.getZoom() < ZOOM_PRECIOS);
+    mapa.on('zoomend', actualizarDetalle);
     this.mapa.setView(CENTRO_MDP, 13);
+    actualizarDetalle();
     this.listo.set(true);
   }
 

@@ -2,9 +2,9 @@
   <h1>Crear cuenta</h1>
 
   @if (exito()) {
-    <p class="card">Registro exitoso. Te enviamos un correo para verificar tu cuenta (valido por 24 horas).</p>
-    <a routerLink="/verificar-cuenta" class="btn">Ya tengo un codigo de verificacion</a>
-    <a routerLink="/login" class="btn">Ir a iniciar sesion</a>
+    <p class="card">Registro exitoso. Te enviamos un correo para verificar tu cuenta (válido por 24 horas).</p>
+    <a routerLink="/verificar-cuenta" class="btn">Ya tengo un código de verificación</a>
+    <a routerLink="/login" class="btn">Ir a iniciar sesión</a>
   } @else {
     <form class="stack" (submit)="$event.preventDefault(); enviar()">
       <div class="form-grid">
@@ -29,7 +29,7 @@
           <input id="password" autocomplete="new-password" type="password" required minlength="6" [ngModel]="form().password" (ngModelChange)="actualizarCampo('password', $event)" name="password" />
         </div>
         <div class="field">
-          <label for="telefono">Telefono</label>
+          <label for="telefono">Teléfono</label>
           <input id="telefono" autocomplete="tel" type="tel" required [ngModel]="form().telefono" (ngModelChange)="actualizarCampo('telefono', $event)" name="telefono" />
         </div>
       </div>
@@ -60,6 +60,6 @@
       </button>
     </form>
 
-    <p class="text-muted">¿Ya tenes cuenta? <a routerLink="/login">Iniciar sesion</a></p>
+    <p class="text-muted">¿Ya tenés cuenta? <a routerLink="/login">Iniciar sesión</a></p>
   }
 </section>

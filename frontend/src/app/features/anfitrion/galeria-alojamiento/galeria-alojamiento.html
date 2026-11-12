@@ -1,5 +1,5 @@
 <section class="stack">
-  <h1>Galeria de {{ tituloAlojamiento() || '...' }}</h1>
+  <h1>Galería de {{ tituloAlojamiento() || '...' }}</h1>
   <a routerLink="/anfitrion/alojamientos" class="link-volver">&larr; Volver a mis alojamientos</a>
 
   @if (cargando()) {
@@ -9,7 +9,7 @@
       <p class="text-danger">{{ error() }}</p>
     }
 
-    <p class="text-muted">{{ imagenes().length }} de 10 imagenes.</p>
+    <p class="text-muted">{{ imagenes().length }} de 10 imágenes.</p>
 
     <ul class="galeria">
       @for (img of imagenes(); track img.id) {
@@ -22,7 +22,7 @@
     </ul>
 
     @if (maximoAlcanzado()) {
-      <p class="text-muted">Llegaste al maximo de 10 imagenes por alojamiento.</p>
+      <p class="text-muted">Llegaste al máximo de 10 imágenes por alojamiento.</p>
     } @else {
       <form class="stack card galeria__subir" (submit)="$event.preventDefault(); subir()">
         <h2>Subir imagen</h2>
@@ -31,7 +31,7 @@
           <input id="archivo" type="file" accept="image/*" required (change)="onArchivoElegido($event)" />
         </div>
         <div class="field">
-          <label for="alt">Descripcion de la imagen</label>
+          <label for="alt">Descripción de la imagen</label>
           <input id="alt" type="text" autocomplete="off" required [ngModel]="alt()" (ngModelChange)="alt.set($event)" name="alt" />
         </div>
         <button type="submit" class="btn btn--primario" [disabled]="subiendo() || !archivoElegido()">

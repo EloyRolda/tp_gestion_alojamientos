@@ -15,7 +15,7 @@
 
     @if (imagenes().length > 0) {
       <div class="detalle__galeria" [class.detalle__galeria--unica]="imagenes().length === 1"
-        [class.detalle__galeria--mosaico]="imagenes().length >= 5" aria-label="Galeria de imagenes">
+        [class.detalle__galeria--mosaico]="imagenes().length >= 5" aria-label="Galería de imágenes">
         @for (imagen of imagenes(); track imagen.id; let primera = $first) {
           <img [src]="imagen.url" [alt]="imagen.alt" [attr.loading]="primera ? null : 'lazy'" />
         }
@@ -29,9 +29,9 @@
       <div class="detalle__principal stack">
         <ul class="detalle__datos">
           <li>{{ a.tipoAlojamiento.nombreTipo }}</li>
-          <li>Hasta {{ a.capacidad }} huespedes</li>
+          <li>Hasta {{ a.capacidad }} huéspedes</li>
           <li>{{ a.cantAmbientes }} ambiente(s)</li>
-          <li>{{ a.cantHabitaciones }} habitacion(es)</li>
+          <li>{{ a.cantHabitaciones }} habitación(es)</li>
           <li>{{ a.cantBanios }} baño(s)</li>
         </ul>
 
@@ -51,7 +51,7 @@
         <section class="stack stack--tight">
           <h2>Reseñas</h2>
           @if (reviews().length === 0) {
-            <p class="text-muted">Este alojamiento todavia no tiene reseñas.</p>
+            <p class="text-muted">Este alojamiento todavía no tiene reseñas.</p>
           } @else {
             @for (review of reviews(); track review.idReview) {
               <article class="card">

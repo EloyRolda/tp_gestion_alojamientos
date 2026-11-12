@@ -21,16 +21,16 @@ export function extraerMensajeError(error: HttpErrorResponse): string {
   }
 
   if (error.status === 0) {
-    return 'No se pudo conectar con el servidor. Verifique su conexion e intente de nuevo.';
+    return 'No se pudo conectar con el servidor. Verifique su conexión e intente de nuevo.';
   }
   if (error.status === 401) {
-    return 'Debe iniciar sesion para continuar.';
+    return 'Debe iniciar sesión para continuar.';
   }
   if (error.status === 403) {
-    return 'No tiene permiso para realizar esta accion.';
+    return 'No tiene permiso para realizar esta acción.';
   }
   if (error.status === 404) {
-    return 'No se encontro lo que estaba buscando.';
+    return 'No se encontró lo que estaba buscando.';
   }
-  return 'Ocurrio un error inesperado. Intente de nuevo en unos minutos.';
+  return 'Ocurrió un error inesperado. Intente de nuevo en unos minutos.';
 }

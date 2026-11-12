@@ -3,7 +3,7 @@
   <h1>Crear administrador</h1>
 
   @if (exito()) {
-    <p class="card">Administrador creado correctamente, ya puede iniciar sesion.</p>
+    <p class="card">Administrador creado correctamente, ya puede iniciar sesión.</p>
   }
 
   <form class="stack" (submit)="$event.preventDefault(); enviar()">
@@ -29,7 +29,7 @@
         <input id="password" autocomplete="new-password" type="password" required minlength="6" [ngModel]="form().password" (ngModelChange)="actualizarCampo('password', $event)" name="password" />
       </div>
       <div class="field">
-        <label for="telefono">Telefono</label>
+        <label for="telefono">Teléfono</label>
         <input id="telefono" autocomplete="off" type="tel" required [ngModel]="form().telefono" (ngModelChange)="actualizarCampo('telefono', $event)" name="telefono" />
       </div>
     </div>

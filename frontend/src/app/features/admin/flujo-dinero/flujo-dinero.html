@@ -26,11 +26,11 @@
         <p class="kpi__valor">${{ flujo()!.totalFacturado | number }}</p>
       </div>
       <div class="kpi">
-        <p class="kpi__etiqueta">Comision plataforma</p>
+        <p class="kpi__etiqueta">Comisión plataforma</p>
         <p class="kpi__valor">${{ flujo()!.totalComisionPlataforma | number }}</p>
       </div>
       <div class="kpi">
-        <p class="kpi__etiqueta">Comision MercadoPago</p>
+        <p class="kpi__etiqueta">Comisión MercadoPago</p>
         <p class="kpi__valor">${{ flujo()!.totalComisionMercadopago | number }}</p>
       </div>
       <div class="kpi">
@@ -63,7 +63,7 @@
       <p class="text-muted">Total del año: <strong>${{ totalAnual() | number }}</strong></p>
       <!-- Una fila por mes con una barra proporcional al mes de mayor
            facturacion: se lee igual en un celular que en desktop. -->
-      <ol class="meses" aria-label="Facturacion por mes">
+      <ol class="meses" aria-label="Facturación por mes">
         @for (i of ingresosMensuales(); track i.mes) {
           <li class="meses__fila">
             <span class="meses__nombre">{{ meses[i.mes - 1] }}</span>
