@@ -5,6 +5,7 @@ import { ReservaService } from '../../../core/services/reserva.service';
 import { Reserva } from '../../../core/models/reserva.model';
 import { calcularNoches, calcularTotal } from '../../../core/utils/reserva.util';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { Estado } from '../../../shared/estado/estado';
 
 /// SCRUM-39 / RF20, RF23, RF25. Detalle de una reserva propia desde el lado
 /// del anfitrion: confirmar (SOLICITADA -> CONFIRMADA, dispara la preferencia
@@ -14,7 +15,7 @@ import { extraerMensajeError } from '../../../core/utils/http-error.util';
 @Component({
   selector: 'app-detalle-reserva-anfitrion',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, RouterLink],
+  imports: [DatePipe, DecimalPipe, RouterLink, Estado],
   templateUrl: './detalle-reserva-anfitrion.html',
   styleUrl: './detalle-reserva-anfitrion.css',
 })

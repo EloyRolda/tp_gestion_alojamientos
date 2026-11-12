@@ -1,10 +1,18 @@
-/* Aire arriba y abajo del contenido: un poco menos en mobile (SCRUM-58). */
+/* Aire arriba y abajo del contenido: un poco menos en mobile (SCRUM-58).
+   Desde tablet el avatar del encabezado sobresale 38px hacia abajo, asi que
+   el contenido arranca con aire suficiente para no quedar tapado. */
 .app-main {
-  padding-block: var(--space-3) var(--space-5);
+  padding-block: var(--space-4) var(--space-5);
+}
+
+@media (min-width: 768px) {
+  .app-main {
+    padding-block: var(--space-6) var(--space-6);
+  }
 }
 
 @media (min-width: 1024px) {
   .app-main {
-    padding-block: var(--space-4) var(--space-6);
+    padding-block: var(--space-6) 72px;
   }
 }

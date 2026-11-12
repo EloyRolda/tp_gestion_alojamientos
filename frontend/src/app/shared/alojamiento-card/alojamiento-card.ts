@@ -1,5 +1,6 @@
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { DecimalPipe } from '@angular/common';
 import { Alojamiento } from '../../core/models/alojamiento.model';
 
 /// Tarjeta de alojamiento reusada por Home y Busqueda -- un solo lugar para
@@ -7,7 +8,7 @@ import { Alojamiento } from '../../core/models/alojamiento.model';
 @Component({
   selector: 'app-alojamiento-card',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, DecimalPipe],
   templateUrl: './alojamiento-card.html',
   styleUrl: './alojamiento-card.css',
 })

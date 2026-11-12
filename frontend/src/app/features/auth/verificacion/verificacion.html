@@ -29,7 +29,7 @@
           @if (errorReenvio()) {
             <p class="text-danger">{{ errorReenvio() }}</p>
           }
-          <button type="submit" class="btn" [disabled]="reenviando()">
+          <button type="submit" class="btn btn--primario" [disabled]="reenviando()">
             {{ reenviando() ? 'Enviando...' : 'Reenviar correo de verificacion' }}
           </button>
         </form>

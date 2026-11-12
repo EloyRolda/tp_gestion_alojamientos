@@ -16,7 +16,7 @@
         } @else {
           <ol class="ranking">
             @for (a of porIngresos(); track a.idAlojamiento) {
-              <li><span class="ranking__titulo">{{ a.titulo }}</span> <span class="ranking__valor">{{ a.valor | number }}</span></li>
+              <li><span class="ranking__titulo">{{ a.titulo }}</span> <span class="ranking__valor">${{ a.valor | number }}</span></li>
             }
           </ol>
         }

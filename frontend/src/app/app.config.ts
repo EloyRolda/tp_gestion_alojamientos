@@ -1,8 +1,13 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, LOCALE_ID, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeEsAr from '@angular/common/locales/es-AR';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
+
+/// Precios y fechas en formato argentino ($45.500, 14/12/2026) en todos los pipes.
+registerLocaleData(localeEsAr);
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -12,5 +17,6 @@ export const appConfig: ApplicationConfig = {
     // sin pasar por ActivatedRoute a mano en cada vista.
     provideRouter(routes, withComponentInputBinding()),
     provideHttpClient(withInterceptors([authInterceptor])),
+    { provide: LOCALE_ID, useValue: 'es-AR' },
   ],
 };

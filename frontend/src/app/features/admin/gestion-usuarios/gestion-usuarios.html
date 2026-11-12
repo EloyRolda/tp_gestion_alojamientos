@@ -1,7 +1,7 @@
 <section class="stack">
   <div class="page-header">
     <h1>Gestion de usuarios</h1>
-    <a routerLink="/admin/usuarios/nuevo-admin" class="btn">Crear administrador</a>
+    <a routerLink="/admin/usuarios/nuevo-admin" class="btn btn--primario">Crear administrador</a>
   </div>
 
   <div class="field field--compacto">
@@ -42,7 +42,7 @@
               <td data-label="Estado">{{ u.activo ? 'Activo' : 'Inactivo' }}</td>
               <td class="tabla__acciones">
                 <a [routerLink]="['/admin/usuarios', u.id, 'editar']" class="btn">Editar</a>
-                <button type="button" class="btn" (click)="toggleActivo(u)" [disabled]="cambiandoEstado() === u.id">
+                <button type="button" class="btn" [class.btn--peligro]="u.activo" (click)="toggleActivo(u)" [disabled]="cambiandoEstado() === u.id">
                   {{ u.activo ? 'Desactivar' : 'Activar' }}
                 </button>
               </td>

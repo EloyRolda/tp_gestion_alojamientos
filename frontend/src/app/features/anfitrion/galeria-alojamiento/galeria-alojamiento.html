@@ -16,7 +16,7 @@
         <li class="galeria__item">
           <img [src]="img.url" [alt]="img.alt" loading="lazy" />
           <p class="galeria__alt text-muted">{{ img.alt }}</p>
-          <button type="button" class="btn" (click)="eliminar(img)">Eliminar</button>
+          <button type="button" class="btn btn--peligro" (click)="eliminar(img)">Eliminar</button>
         </li>
       }
     </ul>
@@ -34,7 +34,7 @@
           <label for="alt">Descripcion de la imagen</label>
           <input id="alt" type="text" autocomplete="off" required [ngModel]="alt()" (ngModelChange)="alt.set($event)" name="alt" />
         </div>
-        <button type="submit" class="btn" [disabled]="subiendo() || !archivoElegido()">
+        <button type="submit" class="btn btn--primario" [disabled]="subiendo() || !archivoElegido()">
           {{ subiendo() ? 'Subiendo...' : 'Subir' }}
         </button>
       </form>

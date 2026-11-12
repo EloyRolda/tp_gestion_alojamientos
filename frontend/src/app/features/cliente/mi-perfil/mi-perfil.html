@@ -39,7 +39,7 @@
         <p class="card">Datos actualizados correctamente.</p>
       }
 
-      <button type="submit" class="btn" [disabled]="guardando()">
+      <button type="submit" class="btn btn--primario" [disabled]="guardando()">
         {{ guardando() ? 'Guardando...' : 'Guardar cambios' }}
       </button>
     </form>
@@ -89,7 +89,7 @@
           <p>{{ aliasCobroInfo()?.mensaje }}</p>
           <p>¿Confirmas que quieres guardar <strong>{{ aliasCobroValor() }}</strong> como tu alias de cobro?</p>
           <div class="form-actions">
-            <button type="button" class="btn" [disabled]="aliasCobroCargando()" (click)="confirmarAliasCobro()">
+            <button type="button" class="btn btn--primario" [disabled]="aliasCobroCargando()" (click)="confirmarAliasCobro()">
               {{ aliasCobroCargando() ? 'Confirmando...' : 'Confirmar' }}
             </button>
             <button type="button" class="btn" [disabled]="aliasCobroCargando()" (click)="cancelarAliasCobro()">

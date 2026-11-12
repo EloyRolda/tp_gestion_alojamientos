@@ -1,9 +1,9 @@
 /* ============================================================
    AlojaME -- estilos globales.
 
-   Base responsive mobile-first (Lote 5). Resuelve la ESTRUCTURA: como se
-   acomoda y reordena todo segun el ancho de pantalla, con controles
-   comodos para el dedo. La paleta sigue siendo neutra.
+   Base responsive mobile-first (Lote 5) con la identidad visual de AlojaME
+   (Lote 6): paleta calida, tipografia Plus Jakarta Sans, controles
+   redondeados y Kaza, la mascota, como marca.
 
    Breakpoints de la app (usar siempre estos, no inventar otros salvo que
    una vista puntual realmente lo necesite):
@@ -16,7 +16,8 @@
      - botones, inputs y selects miden al menos 44px de alto (--tap-size);
      - los inputs usan 16px de fuente, asi el celular no hace zoom al tocarlos;
      - los formularios van en una columna en mobile (.form-grid pasa a dos
-       desde tablet) y sus botones se apilan a todo el ancho (.form-actions).
+       desde tablet) y sus botones se apilan a todo el ancho (.form-actions);
+     - los colores salen siempre de las variables de :root (nunca sueltos).
    ============================================================ */
 
 :root {
@@ -34,13 +35,49 @@
   /* Alto minimo de cualquier control tactil (recomendacion de accesibilidad). */
   --tap-size: 44px;
 
-  /* Placeholders neutros en escala de grises -- no es la paleta final. */
-  --color-text: #1a1a1a;
-  --color-text-muted: #595959;
-  --color-bg: #ffffff;
-  --color-bg-muted: #f2f2f2;
-  --color-border: #d0d0d0;
-  --color-danger: #8a1f1f;
+  /* Paleta de AlojaME: 080708 negro, F06543 tomate, A2AEBB acero, FDCA40 dorado,
+     3F88C5 azul. Las variantes "fuerte" y "suave" salen de esos colores, ajustadas
+     para que el texto encima cumpla contraste AA. */
+  --color-ink: #080708;
+  --color-tomate: #f06543;
+  --color-tomate-fuerte: #bf4527; /* botones principales: el blanco encima se lee */
+  --color-tomate-hover: #a63a20;
+  --color-tomate-suave: #fde5de;
+  --color-acero: #a2aebb;
+  --color-acero-suave: #eceff2;
+  --color-dorado: #fdca40;
+  --color-dorado-suave: #fff4d1;
+  --color-azul: #3f88c5;
+  --color-azul-fuerte: #2c6ca3; /* links */
+  --color-azul-suave: #e3eef8;
+
+  /* Kaza, la mascota, siempre va de UN solo color: amarillo sobre fondos oscuros
+     y negro sobre fondos claros. La unica excepcion es el avatar del encabezado
+     (cara amarilla con aro negro), que queda mitad sobre negro y mitad sobre claro. */
+  --kaza-sobre-oscuro: var(--color-dorado);
+  --kaza-sobre-claro: var(--color-ink);
+
+  /* Neutros con un toque calido. */
+  --color-text: #080708;
+  --color-text-muted: #5e5852;
+  --color-bg: #faf8f5;
+  --color-surface: #ffffff;
+  --color-bg-muted: #f0ece6;
+  --color-border: #e6e1da;
+  --color-danger: #b83a1c;
+
+  --font: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --sombra: 0 1px 2px rgba(8, 7, 8, 0.05), 0 6px 18px rgba(8, 7, 8, 0.06);
+  --sombra-hover: 0 4px 10px rgba(8, 7, 8, 0.08), 0 16px 32px rgba(8, 7, 8, 0.1);
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  color-scheme: light;
+}
+
+[hidden] {
+  display: none !important;
 }
 
 *,
@@ -61,11 +98,11 @@ html {
 }
 
 body {
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font);
   font-size: 1rem;
   color: var(--color-text);
   background: var(--color-bg);
-  line-height: 1.5;
+  line-height: 1.55;
   /* Palabras o datos largos (emails, ids externos, URLs) cortan en vez de
      ensanchar la pagina. break-word (y no anywhere) para no achicar las
      columnas de las tablas al minimo partiendo palabras comunes. */
@@ -83,18 +120,26 @@ figure {
 
 /* Tipografia fluida: crece con el ancho de pantalla entre un minimo y un maximo. */
 h1 {
-  font-size: clamp(1.6rem, 1.2rem + 2vw, 2.25rem);
-  line-height: 1.2;
+  font-size: clamp(1.7rem, 1.2rem + 2.2vw, 2.5rem);
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 
 h2 {
-  font-size: clamp(1.3rem, 1.1rem + 1vw, 1.6rem);
+  font-size: clamp(1.25rem, 1.1rem + 0.8vw, 1.5rem);
   line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
 }
 
 h3 {
-  font-size: clamp(1.1rem, 1rem + 0.5vw, 1.25rem);
+  font-size: clamp(1.05rem, 1rem + 0.3vw, 1.15rem);
   line-height: 1.3;
+  font-weight: 700;
+  text-wrap: balance;
 }
 
 ul,
@@ -106,6 +151,14 @@ ol {
 
 a {
   color: inherit;
+}
+
+/* Links de texto dentro del contenido: azul y subrayados. :where() deja la
+   especificidad en cero, asi cualquier clase (.btn, .link-volver, una tarjeta)
+   manda sobre esta regla sin pelear. */
+:where(main) :where(a:not([class])) {
+  color: var(--color-azul-fuerte);
+  text-underline-offset: 3px;
 }
 
 img,
@@ -143,7 +196,8 @@ textarea {
   width: 100%;
   max-width: var(--container-max-width);
   margin-inline: auto;
-  padding-inline: var(--space-3);
+  padding-left: max(var(--space-3), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--space-3), env(safe-area-inset-right, 0px));
 }
 
 /* Apilado vertical con espaciado consistente entre hijos directos. */
@@ -168,10 +222,10 @@ textarea {
 
 /* Grilla que reacomoda columnas sola, sin una regla por breakpoint.
    Pensada para listados de tarjetas (alojamientos, etc). El min() evita
-   que una tarjeta de 240px desborde en pantallas mas angostas. */
+   que una tarjeta de 250px desborde en pantallas mas angostas. */
 .grid-auto {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr));
   gap: var(--space-3);
 }
 
@@ -192,27 +246,59 @@ textarea {
 
 .tabla {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--sombra);
 }
 
 .tabla th,
 .tabla td {
   text-align: left;
   vertical-align: middle;
-  padding: var(--space-2) var(--space-3);
-  border-bottom: 1px solid var(--color-border);
+  padding: 12px var(--space-3);
+  border-bottom: 1px solid var(--color-bg-muted);
 }
 
 .tabla th {
+  background: var(--color-bg-muted);
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   white-space: nowrap;
+}
+
+.tabla thead th:first-child {
+  border-top-left-radius: var(--radius);
+}
+
+.tabla thead th:last-child {
+  border-top-right-radius: var(--radius);
+}
+
+.tabla tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.tabla tbody tr:hover {
+  background: var(--color-bg);
+}
+
+.tabla tbody tr:last-child td {
+  border-bottom: 0;
 }
 
 .tabla input:not([type='checkbox']):not([type='radio']) {
   width: 100%;
   min-height: var(--tap-size);
   padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
+  border: 1px solid var(--color-acero);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
 }
 
 .tabla__largo {
@@ -226,6 +312,12 @@ textarea {
 /* Unica media query "hacia abajo" de la hoja: es el mismo corte de desktop
    (1024px), pero asi las tarjetas no hay que deshacerlas despues. */
 @media (max-width: 1023.98px) {
+  .tabla {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+  }
+
   .table-cards thead {
     position: absolute;
     width: 1px;
@@ -245,13 +337,19 @@ textarea {
   .table-cards tr {
     margin-bottom: var(--space-3);
     padding: var(--space-2) var(--space-3);
+    background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: 4px;
+    border-radius: var(--radius);
+    box-shadow: var(--sombra);
+  }
+
+  .table-cards tbody tr:hover {
+    background: var(--color-surface);
   }
 
   .table-cards td {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: space-between;
     gap: var(--space-3);
     padding: var(--space-2) 0;
@@ -266,11 +364,13 @@ textarea {
     flex-shrink: 0;
     color: var(--color-text-muted);
     text-align: left;
+    font-weight: 500;
   }
 
   .table-cards td:first-child {
     display: block;
     font-weight: 700;
+    font-size: 1.05rem;
     text-align: left;
   }
 
@@ -309,10 +409,18 @@ textarea {
 }
 
 .card {
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 4px;
+  border-radius: var(--radius);
   padding: var(--space-3);
   min-width: 0;
+  box-shadow: var(--sombra);
+}
+
+@media (min-width: 768px) {
+  .card {
+    padding: var(--space-4);
+  }
 }
 
 /* Tarjetas de metricas (SCRUM-56): dos por fila en mobile, y desde tablet
@@ -329,20 +437,33 @@ textarea {
   gap: var(--space-1);
   min-width: 0;
   padding: var(--space-3);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 4px;
+  border-top: 4px solid var(--color-dorado);
+  border-radius: var(--radius);
+  box-shadow: var(--sombra);
+}
+
+.kpi:nth-child(3n + 2) {
+  border-top-color: var(--color-tomate);
+}
+
+.kpi:nth-child(3n + 3) {
+  border-top-color: var(--color-azul);
 }
 
 .kpi__etiqueta {
   color: var(--color-text-muted);
   font-size: 0.9rem;
+  font-weight: 500;
   line-height: 1.3;
 }
 
 .kpi__valor {
-  font-size: clamp(1.2rem, 1rem + 1vw, 1.6rem);
-  font-weight: 700;
-  line-height: 1.2;
+  font-size: clamp(1.35rem, 1.1rem + 1vw, 1.9rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
 
@@ -352,6 +473,7 @@ textarea {
 
 .text-danger {
   color: var(--color-danger);
+  font-weight: 600;
 }
 
 .visually-hidden {
@@ -376,9 +498,18 @@ textarea {
 .link-volver {
   display: inline-flex;
   align-items: center;
+  gap: var(--space-1);
   align-self: flex-start;
   min-height: var(--tap-size);
   color: var(--color-text-muted);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link-volver:hover {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* Lista de datos "etiqueta: valor" (detalles de reserva): etiqueta a la
@@ -392,7 +523,7 @@ textarea {
 .datos dt,
 .datos dd {
   margin: 0;
-  padding-block: var(--space-1);
+  padding-block: var(--space-2);
   border-bottom: 1px solid var(--color-bg-muted);
 }
 
@@ -403,7 +534,13 @@ textarea {
 .datos dd {
   padding-left: var(--space-3);
   text-align: right;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
+}
+
+.datos dt:last-of-type,
+.datos dd:last-of-type {
+  border-bottom: 0;
 }
 
 /* Botones dentro de una tarjeta (Editar / Galeria / Desactivar): se reparten
@@ -418,6 +555,57 @@ textarea {
   flex: 1 1 100px;
 }
 
+/* ---------- etiquetas de estado (chips) ----------
+   Un color por estado de reserva y de pago, siempre con texto oscuro sobre
+   fondo suave (contraste AA). Se usan desde el componente app-estado. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--color-acero-suave);
+  color: #3e4752;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.chip::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.8;
+}
+
+.chip--solicitada,
+.chip--pendiente {
+  background: var(--color-dorado-suave);
+  color: #7a5a00;
+}
+
+.chip--confirmada,
+.chip--pagado {
+  background: var(--color-azul-suave);
+  color: #1f4f7a;
+}
+
+.chip--finalizada,
+.chip--reembolsado_total,
+.chip--reembolsado_parcial {
+  background: var(--color-acero-suave);
+  color: #3e4752;
+}
+
+.chip--cancelada,
+.chip--vencido {
+  background: var(--color-tomate-suave);
+  color: #8a2e14;
+}
+
 /* ---------- formularios ---------- */
 
 /* Campo de formulario basico, consistente en toda la app: siempre ocupa el
@@ -425,8 +613,13 @@ textarea {
 .field {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: 6px;
   min-width: 0;
+}
+
+.field > label {
+  font-weight: 600;
+  font-size: 0.95rem;
 }
 
 .field input:not([type='checkbox']):not([type='radio']),
@@ -434,10 +627,29 @@ textarea {
 .field textarea {
   width: 100%;
   min-height: var(--tap-size);
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  background: var(--color-bg);
+  padding: var(--space-2) 14px;
+  border: 1px solid var(--color-acero);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.field input:hover,
+.field select:hover,
+.field textarea:hover {
+  border-color: var(--color-text-muted);
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus,
+.input-accion > input:focus,
+.tabla input:focus {
+  outline: none;
+  border-color: var(--color-azul);
+  box-shadow: 0 0 0 3px rgba(63, 136, 197, 0.25);
 }
 
 .field textarea {
@@ -468,8 +680,9 @@ input[type='file'] {
   width: 100%;
   min-height: var(--tap-size);
   padding: var(--space-2);
-  border: 1px dashed var(--color-border);
-  border-radius: 4px;
+  border: 1px dashed var(--color-acero);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
 }
 
 input[type='checkbox'],
@@ -478,6 +691,7 @@ input[type='radio'] {
   height: 20px;
   margin: 0;
   flex-shrink: 0;
+  accent-color: var(--color-tomate-fuerte);
 }
 
 /* Grilla de campos: una columna en mobile, dos (o tres) desde tablet.
@@ -500,9 +714,10 @@ input[type='radio'] {
   flex: 1 1 180px;
   min-width: 0;
   min-height: var(--tap-size);
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
+  padding: var(--space-2) 14px;
+  border: 1px solid var(--color-acero);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
 }
 
 /* Formulario corto de una linea (campo + boton, ej. "Nuevo tipo"): apilado
@@ -524,26 +739,50 @@ input[type='radio'] {
 fieldset {
   min-width: 0;
   border: 1px solid var(--color-border);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   padding: var(--space-3);
   margin: 0;
+  background: var(--color-surface);
 }
 
-/* ---------- botones ---------- */
+legend {
+  font-weight: 700;
+  padding-inline: var(--space-1);
+}
+
+/* ---------- botones ----------
+   .btn: boton secundario (blanco con borde).
+   .btn--primario: la accion principal de cada pantalla (tomate).
+   .btn--peligro: acciones que no se deshacen (cancelar, desactivar, borrar). */
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-1);
+  gap: var(--space-2);
   min-height: var(--tap-size);
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  background: var(--color-bg-muted);
+  padding: var(--space-2) 18px;
+  border: 1px solid var(--color-acero);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-weight: 600;
   cursor: pointer;
   text-align: center;
   text-decoration: none;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.1s ease;
+}
+
+.btn:hover:not(:disabled) {
+  border-color: var(--color-ink);
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .btn:disabled {
@@ -551,17 +790,72 @@ fieldset {
   cursor: not-allowed;
 }
 
+.btn--primario {
+  border-color: var(--color-tomate-fuerte);
+  background: var(--color-tomate-fuerte);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(191, 69, 39, 0.25);
+}
+
+.btn--primario:hover:not(:disabled) {
+  border-color: var(--color-tomate-hover);
+  background: var(--color-tomate-hover);
+}
+
+.btn--peligro {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.btn--peligro:hover:not(:disabled) {
+  border-color: var(--color-danger);
+  background: var(--color-tomate-suave);
+}
+
 /* Foco visible para quien navega con teclado. */
 :focus-visible {
-  outline: 2px solid var(--color-text);
+  outline: 3px solid var(--color-azul);
   outline-offset: 2px;
+}
+
+/* ---------- animaciones compartidas ----------
+   Cortas y sobrias. Se desactivan si el sistema pide menos movimiento. */
+@keyframes vista-entra {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes flota {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 
 /* ---------- tablet y desktop ---------- */
 
 @media (min-width: 768px) {
   .container {
-    padding-inline: var(--space-4);
+    padding-left: max(var(--space-4), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--space-4), env(safe-area-inset-right, 0px));
   }
 
   .grid-auto {
@@ -573,7 +867,7 @@ fieldset {
   }
 
   .kpi-grid {
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: var(--space-3);
   }
 

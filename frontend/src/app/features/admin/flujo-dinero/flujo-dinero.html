@@ -23,23 +23,23 @@
     <div class="kpi-grid">
       <div class="kpi">
         <p class="kpi__etiqueta">Total facturado</p>
-        <p class="kpi__valor">{{ flujo()!.totalFacturado | number }}</p>
+        <p class="kpi__valor">${{ flujo()!.totalFacturado | number }}</p>
       </div>
       <div class="kpi">
         <p class="kpi__etiqueta">Comision plataforma</p>
-        <p class="kpi__valor">{{ flujo()!.totalComisionPlataforma | number }}</p>
+        <p class="kpi__valor">${{ flujo()!.totalComisionPlataforma | number }}</p>
       </div>
       <div class="kpi">
         <p class="kpi__etiqueta">Comision MercadoPago</p>
-        <p class="kpi__valor">{{ flujo()!.totalComisionMercadopago | number }}</p>
+        <p class="kpi__valor">${{ flujo()!.totalComisionMercadopago | number }}</p>
       </div>
       <div class="kpi">
         <p class="kpi__etiqueta">Liquidado a anfitriones</p>
-        <p class="kpi__valor">{{ flujo()!.totalLiquidadoAnfitriones | number }}</p>
+        <p class="kpi__valor">${{ flujo()!.totalLiquidadoAnfitriones | number }}</p>
       </div>
       <div class="kpi">
         <p class="kpi__etiqueta">Reembolsado a clientes</p>
-        <p class="kpi__valor">{{ flujo()!.totalReembolsadoClientes | number }}</p>
+        <p class="kpi__valor">${{ flujo()!.totalReembolsadoClientes | number }}</p>
       </div>
       <div class="kpi">
         <p class="kpi__etiqueta">Cantidad de pagos</p>
@@ -60,7 +60,7 @@
     @if (cargandoIngresos()) {
       <p>Cargando...</p>
     } @else {
-      <p class="text-muted">Total del año: <strong>{{ totalAnual() | number }}</strong></p>
+      <p class="text-muted">Total del año: <strong>${{ totalAnual() | number }}</strong></p>
       <!-- Una fila por mes con una barra proporcional al mes de mayor
            facturacion: se lee igual en un celular que en desktop. -->
       <ol class="meses" aria-label="Facturacion por mes">
@@ -70,7 +70,7 @@
             <span class="meses__barra" aria-hidden="true">
               <span class="meses__relleno" [style.width.%]="porcentajeDelMaximo(i.totalFacturado)"></span>
             </span>
-            <span class="meses__monto">{{ i.totalFacturado | number }}</span>
+            <span class="meses__monto">${{ i.totalFacturado | number }}</span>
           </li>
         }
       </ol>

@@ -1,5 +1,5 @@
 import { Component, effect, inject, input, signal } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { AlojamientoService } from '../../../core/services/alojamiento.service';
 import { GaleriaService } from '../../../core/services/galeria.service';
@@ -21,7 +21,7 @@ import { extraerMensajeError } from '../../../core/utils/http-error.util';
 @Component({
   selector: 'app-detalle-alojamiento',
   standalone: true,
-  imports: [DatePipe],
+  imports: [DatePipe, DecimalPipe],
   templateUrl: './detalle-alojamiento.html',
   styleUrl: './detalle-alojamiento.css',
 })

@@ -26,8 +26,8 @@
               <td data-label="Alojamiento">{{ r.alojamiento.titulo }}</td>
               <td data-label="Check-in">{{ r.fechaInicio | date: 'dd/MM/yyyy' }}</td>
               <td data-label="Check-out">{{ r.fechaFin | date: 'dd/MM/yyyy' }}</td>
-              <td data-label="Total">{{ totalDe(r) | number }}</td>
-              <td data-label="Estado">{{ r.estadoReserva }}</td>
+              <td data-label="Total">${{ totalDe(r) | number }}</td>
+              <td data-label="Estado"><app-estado [valor]="r.estadoReserva" /></td>
               <td class="tabla__acciones"><a [routerLink]="['/mis-reservas', r.idReserva]" class="btn">Ver</a></td>
             </tr>
           }

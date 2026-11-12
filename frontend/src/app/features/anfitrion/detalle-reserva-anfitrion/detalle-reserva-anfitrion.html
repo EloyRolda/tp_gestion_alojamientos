@@ -10,7 +10,7 @@
 
     <article class="stack card">
       <h1>Reserva #{{ r.idReserva }}</h1>
-      <p class="text-muted">Estado: <strong>{{ r.estadoReserva }}</strong></p>
+      <p class="text-muted">Estado: <app-estado [valor]="r.estadoReserva" /></p>
 
       <section class="stack stack--tight">
         <h2>Alojamiento</h2>
@@ -29,8 +29,8 @@
           <dd>{{ r.fechaInicio | date: 'dd/MM/yyyy' }}</dd>
           <dt>Check-out</dt>
           <dd>{{ r.fechaFin | date: 'dd/MM/yyyy' }}</dd>
-          <dt>{{ noches(r) }} {{ noches(r) === 1 ? 'noche' : 'noches' }} &times; {{ r.precioNochePactado | number }}</dt>
-          <dd><strong>{{ total(r) | number }}</strong></dd>
+          <dt>{{ noches(r) }} {{ noches(r) === 1 ? 'noche' : 'noches' }} &times; ${{ r.precioNochePactado | number }}</dt>
+          <dd><strong>${{ total(r) | number }}</strong></dd>
         </dl>
       </section>
 
@@ -39,9 +39,9 @@
           <h2>Pago</h2>
           <dl class="datos">
             <dt>Monto base (lo que vos recibis)</dt>
-            <dd>{{ r.pago.montoBase | number }}</dd>
+            <dd>${{ r.pago.montoBase | number }}</dd>
             <dt>Estado del pago</dt>
-            <dd><strong>{{ r.pago.estado }}</strong></dd>
+            <dd><app-estado [valor]="r.pago.estado" /></dd>
             @if (r.pago.fechaTransferencia) {
               <dt>Transferido el</dt>
               <dd>{{ r.pago.fechaTransferencia | date: 'dd/MM/yyyy HH:mm' }}</dd>
@@ -56,17 +56,17 @@
 
       <div class="form-actions">
         @if (puedeConfirmar(r)) {
-          <button type="button" class="btn" (click)="confirmar()" [disabled]="procesando()">
+          <button type="button" class="btn btn--primario" (click)="confirmar()" [disabled]="procesando()">
             {{ procesando() ? 'Procesando...' : 'Confirmar reserva' }}
           </button>
         }
         @if (puedeFinalizar(r)) {
-          <button type="button" class="btn" (click)="finalizar()" [disabled]="procesando()">
+          <button type="button" class="btn btn--primario" (click)="finalizar()" [disabled]="procesando()">
             {{ procesando() ? 'Procesando...' : 'Finalizar estadia' }}
           </button>
         }
         @if (puedeCancelar(r)) {
-          <button type="button" class="btn" (click)="cancelar()" [disabled]="procesando()">
+          <button type="button" class="btn btn--peligro" (click)="cancelar()" [disabled]="procesando()">
             {{ procesando() ? 'Procesando...' : 'Cancelar reserva' }}
           </button>
         }

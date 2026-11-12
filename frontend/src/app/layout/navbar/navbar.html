@@ -1,50 +1,91 @@
-<header class="navbar">
-  <div class="navbar__bar container">
-    <a routerLink="/" class="navbar__brand" (click)="cerrarMenu()">AlojaME</a>
+<header class="topbar">
+  <div class="topbar__inner container">
+    <a routerLink="/" class="topbar__logo" aria-label="AlojaME, ir al inicio">
+      <app-kaza variante="trazo" sobre="oscuro" />
+      <span class="logo-texto">Aloja<span>ME</span></span>
+    </a>
 
-    <button
-      type="button"
-      class="navbar__toggle"
-      (click)="toggleMenu()"
-      [attr.aria-expanded]="menuAbierto()"
-      aria-controls="navbar-menu"
-    >
-      <span class="visually-hidden">{{ menuAbierto() ? 'Cerrar menu' : 'Abrir menu' }}</span>
-      <span aria-hidden="true">{{ menuAbierto() ? '✕' : '☰' }}</span>
-    </button>
+    <form class="buscador" role="search" (submit)="$event.preventDefault(); buscar()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"></circle>
+        <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+      </svg>
+      <label for="buscador-texto" class="visually-hidden">Buscar por título o barrio</label>
+      <input
+        id="buscador-texto"
+        type="search"
+        placeholder="¿A dónde vas?"
+        autocomplete="off"
+        [ngModel]="textoBusqueda()"
+        (ngModelChange)="textoBusqueda.set($event)"
+        [ngModelOptions]="{ standalone: true }"
+      />
+      <button type="submit">Buscar</button>
+    </form>
 
-    <nav id="navbar-menu" class="navbar__menu" aria-label="Navegacion principal" [class.navbar__menu--abierto]="menuAbierto()">
-      <a routerLink="/" routerLinkActive="navbar__link--activo" [routerLinkActiveOptions]="{ exact: true }" (click)="cerrarMenu()">Inicio</a>
-      <a routerLink="/buscar" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Buscar</a>
+    <div class="perfil">
+      <button
+        #botonPerfil
+        type="button"
+        class="perfil__boton"
+        (click)="toggleMenu()"
+        [attr.aria-expanded]="menuAbierto()"
+        aria-controls="perfil-menu"
+        aria-haspopup="true"
+        [attr.aria-label]="etiquetaAvatar()"
+      >
+        <app-kaza variante="avatar" />
+      </button>
 
-      @if (!estaLogueado()) {
-        <a routerLink="/login" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Iniciar sesion</a>
-        <a routerLink="/registro" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Registrarse</a>
-      } @else {
-        @if (rol() === 'CLIENTE' || rol() === 'ADMIN') {
-          <a routerLink="/mis-reservas" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Mis reservas</a>
-          <a routerLink="/mis-gastos" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Mis gastos</a>
-        }
-        @if (rol() === 'ANFITRION' || rol() === 'ADMIN') {
-          <a routerLink="/anfitrion/alojamientos" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Mis alojamientos</a>
-          <a routerLink="/anfitrion/reservas" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Reservas recibidas</a>
-          <a routerLink="/anfitrion/cobros-pendientes" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Cobros pendientes</a>
-          <a routerLink="/anfitrion/resumen" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Resumen</a>
-        }
-        @if (rol() === 'ADMIN') {
-          <a routerLink="/admin/usuarios" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Usuarios</a>
-          <a routerLink="/admin/catalogo-tipos" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Catalogo de tipos</a>
-          <a routerLink="/admin/catalogo-servicios" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Catalogo de servicios</a>
-          <a routerLink="/admin/reservas" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Todas las reservas</a>
-          <a routerLink="/admin/flujo-dinero" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Flujo de dinero</a>
-          <a routerLink="/admin/estadisticas" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Estadisticas</a>
-        }
-        <a routerLink="/perfil" routerLinkActive="navbar__link--activo" (click)="cerrarMenu()">Mi perfil</a>
-        <div class="navbar__sesion">
-          <span class="navbar__saludo">Hola, {{ usuario()?.nombre ?? '...' }}</span>
-          <button type="button" class="btn" (click)="cerrarSesion()">Cerrar sesion</button>
-        </div>
+      @if (menuAbierto()) {
+        <nav id="perfil-menu" class="perfil__menu" aria-label="Menú de la cuenta">
+          @if (!estaLogueado()) {
+            <div class="perfil__cabecera">
+              <app-kaza variante="maciza" />
+              <div>
+                <span class="perfil__nombre">Bienvenido a AlojaME</span>
+                <span class="perfil__ayuda">Ingresá para reservar o publicar</span>
+              </div>
+            </div>
+            <a routerLink="/login" routerLinkActive="perfil__item--activo">Iniciar sesión</a>
+            <a routerLink="/registro" routerLinkActive="perfil__item--activo">Registrarse</a>
+          } @else {
+            <div class="perfil__cabecera">
+              <app-kaza variante="maciza" />
+              <div>
+                <span class="perfil__nombre">Hola, {{ usuario()?.nombre ?? '...' }}</span>
+                <span class="perfil__rol">{{ nombreRol() }}</span>
+              </div>
+            </div>
+
+            @if (rol() === 'CLIENTE' || rol() === 'ADMIN') {
+              <p class="perfil__grupo">Mis viajes</p>
+              <a routerLink="/mis-reservas" routerLinkActive="perfil__item--activo">Mis reservas</a>
+              <a routerLink="/mis-gastos" routerLinkActive="perfil__item--activo">Mis gastos</a>
+            }
+            @if (rol() === 'ANFITRION' || rol() === 'ADMIN') {
+              <p class="perfil__grupo">Anfitrión</p>
+              <a routerLink="/anfitrion/alojamientos" routerLinkActive="perfil__item--activo">Mis alojamientos</a>
+              <a routerLink="/anfitrion/reservas" routerLinkActive="perfil__item--activo">Reservas recibidas</a>
+              <a routerLink="/anfitrion/cobros-pendientes" routerLinkActive="perfil__item--activo">Cobros pendientes</a>
+              <a routerLink="/anfitrion/resumen" routerLinkActive="perfil__item--activo">Resumen</a>
+            }
+            @if (rol() === 'ADMIN') {
+              <p class="perfil__grupo">Administración</p>
+              <a routerLink="/admin/usuarios" routerLinkActive="perfil__item--activo">Usuarios</a>
+              <a routerLink="/admin/catalogo-tipos" routerLinkActive="perfil__item--activo">Catálogo de tipos</a>
+              <a routerLink="/admin/catalogo-servicios" routerLinkActive="perfil__item--activo">Catálogo de servicios</a>
+              <a routerLink="/admin/reservas" routerLinkActive="perfil__item--activo">Todas las reservas</a>
+              <a routerLink="/admin/flujo-dinero" routerLinkActive="perfil__item--activo">Flujo de dinero</a>
+              <a routerLink="/admin/estadisticas" routerLinkActive="perfil__item--activo">Estadísticas</a>
+            }
+
+            <p class="perfil__grupo">Cuenta</p>
+            <a routerLink="/perfil" routerLinkActive="perfil__item--activo">Mi perfil y ajustes</a>
+            <button type="button" class="perfil__salir" (click)="cerrarSesion()">Cerrar sesión</button>
+          }
+        </nav>
       }
-    </nav>
+    </div>
   </div>
 </header>

@@ -4,5 +4,5 @@
     {{ alojamiento().direccion.ciudad }}, {{ alojamiento().direccion.provincia }}
   </p>
   <p class="text-muted">{{ alojamiento().tipoAlojamiento.nombreTipo }} &middot; hasta {{ alojamiento().capacidad }} huespedes</p>
-  <p class="alojamiento-card__precio">${{ alojamiento().precioNoche }} <span class="text-muted">/ noche</span></p>
+  <p class="alojamiento-card__precio">${{ alojamiento().precioNoche | number }} <span class="text-muted">/ noche</span></p>
 </a>

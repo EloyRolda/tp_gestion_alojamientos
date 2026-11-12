@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, map } from 'rxjs';
 import { AlojamientoService } from '../../../core/services/alojamiento.service';
@@ -37,6 +37,9 @@ export class Busqueda {
   readonly error = signal<string | null>(null);
 
   readonly texto = signal('');
+
+  /// Texto que llega desde el buscador del encabezado (/buscar?q=...).
+  readonly q = input<string>();
   readonly precioMin = signal<number | null>(null);
   readonly precioMax = signal<number | null>(null);
   readonly capacidadMin = signal<number | null>(null);
@@ -44,6 +47,10 @@ export class Busqueda {
 
   /// Solo tiene efecto debajo de 1024px: en desktop el panel siempre se ve.
   readonly filtrosAbiertos = signal(false);
+
+  private readonly copiarTextoDelEncabezado = effect(() => {
+    this.texto.set(this.q() ?? '');
+  });
 
   /// Filtros aplicados ademas del texto, para mostrarlos en el boton plegado.
   readonly filtrosActivos = computed(() => {

@@ -13,7 +13,7 @@
 
     <article class="stack card comprobante">
       <h1>Reserva #{{ r.idReserva }}</h1>
-      <p class="text-muted">Estado: <strong>{{ r.estadoReserva }}</strong></p>
+      <p class="text-muted">Estado: <app-estado [valor]="r.estadoReserva" /></p>
 
       <section class="stack stack--tight">
         <h2>Alojamiento</h2>
@@ -27,8 +27,8 @@
           <dd>{{ r.fechaInicio | date: 'dd/MM/yyyy' }}</dd>
           <dt>Check-out</dt>
           <dd>{{ r.fechaFin | date: 'dd/MM/yyyy' }}</dd>
-          <dt>{{ noches(r) }} {{ noches(r) === 1 ? 'noche' : 'noches' }} &times; {{ r.precioNochePactado | number }}</dt>
-          <dd><strong>{{ total(r) | number }}</strong></dd>
+          <dt>{{ noches(r) }} {{ noches(r) === 1 ? 'noche' : 'noches' }} &times; ${{ r.precioNochePactado | number }}</dt>
+          <dd><strong>${{ total(r) | number }}</strong></dd>
         </dl>
       </section>
 
@@ -37,15 +37,15 @@
           <h2>Pago</h2>
           <dl class="datos">
             <dt>Monto base (anfitrion)</dt>
-            <dd>{{ r.pago.montoBase | number }}</dd>
+            <dd>${{ r.pago.montoBase | number }}</dd>
             <dt>Comision plataforma</dt>
-            <dd>{{ r.pago.comisionPlataforma | number }}</dd>
+            <dd>${{ r.pago.comisionPlataforma | number }}</dd>
             <dt>Comision MercadoPago</dt>
-            <dd>{{ r.pago.comisionMercadopago | number }}</dd>
+            <dd>${{ r.pago.comisionMercadopago | number }}</dd>
             <dt>Total a pagar</dt>
-            <dd><strong>{{ r.pago.montoTotalCliente | number }}</strong></dd>
+            <dd><strong>${{ r.pago.montoTotalCliente | number }}</strong></dd>
             <dt>Estado del pago</dt>
-            <dd><strong>{{ r.pago.estado }}</strong></dd>
+            <dd><app-estado [valor]="r.pago.estado" /></dd>
             @if (r.pago.fechaLimitePago && r.pago.estado === 'PENDIENTE') {
               <dt>Plazo para pagar</dt>
               <dd>{{ r.pago.fechaLimitePago | date: 'dd/MM/yyyy HH:mm' }}</dd>
@@ -57,14 +57,14 @@
           </dl>
 
           @if (r.pago.estado === 'PENDIENTE' && r.pago.urlCheckout) {
-            <a [href]="r.pago.urlCheckout" class="btn no-print" target="_blank" rel="noopener">Pagar ahora con MercadoPago</a>
+            <a [href]="r.pago.urlCheckout" class="btn btn--primario no-print" target="_blank" rel="noopener">Pagar ahora con MercadoPago</a>
           }
         </section>
       }
 
       <div class="form-actions no-print">
         @if (puedeCancelar(r)) {
-          <button type="button" class="btn" (click)="cancelar()" [disabled]="cancelando()">
+          <button type="button" class="btn btn--peligro" (click)="cancelar()" [disabled]="cancelando()">
             {{ cancelando() ? 'Cancelando...' : 'Cancelar reserva' }}
           </button>
         }
@@ -96,7 +96,7 @@
             @if (errorReview()) {
               <p class="text-danger">{{ errorReview() }}</p>
             }
-            <button type="submit" class="btn" [disabled]="enviandoReview()">
+            <button type="submit" class="btn btn--primario" [disabled]="enviandoReview()">
               {{ enviandoReview() ? 'Enviando...' : 'Enviar reseña' }}
             </button>
           </form>

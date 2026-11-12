@@ -64,8 +64,8 @@
       </div>
 
       <aside class="detalle__reserva" aria-label="Reservar">
-        <p class="detalle__precio">${{ a.precioNoche }} <span class="detalle__precio-unidad text-muted">/ noche</span></p>
-        <button type="button" class="btn detalle__reservar" (click)="reservar()">Reservar</button>
+        <p class="detalle__precio">${{ a.precioNoche | number }} <span class="detalle__precio-unidad text-muted">/ noche</span></p>
+        <button type="button" class="btn btn--primario detalle__reservar" (click)="reservar()">Reservar</button>
       </aside>
     </div>
   </article>

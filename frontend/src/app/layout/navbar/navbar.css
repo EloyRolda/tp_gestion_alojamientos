@@ -1,120 +1,306 @@
-/* Navbar responsive (SCRUM-51).
-   - Mobile y tablet (< 1024px): marca + boton de menu; el menu se despliega
-     debajo, a todo el ancho, con un link por fila y area tactil de 44px.
-   - Desktop (>= 1024px): links en fila; si no entran (admin tiene 13), pasan a
-     una segunda linea en vez de desbordar la pagina. */
+/* Encabezado negro y fijo arriba (SCRUM-63).
+   Mobile: logo y avatar en la primera fila, buscador a todo el ancho abajo.
+   Desde tablet: logo | buscador | avatar en una sola fila, y el avatar baja
+   para que la cara de Kaza quede mitad afuera del encabezado. */
 
-.navbar {
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-bg);
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding-top: env(safe-area-inset-top, 0px);
+  background: var(--color-ink);
+  color: #ffffff;
 }
 
-.navbar__bar {
-  display: flex;
-  flex-wrap: wrap;
+.topbar__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'logo perfil'
+    'buscador buscador';
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-2) var(--space-3);
-  padding-block: var(--space-2);
+  padding-block: 14px var(--space-3);
 }
 
-.navbar__brand {
+.topbar__logo {
+  grid-area: logo;
+  justify-self: start;
   display: inline-flex;
   align-items: center;
+  gap: 10px;
   min-height: var(--tap-size);
-  font-weight: 700;
-  font-size: 1.15rem;
+  color: #ffffff;
   text-decoration: none;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
 }
 
-.navbar__toggle {
-  display: inline-flex;
+.topbar__logo app-kaza {
+  width: 50px;
+}
+
+/* Logotipo: "Aloja" en blanco y "ME" en amarillo. Al pasar el mouse se subraya
+   en amarillo (igual que en el pie). */
+.logo-texto {
+  color: #ffffff;
+  text-decoration: underline 2px transparent;
+  text-underline-offset: 6px;
+  transition: text-decoration-color 0.15s ease;
+}
+
+.logo-texto span {
+  color: var(--color-dorado);
+}
+
+.topbar__logo:hover .logo-texto {
+  text-decoration-color: var(--color-dorado);
+}
+
+.topbar__logo:focus-visible {
+  outline-color: var(--color-dorado);
+  border-radius: var(--radius-sm);
+}
+
+/* ---------- buscador ---------- */
+.buscador {
+  grid-area: buscador;
+  display: flex;
   align-items: center;
-  justify-content: center;
-  width: var(--tap-size);
-  height: var(--tap-size);
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  background: var(--color-bg);
-  cursor: pointer;
-  font-size: 1.3rem;
-  line-height: 1;
-}
-
-.navbar__menu {
-  display: none;
-  flex-direction: column;
-  align-items: stretch;
   width: 100%;
-  padding-bottom: var(--space-2);
+  min-width: 0;
+  padding: 5px;
+  background: var(--color-surface);
+  border-radius: 999px;
+  transition: box-shadow 0.2s ease;
 }
 
-.navbar__menu--abierto {
-  display: flex;
+.buscador:focus-within {
+  box-shadow: 0 0 0 3px var(--color-dorado);
 }
 
-.navbar__menu a {
-  display: flex;
-  align-items: center;
-  min-height: var(--tap-size);
-  padding-inline: var(--space-2);
-  border-bottom: 1px solid var(--color-bg-muted);
-  text-decoration: none;
-}
-
-.navbar__link--activo {
-  font-weight: 700;
-}
-
-.navbar__sesion {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-2) 0;
-}
-
-.navbar__saludo {
+.buscador > svg {
+  flex-shrink: 0;
+  margin-left: 12px;
   color: var(--color-text-muted);
 }
 
-@media (min-width: 1024px) {
-  .navbar__toggle {
-    display: none;
+.buscador input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: var(--tap-size);
+  padding: 0 var(--space-2);
+  border: 0;
+  background: transparent;
+  color: var(--color-ink);
+  outline: none;
+}
+
+.buscador input::placeholder {
+  color: #8a847e;
+}
+
+.buscador input:focus-visible {
+  outline: none;
+}
+
+.buscador button {
+  flex-shrink: 0;
+  min-height: var(--tap-size);
+  padding: 0 20px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--color-dorado);
+  color: var(--color-ink);
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    filter 0.15s ease,
+    transform 0.1s ease;
+}
+
+.buscador button:hover {
+  filter: brightness(0.95);
+}
+
+.buscador button:active {
+  transform: scale(0.97);
+}
+
+.buscador button:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: -5px;
+}
+
+/* ---------- avatar y menu de la cuenta ---------- */
+.perfil {
+  grid-area: perfil;
+  position: relative;
+  justify-self: end;
+}
+
+/* El avatar ES el logo de Kaza con su techo: asi el techo queda siempre
+   centrado sobre la cara. El techo sube al pasar el mouse o con el menu abierto. */
+.perfil__boton {
+  display: block;
+  width: 56px;
+  min-height: var(--tap-size);
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.perfil__boton app-kaza {
+  width: 100%;
+  filter: drop-shadow(0 4px 8px rgba(8, 7, 8, 0.28));
+}
+
+.perfil__boton:focus-visible {
+  outline: 3px solid var(--color-dorado);
+  outline-offset: 4px;
+  border-radius: 50%;
+}
+
+.perfil__menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  max-width: calc(100vw - 2 * var(--space-3));
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+  padding: var(--space-2);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: 0 14px 40px rgba(8, 7, 8, 0.2);
+  transform-origin: top right;
+  animation: menu-entra 0.16s var(--ease);
+}
+
+.perfil__cabecera {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-2) var(--space-3);
+  margin-bottom: var(--space-1);
+  border-bottom: 1px solid var(--color-bg-muted);
+}
+
+.perfil__cabecera app-kaza {
+  width: 40px;
+}
+
+.perfil__nombre {
+  display: block;
+  font-weight: 700;
+}
+
+.perfil__ayuda {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.perfil__rol {
+  display: inline-block;
+  margin-top: 2px;
+  padding: 1px 10px;
+  border-radius: 999px;
+  background: var(--color-dorado-suave);
+  color: #7a5a00;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.perfil__grupo {
+  padding: var(--space-2) var(--space-2) 2px;
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.perfil__menu a,
+.perfil__menu button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: var(--tap-size);
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-ink);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.perfil__menu a:hover,
+.perfil__menu button:hover {
+  background: var(--color-bg);
+}
+
+.perfil__menu a.perfil__item--activo {
+  background: var(--color-dorado-suave);
+  font-weight: 700;
+}
+
+.perfil__menu .perfil__salir {
+  margin-top: var(--space-1);
+  border-top: 1px solid var(--color-bg-muted);
+  border-radius: 0;
+  color: var(--color-danger);
+  font-weight: 600;
+}
+
+@keyframes menu-entra {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .topbar__inner {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: 'logo buscador perfil';
+    min-height: 80px;
+    padding-block: var(--space-3);
   }
 
-  .navbar__menu,
-  .navbar__menu--abierto {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 0 var(--space-1);
-    width: auto;
-    /* Base 0 + min-width 0: el menu comparte la fila con la marca y sus links
-       se reparten en lineas dentro del espacio que queda. */
-    flex: 1 1 0;
-    min-width: 0;
-    padding-bottom: 0;
+  .topbar__logo app-kaza {
+    width: 58px;
   }
 
-  .navbar__menu a {
-    border-bottom: 2px solid transparent;
-    white-space: nowrap;
+  .buscador {
+    max-width: 620px;
+    justify-self: center;
   }
 
-  .navbar__menu a.navbar__link--activo {
-    border-bottom-color: var(--color-text);
+  /* El avatar baja y la cara queda mitad afuera del encabezado. Sin reborde:
+     el aro de Kaza ya hace de borde y la sombra lo separa del fondo. */
+  .perfil {
+    align-self: end;
+    margin-bottom: -38px;
   }
 
-  .navbar__sesion {
-    padding: 0 0 0 var(--space-2);
-    flex-wrap: nowrap;
-  }
-
-  .navbar__saludo {
-    white-space: nowrap;
+  .perfil__boton {
+    width: 96px;
   }
 }

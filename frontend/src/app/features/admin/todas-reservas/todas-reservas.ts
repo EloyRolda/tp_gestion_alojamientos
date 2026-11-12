@@ -6,6 +6,7 @@ import { ReservaService } from '../../../core/services/reserva.service';
 import { EstadoReserva, Reserva } from '../../../core/models/reserva.model';
 import { calcularTotal } from '../../../core/utils/reserva.util';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { Estado } from '../../../shared/estado/estado';
 
 type FiltroEstado = EstadoReserva | 'TODAS';
 
@@ -15,7 +16,7 @@ type FiltroEstado = EstadoReserva | 'TODAS';
 @Component({
   selector: 'app-todas-reservas',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, FormsModule, RouterLink],
+  imports: [DatePipe, DecimalPipe, FormsModule, RouterLink, Estado],
   templateUrl: './todas-reservas.html',
   styleUrl: './todas-reservas.css',
 })

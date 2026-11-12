@@ -7,6 +7,7 @@ import { PagoService } from '../../../core/services/pago.service';
 import { Reserva } from '../../../core/models/reserva.model';
 import { calcularNoches, calcularTotal } from '../../../core/utils/reserva.util';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { Estado } from '../../../shared/estado/estado';
 
 /// SCRUM-45/46 / RF24. Detalle de cualquier reserva de la plataforma, visto
 /// como admin: cancelar (regla automatica segun quien cancela) o reembolso
@@ -15,7 +16,7 @@ import { extraerMensajeError } from '../../../core/utils/http-error.util';
 @Component({
   selector: 'app-detalle-reserva-admin',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, FormsModule, RouterLink],
+  imports: [DatePipe, DecimalPipe, FormsModule, RouterLink, Estado],
   templateUrl: './detalle-reserva-admin.html',
   styleUrl: './detalle-reserva-admin.css',
 })

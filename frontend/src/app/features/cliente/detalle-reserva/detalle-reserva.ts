@@ -7,6 +7,7 @@ import { ReviewService, ReviewRegistro } from '../../../core/services/review.ser
 import { Reserva } from '../../../core/models/reserva.model';
 import { calcularNoches, calcularTotal } from '../../../core/utils/reserva.util';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { Estado } from '../../../shared/estado/estado';
 
 /// SCRUM-31 / RF21, RF22, RF29, RF31, RF40. Detalle completo de una reserva
 /// propia: estado, desglose del pago (embebido en ReservaResponseDTO.pago, no
@@ -18,7 +19,7 @@ import { extraerMensajeError } from '../../../core/utils/http-error.util';
 @Component({
   selector: 'app-detalle-reserva',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, FormsModule, RouterLink],
+  imports: [DatePipe, DecimalPipe, FormsModule, RouterLink, Estado],
   templateUrl: './detalle-reserva.html',
   styleUrl: './detalle-reserva.css',
 })

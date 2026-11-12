@@ -10,7 +10,7 @@
 
     <article class="stack card">
       <h1>Reserva #{{ r.idReserva }}</h1>
-      <p class="text-muted">Estado: <strong>{{ r.estadoReserva }}</strong></p>
+      <p class="text-muted">Estado: <app-estado [valor]="r.estadoReserva" /></p>
 
       <section class="stack stack--tight">
         <h2>Alojamiento</h2>
@@ -29,8 +29,8 @@
           <dd>{{ r.fechaInicio | date: 'dd/MM/yyyy' }}</dd>
           <dt>Check-out</dt>
           <dd>{{ r.fechaFin | date: 'dd/MM/yyyy' }}</dd>
-          <dt>{{ noches(r) }} {{ noches(r) === 1 ? 'noche' : 'noches' }} &times; {{ r.precioNochePactado | number }}</dt>
-          <dd><strong>{{ total(r) | number }}</strong></dd>
+          <dt>{{ noches(r) }} {{ noches(r) === 1 ? 'noche' : 'noches' }} &times; ${{ r.precioNochePactado | number }}</dt>
+          <dd><strong>${{ total(r) | number }}</strong></dd>
         </dl>
       </section>
 
@@ -39,22 +39,22 @@
           <h2>Pago</h2>
           <dl class="datos">
             <dt>Monto base</dt>
-            <dd>{{ r.pago.montoBase | number }}</dd>
+            <dd>${{ r.pago.montoBase | number }}</dd>
             <dt>Total cobrado al cliente</dt>
-            <dd>{{ r.pago.montoTotalCliente | number }}</dd>
+            <dd>${{ r.pago.montoTotalCliente | number }}</dd>
             <dt>Estado del pago</dt>
-            <dd><strong>{{ r.pago.estado }}</strong></dd>
+            <dd><app-estado [valor]="r.pago.estado" /></dd>
             @if (r.pago.motivoCancelacion) {
               <dt>Motivo de cancelacion</dt>
               <dd>{{ r.pago.motivoCancelacion }}</dd>
             }
             @if (r.pago.montoReembolsadoCliente != null) {
               <dt>Reembolsado al cliente</dt>
-              <dd>{{ r.pago.montoReembolsadoCliente | number }}</dd>
+              <dd>${{ r.pago.montoReembolsadoCliente | number }}</dd>
             }
             @if (r.pago.montoRetenidoAnfitrion != null) {
               <dt>Retenido para el anfitrion</dt>
-              <dd>{{ r.pago.montoRetenidoAnfitrion | number }}</dd>
+              <dd>${{ r.pago.montoRetenidoAnfitrion | number }}</dd>
             }
           </dl>
         </section>
@@ -66,7 +66,7 @@
 
       @if (puedeCancelar(r)) {
         <div class="form-actions">
-          <button type="button" class="btn" (click)="cancelar()" [disabled]="procesando()">
+          <button type="button" class="btn btn--peligro" (click)="cancelar()" [disabled]="procesando()">
             {{ procesando() ? 'Procesando...' : 'Cancelar reserva (regla automatica)' }}
           </button>
         </div>
@@ -85,7 +85,7 @@
           @if (errorReembolso()) {
             <p class="text-danger">{{ errorReembolso() }}</p>
           }
-          <button type="submit" class="btn" [disabled]="enviandoReembolso() || montoReembolso() === null">
+          <button type="submit" class="btn btn--primario" [disabled]="enviandoReembolso() || montoReembolso() === null">
             {{ enviandoReembolso() ? 'Procesando...' : 'Ejecutar reembolso manual' }}
           </button>
         </form>

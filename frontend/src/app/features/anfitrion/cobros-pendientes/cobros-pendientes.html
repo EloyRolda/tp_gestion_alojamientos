@@ -12,7 +12,7 @@
     <div class="kpi-grid">
       <div class="kpi">
         <p class="kpi__etiqueta">Total pendiente de cobro</p>
-        <p class="kpi__valor">{{ totalPendiente() | number }}</p>
+        <p class="kpi__valor">${{ totalPendiente() | number }}</p>
       </div>
       <div class="kpi">
         <p class="kpi__etiqueta">Reservas por liquidar</p>
@@ -34,7 +34,7 @@
             <tr>
               <td data-label="Alojamiento">{{ c.tituloAlojamiento }}</td>
               <td data-label="Fin de estadia">{{ c.fechaFinEstadia | date: 'dd/MM/yyyy' }}</td>
-              <td data-label="Monto a cobrar">{{ c.montoAcobrar | number }}</td>
+              <td data-label="Monto a cobrar">${{ c.montoAcobrar | number }}</td>
             </tr>
           }
         </tbody>

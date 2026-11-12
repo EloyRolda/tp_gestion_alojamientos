@@ -15,7 +15,7 @@
       </div>
       <div class="kpi">
         <p class="kpi__etiqueta">Ingresos totales</p>
-        <p class="kpi__valor">{{ ingresosTotales() | number }}</p>
+        <p class="kpi__valor">${{ ingresosTotales() | number }}</p>
       </div>
       <div class="kpi">
         <p class="kpi__etiqueta">Reservas</p>
@@ -37,7 +37,7 @@
           @for (r of resumen(); track r.idAlojamiento) {
             <tr>
               <td data-label="Alojamiento">{{ r.titulo }}</td>
-              <td data-label="Ingresos totales">{{ r.ingresosTotales | number }}</td>
+              <td data-label="Ingresos totales">${{ r.ingresosTotales | number }}</td>
               <td data-label="Cantidad de reservas">{{ r.cantidadReservas }}</td>
               <td data-label="Rating">{{ r.ratingPromedio != null ? (r.ratingPromedio | number: '1.1-1') : 'Sin reseñas' }}</td>
             </tr>
