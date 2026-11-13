@@ -125,17 +125,16 @@ Internet ──HTTPS──> Nginx
 - **Backend:** completo y auditado en tres rondas (arquitectura, seguridad y lógica de negocio).
 - **Frontend:** terminado y verificado contra el backend con recorridos completos por cada perfil, incluido un pago en el entorno de pruebas de MercadoPago y la subida de imágenes a Cloudinary. Además de las pantallas de cada perfil (vistas públicas, Cliente, Anfitrión y Administrador), suma identidad visual propia, gráficos con Chart.js, mapa, calendario de reservas, ficha de usuario para el administrador y modo de pagos simulados para demostraciones.
 - **Responsive:** se adapta a celular, tablet y desktop; verificado con los cuatro perfiles en 360, 768, 1024 y 1280 px, sin scroll horizontal y con controles táctiles de 44 px.
-- **Limitaciones conocidas:** la API de liquidaciones (payouts) de MercadoPago rechaza las credenciales de prueba con `400 "Invalid signature"` (requiere una habilitación especial de la cuenta); para demostraciones está el modo de pagos simulados. Las funciones que necesitarían cambios en el backend están en `Archives/Archivos_Nuevos [4T]/Programacion/Pendientes_Backend_AlojaME.pdf`. No hay tests automatizados por decisión de alcance.
+- **Limitaciones conocidas:** la API de liquidaciones (payouts) de MercadoPago rechaza las credenciales de prueba con `400 "Invalid signature"` (requiere una habilitación especial de la cuenta); para demostraciones está el modo de pagos simulados. Quedan como mejoras a futuro, porque necesitan cambios en el backend: búsqueda por fechas disponibles, recuperación de contraseña, cantidad de huéspedes por reserva y avisos por correo. No hay tests automatizados por decisión de alcance.
 
 ## Documentación
 
 - `frontend/README.md` — comandos, estructura y convenciones del frontend.
+- `capturas/` — capturas de la aplicación en escritorio y en celular, por perfil (visitante, cliente, anfitrión y administrador).
 - `Archives/Archivos_Nuevos [4T]/Programacion/Documentacion_Frontend_AlojaME.pdf` — qué se construyó, cumplimiento de la consigna y las decisiones de diseño con su porqué.
 - `Archives/Archivos_Nuevos [4T]/Programacion/Manual_de_Marca_AlojaME.pdf` — identidad visual: logotipo, Kaza, paleta, tipografía, componentes y tono de voz.
 - `Archives/Archivos_Nuevos [4T]/Programacion/Bitacora_Tecnica_AlojaME.pdf` — arquitectura, reglas de negocio y errores encontrados y resueltos (causa y solución).
 - `Archives/Archivos_Nuevos [4T]/Programacion/Plan_Desarrollo_Frontend_AlojaME.pdf` — desarrollo del frontend por etapas (maquetado, responsive, estilo y mejoras) y sprints, con lo verificado en cada una.
-- `Archives/Archivos_Nuevos [4T]/Programacion/Requisitos_Funcionales_Adicionales_AlojaME.pdf` — requisitos funcionales propuestos para el Trabajo Final Integrador.
-- `Archives/Archivos_Nuevos [4T]/Programacion/Pendientes_Backend_AlojaME.pdf` — mejoras que requieren cambios en el backend.
 - `Archives/Archivos_Nuevos [4T]/Gestion de desarrollo/` — dossier de gestión del proyecto (alcance, C4, EDT, estimaciones, riesgos, seguimiento y cierre).
 - `Archives/Archivos_Nuevos [4T]/Metodologia/` — auditoría de código con propuestas de mejora, diagramas UML y diseño de pruebas.
 - `GA/.env.example` — variables de entorno que necesita el backend.
