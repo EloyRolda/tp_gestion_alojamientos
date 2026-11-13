@@ -11,6 +11,6 @@ export class TituloAlojaMe extends TitleStrategy {
 
   override updateTitle(estado: RouterStateSnapshot): void {
     const propio = this.buildTitle(estado);
-    this.titulo.setTitle(propio ? `${propio} · AlojaME` : 'AlojaME · Alojamientos en Mar del Plata');
+    this.titulo.setTitle(propio ? `${propio} · AlojaME` : 'AlojaME · Alojamientos temporarios');
   }
 }

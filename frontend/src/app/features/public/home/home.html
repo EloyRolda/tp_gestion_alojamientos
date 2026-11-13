@@ -1,8 +1,8 @@
 <section class="stack">
   <header class="home__hero">
     <div class="stack stack--tight">
-      <h1>Encontrá tu próximo alojamiento en Mar del Plata</h1>
-      <p class="text-muted">Casas, departamentos y cabañas de anfitriones locales, con pago seguro por MercadoPago.</p>
+      <h1>Encontrá tu próximo alojamiento</h1>
+      <p class="text-muted">Casas, departamentos y cabañas de anfitriones particulares, con pago seguro por MercadoPago.</p>
     </div>
     <app-kaza class="home__mascota" variante="trazo" sobre="claro" />
     <a routerLink="/buscar" class="btn btn--primario home__cta">Ver todos los alojamientos</a>
@@ -18,7 +18,7 @@
   } @else if (error()) {
     <p class="text-danger">{{ error() }}</p>
   } @else if (destacados().length === 0) {
-    <app-vacio titulo="Todavía no hay alojamientos publicados" texto="Volvé pronto: los anfitriones de Mar del Plata están sumando sus casas y departamentos." />
+    <app-vacio titulo="Todavía no hay alojamientos publicados" texto="Volvé pronto: los anfitriones están sumando sus casas y departamentos." />
   } @else {
     <div class="grid-auto">
       @for (alojamiento of destacados(); track alojamiento.idAlojamiento) {

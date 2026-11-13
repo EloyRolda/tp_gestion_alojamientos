@@ -16,8 +16,9 @@ import * as L from 'leaflet';
 import { Alojamiento } from '../../core/models/alojamiento.model';
 import { miniatura } from '../../core/utils/imagen.util';
 
-/// Centro de Mar del Plata: vista inicial cuando ningun alojamiento tiene ubicacion.
-const CENTRO_MDP: L.LatLngTuple = [-38.004, -57.548];
+/// Vista de todo el pais: vista inicial cuando ningun alojamiento tiene ubicacion.
+const CENTRO_PAIS: L.LatLngTuple = [-38.4, -63.6];
+const ZOOM_PAIS = 4;
 
 const pesos = new Intl.NumberFormat('es-AR', { maximumFractionDigits: 0 });
 
@@ -81,7 +82,7 @@ export class MapaAlojamientos {
     const actualizarDetalle = () =>
       mapa.getContainer().classList.toggle('mapa--lejos', mapa.getZoom() < ZOOM_PRECIOS);
     mapa.on('zoomend', actualizarDetalle);
-    this.mapa.setView(CENTRO_MDP, 13);
+    this.mapa.setView(CENTRO_PAIS, ZOOM_PAIS);
     actualizarDetalle();
     this.listo.set(true);
   }

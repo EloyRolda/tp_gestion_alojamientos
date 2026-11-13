@@ -18,8 +18,9 @@ export interface Punto {
   longitud: number;
 }
 
-/// Centro de Mar del Plata: vista inicial mientras no haya un punto marcado.
-const CENTRO_MDP: L.LatLngTuple = [-38.004, -57.548];
+/// Vista de todo el pais: vista inicial mientras no haya un punto marcado.
+const CENTRO_PAIS: L.LatLngTuple = [-38.4, -63.6];
+const ZOOM_PAIS = 4;
 
 /// Nominatim (el buscador de direcciones de OpenStreetMap) pide no hacer mas de
 /// un pedido por segundo y nunca buscar mientras se escribe: por eso se busca
@@ -119,7 +120,7 @@ export class SelectorUbicacion {
       maxZoom: 19,
       attribution: '&copy; colaboradores de <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(this.mapa);
-    this.mapa.setView(inicial ? [inicial.latitud, inicial.longitud] : CENTRO_MDP, inicial ? 16 : 13);
+    this.mapa.setView(inicial ? [inicial.latitud, inicial.longitud] : CENTRO_PAIS, inicial ? 16 : ZOOM_PAIS);
     this.mapa.on('click', (e: L.LeafletMouseEvent) =>
       this.punto.set(this.redondear({ latitud: e.latlng.lat, longitud: e.latlng.lng })),
     );
