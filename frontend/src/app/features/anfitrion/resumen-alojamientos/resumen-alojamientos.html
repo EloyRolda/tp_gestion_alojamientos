@@ -25,6 +25,40 @@
       </div>
     </div>
 
+    <div class="graficos-resumen">
+      <section class="stack card">
+        <div class="titulo-info">
+          <h2>Ingresos por alojamiento</h2>
+          <app-info-grafico titulo="Ingresos por alojamiento" [texto]="['Cuánto generó cada uno de tus alojamientos.', 'Suma lo que cobrás por cada reserva que llegó a pagarse (precio por noche por cantidad de noches), sin las comisiones. Lo que todavía no te transferimos lo ves en Cobros pendientes.', 'Pasá el mouse o tocá una barra para ver el valor exacto; en “Ver los datos” están todos los números.']" />
+        </div>
+        <app-grafico-barras
+          [etiquetas]="titulosPorIngresos()"
+          [valores]="montosPorIngresos()"
+          descripcion="Ingresos"
+          nombreEtiqueta="Alojamiento"
+          formato="pesos"
+          orientacion="horizontal"
+          [parteDelTotal]="true"
+        />
+      </section>
+      <section class="stack card">
+        <div class="titulo-info">
+          <h2>Reservas por alojamiento</h2>
+          <app-info-grafico titulo="Reservas por alojamiento" [texto]="['Cuántas reservas tuvo cada uno de tus alojamientos.', 'Cuenta las pedidas, confirmadas y finalizadas; las canceladas no suman.', 'Pasá el mouse o tocá una barra para ver el valor exacto; en “Ver los datos” están todos los números.']" />
+        </div>
+        <app-grafico-barras
+          [etiquetas]="titulosPorReservas()"
+          [valores]="cantidadesPorReservas()"
+          descripcion="Reservas"
+          nombreEtiqueta="Alojamiento"
+          formato="entero"
+          orientacion="horizontal"
+          [parteDelTotal]="true"
+        />
+      </section>
+    </div>
+
+    <h2>Detalle por alojamiento</h2>
     <div class="table-scroll">
       <table class="tabla table-cards">
         <thead>

@@ -1,0 +1,37 @@
+<figure class="grafico">
+  @if (conclusion(); as c) {
+    <figcaption class="grafico__conclusion">
+      @if (c.marca !== false) {
+        <span class="grafico__marca" aria-hidden="true"></span>
+      }
+      <span>{{ c.antes }}<strong>{{ c.nombre }}</strong>{{ c.medio }}<strong>{{ c.valor }}</strong>{{ c.despues }}</span>
+    </figcaption>
+  }
+  <div class="grafico__lienzo" [style.height.px]="alto()">
+    <canvas #lienzo role="img" [attr.aria-label]="descripcion() + '. Los valores están en la tabla de abajo.'"></canvas>
+  </div>
+  @if (error()) {
+    <p class="text-muted">No se pudo cargar el gráfico. Los datos están en la tabla.</p>
+  }
+  <details class="grafico__datos" [open]="error()">
+    <summary>Ver los datos</summary>
+    <div class="table-scroll">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th scope="col">{{ nombreEtiqueta() }}</th>
+            <th scope="col" class="grafico__num">{{ descripcion() }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (f of filas(); track $index) {
+            <tr>
+              <td>{{ f.etiqueta }}</td>
+              <td class="grafico__num">{{ formatear(f.valor) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </details>
+</figure>

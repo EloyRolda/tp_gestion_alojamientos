@@ -1,6 +1,6 @@
-import { Component, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { AlojamientoService } from '../../../core/services/alojamiento.service';
 import { GaleriaService } from '../../../core/services/galeria.service';
@@ -12,6 +12,7 @@ import { Imagen } from '../../../core/models/galeria.model';
 import { Review } from '../../../core/models/review.model';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
 import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
+import { VisorFotos } from '../../../shared/visor-fotos/visor-fotos';
 
 /// SCRUM-24 / RF15, RF16, RF17, RF35. "id" se bindea solo desde la ruta
 /// :id gracias a withComponentInputBinding() (app.config.ts).
@@ -23,7 +24,7 @@ import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 @Component({
   selector: 'app-detalle-alojamiento',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, Esqueleto],
+  imports: [DatePipe, DecimalPipe, RouterLink, Esqueleto, VisorFotos],
   templateUrl: './detalle-alojamiento.html',
   styleUrl: './detalle-alojamiento.css',
 })
@@ -38,8 +39,19 @@ export class DetalleAlojamiento {
   protected readonly auth = inject(AuthService);
 
   readonly alojamiento = signal<Alojamiento | null>(null);
+  /// Reservan los clientes (y los visitantes, que primero inician sesion). Un
+  /// anfitrion o un administrador no reservan: el backend lo rechaza.
+  readonly puedeReservar = computed(() => !this.auth.estaLogueado() || this.auth.rol() === 'CLIENTE');
+  /// El anfitrion viendo su propia publicacion: en vez de "Reservar", "Editar".
+  readonly esMio = computed(() => {
+    const a = this.alojamiento();
+    return !!a && this.auth.rol() === 'ANFITRION' && this.auth.usuario()?.id === a.anfitrion.id;
+  });
+  readonly esAdmin = computed(() => this.auth.rol() === 'ADMIN');
   readonly servicios = signal<ServicioxAlojamiento[]>([]);
   readonly imagenes = signal<Imagen[]>([]);
+  /// Foto abierta en el visor a pantalla completa (null = cerrado).
+  readonly fotoAbierta = signal<number | null>(null);
   readonly reviews = signal<Review[]>([]);
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);

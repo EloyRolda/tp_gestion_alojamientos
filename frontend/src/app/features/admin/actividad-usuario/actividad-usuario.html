@@ -1,0 +1,152 @@
+@let u = usuario();
+@if (u.tipo !== 'ADMIN') {
+  @if (cargando()) {
+    <app-esqueleto tipo="kpis" />
+  } @else if (error()) {
+    <p class="text-danger">{{ error() }}</p>
+  } @else {
+    <!-- Numeros -->
+    @if (u.tipo === 'ANFITRION') {
+      <div class="kpi-grid">
+        <div class="kpi">
+          <p class="kpi__etiqueta">Alojamientos</p>
+          <p class="kpi__valor">{{ alojamientos().length }}</p>
+          <p class="text-muted">{{ publicados() }} publicados</p>
+        </div>
+        <div class="kpi">
+          <p class="kpi__etiqueta">Ingresos totales</p>
+          <p class="kpi__valor">${{ ingresos() | number }}</p>
+        </div>
+        <div class="kpi">
+          <p class="kpi__etiqueta">Reservas</p>
+          <p class="kpi__valor">{{ reservasAnfitrion() }}</p>
+          <p class="text-muted">{{ activas().length }} activas</p>
+        </div>
+      </div>
+      @if (u.aliasCobro) {
+        <p class="alias text-muted">Alias de cobro: <strong>{{ u.aliasCobro }}</strong></p>
+      } @else {
+        <p class="alias alias--falta">No cargó alias de cobro: no se le puede liquidar ninguna reserva hasta que lo cargue.</p>
+      }
+
+      <section class="stack" id="alojamientos">
+        <h2>Alojamientos a su nombre</h2>
+        @if (alojamientos().length === 0) {
+          <p class="text-muted">Todavía no publicó ningún alojamiento.</p>
+        } @else {
+          <div class="table-scroll">
+            <table class="tabla table-cards">
+              <thead>
+                <tr>
+                  <th>Alojamiento</th>
+                  <th>Estado</th>
+                  <th>Reservas</th>
+                  <th>Ingresos</th>
+                  <th>Calificación</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (a of alojamientos(); track a.idAlojamiento) {
+                  <tr>
+                    <td data-label="Alojamiento"><a [routerLink]="['/alojamientos', a.idAlojamiento]">{{ a.titulo }}</a></td>
+                    <td data-label="Estado">
+                      @switch (publicado(a.idAlojamiento)) {
+                        @case (true) { <span class="estado-aloj">Publicado</span> }
+                        @case (false) { <span class="estado-aloj estado-aloj--pausado">Pausado</span> }
+                        @default { <span class="text-muted">—</span> }
+                      }
+                    </td>
+                    <td data-label="Reservas" class="num">{{ a.cantidadReservas }}</td>
+                    <td data-label="Ingresos" class="num">${{ a.ingresosTotales | number }}</td>
+                    <td data-label="Calificación" class="num">{{ a.ratingPromedio != null ? (a.ratingPromedio | number: '1.1-1') + ' ★' : 'Sin reseñas' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    } @else {
+      <div class="kpi-grid">
+        <div class="kpi">
+          <p class="kpi__etiqueta">Reservas realizadas</p>
+          <p class="kpi__valor">{{ resumenCliente()?.cantidadReservas ?? 0 }}</p>
+          <p class="text-muted">{{ activas().length }} activas</p>
+        </div>
+        <div class="kpi">
+          <p class="kpi__etiqueta">Total gastado</p>
+          <p class="kpi__valor">${{ (resumenCliente()?.montoTotalGastado ?? 0) | number }}</p>
+        </div>
+        <div class="kpi">
+          <p class="kpi__etiqueta">Promedio por estadía</p>
+          <p class="kpi__valor">{{ resumenCliente()?.montoPromedioPorEstadia != null ? '$' + (resumenCliente()!.montoPromedioPorEstadia | number) : '-' }}</p>
+        </div>
+      </div>
+    }
+
+    <!-- Reservas -->
+    <section class="stack" id="reservas">
+      <div class="actividad__encabezado">
+        <h2>{{ u.tipo === 'ANFITRION' ? 'Reservas en sus alojamientos' : 'Sus reservas' }}</h2>
+        @if (reservas().length > 0) {
+          <div class="selector" role="group" aria-label="Qué reservas ver">
+            <button type="button" [attr.aria-pressed]="!verTodas()" (click)="verTodas.set(false)">Activas ({{ activas().length }})</button>
+            <button type="button" [attr.aria-pressed]="verTodas()" (click)="verTodas.set(true)">Todas ({{ reservas().length }})</button>
+          </div>
+        }
+      </div>
+      @if (reservas().length === 0) {
+        <p class="text-muted">{{ u.tipo === 'ANFITRION' ? 'Sus alojamientos todavía no tienen reservas.' : 'Todavía no hizo ninguna reserva.' }}</p>
+      } @else if (visibles().length === 0) {
+        <p class="text-muted">No tiene reservas activas (solicitadas o confirmadas).</p>
+      } @else {
+        <div class="table-scroll">
+          <table class="tabla table-cards">
+            <thead>
+              <tr>
+                <th>Reserva</th>
+                <th>Alojamiento</th>
+                <th>{{ u.tipo === 'ANFITRION' ? 'Cliente' : 'Anfitrión' }}</th>
+                <th>Estadía</th>
+                <th>Total</th>
+                <th>Estado</th>
+                <th>Pago</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of visibles(); track r.idReserva) {
+                <tr>
+                  <td data-label="Reserva" class="num">#{{ r.idReserva }}</td>
+                  <td data-label="Alojamiento"><a [routerLink]="['/alojamientos', r.alojamiento.idAlojamiento]">{{ r.alojamiento.titulo }}</a></td>
+                  @if (u.tipo === 'ANFITRION') {
+                    <td data-label="Cliente"><a [routerLink]="['/admin/usuarios', r.cliente.id]">{{ r.cliente.nombre }} {{ r.cliente.apellido }}</a></td>
+                  } @else {
+                    <td data-label="Anfitrión">
+                      @if (anfitrionDe(r.alojamiento.idAlojamiento); as an) {
+                        <a [routerLink]="['/admin/usuarios', an.id]">{{ an.nombre }} {{ an.apellido }}</a>
+                      } @else {
+                        <span class="text-muted">—</span>
+                      }
+                    </td>
+                  }
+                  <td data-label="Estadía" class="num">{{ r.fechaInicio | date: 'dd/MM/yy' }} – {{ r.fechaFin | date: 'dd/MM/yy' }}</td>
+                  <td data-label="Total" class="num">${{ totalDe(r) | number }}</td>
+                  <td data-label="Estado"><app-estado [valor]="r.estadoReserva" /></td>
+                  <td data-label="Pago">
+                    @if (r.pago) {
+                      <app-estado [valor]="r.pago.estado" />
+                    } @else {
+                      <span class="text-muted">Sin pago</span>
+                    }
+                  </td>
+                  <td class="tabla__acciones"><a [routerLink]="['/admin/reservas', r.idReserva]" class="btn">Ver</a></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  }
+}

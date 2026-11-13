@@ -3,12 +3,12 @@ import { ViewportScroller } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { Navbar } from './layout/navbar/navbar';
 import { Footer } from './layout/footer/footer';
-import { Avisos } from './shared/avisos/avisos';
+import { Confirmacion } from './shared/confirmacion/confirmacion';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, Navbar, Footer, Avisos],
+  imports: [RouterOutlet, Navbar, Footer, Confirmacion],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })

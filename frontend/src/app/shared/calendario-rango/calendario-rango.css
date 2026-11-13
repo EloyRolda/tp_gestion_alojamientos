@@ -1,0 +1,200 @@
+/* Calendario de rango: un mes en el celular, dos lado a lado desde 768px.
+   Los dias miden 44px (tamaño minimo para el dedo). El rango elegido se pinta
+   como una banda continua de tomate suave, con los extremos en tomate fuerte. */
+
+:host {
+  display: block;
+}
+
+.cal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.cal__barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.cal__resumen {
+  margin: 0;
+  flex: 1;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.cal__nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap-size);
+  height: var(--tap-size);
+  flex-shrink: 0;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-surface);
+  cursor: pointer;
+}
+
+.cal__nav:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.cal__nav svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.cal__meses {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+.cal__mes--segundo {
+  display: none;
+}
+
+.cal__titulo {
+  margin: 0 0 var(--space-2);
+  text-align: center;
+  font-weight: 700;
+}
+
+.cal__grilla {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  row-gap: 2px;
+}
+
+.cal__dia-semana {
+  padding-bottom: var(--space-1);
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+.cal__dia {
+  position: relative;
+  height: var(--tap-size);
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.cal__dia:hover:not(:disabled) {
+  background: var(--color-tomate-suave);
+}
+
+.cal__dia:focus-visible {
+  outline: 2px solid var(--color-azul-fuerte);
+  outline-offset: -2px;
+}
+
+.cal__dia--hoy {
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* No elegibles: grises y tachados si estan ocupados. */
+.cal__dia:disabled {
+  color: var(--color-acero);
+  cursor: not-allowed;
+}
+
+.cal__dia--ocupado:disabled {
+  background: var(--color-acero-suave);
+  border-radius: 0;
+  text-decoration: line-through;
+}
+
+/* Rango: banda continua entre check-in y check-out. */
+.cal__dia--rango {
+  border-radius: 0;
+  background: var(--color-tomate-suave);
+}
+
+.cal__dia--inicio,
+.cal__dia--fin {
+  color: #fff;
+  font-weight: 700;
+  background: var(--color-tomate-fuerte);
+}
+
+.cal__dia--inicio:hover:not(:disabled),
+.cal__dia--fin:hover:not(:disabled) {
+  background: var(--color-tomate-hover);
+}
+
+.cal__pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.cal__leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.cal__leyenda li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.cal__muestra {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.cal__muestra--elegido {
+  background: var(--color-tomate-fuerte);
+}
+
+.cal__muestra--ocupado {
+  background: var(--color-acero-suave);
+  border: 1px solid var(--color-acero);
+}
+
+@media (min-width: 768px) {
+  .cal__meses {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5);
+  }
+
+  .cal__mes--segundo {
+    display: block;
+  }
+}

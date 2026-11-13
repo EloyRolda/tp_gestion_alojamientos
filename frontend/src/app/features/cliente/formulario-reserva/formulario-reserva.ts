@@ -1,6 +1,5 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AlojamientoService } from '../../../core/services/alojamiento.service';
 import { ReservaService } from '../../../core/services/reserva.service';
@@ -9,8 +8,14 @@ import { calcularNoches, calcularTotal } from '../../../core/utils/reserva.util'
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
 import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 import { AvisoService } from '../../../core/services/aviso.service';
+import { CalendarioRango, RangoOcupado } from '../../../shared/calendario-rango/calendario-rango';
+import { hoyIso } from '../../../core/utils/fecha.util';
 
 /// SCRUM-29 / RF18, RF19. "id" se bindea solo desde la ruta :id (withComponentInputBinding).
+/// Las fechas se eligen en un calendario de rango (app-calendario-rango). En
+/// gris quedan los dias pasados y las noches que el propio cliente ya tiene
+/// reservadas en este alojamiento; las reservas de otras personas no las
+/// expone la API, asi que ese caso lo sigue resolviendo el backend al enviar.
 /// El calculo de precio es en vivo del lado del cliente (noches * precioNoche,
 /// mismo criterio que PagoService.calcularMontoBase en el backend); la
 /// validacion de solapamiento de fechas NO se duplica aca -- se manda el
@@ -19,7 +24,7 @@ import { AvisoService } from '../../../core/services/aviso.service';
 @Component({
   selector: 'app-formulario-reserva',
   standalone: true,
-  imports: [FormsModule, RouterLink, DecimalPipe, Esqueleto],
+  imports: [RouterLink, DecimalPipe, Esqueleto, CalendarioRango],
   templateUrl: './formulario-reserva.html',
   styleUrl: './formulario-reserva.css',
 })
@@ -38,7 +43,10 @@ export class FormularioReserva {
 
   readonly fechaInicio = signal('');
   readonly fechaFin = signal('');
-  readonly fechaMinima = new Date().toISOString().slice(0, 10);
+  /// Fecha local (no UTC): a la noche, toISOString() ya devolveria mañana.
+  readonly fechaMinima = hoyIso();
+  /// Noches de este alojamiento que el cliente ya tiene reservadas (no canceladas).
+  readonly ocupados = signal<RangoOcupado[]>([]);
 
   readonly noches = computed(() => {
     if (!this.fechaInicio() || !this.fechaFin()) return 0;
@@ -57,6 +65,7 @@ export class FormularioReserva {
     effect(() => {
       const idNumerico = Number(this.id());
       if (!Number.isFinite(idNumerico)) return;
+      this.cargarOcupados(idNumerico);
       this.alojamientoService.obtener(idNumerico).subscribe({
         next: (a) => {
           this.alojamiento.set(a);
@@ -67,6 +76,18 @@ export class FormularioReserva {
           this.cargando.set(false);
         },
       });
+    });
+  }
+
+  private cargarOcupados(idAlojamiento: number): void {
+    // Si falla, el calendario solo pierde ese dato: el backend igual valida.
+    this.reservaService.listarPropios().subscribe({
+      next: (reservas) =>
+        this.ocupados.set(
+          reservas
+            .filter((r) => r.alojamiento.idAlojamiento === idAlojamiento && r.estadoReserva !== 'CANCELADA')
+            .map((r) => ({ inicio: r.fechaInicio, fin: r.fechaFin })),
+        ),
     });
   }
 
@@ -85,7 +106,9 @@ export class FormularioReserva {
       .subscribe({
         next: (reserva) => {
           this.enviando.set(false);
-          this.aviso.mostrar('Solicitud enviada al anfitrión');
+          this.aviso.mostrar('Solicitud enviada al anfitrión', [
+            'Cuando la confirme, vas a tener 48 horas para pagar con MercadoPago.',
+          ]);
           this.router.navigate(['/mis-reservas', reserva.idReserva]);
         },
         error: (err) => {

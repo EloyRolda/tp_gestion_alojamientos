@@ -1,0 +1,124 @@
+/* Visor de fotos: ocupa toda la pantalla sobre un fondo oscuro. La foto se
+   ajusta sin recortarse; los botones son de al menos 44px para el dedo. */
+
+.visor {
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: rgba(10, 10, 10, 0.97);
+  color: #fff;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+.visor::backdrop {
+  background: rgba(10, 10, 10, 0.6);
+}
+
+.visor[open] {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  animation: visor-entrar 160ms ease-out;
+}
+
+.visor__barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+}
+
+.visor__contador {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.95rem;
+}
+
+.visor__figura {
+  margin: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-2) var(--space-4);
+}
+
+.visor__figura img {
+  max-width: 100%;
+  max-height: calc(100dvh - 140px);
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  user-select: none;
+}
+
+.visor__figura figcaption {
+  font-size: 0.9rem;
+  opacity: 0.85;
+  text-align: center;
+}
+
+.visor__boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  min-height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+}
+
+.visor__boton:hover,
+.visor__boton:focus-visible {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.visor__boton:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.visor__boton svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.visor__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.visor__nav--ant {
+  left: var(--space-2);
+}
+
+.visor__nav--sig {
+  right: var(--space-2);
+}
+
+@keyframes visor-entrar {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .visor[open] {
+    animation: none;
+  }
+}

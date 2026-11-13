@@ -12,6 +12,7 @@ import type { Punto } from '../../../shared/selector-ubicacion/selector-ubicacio
 import { SelectorUbicacion } from '../../../shared/selector-ubicacion/selector-ubicacion';
 import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 import { AvisoService } from '../../../core/services/aviso.service';
+import { exigirDuenio } from '../../../core/utils/duenio.util';
 
 interface FormAlojamiento {
   titulo: string;
@@ -70,6 +71,8 @@ export class AlojamientoForm {
   private readonly aviso = inject(AvisoService);
   private readonly catalogoService = inject(CatalogoService);
   private readonly router = inject(Router);
+  /// Anfitrion dueño del alojamiento en edicion (para exigirDuenio).
+  private readonly idDuenio = signal<number | null>(null);
 
   readonly esEdicion = computed(() => !!this.id());
 
@@ -104,6 +107,8 @@ export class AlojamientoForm {
   constructor() {
     this.catalogoService.listarTipos().subscribe({ next: (t) => this.tipos.set(t) });
     this.catalogoService.listarServicios().subscribe({ next: (s) => this.catalogoServicios.set(s) });
+
+    exigirDuenio(this.idDuenio);
 
     effect(() => {
       const idStr = this.id();
@@ -191,7 +196,7 @@ export class AlojamientoForm {
       this.alojamientoService.registrar(dto).subscribe({
         next: (a) => {
           this.enviando.set(false);
-          this.aviso.mostrar('Alojamiento publicado. Ahora sumale fotos.');
+          this.aviso.mostrar('Alojamiento publicado', ['Ahora sumale fotos: las publicaciones con fotos se eligen mucho más.']);
           this.router.navigate(['/anfitrion/alojamientos', a.idAlojamiento, 'galeria']);
         },
         error: (err) => {
@@ -234,6 +239,7 @@ export class AlojamientoForm {
     this.cargando.set(true);
     this.alojamientoService.obtener(idAlojamiento).subscribe({
       next: (a) => {
+        this.idDuenio.set(a.anfitrion.id);
         this.form.set({
           titulo: a.titulo,
           descripcion: a.descripcion,

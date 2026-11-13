@@ -114,7 +114,7 @@ export class SelectorUbicacion {
 
   private crearMapa(): void {
     const inicial = this.punto();
-    this.mapa = L.map(this.contenedor().nativeElement, { scrollWheelZoom: false });
+    this.mapa = L.map(this.contenedor().nativeElement, { scrollWheelZoom: true, wheelPxPerZoomLevel: 90 });
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; colaboradores de <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',

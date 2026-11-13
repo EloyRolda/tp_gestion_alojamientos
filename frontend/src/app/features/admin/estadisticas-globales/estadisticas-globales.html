@@ -1,5 +1,6 @@
 <section class="stack">
   <h1>Estadísticas globales</h1>
+  <p class="text-muted">Los 10 alojamientos que más se destacan en cada criterio. Pasá el mouse o tocá una barra para ver el valor exacto.</p>
 
   @if (error()) {
     <p class="text-danger">{{ error() }}</p>
@@ -10,41 +11,59 @@
   } @else {
     <div class="rankings">
       <section class="stack card">
-        <h2>Top por ingresos</h2>
+        <div class="titulo-info">
+          <h2>Top por ingresos</h2>
+          <app-info-grafico titulo="Top por ingresos" [texto]="['Los 10 alojamientos que más plata generaron.', 'Cada barra suma lo que cobra el anfitrión por cada reserva que llegó a pagarse (precio por noche por cantidad de noches), sin las comisiones.', 'Pasá el mouse o tocá una barra para ver el valor exacto; en “Ver los datos” están todos los números.']" />
+        </div>
         @if (porIngresos().length === 0) {
           <p class="text-muted">Sin datos.</p>
         } @else {
-          <ol class="ranking">
-            @for (a of porIngresos(); track a.idAlojamiento) {
-              <li><span class="ranking__titulo">{{ a.titulo }}</span> <span class="ranking__valor">${{ a.valor | number }}</span></li>
-            }
-          </ol>
+          <app-grafico-barras
+            [etiquetas]="ingresos().etiquetas"
+            [valores]="ingresos().valores"
+            descripcion="Ingresos"
+            nombreEtiqueta="Alojamiento"
+            formato="pesos"
+            orientacion="horizontal"
+          />
         }
       </section>
 
       <section class="stack card">
-        <h2>Top por cantidad de reservas</h2>
+        <div class="titulo-info">
+          <h2>Top por cantidad de reservas</h2>
+          <app-info-grafico titulo="Top por cantidad de reservas" [texto]="['Los 10 alojamientos con más reservas.', 'Cuenta las reservas pedidas, confirmadas y finalizadas; las canceladas no suman.', 'Pasá el mouse o tocá una barra para ver el valor exacto; en “Ver los datos” están todos los números.']" />
+        </div>
         @if (porReservas().length === 0) {
           <p class="text-muted">Sin datos.</p>
         } @else {
-          <ol class="ranking">
-            @for (a of porReservas(); track a.idAlojamiento) {
-              <li><span class="ranking__titulo">{{ a.titulo }}</span> <span class="ranking__valor">{{ a.valor }}</span></li>
-            }
-          </ol>
+          <app-grafico-barras
+            [etiquetas]="reservas().etiquetas"
+            [valores]="reservas().valores"
+            descripcion="Reservas"
+            nombreEtiqueta="Alojamiento"
+            formato="entero"
+            orientacion="horizontal"
+          />
         }
       </section>
 
       <section class="stack card">
-        <h2>Top por rating</h2>
+        <div class="titulo-info">
+          <h2>Top por rating</h2>
+          <app-info-grafico titulo="Top por rating" [texto]="['Los 10 alojamientos mejor calificados.', 'Cada barra es el promedio de estrellas (de 1 a 5) de las reseñas que dejaron los huéspedes. Ojo: uno con pocas reseñas buenas puede quedar arriba de otro con muchas.', 'Pasá el mouse o tocá una barra para ver el valor exacto; en “Ver los datos” están todos los números.']" />
+        </div>
         @if (porRating().length === 0) {
           <p class="text-muted">Sin datos.</p>
         } @else {
-          <ol class="ranking">
-            @for (a of porRating(); track a.idAlojamiento) {
-              <li><span class="ranking__titulo">{{ a.titulo }}</span> <span class="ranking__valor">{{ a.valor | number: '1.1-1' }}</span></li>
-            }
-          </ol>
+          <app-grafico-barras
+            [etiquetas]="rating().etiquetas"
+            [valores]="rating().valores"
+            descripcion="Rating promedio" [maximo]="5"
+            nombreEtiqueta="Alojamiento"
+            formato="decimal"
+            orientacion="horizontal"
+          />
         }
       </section>
     </div>

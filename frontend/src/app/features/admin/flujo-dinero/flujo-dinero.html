@@ -5,17 +5,32 @@
     <p class="text-danger">{{ error() }}</p>
   }
 
-  <form class="form-inline card" (submit)="$event.preventDefault(); aplicarFiltroFechas()" aria-label="Filtrar por fechas">
-    <div class="field">
-      <label for="desde">Desde</label>
-      <input id="desde" type="date" [ngModel]="desde()" (ngModelChange)="desde.set($event)" name="desde" />
+  <section class="card stack stack--tight flujo__filtro" aria-label="Período">
+    <div class="flujo__periodo">
+      <p>
+        <span class="text-muted">Período:&nbsp;</span>
+        <strong>{{ textoPeriodo() }}</strong>
+      </p>
+      <div class="flujo__periodo-acciones">
+        <button type="button" class="btn" (click)="eligiendoPeriodo.set(!eligiendoPeriodo())" [attr.aria-expanded]="eligiendoPeriodo()">
+          {{ eligiendoPeriodo() ? 'Cerrar calendario' : 'Elegir período' }}
+        </button>
+        @if (desde() || hasta()) {
+          <button type="button" class="btn" (click)="verTodo()">Ver todo el historial</button>
+        }
+      </div>
     </div>
-    <div class="field">
-      <label for="hasta">Hasta</label>
-      <input id="hasta" type="date" [ngModel]="hasta()" (ngModelChange)="hasta.set($event)" name="hasta" />
-    </div>
-    <button type="submit" class="btn">Filtrar</button>
-  </form>
+    @if (eligiendoPeriodo()) {
+      <app-calendario-rango
+        modo="periodo"
+        minimo="2020-01-01"
+        [inicio]="desdeElegido()"
+        (inicioChange)="desdeElegido.set($event)"
+        [fin]="hastaElegido()"
+        (finChange)="alElegirFin($event)"
+      />
+    }
+  </section>
 
   @if (cargandoFlujo()) {
     <app-esqueleto tipo="kpis" [cantidad]="5" />
@@ -50,7 +65,10 @@
 
   <section class="stack">
     <div class="flujo__encabezado">
-      <h2>Ingresos mensuales</h2>
+      <div class="titulo-info">
+        <h2>Ingresos mensuales</h2>
+        <app-info-grafico titulo="Ingresos mensuales" [texto]="['Lo que pagaron los clientes en cada mes del año elegido, según el día del pago.', 'Es el total cobrado: la estadía más las comisiones de la plataforma y de Mercado Pago. Si después hubo un reembolso, el pago igual cuenta en su mes.', 'Pasá el mouse o tocá una barra para ver el valor exacto; en “Ver los datos” están todos los números.']" />
+      </div>
       <div class="field">
         <label for="anio">Año</label>
         <input id="anio" type="number" inputmode="numeric" min="2000" [ngModel]="anio()" (ngModelChange)="anio.set($event); cambiarAnio()" name="anio" />
@@ -61,47 +79,35 @@
       <app-esqueleto tipo="tabla" [cantidad]="3" />
     } @else {
       <p class="text-muted">Total del año: <strong>${{ totalAnual() | number }}</strong></p>
-      <!-- Una fila por mes con una barra proporcional al mes de mayor
-           facturacion: se lee igual en un celular que en desktop. -->
-      <ol class="meses" aria-label="Facturación por mes">
-        @for (i of ingresosMensuales(); track i.mes) {
-          <li class="meses__fila">
-            <span class="meses__nombre">{{ meses[i.mes - 1] }}</span>
-            <span class="meses__barra" aria-hidden="true">
-              <span class="meses__relleno" [style.width.%]="porcentajeDelMaximo(i.totalFacturado)"></span>
-            </span>
-            <span class="meses__monto">${{ i.totalFacturado | number }}</span>
-          </li>
-        }
-      </ol>
+      <app-grafico-barras
+        [etiquetas]="etiquetasMeses()"
+        [valores]="montosMeses()"
+        descripcion="Facturado"
+        nombreEtiqueta="Mes"
+        formato="pesos"
+      />
     }
   </section>
 
   <section class="stack">
-    <h2>Cancelaciones por motivo</h2>
+    <div class="titulo-info">
+      <h2>Cancelaciones por motivo</h2>
+      <app-info-grafico titulo="Cancelaciones por motivo" [texto]="['Cuántas reservas se cancelaron en el período elegido, separadas por quién o por qué: el anfitrión, el cliente (con más o menos de 48 horas de anticipación), un administrador o el pago vencido.', 'Solo cuenta reservas que ya estaban confirmadas: las que se cancelan antes de confirmarse no llegan a tener pago.', 'Pasá el mouse o tocá una barra para ver el valor exacto; en “Ver los datos” están todos los números.']" />
+    </div>
     @if (cargandoCancelaciones()) {
       <app-esqueleto tipo="tabla" [cantidad]="3" />
     } @else if (cancelaciones().length === 0) {
       <p class="text-muted">Sin cancelaciones en el rango seleccionado.</p>
     } @else {
-      <div class="table-scroll">
-        <table class="tabla">
-          <thead>
-            <tr>
-              <th>Motivo</th>
-              <th>Cantidad</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (c of cancelaciones(); track c.motivo) {
-              <tr>
-                <td>{{ c.motivo }}</td>
-                <td>{{ c.cantidad }}</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+      <app-grafico-barras
+        [etiquetas]="etiquetasCancelaciones()"
+        [valores]="cantidadesCancelaciones()"
+        descripcion="Cancelaciones"
+        nombreEtiqueta="Motivo"
+        formato="entero"
+        orientacion="horizontal"
+        [parteDelTotal]="true"
+      />
     }
   </section>
 </section>

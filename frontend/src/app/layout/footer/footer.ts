@@ -15,12 +15,17 @@ import { Kaza } from '../../shared/kaza/kaza';
 export class Footer {
   private readonly auth = inject(AuthService);
 
-  /// "Publica tu alojamiento" lleva directo al formulario si ya es anfitrion;
-  /// si no, a crear una cuenta.
+  /// "Publica tu alojamiento": al anfitrion lo lleva directo al formulario; a un
+  /// visitante, a crear su cuenta; a un cliente o un administrador (que no
+  /// pueden publicar con esa cuenta), a la ayuda que explica como hacerlo.
   readonly linkPublicar = computed(() => {
     const rol = this.auth.rol();
-    return rol === 'ANFITRION' || rol === 'ADMIN' ? '/anfitrion/alojamientos/nuevo' : '/registro';
+    if (rol === 'ANFITRION') return '/anfitrion/alojamientos/nuevo';
+    return this.auth.estaLogueado() ? '/ayuda' : '/registro';
   });
+  readonly fragmentoPublicar = computed(() =>
+    this.auth.estaLogueado() && this.auth.rol() !== 'ANFITRION' ? 'ayuda' : undefined,
+  );
 
   readonly anio = new Date().getFullYear();
 }

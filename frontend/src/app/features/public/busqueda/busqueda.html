@@ -29,60 +29,74 @@
       </button>
 
       <div id="filtros-panel" class="filtros__panel" [class.filtros__panel--abierto]="filtrosAbiertos()">
-        <div class="filtros__rango">
-          <div class="field">
-            <label for="precioMin">Precio mínimo</label>
-            <input
-              id="precioMin"
-              type="number"
-              inputmode="numeric"
-              min="0"
-              [ngModel]="precioMin()"
-              (ngModelChange)="precioMin.set($event)"
-              name="precioMin"
-            />
-          </div>
-          <div class="field">
-            <label for="precioMax">Precio máximo</label>
-            <input
-              id="precioMax"
-              type="number"
-              inputmode="numeric"
-              min="0"
-              [ngModel]="precioMax()"
-              (ngModelChange)="precioMax.set($event)"
-              name="precioMax"
-            />
-          </div>
-        </div>
-
-        <div class="field">
-          <label for="capacidadMin">Huéspedes (mínimo)</label>
-          <input
-            id="capacidadMin"
-            type="number"
-            inputmode="numeric"
-            min="1"
-            [ngModel]="capacidadMin()"
-            (ngModelChange)="capacidadMin.set($event)"
-            name="capacidadMin"
-          />
-        </div>
-
-        @if (serviciosDisponibles().length > 0) {
-          <fieldset class="filtros__servicios">
-            <legend>Servicios</legend>
-            @for (servicio of serviciosDisponibles(); track servicio.idServicio) {
-              <label>
-                <input
-                  type="checkbox"
-                  [checked]="serviciosSeleccionados().has(servicio.idServicio)"
-                  (change)="toggleServicio(servicio.idServicio)"
-                />
-                {{ servicio.nombreServicio }}
-              </label>
+        <fieldset class="filtros__grupo">
+          <legend>Precio por noche</legend>
+          <div class="sugeridos">
+            @for (r of rangosPrecio; track r.etiqueta) {
+              <button type="button" class="sugerido" [attr.aria-pressed]="rangoActivo(r)" (click)="elegirRango(r)">
+                {{ r.etiqueta }}
+              </button>
             }
-          </fieldset>
+          </div>
+          <div class="filtros__rango">
+            <div class="field">
+              <label for="precioMin">Mínimo</label>
+              <input
+                id="precioMin"
+                type="number"
+                inputmode="numeric"
+                min="0"
+                step="1000"
+                placeholder="$ 0"
+                [ngModel]="precioMin()"
+                (ngModelChange)="precioMin.set($event)"
+                name="precioMin"
+              />
+            </div>
+            <div class="field">
+              <label for="precioMax">Máximo</label>
+              <input
+                id="precioMax"
+                type="number"
+                inputmode="numeric"
+                min="0"
+                step="1000"
+                placeholder="Sin tope"
+                [ngModel]="precioMax()"
+                (ngModelChange)="precioMax.set($event)"
+                name="precioMax"
+              />
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="filtros__grupo">
+          <legend>Huéspedes (mínimo)</legend>
+          <div class="sugeridos">
+            @for (n of opcionesHuespedes; track n) {
+              <button type="button" class="sugerido sugerido--numero" [attr.aria-pressed]="capacidadMin() === n" (click)="elegirHuespedes(n)">
+                {{ n === 8 ? '8+' : n }}
+              </button>
+            }
+          </div>
+        </fieldset>
+
+        <!-- Los servicios pueden ser muchos: en vez de una lista eterna en la
+             barra, un boton que abre la carta con todos para tildar. -->
+        @if (serviciosDisponibles().length > 0) {
+          <div class="filtros__grupo">
+            <span class="filtros__titulo" id="servicios-titulo">Servicios</span>
+            <button type="button" class="sugerido filtros__servicios-btn" aria-describedby="servicios-titulo" [disabled]="!serviciosListos()" (click)="abrirServicios()">
+              @if (!serviciosListos()) {
+                Cargando servicios…
+              } @else {
+                {{ serviciosSeleccionados().size === 0 ? 'Elegir servicios' : 'Servicios (' + serviciosSeleccionados().size + ')' }}
+              }
+            </button>
+            @if (nombresSeleccionados()) {
+              <p class="filtros__elegidos text-muted">{{ nombresSeleccionados() }}</p>
+            }
+          </div>
         }
 
         <button type="button" class="btn" (click)="limpiarFiltros()">Limpiar filtros</button>
@@ -101,8 +115,16 @@
       } @else {
         <div class="resultados-barra">
           <p class="text-muted" aria-live="polite">
-            {{ resultados().length }} {{ resultados().length === 1 ? 'alojamiento' : 'alojamientos' }}
+            @if (modo() === 'lista' && totalPaginas() > 1) {
+              {{ desde() }}–{{ hasta() }} de {{ resultados().length }} alojamientos
+            } @else {
+              {{ resultados().length }} {{ resultados().length === 1 ? 'alojamiento' : 'alojamientos' }}
+            }
           </p>
+          <div class="resultados-barra__derecha">
+          @if (modo() === 'lista' && totalPaginas() > 1) {
+            <ng-container [ngTemplateOutlet]="paginador" />
+          }
           <div class="vista-toggle" role="group" aria-label="Ver resultados como">
             <button type="button" [attr.aria-pressed]="modo() === 'lista'" (click)="modo.set('lista')">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
@@ -121,14 +143,20 @@
               Mapa
             </button>
           </div>
+          </div>
         </div>
 
         @if (modo() === 'lista') {
           <div class="grid-auto">
-            @for (alojamiento of resultados(); track alojamiento.idAlojamiento) {
+            @for (alojamiento of visibles(); track alojamiento.idAlojamiento) {
               <app-alojamiento-card [alojamiento]="alojamiento" />
             }
           </div>
+          @if (totalPaginas() > 1) {
+            <div class="paginador-pie">
+              <ng-container [ngTemplateOutlet]="paginador" />
+            </div>
+          }
         } @else {
           <!-- El mapa (y Leaflet) se descarga recien la primera vez que se elige. -->
           @defer (on immediate) {
@@ -142,4 +170,58 @@
       }
     </div>
   </div>
+
+  <ng-template #paginador>
+    <nav class="paginador" aria-label="Páginas de resultados">
+      <button type="button" class="paginador__btn" [disabled]="paginaActual() === 1" (click)="irAPagina(paginaActual() - 1)" aria-label="Página anterior">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m15 6-6 6 6 6" /></svg>
+      </button>
+      <span class="paginador__texto"><span class="paginador__palabra">Página&nbsp;</span>{{ paginaActual() }} de {{ totalPaginas() }}</span>
+      <button type="button" class="paginador__btn" [disabled]="paginaActual() === totalPaginas()" (click)="irAPagina(paginaActual() + 1)" aria-label="Página siguiente">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+      </button>
+    </nav>
+  </ng-template>
+
+  <!-- Carta de servicios: mismo estilo que las confirmaciones (con Kaza).
+       Tildar o destildar filtra al instante; "Listo" solo la cierra. -->
+  <dialog #dialogoServicios class="carta carta--ancha" aria-labelledby="servicios-dialogo-titulo" (click)="clicFondoServicios($event)">
+    <div class="carta__cuerpo servicios-carta">
+      <span class="carta__kaza" aria-hidden="true">
+        <app-kaza variante="insignia" />
+      </span>
+      <h2 id="servicios-dialogo-titulo">Servicios</h2>
+      <p class="text-muted">Mostramos solo los alojamientos que tienen <strong>todos</strong> los que tildes.</p>
+      <div class="servicios-carta__buscar">
+        <app-buscador-lista
+          [(texto)]="buscarServicio"
+          idCampo="buscar-servicio"
+          etiqueta="Buscar un servicio"
+          placeholder="Buscar un servicio"
+          [resultados]="serviciosFiltrados().length"
+          [total]="serviciosDisponibles().length"
+        />
+      </div>
+      <div class="servicios-carta__lista">
+        @for (servicio of serviciosFiltrados(); track servicio.idServicio) {
+          <label>
+            <input
+              type="checkbox"
+              [checked]="serviciosSeleccionados().has(servicio.idServicio)"
+              (change)="toggleServicio(servicio.idServicio)"
+            />
+            {{ servicio.nombreServicio }}
+          </label>
+        } @empty {
+          <p class="text-muted">Ningún servicio coincide con lo que escribiste.</p>
+        }
+      </div>
+      <div class="carta__acciones">
+        <button type="button" class="btn" [disabled]="serviciosSeleccionados().size === 0" (click)="limpiarServicios()">Quitar todos</button>
+        <button type="button" class="btn btn--primario" (click)="cerrarServicios()">
+          {{ serviciosSeleccionados().size === 0 ? 'Listo' : 'Ver resultados' }}
+        </button>
+      </div>
+    </div>
+  </dialog>
 </section>

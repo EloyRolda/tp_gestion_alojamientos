@@ -1,0 +1,65 @@
+<div
+  class="cal"
+  role="group"
+  [attr.aria-label]="modo() === 'periodo' ? 'Elegir período' : 'Elegir fechas de llegada y salida'"
+  (mouseleave)="hover.set(null)"
+>
+  <div class="cal__barra">
+    <button type="button" class="cal__nav" (click)="mover(-1)" [disabled]="!puedeRetroceder()" aria-label="Mes anterior">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+    </button>
+    <p class="cal__resumen" aria-live="polite">{{ resumen() }}</p>
+    <button type="button" class="cal__nav" (click)="mover(1)" aria-label="Mes siguiente">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
+    </button>
+  </div>
+
+  <div class="cal__meses">
+    @for (mes of meses(); track mes.titulo; let segundo = $last) {
+      <div class="cal__mes" [class.cal__mes--segundo]="segundo">
+        <p class="cal__titulo">{{ mes.titulo }}</p>
+        <div class="cal__grilla" role="grid">
+          @for (d of diasSemana; track d) {
+            <span class="cal__dia-semana" aria-hidden="true">{{ d }}</span>
+          }
+          @for (h of mes.huecos; track h) {
+            <span></span>
+          }
+          @for (dia of mes.dias; track dia.iso) {
+            <button
+              type="button"
+              class="cal__dia"
+              [attr.data-fecha]="dia.iso"
+              [class.cal__dia--hoy]="dia.esHoy"
+              [class.cal__dia--ocupado]="dia.ocupado"
+              [class.cal__dia--rango]="enRango(dia.iso)"
+              [class.cal__dia--inicio]="esExtremo(dia.iso) === 'inicio'"
+              [class.cal__dia--fin]="esExtremo(dia.iso) === 'fin'"
+              [disabled]="deshabilitado(dia)"
+              [attr.aria-pressed]="dia.iso === inicio() || dia.iso === fin()"
+              [attr.aria-label]="etiqueta(dia)"
+              [attr.tabindex]="dia.iso === enfocable() ? 0 : -1"
+              (click)="elegir(dia)"
+              (mouseenter)="hover.set(dia.iso)"
+              (keydown)="teclado($event, dia)"
+            >
+              {{ dia.numero }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="cal__pie">
+    <ul class="cal__leyenda" aria-label="Referencias">
+      <li><span class="cal__muestra cal__muestra--elegido"></span> Elegido</li>
+      @if (modo() === 'estadia') {
+        <li><span class="cal__muestra cal__muestra--ocupado"></span> No disponible</li>
+      }
+    </ul>
+    @if (inicio()) {
+      <button type="button" class="btn" (click)="limpiar()">Borrar fechas</button>
+    }
+  </div>
+</div>

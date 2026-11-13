@@ -1,0 +1,35 @@
+<dialog
+  #dialogo
+  class="visor"
+  aria-label="Visor de fotos"
+  (close)="alCerrarDialogo()"
+  (keydown)="teclado($event)"
+  (click)="clicFondo($event)"
+  (touchstart)="toqueInicio($event)"
+  (touchend)="toqueFin($event)"
+>
+  @if (actual(); as foto) {
+    <div class="visor__barra">
+      <span class="visor__contador" aria-live="polite">{{ indice()! + 1 }} / {{ fotos().length }}</span>
+      <button type="button" class="visor__boton" (click)="cerrar()" aria-label="Cerrar visor">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+      </button>
+    </div>
+
+    <figure class="visor__figura" (click)="clicFondo($event)">
+      <img [src]="foto.url" [alt]="foto.alt" />
+      @if (foto.alt) {
+        <figcaption>{{ foto.alt }}</figcaption>
+      }
+    </figure>
+
+    @if (fotos().length > 1) {
+      <button type="button" class="visor__boton visor__nav visor__nav--ant" (click)="anterior()" aria-label="Foto anterior">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+      </button>
+      <button type="button" class="visor__boton visor__nav visor__nav--sig" (click)="siguiente()" aria-label="Foto siguiente">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
+      </button>
+    }
+  }
+</dialog>

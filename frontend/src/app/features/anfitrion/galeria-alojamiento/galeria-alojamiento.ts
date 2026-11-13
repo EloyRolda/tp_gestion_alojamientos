@@ -7,6 +7,9 @@ import { Imagen } from '../../../core/models/galeria.model';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
 import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 import { AvisoService } from '../../../core/services/aviso.service';
+import { VisorFotos } from '../../../shared/visor-fotos/visor-fotos';
+import { ConfirmacionService } from '../../../core/services/confirmacion.service';
+import { exigirDuenio } from '../../../core/utils/duenio.util';
 
 const MAXIMO_IMAGENES = 10;
 
@@ -17,7 +20,7 @@ const MAXIMO_IMAGENES = 10;
 @Component({
   selector: 'app-galeria-alojamiento',
   standalone: true,
-  imports: [FormsModule, RouterLink, Esqueleto],
+  imports: [FormsModule, RouterLink, Esqueleto, VisorFotos],
   templateUrl: './galeria-alojamiento.html',
   styleUrl: './galeria-alojamiento.css',
 })
@@ -25,12 +28,16 @@ export class GaleriaAlojamiento {
   readonly id = input.required<string>();
 
   private readonly galeriaService = inject(GaleriaService);
+  private readonly confirmacion = inject(ConfirmacionService);
   private readonly aviso = inject(AvisoService);
   private readonly alojamientoService = inject(AlojamientoService);
+  private readonly idDuenio = signal<number | null>(null);
 
   readonly tituloAlojamiento = signal('');
   readonly idGaleria = signal<number | null>(null);
   readonly imagenes = signal<Imagen[]>([]);
+  /// Foto abierta en el visor a pantalla completa (null = cerrado).
+  readonly fotoAbierta = signal<number | null>(null);
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
 
@@ -41,6 +48,7 @@ export class GaleriaAlojamiento {
   readonly maximoAlcanzado = () => this.imagenes().length >= MAXIMO_IMAGENES;
 
   constructor() {
+    exigirDuenio(this.idDuenio);
     effect(() => {
       const idNumerico = Number(this.id());
       if (!Number.isFinite(idNumerico)) return;
@@ -75,7 +83,14 @@ export class GaleriaAlojamiento {
     });
   }
 
-  eliminar(imagen: Imagen): void {
+  async eliminar(imagen: Imagen): Promise<void> {
+    const ok = await this.confirmacion.pedir({
+      titulo: 'Eliminar foto',
+      mensaje: ['La foto se borra de la galería y deja de verse en la publicación.'],
+      aceptar: 'Eliminar foto',
+      peligro: true,
+    });
+    if (!ok) return;
     this.galeriaService.eliminarImagen(imagen.id).subscribe({
       next: () => {
         this.aviso.mostrar('Foto eliminada');
@@ -89,7 +104,12 @@ export class GaleriaAlojamiento {
     this.cargando.set(true);
     this.error.set(null);
 
-    this.alojamientoService.obtener(idAlojamiento).subscribe({ next: (a) => this.tituloAlojamiento.set(a.titulo) });
+    this.alojamientoService.obtener(idAlojamiento).subscribe({
+      next: (a) => {
+        this.tituloAlojamiento.set(a.titulo);
+        this.idDuenio.set(a.anfitrion.id);
+      },
+    });
 
     this.galeriaService.obtenerPorAlojamiento(idAlojamiento).subscribe({
       next: (g) => {

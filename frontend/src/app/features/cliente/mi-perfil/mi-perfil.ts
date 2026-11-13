@@ -28,7 +28,7 @@ const FORM_VACIO: FormPerfil = {
 /// (cualquier rol). La contraseña queda en blanco a proposito (nunca se
 /// precarga): si se deja vacia, no se manda en el PUT (UsuarioModificarDTO
 /// acepta todos los campos opcionales, solo pisa lo que venga no-nulo).
-/// Para ANFITRION/ADMIN suma el alias de cobro (CBU/CVU/alias) con el flujo de
+/// Para ANFITRION suma el alias de cobro (CBU/CVU/alias) con el flujo de
 /// 2 pasos validar->confirmar que ya existia en el backend sin UI (Lote 4.1).
 @Component({
   selector: 'app-mi-perfil',
@@ -46,6 +46,8 @@ export class MiPerfil {
   readonly cargando = signal(true);
   readonly guardando = signal(false);
   readonly error = signal<string | null>(null);
+  /// Para no cambiar la contraseña por una con un error de tipeo (y quedar afuera).
+  readonly repetirPassword = signal('');
   readonly exito = signal(false);
 
   readonly rol = this.auth.rol;
@@ -95,6 +97,11 @@ export class MiPerfil {
       email: actual.email,
       telefono: actual.telefono,
     };
+    if (actual.password && actual.password !== this.repetirPassword()) {
+      this.error.set('Las dos contraseñas nuevas no coinciden.');
+      this.guardando.set(false);
+      return;
+    }
     if (actual.password.trim().length > 0) {
       dto.password = actual.password;
     }
@@ -105,6 +112,7 @@ export class MiPerfil {
         this.exito.set(true);
         this.aviso.mostrar('Cambios guardados');
         this.actualizarCampo('password', '');
+        this.repetirPassword.set('');
         this.auth.refrescarPerfil().subscribe();
       },
       error: (err) => {

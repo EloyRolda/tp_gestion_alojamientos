@@ -9,6 +9,8 @@ import { extraerMensajeError } from '../../../core/utils/http-error.util';
 import { Estado } from '../../../shared/estado/estado';
 import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 import { Vacio } from '../../../shared/vacio/vacio';
+import { coincide } from '../../../core/utils/busqueda.util';
+import { BuscadorLista } from '../../../shared/buscador-lista/buscador-lista';
 
 type FiltroEstado = EstadoReserva | 'TODAS';
 
@@ -19,7 +21,7 @@ type FiltroEstado = EstadoReserva | 'TODAS';
 @Component({
   selector: 'app-reservas-anfitrion',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, FormsModule, RouterLink, Estado, Esqueleto, Vacio],
+  imports: [DatePipe, DecimalPipe, FormsModule, RouterLink, Estado, Esqueleto, Vacio, BuscadorLista],
   templateUrl: './reservas-anfitrion.html',
   styleUrl: './reservas-anfitrion.css',
 })
@@ -30,10 +32,17 @@ export class ReservasAnfitrion {
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
   readonly filtro = signal<FiltroEstado>('TODAS');
+  /// Busca por numero de reserva, alojamiento o cliente (sin tildes ni mayusculas).
+  readonly busqueda = signal('');
 
   readonly reservasFiltradas = computed(() => {
     const f = this.filtro();
-    return f === 'TODAS' ? this.reservas() : this.reservas().filter((r) => r.estadoReserva === f);
+    const b = this.busqueda().replace('#', '');
+    return this.reservas().filter(
+      (r) =>
+        (f === 'TODAS' || r.estadoReserva === f) &&
+        coincide(b, r.idReserva, r.alojamiento.titulo, r.cliente.nombre, r.cliente.apellido),
+    );
   });
 
   readonly estados: FiltroEstado[] = ['TODAS', 'SOLICITADA', 'CONFIRMADA', 'FINALIZADA', 'CANCELADA'];

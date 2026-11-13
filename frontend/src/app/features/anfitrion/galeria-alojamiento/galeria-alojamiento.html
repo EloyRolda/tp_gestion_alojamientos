@@ -12,14 +12,18 @@
     <p class="text-muted">{{ imagenes().length }} de 10 imágenes.</p>
 
     <ul class="galeria">
-      @for (img of imagenes(); track img.id) {
+      @for (img of imagenes(); track img.id; let i = $index) {
         <li class="galeria__item">
-          <img [src]="img.url" [alt]="img.alt" loading="lazy" />
+          <button type="button" class="galeria__foto" (click)="fotoAbierta.set(i)"
+            [attr.aria-label]="'Ver foto ' + (i + 1) + ' en grande'">
+            <img [src]="img.url" [alt]="img.alt" loading="lazy" />
+          </button>
           <p class="galeria__alt text-muted">{{ img.alt }}</p>
           <button type="button" class="btn btn--peligro" (click)="eliminar(img)">Eliminar</button>
         </li>
       }
     </ul>
+    <app-visor-fotos [fotos]="imagenes()" [(indice)]="fotoAbierta" />
 
     @if (maximoAlcanzado()) {
       <p class="text-muted">Llegaste al máximo de 10 imágenes por alojamiento.</p>

@@ -1,6 +1,15 @@
 <section class="stack">
   <h1>Reservas de mis alojamientos</h1>
 
+  <div class="filtros-lista">
+  <app-buscador-lista
+    [(texto)]="busqueda"
+    idCampo="buscar-reservas"
+    etiqueta="Buscar reservas"
+    placeholder="Alojamiento, cliente o n.º de reserva"
+    [resultados]="reservasFiltradas().length"
+    [total]="reservas().length"
+  />
   <div class="field field--compacto">
     <label for="filtro">Filtrar por estado</label>
     <select id="filtro" [ngModel]="filtro()" (ngModelChange)="filtro.set($event)" name="filtro">
@@ -9,13 +18,14 @@
       }
     </select>
   </div>
+  </div>
 
   @if (cargando()) {
     <app-esqueleto tipo="tabla" />
   } @else if (error()) {
     <p class="text-danger">{{ error() }}</p>
   } @else if (reservasFiltradas().length === 0) {
-    <app-vacio titulo="No hay reservas para mostrar" texto="Probá con otro estado en el filtro, o esperá a que lleguen nuevas solicitudes." />
+    <app-vacio titulo="No hay reservas para mostrar" texto="Revisá la búsqueda o probá con otro estado en el filtro, o esperá a que lleguen nuevas solicitudes." />
   } @else {
     <div class="table-scroll">
       <table class="tabla table-cards">

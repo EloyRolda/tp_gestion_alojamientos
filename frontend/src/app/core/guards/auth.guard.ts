@@ -13,3 +13,10 @@ export const authGuard: CanActivateFn = (_route, state) => {
   }
   return router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } });
 };
+
+/// Para "Iniciar sesion" y "Crear cuenta": quien ya tiene la sesion iniciada no
+/// tiene nada que hacer ahi, asi que vuelve al inicio.
+export const soloVisitanteGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  return auth.estaLogueado() ? inject(Router).createUrlTree(['/']) : true;
+};

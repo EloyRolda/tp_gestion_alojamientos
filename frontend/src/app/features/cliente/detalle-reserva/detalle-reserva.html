@@ -56,13 +56,22 @@
             }
           </dl>
 
-          @if (r.pago.estado === 'PENDIENTE' && r.pago.urlCheckout) {
+          @if (pagoVencido(r)) {
+            <p class="text-danger">Venció el plazo para pagar. La reserva se va a cancelar automáticamente.</p>
+          } @else if (r.pago.estado === 'PENDIENTE' && r.pago.urlCheckout) {
             <a [href]="r.pago.urlCheckout" class="btn btn--primario no-print" target="_blank" rel="noopener">Pagar ahora con MercadoPago</a>
           }
         </section>
       }
 
+      @if (r.estadoReserva === 'SOLICITADA') {
+        <p class="text-muted no-print">El anfitrión todavía no confirmó. Cuando lo haga, vas a tener 48 horas para pagar.</p>
+      }
+
       <div class="form-actions no-print">
+        @if (puedeCambiarFechas(r) && !editandoFechas()) {
+          <button type="button" class="btn" (click)="abrirCambioFechas(r)">Cambiar fechas</button>
+        }
         @if (puedeCancelar(r)) {
           <button type="button" class="btn btn--peligro" (click)="cancelar()" [disabled]="cancelando()">
             {{ cancelando() ? 'Cancelando...' : 'Cancelar reserva' }}
@@ -74,6 +83,27 @@
       </div>
     </article>
 
+    @if (editandoFechas()) {
+      <section class="stack card no-print">
+        <h2>Cambiar fechas</h2>
+        <app-calendario-rango [(inicio)]="nuevaInicio" [(fin)]="nuevaFin" [minimo]="hoy" [ocupados]="ocupados()" />
+        @if (errorFechas()) {
+          <p class="text-danger" role="alert">{{ errorFechas() }}</p>
+        }
+        <div class="form-actions">
+          <button type="button" class="btn" (click)="editandoFechas.set(false)">Volver</button>
+          <button
+            type="button"
+            class="btn btn--primario"
+            (click)="guardarFechas()"
+            [disabled]="guardandoFechas() || !nuevaFin() || (nuevaInicio() === r.fechaInicio && nuevaFin() === r.fechaFin)"
+          >
+            {{ guardandoFechas() ? 'Guardando...' : 'Guardar fechas' }}
+          </button>
+        </div>
+      </section>
+    }
+
     @if (puedeResenar(r)) {
       <section class="stack card no-print">
         <h2>Dejar una reseña</h2>
@@ -84,8 +114,8 @@
             <div class="field">
               <label for="puntuacion">Puntuación (1 a 5)</label>
               <select id="puntuacion" [ngModel]="puntuacion()" (ngModelChange)="puntuacion.set($event)" name="puntuacion">
-                @for (n of [1, 2, 3, 4, 5]; track n) {
-                  <option [value]="n">{{ n }}</option>
+                @for (n of [5, 4, 3, 2, 1]; track n) {
+                  <option [ngValue]="n">{{ '★'.repeat(n) }} ({{ n }})</option>
                 }
               </select>
             </div>
@@ -96,7 +126,7 @@
             @if (errorReview()) {
               <p class="text-danger">{{ errorReview() }}</p>
             }
-            <button type="submit" class="btn btn--primario" [disabled]="enviandoReview()">
+            <button type="submit" class="btn btn--primario" [disabled]="enviandoReview() || !comentario().trim()">
               {{ enviandoReview() ? 'Enviando...' : 'Enviar reseña' }}
             </button>
           </form>

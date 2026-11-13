@@ -2,3 +2,15 @@
   max-width: 640px;
   margin-inline: auto;
 }
+
+/* Cliente y anfitrion, uno al lado del otro desde tablet. */
+.partes {
+  display: grid;
+  gap: var(--space-3);
+}
+
+@media (min-width: 768px) {
+  .partes {
+    grid-template-columns: 1fr 1fr;
+  }
+}

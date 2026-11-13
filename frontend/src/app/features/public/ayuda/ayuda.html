@@ -83,11 +83,15 @@
           establece la normativa de defensa del consumidor. Para hacerlo, cancelá la reserva desde su detalle en
           Mis reservas: el reintegro se calcula con la política de cancelación de esta página.
         </p>
-        <div>
-          <a class="btn" [routerLink]="linkArrepentimiento()" [queryParams]="paramsArrepentimiento()">
-            Arrepentirme de una reserva
-          </a>
-        </div>
+        @if (esCuentaSinReservas()) {
+          <p class="text-muted">Esta opción es para cuentas de cliente, que son las que hacen reservas.</p>
+        } @else {
+          <div>
+            <a class="btn" [routerLink]="linkArrepentimiento()" [queryParams]="paramsArrepentimiento()">
+              Arrepentirme de una reserva
+            </a>
+          </div>
+        }
       </section>
 
       <section class="legal__seccion" id="terminos">

@@ -54,13 +54,33 @@
         <p class="text-danger">{{ error() }}</p>
       }
 
+      @if (r.estadoReserva === 'SOLICITADA' && llegadaPasada(r)) {
+        <p class="text-muted">La fecha de llegada ya pasó, así que esta solicitud ya no se puede confirmar.</p>
+      }
+      @if (r.estadoReserva === 'CONFIRMADA' && r.pago?.estado === 'PENDIENTE') {
+        <p class="text-muted">Esperando el pago del cliente (tiene 48 horas desde que confirmaste).</p>
+      }
+      @if (r.estadoReserva === 'CONFIRMADA' && r.pago?.estado === 'PAGADO' && !puedeFinalizar(r)) {
+        <p class="text-muted">Vas a poder finalizar la estadía desde el {{ finalizableDesde(r) | date: 'dd/MM/yyyy' }}, el día después del check-out.</p>
+      }
+      @if ((puedeConfirmar(r) || puedeFinalizar(r)) && sinAliasCobro()) {
+        <p class="aviso-alias">
+          @if (puedeFinalizar(r)) {
+            Para finalizar la estadía necesitás cargar tu alias de cobro: es la cuenta a la que te transferimos.
+          } @else {
+            Todavía no cargaste tu alias de cobro: sin él no podemos transferirte lo que ganes.
+          }
+          <a routerLink="/perfil" fragment="alias-cobro">Cargarlo en Mi perfil</a>
+        </p>
+      }
+
       <div class="form-actions">
         @if (puedeConfirmar(r)) {
           <button type="button" class="btn btn--primario" (click)="confirmar()" [disabled]="procesando()">
             {{ procesando() ? 'Procesando...' : 'Confirmar reserva' }}
           </button>
         }
-        @if (puedeFinalizar(r)) {
+        @if (puedeFinalizar(r) && !sinAliasCobro()) {
           <button type="button" class="btn btn--primario" (click)="finalizar()" [disabled]="procesando()">
             {{ procesando() ? 'Procesando...' : 'Finalizar estadía' }}
           </button>

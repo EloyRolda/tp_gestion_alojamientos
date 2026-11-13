@@ -20,6 +20,8 @@ export class Ayuda {
   /// El arrepentimiento se hace cancelando la reserva desde su detalle: con
   /// sesion iniciada se va directo a "Mis reservas"; si no, primero a ingresar.
   readonly linkArrepentimiento = computed(() => (this.auth.estaLogueado() ? '/mis-reservas' : '/login'));
+  /// Anfitriones y administradores no tienen reservas propias.
+  readonly esCuentaSinReservas = computed(() => this.auth.rol() === 'ANFITRION' || this.auth.rol() === 'ADMIN');
   readonly paramsArrepentimiento = computed(() =>
     this.auth.estaLogueado() ? {} : { returnUrl: '/mis-reservas' },
   );

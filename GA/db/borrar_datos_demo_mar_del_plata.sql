@@ -1,8 +1,9 @@
 -- =====================================================================
 -- AlojaME -- borrar los datos de demostracion de Mar del Plata
 --
--- Elimina todo lo que cargo datos_demo_mar_del_plata.sql: los 75 usuarios de la demo
--- (emails terminados en .mdp.alojame@gmail.com), sus alojamientos, direcciones,
+-- Elimina todo lo que cargo datos_demo_completa.sql (o la demo anterior,
+-- datos_demo_mar_del_plata.sql): todos los usuarios de la
+-- demo (emails terminados en .mdp.alojame@gmail.com), sus alojamientos, direcciones,
 -- galerias, imagenes, servicios asignados, reservas, pagos y resenas.
 -- Tambien borra las reservas que OTROS usuarios hayan hecho sobre esos
 -- alojamientos. No toca los tipos de alojamiento ni los servicios del

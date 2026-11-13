@@ -1,4 +1,6 @@
-/* Encabezado negro y fijo arriba (SCRUM-63).
+/* Encabezado negro arriba (SCRUM-63). Se desplaza con la pagina: el
+   "sticky" de .topbar no tiene efecto porque su contenedor (app-navbar) mide
+   lo mismo que el; asi se decidio dejarlo, para no ocupar alto en celulares.
    Mobile: logo y avatar en la primera fila, buscador a todo el ancho abajo.
    Desde tablet: logo | buscador | avatar en una sola fila, y el avatar baja
    para que la cara de Kaza quede mitad afuera del encabezado. */
@@ -44,6 +46,12 @@
 /* Logotipo: "Aloja" en blanco y "ME" en amarillo. Al pasar el mouse se subraya
    en amarillo (igual que en el pie). */
 .logo-texto {
+  font-family: var(--font-logo);
+  /* La letra manuscrita se ve mas chica que la de texto: se agranda un poco. */
+  font-size: 1.75rem;
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: 0.01em;
   color: #ffffff;
   text-decoration: underline 2px transparent;
   text-underline-offset: 6px;

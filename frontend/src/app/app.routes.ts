@@ -7,24 +7,20 @@ import { Verificacion } from './features/auth/verificacion/verificacion';
 import { Login } from './features/auth/login/login';
 import { NotFound } from './layout/not-found/not-found';
 import { Forbidden } from './layout/forbidden/forbidden';
-import { authGuard } from './core/guards/auth.guard';
+import { authGuard, soloVisitanteGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
-import { MiPerfil } from './features/cliente/mi-perfil/mi-perfil';
-import { FormularioReserva } from './features/cliente/formulario-reserva/formulario-reserva';
-import { MisReservas } from './features/cliente/mis-reservas/mis-reservas';
-import { DetalleReserva } from './features/cliente/detalle-reserva/detalle-reserva';
-import { PagoResultado } from './features/cliente/pago-resultado/pago-resultado';
-import { ResumenGastos } from './features/cliente/resumen-gastos/resumen-gastos';
+import { idNumericoGuard } from './core/guards/id.guard';
 
 export const routes: Routes = [
   { path: '', component: Home },
   { path: 'buscar', title: 'Buscar alojamientos', component: Busqueda },
-  { path: 'alojamientos/:id', title: 'Detalle del alojamiento', component: DetalleAlojamiento },
+  { path: 'alojamientos/:id', title: 'Detalle del alojamiento', component: DetalleAlojamiento, canActivate: [idNumericoGuard] },
   {
     path: 'alojamientos/:id/reservar',
     title: 'Reservar',
-    component: FormularioReserva,
-    canActivate: [roleGuard(['CLIENTE', 'ADMIN'])],
+    // Lazy: trae el calendario de fechas.
+    loadComponent: () => import('./features/cliente/formulario-reserva/formulario-reserva').then((m) => m.FormularioReserva),
+    canActivate: [idNumericoGuard, roleGuard(['CLIENTE'])],
   },
   // Paginas de texto: se descargan recien cuando alguien las abre.
   {
@@ -33,62 +29,69 @@ export const routes: Routes = [
     loadComponent: () => import('./features/public/sobre-nosotros/sobre-nosotros').then((m) => m.SobreNosotros),
   },
   { path: 'ayuda', title: 'Ayuda y legales', loadComponent: () => import('./features/public/ayuda/ayuda').then((m) => m.Ayuda) },
-  { path: 'registro', title: 'Crear cuenta', component: Registro },
+  { path: 'registro', title: 'Crear cuenta', component: Registro, canActivate: [soloVisitanteGuard] },
   { path: 'verificar-cuenta', title: 'Verificar cuenta', component: Verificacion },
-  { path: 'login', title: 'Iniciar sesión', component: Login },
-  { path: 'perfil', title: 'Mi perfil', component: MiPerfil, canActivate: [authGuard] },
-  { path: 'mis-reservas', title: 'Mis reservas', component: MisReservas, canActivate: [roleGuard(['CLIENTE', 'ADMIN'])] },
-  { path: 'mis-reservas/:id', title: 'Detalle de la reserva', component: DetalleReserva, canActivate: [authGuard] },
-  { path: 'pago-resultado', title: 'Resultado del pago', component: PagoResultado, canActivate: [authGuard] },
-  { path: 'mis-gastos', title: 'Mis gastos', component: ResumenGastos, canActivate: [roleGuard(['CLIENTE', 'ADMIN'])] },
-  // Anfitrion: solo lo usan ANFITRION y ADMIN, se descarga recien al entrar.
+  { path: 'login', title: 'Iniciar sesión', component: Login, canActivate: [soloVisitanteGuard] },
+  { path: 'perfil', title: 'Mi perfil', loadComponent: () => import('./features/cliente/mi-perfil/mi-perfil').then((m) => m.MiPerfil), canActivate: [authGuard] },
+  { path: 'mis-reservas', title: 'Mis reservas', loadComponent: () => import('./features/cliente/mis-reservas/mis-reservas').then((m) => m.MisReservas), canActivate: [roleGuard(['CLIENTE'])] },
+  { path: 'mis-reservas/:id', title: 'Detalle de la reserva', loadComponent: () => import('./features/cliente/detalle-reserva/detalle-reserva').then((m) => m.DetalleReserva), canActivate: [idNumericoGuard, roleGuard(['CLIENTE'])] },
+  { path: 'pago-resultado', title: 'Resultado del pago', loadComponent: () => import('./features/cliente/pago-resultado/pago-resultado').then((m) => m.PagoResultado), canActivate: [roleGuard(['CLIENTE'])] },
+  {
+    path: 'mis-gastos',
+    title: 'Mis gastos',
+    // Lazy: trae el grafico de gastos por mes.
+    loadComponent: () => import('./features/cliente/resumen-gastos/resumen-gastos').then((m) => m.ResumenGastos),
+    canActivate: [roleGuard(['CLIENTE'])],
+  },
+  // Anfitrion: solo para ese rol (el administrador no publica ni cobra), se
+  // descarga recien al entrar.
   {
     path: 'anfitrion/alojamientos',
     title: 'Mis alojamientos',
     loadComponent: () => import('./features/anfitrion/mis-alojamientos/mis-alojamientos').then((m) => m.MisAlojamientos),
-    canActivate: [roleGuard(['ANFITRION', 'ADMIN'])],
+    canActivate: [roleGuard(['ANFITRION'])],
   },
   {
     path: 'anfitrion/alojamientos/nuevo',
     title: 'Publicar alojamiento',
     loadComponent: () => import('./features/anfitrion/alojamiento-form/alojamiento-form').then((m) => m.AlojamientoForm),
-    canActivate: [roleGuard(['ANFITRION', 'ADMIN'])],
+    canActivate: [roleGuard(['ANFITRION'])],
   },
   {
     path: 'anfitrion/alojamientos/:id/editar',
     title: 'Editar alojamiento',
     loadComponent: () => import('./features/anfitrion/alojamiento-form/alojamiento-form').then((m) => m.AlojamientoForm),
-    canActivate: [roleGuard(['ANFITRION', 'ADMIN'])],
+    canActivate: [idNumericoGuard, roleGuard(['ANFITRION'])],
   },
   {
     path: 'anfitrion/alojamientos/:id/galeria',
     title: 'Galería de fotos',
     loadComponent: () => import('./features/anfitrion/galeria-alojamiento/galeria-alojamiento').then((m) => m.GaleriaAlojamiento),
-    canActivate: [roleGuard(['ANFITRION', 'ADMIN'])],
+    canActivate: [idNumericoGuard, roleGuard(['ANFITRION'])],
   },
   {
     path: 'anfitrion/reservas',
     title: 'Reservas recibidas',
     loadComponent: () => import('./features/anfitrion/reservas-anfitrion/reservas-anfitrion').then((m) => m.ReservasAnfitrion),
-    canActivate: [roleGuard(['ANFITRION', 'ADMIN'])],
+    canActivate: [roleGuard(['ANFITRION'])],
   },
   {
     path: 'anfitrion/reservas/:id',
     title: 'Detalle de la reserva',
     loadComponent: () => import('./features/anfitrion/detalle-reserva-anfitrion/detalle-reserva-anfitrion').then((m) => m.DetalleReservaAnfitrion),
-    canActivate: [roleGuard(['ANFITRION', 'ADMIN'])],
+    canActivate: [idNumericoGuard, roleGuard(['ANFITRION'])],
   },
   {
     path: 'anfitrion/cobros-pendientes',
     title: 'Cobros pendientes',
     loadComponent: () => import('./features/anfitrion/cobros-pendientes/cobros-pendientes').then((m) => m.CobrosPendientes),
-    canActivate: [roleGuard(['ANFITRION', 'ADMIN'])],
+    canActivate: [roleGuard(['ANFITRION'])],
   },
   {
     path: 'anfitrion/resumen',
     title: 'Resumen de mis alojamientos',
     loadComponent: () => import('./features/anfitrion/resumen-alojamientos/resumen-alojamientos').then((m) => m.ResumenAlojamientos),
-    canActivate: [roleGuard(['ANFITRION', 'ADMIN'])],
+    canActivate: [roleGuard(['ANFITRION'])],
   },
   // Administracion: solo la usa el rol ADMIN, se descarga recien al entrar.
   {
@@ -104,10 +107,16 @@ export const routes: Routes = [
     canActivate: [roleGuard(['ADMIN'])],
   },
   {
+    path: 'admin/usuarios/:id',
+    title: 'Ficha del usuario',
+    loadComponent: () => import('./features/admin/ficha-usuario/ficha-usuario').then((m) => m.FichaUsuario),
+    canActivate: [idNumericoGuard, roleGuard(['ADMIN'])],
+  },
+  {
     path: 'admin/usuarios/:id/editar',
     title: 'Editar usuario',
     loadComponent: () => import('./features/admin/usuario-form/usuario-form').then((m) => m.UsuarioForm),
-    canActivate: [roleGuard(['ADMIN'])],
+    canActivate: [idNumericoGuard, roleGuard(['ADMIN'])],
   },
   {
     path: 'admin/catalogo-tipos',
@@ -131,7 +140,7 @@ export const routes: Routes = [
     path: 'admin/reservas/:id',
     title: 'Detalle de la reserva',
     loadComponent: () => import('./features/admin/detalle-reserva-admin/detalle-reserva-admin').then((m) => m.DetalleReservaAdmin),
-    canActivate: [roleGuard(['ADMIN'])],
+    canActivate: [idNumericoGuard, roleGuard(['ADMIN'])],
   },
   {
     path: 'admin/flujo-dinero',

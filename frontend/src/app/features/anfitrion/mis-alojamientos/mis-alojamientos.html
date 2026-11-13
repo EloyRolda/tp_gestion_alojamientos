@@ -13,8 +13,16 @@
       <a routerLink="/anfitrion/alojamientos/nuevo" class="btn btn--primario">Publicar alojamiento</a>
     </app-vacio>
   } @else {
+    <app-buscador-lista
+      [(texto)]="busqueda"
+      idCampo="buscar-mis-alojamientos"
+      etiqueta="Buscar en mis alojamientos"
+      placeholder="Título, calle o tipo"
+      [resultados]="alojamientosFiltrados().length"
+      [total]="alojamientos().length"
+    />
     <div class="grid-auto">
-      @for (a of alojamientos(); track a.idAlojamiento) {
+      @for (a of alojamientosFiltrados(); track a.idAlojamiento) {
         <app-alojamiento-card [alojamiento]="a" [aviso]="a.activo ? null : 'Inactivo'">
           <div acciones class="acciones-fila">
             <a [routerLink]="['/anfitrion/alojamientos', a.idAlojamiento, 'editar']" class="btn">Editar</a>

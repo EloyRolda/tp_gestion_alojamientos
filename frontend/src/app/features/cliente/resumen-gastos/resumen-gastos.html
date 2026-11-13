@@ -20,5 +20,23 @@
         <p class="kpi__valor">{{ resumen()!.montoPromedioPorEstadia != null ? '$' + (resumen()!.montoPromedioPorEstadia | number) : '-' }}</p>
       </div>
     </div>
+
+    <section class="stack card">
+      <div class="titulo-info">
+        <h2>Gastos de los últimos 12 meses</h2>
+        <app-info-grafico titulo="Gastos de los últimos 12 meses" [texto]="['Lo que pagaste en cada uno de los últimos 12 meses, según el día del pago.', 'Es el total que pagaste por cada reserva: la estadía más las comisiones. Si después te devolvieron plata por una cancelación, el gráfico igual muestra el pago en su mes.', 'Pasá el mouse o tocá una barra para ver el valor exacto; en “Ver los datos” están todos los números.']" />
+      </div>
+      @if (hayGastosRecientes()) {
+        <app-grafico-barras
+          [etiquetas]="etiquetasMeses()"
+          [valores]="gastoPorMes()"
+          descripcion="Pagado"
+          nombreEtiqueta="Mes"
+          formato="pesos"
+        />
+      } @else {
+        <p class="text-muted">No pagaste reservas en los últimos 12 meses.</p>
+      }
+    </section>
   }
 </section>

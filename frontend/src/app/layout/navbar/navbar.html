@@ -58,12 +58,12 @@
               </div>
             </div>
 
-            @if (rol() === 'CLIENTE' || rol() === 'ADMIN') {
+            @if (rol() === 'CLIENTE') {
               <p class="perfil__grupo">Mis viajes</p>
               <a routerLink="/mis-reservas" routerLinkActive="perfil__item--activo">Mis reservas</a>
               <a routerLink="/mis-gastos" routerLinkActive="perfil__item--activo">Mis gastos</a>
             }
-            @if (rol() === 'ANFITRION' || rol() === 'ADMIN') {
+            @if (rol() === 'ANFITRION') {
               <p class="perfil__grupo">Anfitrión</p>
               <a routerLink="/anfitrion/alojamientos" routerLinkActive="perfil__item--activo">Mis alojamientos</a>
               <a routerLink="/anfitrion/reservas" routerLinkActive="perfil__item--activo">Reservas recibidas</a>

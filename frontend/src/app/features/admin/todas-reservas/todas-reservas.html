@@ -1,6 +1,15 @@
 <section class="stack">
   <h1>Todas las reservas</h1>
 
+  <div class="filtros-lista">
+  <app-buscador-lista
+    [(texto)]="busqueda"
+    idCampo="buscar-reservas"
+    etiqueta="Buscar reservas"
+    placeholder="Alojamiento, cliente, anfitrión o n.º"
+    [resultados]="reservasFiltradas().length"
+    [total]="reservas().length"
+  />
   <div class="field field--compacto">
     <label for="filtro">Filtrar por estado</label>
     <select id="filtro" [ngModel]="filtro()" (ngModelChange)="filtro.set($event)" name="filtro">
@@ -9,13 +18,14 @@
       }
     </select>
   </div>
+  </div>
 
   @if (cargando()) {
     <app-esqueleto tipo="tabla" />
   } @else if (error()) {
     <p class="text-danger">{{ error() }}</p>
   } @else if (reservasFiltradas().length === 0) {
-    <app-vacio titulo="No hay reservas para mostrar" texto="Probá con otro estado en el filtro." />
+    <app-vacio titulo="No hay reservas para mostrar" texto="Revisá la búsqueda o probá con otro estado en el filtro." />
   } @else {
     <div class="table-scroll">
       <table class="tabla table-cards">
@@ -23,6 +33,7 @@
           <tr>
             <th>Alojamiento</th>
             <th>Cliente</th>
+            <th>Anfitrión</th>
             <th>Check-in</th>
             <th>Check-out</th>
             <th>Total</th>
@@ -33,8 +44,15 @@
         <tbody>
           @for (r of reservasFiltradas(); track r.idReserva) {
             <tr>
-              <td data-label="Alojamiento">{{ r.alojamiento.titulo }}</td>
-              <td data-label="Cliente">{{ r.cliente.nombre }} {{ r.cliente.apellido }}</td>
+              <td data-label="Alojamiento"><a [routerLink]="['/alojamientos', r.alojamiento.idAlojamiento]">{{ r.alojamiento.titulo }}</a></td>
+              <td data-label="Cliente"><a [routerLink]="['/admin/usuarios', r.cliente.id]">{{ r.cliente.nombre }} {{ r.cliente.apellido }}</a></td>
+              <td data-label="Anfitrión">
+                @if (anfitrionDe(r); as an) {
+                  <a [routerLink]="['/admin/usuarios', an.id]">{{ an.nombre }} {{ an.apellido }}</a>
+                } @else {
+                  <span class="text-muted">…</span>
+                }
+              </td>
               <td data-label="Check-in">{{ r.fechaInicio | date: 'dd/MM/yyyy' }}</td>
               <td data-label="Check-out">{{ r.fechaFin | date: 'dd/MM/yyyy' }}</td>
               <td data-label="Total">${{ totalDe(r) | number }}</td>

@@ -10,6 +10,14 @@
       <a routerLink="/buscar" class="btn btn--primario">Buscar alojamientos</a>
     </app-vacio>
   } @else {
+    <app-buscador-lista
+      [(texto)]="busqueda"
+      idCampo="buscar-mis-reservas"
+      etiqueta="Buscar en mis reservas"
+      placeholder="Alojamiento o n.º de reserva"
+      [resultados]="reservasFiltradas().length"
+      [total]="reservas().length"
+    />
     <div class="table-scroll">
       <table class="tabla table-cards">
         <thead>
@@ -23,7 +31,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (r of reservas(); track r.idReserva) {
+          @for (r of reservasFiltradas(); track r.idReserva) {
             <tr>
               <td data-label="Alojamiento">{{ r.alojamiento.titulo }}</td>
               <td data-label="Check-in">{{ r.fechaInicio | date: 'dd/MM/yyyy' }}</td>

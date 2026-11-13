@@ -1,1 +1,14 @@
 /* Estilos de la tabla: globales (.tabla y .table-cards en styles.css, SCRUM-55). */
+
+/* Graficos de ingresos y reservas: uno debajo del otro; en desktop, lado a lado. */
+.graficos-resumen {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-3);
+}
+
+@media (min-width: 1024px) {
+  .graficos-resumen {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

@@ -18,12 +18,17 @@ import {
 export class EstadisticasService {
   private readonly http = inject(HttpClient);
 
-  resumenCliente(): Observable<ResumenCliente> {
-    return this.http.get<ResumenCliente>(`${API_BASE_URL}/Estadisticas/cliente/resumen`);
+  /// Sin idCliente: el del usuario logueado. Con idCliente: el de ese cliente
+  /// (solo lo acepta el backend si quien pregunta es ADMIN).
+  resumenCliente(idCliente?: number): Observable<ResumenCliente> {
+    const params = idCliente != null ? new HttpParams().set('idCliente', idCliente) : undefined;
+    return this.http.get<ResumenCliente>(`${API_BASE_URL}/Estadisticas/cliente/resumen`, { params });
   }
 
-  resumenAnfitrion(): Observable<ResumenAlojamientoAnfitrion[]> {
-    return this.http.get<ResumenAlojamientoAnfitrion[]>(`${API_BASE_URL}/Estadisticas/anfitrion/resumen`);
+  /// Igual que resumenCliente: idAnfitrion solo lo usa un ADMIN.
+  resumenAnfitrion(idAnfitrion?: number): Observable<ResumenAlojamientoAnfitrion[]> {
+    const params = idAnfitrion != null ? new HttpParams().set('idAnfitrion', idAnfitrion) : undefined;
+    return this.http.get<ResumenAlojamientoAnfitrion[]>(`${API_BASE_URL}/Estadisticas/anfitrion/resumen`, { params });
   }
 
   cobrosPendientes(): Observable<CobroPendiente[]> {

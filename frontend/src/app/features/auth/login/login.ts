@@ -40,7 +40,7 @@ export class Login {
     this.auth.login(this.identificador(), this.password()).subscribe({
       next: () => {
         this.enviando.set(false);
-        this.aviso.mostrar('Ingresaste a tu cuenta. ¡Hola de nuevo!');
+        this.aviso.mostrar('¡Hola de nuevo!', ['Ingresaste a tu cuenta.']);
         this.router.navigateByUrl(this.destinoSeguro());
       },
       error: (err) => {

@@ -2,3 +2,7 @@
   max-width: 640px;
   margin-inline: auto;
 }
+
+.usuario-form h1 {
+  margin-bottom: 0;
+}

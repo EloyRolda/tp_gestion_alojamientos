@@ -3,55 +3,54 @@
     <app-esqueleto tipo="formulario" [cantidad]="3" />
   } @else if (!alojamiento()) {
     <p class="text-danger">{{ error() }}</p>
+  } @else if (!alojamiento()!.activo) {
+    <h1>{{ alojamiento()!.titulo }}</h1>
+    <p>Este alojamiento no está recibiendo reservas por ahora.</p>
+    <a routerLink="/buscar" class="btn btn--primario">Buscar otro alojamiento</a>
   } @else {
-    <h1>Reservar {{ alojamiento()!.titulo }}</h1>
-    <p class="text-muted">${{ alojamiento()!.precioNoche | number }} por noche</p>
+    <header class="stack stack--tight">
+      <h1>Reservar {{ alojamiento()!.titulo }}</h1>
+      <p class="text-muted">${{ alojamiento()!.precioNoche | number }} por noche</p>
+    </header>
 
     <form class="stack" (submit)="$event.preventDefault(); reservar()">
-      <div class="form-grid">
-        <div class="field">
-          <label for="fechaInicio">Check-in</label>
-          <input
-            id="fechaInicio"
-            type="date"
-            required
-            [min]="fechaMinima"
-            [ngModel]="fechaInicio()"
-            (ngModelChange)="fechaInicio.set($event)"
-            name="fechaInicio"
-          />
-        </div>
-        <div class="field">
-          <label for="fechaFin">Check-out</label>
-          <input
-            id="fechaFin"
-            type="date"
-            required
-            [min]="fechaInicio() || fechaMinima"
-            [ngModel]="fechaFin()"
-            (ngModelChange)="fechaFin.set($event)"
-            name="fechaFin"
-          />
-        </div>
-      </div>
-
-      @if (fechaInicio() && fechaFin() && !fechasValidas()) {
-        <p class="text-danger">El check-out tiene que ser posterior al check-in.</p>
+      <app-calendario-rango
+        [(inicio)]="fechaInicio"
+        [(fin)]="fechaFin"
+        [minimo]="fechaMinima"
+        [ocupados]="ocupados()"
+      />
+      @if (ocupados().length > 0) {
+        <p class="text-muted">Los días tachados son fechas que ya reservaste en este alojamiento.</p>
       }
 
       @if (fechasValidas()) {
-        <p class="card">
-          {{ noches() }} {{ noches() === 1 ? 'noche' : 'noches' }} &times; ${{ alojamiento()!.precioNoche | number }} =
-          <strong>${{ total() | number }}</strong>
-        </p>
+        <div class="card stack stack--tight formulario-reserva__total">
+          <p>
+            {{ noches() }} {{ noches() === 1 ? 'noche' : 'noches' }} &times; ${{ alojamiento()!.precioNoche | number }} =
+            <strong>${{ total() | number }}</strong>
+          </p>
+          <p class="text-muted">
+            Cuando el anfitrión confirme, se suman los cargos de servicio (plataforma y MercadoPago) y tenés 48 horas
+            para pagar.
+          </p>
+        </div>
       }
 
       @if (error()) {
-        <p class="text-danger">{{ error() }}</p>
+        <p class="text-danger" role="alert">{{ error() }}</p>
       }
 
       <button type="submit" class="btn btn--primario" [disabled]="enviando() || !fechasValidas()">
-        {{ enviando() ? 'Enviando solicitud...' : 'Solicitar reserva' }}
+        @if (enviando()) {
+          Enviando solicitud...
+        } @else if (!fechaInicio()) {
+          Elegí las fechas
+        } @else if (!fechaFin()) {
+          Elegí el check-out
+        } @else {
+          Solicitar reserva
+        }
       </button>
       <a [routerLink]="['/alojamientos', id()]" class="text-muted">Volver al alojamiento</a>
     </form>

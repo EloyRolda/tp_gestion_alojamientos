@@ -49,10 +49,23 @@
   gap: var(--space-2);
 }
 
-.filtros__servicios {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(140px, 100%), 1fr));
-  gap: 0 var(--space-2);
+.filtros__titulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.filtros__servicios-btn {
+  align-self: flex-start;
+}
+
+.filtros__servicios-btn:disabled {
+  color: var(--color-text-muted);
+  cursor: progress;
+}
+
+.filtros__elegidos {
+  margin: 0;
+  font-size: 0.85rem;
 }
 
 .filtros__panel > .btn {
@@ -68,11 +81,12 @@
 
   .filtros {
     position: sticky;
-    /* Queda debajo del encabezado fijo (80px + aire). */
-    top: 110px;
-    /* Si hubiera muchos servicios, el panel scrollea solo en vez de quedar
-       cortado fuera de la pantalla. */
-    max-height: calc(100vh - 130px);
+    /* El encabezado se va con el scroll, asi que el panel se pega arriba
+       con un margen chico (antes dejaba lugar para el encabezado y quedaba un
+       hueco vacio al bajar). */
+    top: var(--space-3);
+    /* Red de seguridad en pantallas muy bajas. */
+    max-height: calc(100vh - 2 * var(--space-3));
     overflow-y: auto;
   }
 
@@ -85,9 +99,6 @@
     display: flex;
   }
 
-  .filtros__servicios {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* Barra de resultados: cantidad a la izquierda y selector Lista / Mapa. */
@@ -139,4 +150,150 @@
   background: var(--color-bg-muted);
   color: var(--color-text-muted);
   font-weight: 600;
+}
+
+/* Grupos de filtro con valores sugeridos (precio y huespedes). */
+.filtros__grupo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.filtros__grupo legend {
+  margin-bottom: var(--space-2);
+  padding: 0;
+  font-size: 0.95rem;
+}
+
+.sugeridos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.sugerido {
+  min-height: var(--tap-size);
+  padding: 0 14px;
+  border: 1px solid var(--color-acero);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.sugerido:hover {
+  border-color: var(--color-ink);
+}
+
+.sugerido[aria-pressed='true'] {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+  color: #ffffff;
+}
+
+.sugerido--numero {
+  min-width: var(--tap-size);
+  padding: 0;
+}
+
+.resultados-barra__derecha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+/* Paginado: "< Pagina 2 de 25 >", arriba a la derecha y repetido al pie. */
+.paginador {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.paginador__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap-size);
+  height: var(--tap-size);
+  border: 1px solid var(--color-acero);
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.paginador__btn:hover:not(:disabled) {
+  border-color: var(--color-ink);
+}
+
+.paginador__btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.paginador__texto {
+  min-width: 9.5em;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.paginador-pie {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-2);
+}
+
+/* Carta de servicios: lista en columnas, alineada a la izquierda. */
+.servicios-carta {
+  text-align: left;
+}
+
+.servicios-carta h2,
+.servicios-carta > p {
+  text-align: center;
+}
+
+.servicios-carta__buscar {
+  display: flex;
+  justify-content: center;
+}
+
+.servicios-carta__lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(180px, 100%), 1fr));
+  gap: 0 var(--space-3);
+  max-height: min(46vh, 420px);
+  overflow-y: auto;
+  padding: var(--space-1) var(--space-2);
+  border-block: 1px solid var(--color-border);
+}
+
+/* En celular: paginado y Lista / Mapa en una sola fila, a todo el ancho. */
+@media (max-width: 767.98px) {
+  .resultados-barra__derecha {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .paginador__texto {
+    min-width: 0;
+    padding-inline: var(--space-1);
+  }
+
+  /* "1 de 25" en vez de "Pagina 1 de 25": asi entra en la fila. */
+  .paginador__palabra {
+    display: none;
+  }
 }

@@ -1,4 +1,10 @@
+/* Formulario de reserva: el calendario muestra dos meses desde tablet, asi
+   que el ancho maximo alcanza para ambos. */
 .formulario-reserva {
-  max-width: 480px;
+  max-width: 760px;
   margin-inline: auto;
+}
+
+.formulario-reserva__total p {
+  margin: 0;
 }

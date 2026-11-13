@@ -2,6 +2,9 @@
 /// Angular, asi que se puede cambiar en el servidor sin recompilar.
 /// - Desarrollo (ng serve): el backend corre aparte en http://localhost:8081.
 /// - Produccion detras de Nginx: usar "/api" (Nginx reenvia /api/ al backend).
+/// - pagosSimulados: poner true si el backend corre con PAGOS_SIMULADOS=true
+///   (cuenta de MercadoPago de desarrollo), para que los carteles lo avisen.
 window.__ALOJAME_CONFIG__ = {
-  apiUrl: 'http://localhost:8081'
+  apiUrl: 'http://localhost:8081',
+  pagosSimulados: true
 };

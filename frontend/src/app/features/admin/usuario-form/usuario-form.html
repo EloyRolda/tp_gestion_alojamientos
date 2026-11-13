@@ -1,14 +1,16 @@
 <section class="stack usuario-form">
-  <a routerLink="/admin/usuarios" class="text-muted">&larr; Volver a gestion de usuarios</a>
+  <a [routerLink]="['/admin/usuarios', id()]" class="text-muted">&larr; Volver a la ficha del usuario</a>
 
   @if (cargando()) {
     <app-esqueleto tipo="formulario" [cantidad]="4" />
   } @else if (!form()) {
     <p class="text-danger">{{ error() }}</p>
   } @else {
-    <h1>Editar usuario ({{ tipo() }})</h1>
+    @let u = usuario()!;
+    <h1>Editar a {{ u.nombre }} {{ u.apellido }}</h1>
+    <p class="text-muted">{{ nombreTipo(u.tipo) }} · {{ u.activo ? 'Cuenta activa' : 'Cuenta desactivada' }}</p>
 
-    <form class="stack" (submit)="$event.preventDefault(); guardar()">
+    <form class="stack card" (submit)="$event.preventDefault(); guardar()">
       <div class="form-grid">
         <div class="field">
           <label for="nombre">Nombre</label>
@@ -35,10 +37,12 @@
           <input id="password" autocomplete="new-password" type="password" minlength="6" placeholder="Dejar en blanco para no cambiarla" [ngModel]="form()!.password" (ngModelChange)="actualizarCampo('password', $event)" name="password" />
         </div>
       </div>
-      <label>
-        <input type="checkbox" [checked]="form()!.activo" (change)="actualizarCampo('activo', !form()!.activo)" />
-        Cuenta activa
-      </label>
+      @if (!esMiCuenta()) {
+        <label>
+          <input type="checkbox" [checked]="form()!.activo" (change)="actualizarCampo('activo', !form()!.activo)" />
+          Cuenta activa
+        </label>
+      }
 
       @if (error()) {
         <p class="text-danger">{{ error() }}</p>

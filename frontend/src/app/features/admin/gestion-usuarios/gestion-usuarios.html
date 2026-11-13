@@ -1,28 +1,41 @@
 <section class="stack">
   <div class="page-header">
-    <h1>Gestion de usuarios</h1>
+    <h1>Gestión de usuarios</h1>
     <a routerLink="/admin/usuarios/nuevo-admin" class="btn btn--primario">Crear administrador</a>
   </div>
 
+  <div class="filtros-lista">
+  <app-buscador-lista
+    [(texto)]="busqueda"
+    idCampo="buscar-usuarios"
+    etiqueta="Buscar usuarios"
+    placeholder="Nombre, usuario, email o teléfono"
+    [resultados]="usuariosFiltrados().length"
+    [total]="usuarios().length"
+  />
   <div class="field field--compacto">
     <label for="filtro">Filtrar por tipo</label>
     <select id="filtro" [ngModel]="filtro()" (ngModelChange)="filtro.set($event)" name="filtro">
       @for (t of tipos; track t) {
-        <option [value]="t">{{ t === 'TODOS' ? 'Todos' : t }}</option>
+        <option [value]="t">{{ nombreTipo[t] ?? t }}</option>
       }
     </select>
+  </div>
   </div>
 
   @if (cargando()) {
     <app-esqueleto tipo="tabla" />
   } @else if (error()) {
     <p class="text-danger">{{ error() }}</p>
+  } @else if (usuariosFiltrados().length === 0) {
+    <app-vacio titulo="No encontramos usuarios" texto="Revisá lo que escribiste o cambiá el filtro de tipo.">
+      <button type="button" class="btn" (click)="limpiarBusqueda()">Ver todos los usuarios</button>
+    </app-vacio>
   } @else {
     <div class="table-scroll">
-      <table class="tabla table-cards">
+      <table class="tabla table-cards tabla--usuarios">
         <thead>
           <tr>
-            <th>Usuario</th>
             <th>Nombre</th>
             <th>Email</th>
             <th>Tipo</th>
@@ -34,17 +47,23 @@
         <tbody>
           @for (u of usuariosFiltrados(); track u.id) {
             <tr>
-              <td data-label="Usuario" class="tabla__largo">{{ u.usuarioLogin }}</td>
-              <td data-label="Nombre">{{ u.nombre }} {{ u.apellido }}</td>
+              <td data-label="Nombre">
+                <a [routerLink]="['/admin/usuarios', u.id]" class="usuario__nombre">{{ u.nombre }} {{ u.apellido }}</a>
+                <span class="usuario__login tabla__largo">{{ u.usuarioLogin }}</span>
+              </td>
               <td data-label="Email" class="tabla__largo">{{ u.email }}</td>
-              <td data-label="Tipo">{{ u.tipo }}</td>
+              <td data-label="Tipo">{{ nombreTipo[u.tipo] ?? u.tipo }}</td>
               <td data-label="Registrado">{{ u.fechaRegistro | date: 'dd/MM/yyyy' }}</td>
               <td data-label="Estado">{{ u.activo ? 'Activo' : 'Inactivo' }}</td>
               <td class="tabla__acciones">
-                <a [routerLink]="['/admin/usuarios', u.id, 'editar']" class="btn">Editar</a>
-                <button type="button" class="btn" [class.btn--peligro]="u.activo" (click)="toggleActivo(u)" [disabled]="cambiandoEstado() === u.id">
-                  {{ u.activo ? 'Desactivar' : 'Activar' }}
-                </button>
+                @if (u.id === miId()) {
+                  <a routerLink="/perfil" class="btn">Mi perfil</a>
+                } @else {
+                  <a [routerLink]="['/admin/usuarios', u.id, 'editar']" class="btn">Editar</a>
+                  <button type="button" class="btn" [class.btn--peligro]="u.activo" (click)="toggleActivo(u)" [disabled]="cambiandoEstado() === u.id">
+                    {{ u.activo ? 'Desactivar' : 'Activar' }}
+                  </button>
+                }
               </td>
             </tr>
           }

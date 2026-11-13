@@ -39,6 +39,12 @@
 }
 
 .logo-texto {
+  font-family: var(--font-logo);
+  /* La letra manuscrita se ve mas chica que la de texto: se agranda un poco. */
+  font-size: 1.6rem;
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: 0.01em;
   color: #ffffff;
   text-decoration: underline 2px transparent;
   text-underline-offset: 6px;

@@ -1,25 +1,32 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CatalogoService } from '../../../core/services/catalogo.service';
 import { Servicio } from '../../../core/models/servicio.model';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
 import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 import { AvisoService } from '../../../core/services/aviso.service';
+import { coincide } from '../../../core/utils/busqueda.util';
+import { BuscadorLista } from '../../../shared/buscador-lista/buscador-lista';
+import { ConfirmacionService } from '../../../core/services/confirmacion.service';
 
 /// SCRUM-44 / RF10. Mismo criterio que SCRUM-43 (catalogo de tipos) pero para
 /// el catalogo de servicios/comodidades: alta, edicion, fusionar duplicados y eliminar.
 @Component({
   selector: 'app-catalogo-servicios',
   standalone: true,
-  imports: [FormsModule, Esqueleto],
+  imports: [FormsModule, Esqueleto, BuscadorLista],
   templateUrl: './catalogo-servicios.html',
   styleUrl: './catalogo-servicios.css',
 })
 export class CatalogoServicios {
   private readonly catalogoService = inject(CatalogoService);
+  private readonly confirmacion = inject(ConfirmacionService);
   private readonly aviso = inject(AvisoService);
 
   readonly servicios = signal<Servicio[]>([]);
+  /// Busca por nombre (sin tildes ni mayusculas).
+  readonly busqueda = signal('');
+  readonly serviciosFiltrados = computed(() => this.servicios().filter((s) => coincide(this.busqueda(), s.nombreServicio)));
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
 
@@ -87,10 +94,21 @@ export class CatalogoServicios {
     });
   }
 
-  fusionar(): void {
+  async fusionar(): Promise<void> {
     const origen = this.idOrigen();
     const destino = this.idDestino();
     if (!origen || !destino || origen === destino) return;
+    const nombre = (id: number) => this.servicios().find((x) => x.idServicio === id)?.nombreServicio ?? '';
+    const ok = await this.confirmacion.pedir({
+      titulo: 'Fusionar servicios',
+      mensaje: [
+        `Todo lo que hoy usa "${nombre(origen)}" va a pasar a "${nombre(destino)}", y "${nombre(origen)}" se elimina.`,
+        'Esto no se puede deshacer.',
+      ],
+      aceptar: 'Fusionar',
+      peligro: true,
+    });
+    if (!ok) return;
 
     this.error.set(null);
     this.fusionando.set(true);
@@ -109,14 +127,22 @@ export class CatalogoServicios {
     });
   }
 
-  eliminar(id: number): void {
+  async eliminar(id: number): Promise<void> {
+    const nombre = this.servicios().find((x) => x.idServicio === id)?.nombreServicio ?? '';
+    const ok = await this.confirmacion.pedir({
+      titulo: `Eliminar "${nombre}"`,
+      mensaje: ['Se quita del catálogo. Si algún alojamiento lo usa, el sistema no te va a dejar eliminarlo: en ese caso fusionalo con otro.'],
+      aceptar: 'Eliminar',
+      peligro: true,
+    });
+    if (!ok) return;
     this.error.set(null);
     this.catalogoService.eliminarServicio(id).subscribe({
       next: () => {
         this.aviso.mostrar('Servicio eliminado');
         this.cargar();
       },
-      error: (err) => this.error.set(extraerMensajeError(err)),
+      error: (err) => void this.confirmacion.informar({ titulo: 'No se pudo eliminar', mensaje: [extraerMensajeError(err)] }),
     });
   }
 

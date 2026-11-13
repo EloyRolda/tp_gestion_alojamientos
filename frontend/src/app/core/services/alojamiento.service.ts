@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, catchError, forkJoin, map, of, switchMap } from 'rxjs';
 import { API_BASE_URL } from '../config/api.config';
 import { Alojamiento, AlojamientoModificar, AlojamientoRegistro } from '../models/alojamiento.model';
 import { ServicioxAlojamiento } from '../models/servicio.model';
@@ -20,6 +20,28 @@ export class AlojamientoService {
 
   obtener(id: number): Observable<Alojamiento> {
     return this.http.get<Alojamiento>(`${API_BASE_URL}/Alojamiento/mostrar/${id}`);
+  }
+
+  /// Alojamiento completo (con su anfitrion y si esta publicado) de cada id
+  /// pedido, incluidos los pausados. El listado publico solo trae los
+  /// publicados, asi que los que falten se consultan de a uno (suelen ser
+  /// pocos). Si alguno no se puede consultar, simplemente no esta en el mapa.
+  porIds(ids: number[]): Observable<Map<number, Alojamiento>> {
+    const pedidos = new Set(ids);
+    if (pedidos.size === 0) return of(new Map());
+    return this.listar().pipe(
+      switchMap((publicados) => {
+        const mapa = new Map(publicados.filter((a) => pedidos.has(a.idAlojamiento)).map((a) => [a.idAlojamiento, a] as const));
+        const faltan = [...pedidos].filter((id) => !mapa.has(id));
+        if (faltan.length === 0) return of(mapa);
+        return forkJoin(faltan.map((id) => this.obtener(id).pipe(catchError(() => of(null))))).pipe(
+          map((extra) => {
+            for (const a of extra) if (a) mapa.set(a.idAlojamiento, a);
+            return mapa;
+          }),
+        );
+      }),
+    );
   }
 
   listarPropios(): Observable<Alojamiento[]> {

@@ -1,31 +1,16 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { ConfirmacionService } from './confirmacion.service';
 
-export interface Aviso {
-  id: number;
-  texto: string;
-  saliendo: boolean;
-}
-
-const DURACION_MS = 3500;
-const SALIDA_MS = 220;
-
-/// Avisos breves abajo de la pantalla (SCRUM-68): confirman que una accion
-/// salio bien (iniciar sesion, guardar, cancelar, confirmar...) y se van solos.
-/// Los errores NO van por aca: se muestran al lado de donde ocurrieron.
+/// Avisos de que una accion salio bien (iniciar sesion, guardar, confirmar,
+/// publicar...). Se muestran en la misma carta con Kaza que las
+/// confirmaciones (ver ConfirmacionService), asi toda la app usa un solo tipo
+/// de cartel. Los errores NO van por aca: se muestran al lado de donde ocurrieron.
 @Injectable({ providedIn: 'root' })
 export class AvisoService {
-  private siguienteId = 1;
-  private readonly lista = signal<Aviso[]>([]);
-  readonly avisos = this.lista.asReadonly();
+  private readonly carta = inject(ConfirmacionService);
 
-  mostrar(texto: string): void {
-    const id = this.siguienteId++;
-    this.lista.update((actuales) => [...actuales.slice(-2), { id, texto, saliendo: false }]);
-    setTimeout(() => this.cerrar(id), DURACION_MS);
-  }
-
-  cerrar(id: number): void {
-    this.lista.update((actuales) => actuales.map((a) => (a.id === id ? { ...a, saliendo: true } : a)));
-    setTimeout(() => this.lista.update((actuales) => actuales.filter((a) => a.id !== id)), SALIDA_MS);
+  /// titulo: lo que paso; detalle: que sigue (opcional).
+  mostrar(titulo: string, detalle: string[] = []): void {
+    void this.carta.informar({ titulo, mensaje: detalle });
   }
 }

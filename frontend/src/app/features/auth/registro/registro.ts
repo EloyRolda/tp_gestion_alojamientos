@@ -53,6 +53,6 @@ export class Registro {
 
   readonly tipos: { valor: TipoUsuario; etiqueta: string }[] = [
     { valor: 'CLIENTE', etiqueta: 'Cliente (quiero reservar alojamientos)' },
-    { valor: 'ANFITRION', etiqueta: 'Anfitrion (quiero publicar alojamientos)' },
+    { valor: 'ANFITRION', etiqueta: 'Anfitrión (quiero publicar alojamientos)' },
   ];
 }

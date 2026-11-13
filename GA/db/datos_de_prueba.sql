@@ -10,7 +10,7 @@
 -- que el script sirve igual hoy que dentro de unos meses.
 --
 -- Contrasena de TODOS los usuarios de prueba: Prueba2026
--- (No crea administradores: el admin se crea aparte, ver el README del repositorio.)
+-- (No crea administradores: el admin se crea aparte, ver LEEME.md.)
 --
 -- Uso (con el backend arrancado al menos una vez, para que existan las tablas):
 --   mysql -u alojame -p alojame < datos_de_prueba.sql

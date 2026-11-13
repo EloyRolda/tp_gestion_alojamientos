@@ -6,19 +6,19 @@ Trabajo Práctico Final de la Tecnicatura Universitaria en Programación (UTN �
 
 | Capa | Tecnologías |
 |---|---|
-| Frontend | Angular 22 (componentes standalone, signals, guards, interceptor HTTP), TypeScript, CSS propio, Leaflet (mapas) |
+| Frontend | Angular 22 (componentes standalone, signals, guards, interceptor HTTP), TypeScript, CSS propio |
 | Backend | Java 21, Spring Boot 3.4.3 (Web, Data JPA, Security, Validation), JWT (JJWT 0.12.6), Lombok, Springdoc OpenAPI |
 | Base de datos | MariaDB / MySQL |
-| Servicios externos | MercadoPago (Checkout Pro, reembolsos, liquidaciones), Brevo (emails transaccionales), Cloudinary (imágenes), OpenStreetMap y Nominatim (mapas y búsqueda de direcciones) |
+| Servicios externos | MercadoPago (Checkout Pro, reembolsos, liquidaciones), Brevo (emails transaccionales), Cloudinary (imágenes) |
 
 ---
 
 ## Funcionalidades por rol
 
-- **Visitante (sin cuenta):** navega el catálogo completo (listado con fotos, búsqueda con filtros en lista o en mapa, detalle, galería y reseñas) sin necesidad de iniciar sesión, y consulta las páginas de ayuda y legales.
-- **Cliente:** registro con verificación de cuenta por email (token de un solo uso, 24 h), edición de perfil, reserva de alojamientos con control de superposición de fechas, pago con MercadoPago, detalle de reservas con comprobante, cancelación según la política vigente, reseñas tras una estadía finalizada y resumen de gastos.
-- **Anfitrión:** alta, edición y activación/desactivación de alojamientos (con su ubicación marcada en el mapa), galería de imágenes en Cloudinary, servicios por alojamiento, gestión de las reservas recibidas (confirmar, cancelar, finalizar), alias/CBU/CVU de cobro validado (dígito verificador e identificación del banco), cobros pendientes de liquidar y resumen de ingresos por alojamiento.
-- **Administrador:** gestión de usuarios (incluye alta de otros administradores), CRUD de los catálogos de tipos de alojamiento y servicios, todas las reservas de la plataforma, reembolsos manuales y estadísticas globales (flujo de dinero, ranking de alojamientos, cancelaciones por motivo, ingresos mensuales).
+- **Visitante (sin cuenta):** navega el catálogo completo sin iniciar sesión: búsqueda con filtros (texto, precio, huéspedes y servicios) y paginado, vista de mapa, detalle con galería de fotos y reseñas.
+- **Cliente:** registro con verificación de cuenta por email (token de un solo uso, 24 h), edición de perfil, reserva con un calendario que marca los días ocupados, pago real con MercadoPago, cambio de fechas, cancelación con el reembolso explicado antes de confirmar, reseñas tras una estadía finalizada y resumen de gastos con gráfico.
+- **Anfitrión:** alta, edición y pausa de alojamientos (con ubicación en el mapa), galería de imágenes en Cloudinary, servicios por alojamiento, gestión de las reservas recibidas (confirmar, cancelar, finalizar), alias/CBU/CVU de cobro validado (dígito verificador e identificación del banco), cobros pendientes y resumen de ingresos con gráficos.
+- **Administrador:** gestión de usuarios con una ficha por usuario (sus números, alojamientos y reservas, con links cruzados), alta de otros administradores, baja en cascada (pausa los alojamientos y cancela las reservas sin pago), CRUD de los catálogos de tipos de alojamiento y servicios, todas las reservas de la plataforma, reembolsos manuales, flujo de dinero y estadísticas globales con gráficos.
 
 ## Reglas de negocio principales
 
@@ -37,10 +37,10 @@ tp_gestion_alojamientos/
 │   ├── src/main/java/...      Config, DTO, Model, Repository, RestController, Service, ...
 │   ├── src/main/resources/    application.properties (todo se configura por variables de entorno)
 │   ├── .env.example           Plantilla de variables de entorno
-│   └── db/                    Scripts SQL: catálogo inicial, datos de prueba y demo de Mar del Plata
+│   └── db/                    Scripts SQL: catálogo inicial, datos de prueba y demo completa
 ├── frontend/                  Frontend Angular 22 (ver frontend/README.md)
 ├── Archives/                  Documentación académica
-│   ├── Archivos_Nuevos [4T]/  Consignas de Gestión, Metodología y Programación IV
+│   ├── Archivos_Nuevos [4T]/  Consignas, dossier de Gestión, TP de Metodología y documentación del frontend
 │   └── Archivos_Viejos [3T]/  Documentación de la etapa anterior (modelo conceptual, mapa de la base)
 └── scriptv2.sql               Script SQL de referencia del esquema
 ```
@@ -62,9 +62,10 @@ Después del primer arranque del backend se pueden cargar datos desde `GA/db/`:
 
 - `catalogo_inicial.sql`: tipos de alojamiento y servicios.
 - `datos_de_prueba.sql`: 7 usuarios, 8 alojamientos y reservas en todos los estados.
-- `datos_demo_mar_del_plata.sql`: 25 anfitriones, 50 clientes y 75 alojamientos en Mar del Plata, con reservas, pagos y reseñas.
+- `datos_demo_completa.sql`: la demo completa de Mar del Plata, con anfitriones, clientes, alojamientos con fotos, reservas en todos los estados, pagos y reseñas. Al terminar imprime una guía con cada cuenta de prueba y el caso que muestra. Para borrarla, `borrar_datos_demo_mar_del_plata.sql`.
+- `datos_demo_para_mostrar.sql`: reservas extra para mostrar en vivo una finalización y una cancelación tardía.
 
-La contraseña de todos los usuarios de prueba es `Prueba2026`. Cada script de datos tiene su `borrar_...sql` para sacarlos.
+La contraseña de todos los usuarios de prueba es `Prueba2026`. Los scripts no crean administradores: el primero se crea como se explica en el paso 6 del despliegue.
 
 ### 2. Backend
 
@@ -87,6 +88,10 @@ npm start          # http://localhost:4200
 ```
 
 La URL del backend se toma de `frontend/public/env.js` (por defecto `http://localhost:8081`).
+
+### Modo de pagos simulados
+
+MercadoPago de prueba no permite reembolsos ni liquidaciones a anfitriones. Para una demostración, con `PAGOS_SIMULADOS=true` en el backend esos dos movimientos se registran sin llamar a MercadoPago (las reservas cambian de estado igual) y, con `pagosSimulados: true` en `env.js`, el frontend lo aclara en cada aviso. El cobro al cliente sigue pasando por MercadoPago.
 
 ---
 
@@ -117,15 +122,19 @@ Internet ──HTTPS──> Nginx
 
 ## Estado del proyecto
 
-- **Backend:** completo y auditado en tres rondas (arquitectura, seguridad y lógica de negocio). 65 endpoints REST.
-- **Frontend:** los cuatro lotes funcionales (vistas públicas, Cliente, Anfitrión y Administrador) están terminados y verificados en vivo contra el backend, incluido un pago completo en el entorno de pruebas de MercadoPago y la subida de imágenes a Cloudinary.
-- **Responsive:** el frontend se adapta a celular, tablet y desktop (Lote 5, sprint de Jira SCRUM-49): verificado en las 33 pantallas con los cuatro perfiles en 360, 768, 1024 y 1280px, sin scroll horizontal y con controles táctiles de 44px.
-- **Identidad visual (Lote 6, sprint de Jira SCRUM-59):** paleta y tipografía propias, encabezado con buscador fijo y menú de cuenta, pie de página, páginas de ayuda y legales, fotos en los listados, búsqueda en mapa, esqueletos de carga, estados vacíos y avisos. La marca es **Kaza**, la mascota de AlojaME: una carita adentro de una casa con techo, siempre de un solo color (amarillo sobre fondos oscuros, negro sobre fondos claros).
-- **Limitaciones conocidas:** la API de liquidaciones (payouts) de MercadoPago rechaza las credenciales de prueba con `400 "Invalid signature"`; requiere una habilitación especial de la cuenta. El resto de la integración (preferencias, consulta de pagos y webhook) funciona con las mismas credenciales. No hay tests automatizados de backend por decisión de alcance.
+- **Backend:** completo y auditado en tres rondas (arquitectura, seguridad y lógica de negocio).
+- **Frontend:** terminado y verificado en vivo contra el backend real con recorridos completos por cada perfil, incluido un pago real en el entorno de pruebas de MercadoPago y la subida de imágenes a Cloudinary. Además de los cuatro lotes funcionales (vistas públicas, Cliente, Anfitrión y Administrador), suma identidad visual propia, gráficos con Chart.js, mapa, calendario de reservas, ficha de usuario para el administrador y modo de pagos simulados para demostraciones.
+- **Responsive:** se adapta a celular, tablet y desktop; verificado con los cuatro perfiles en 360, 768, 1024 y 1280 px, sin scroll horizontal y con controles táctiles de 44 px.
+- **Limitaciones conocidas:** la API de liquidaciones (payouts) de MercadoPago rechaza las credenciales de prueba con `400 "Invalid signature"` (requiere una habilitación especial de la cuenta); para demostraciones está el modo de pagos simulados. Las funciones que necesitarían cambios en el backend están en `Archives/Archivos_Nuevos [4T]/Programacion/Pendientes_Backend_AlojaME.pdf`. No hay tests automatizados por decisión de alcance.
 
 ## Documentación
 
-- `frontend/README.md` — estructura y convenciones del frontend.
+- `frontend/README.md` — comandos, estructura y convenciones del frontend.
+- `Archives/Archivos_Nuevos [4T]/Programacion/Documentacion_Frontend_AlojaME.pdf` — qué se construyó, cumplimiento de la consigna y las decisiones de diseño con su porqué.
+- `Archives/Archivos_Nuevos [4T]/Programacion/Bitacora_Tecnica_AlojaME.pdf` — arquitectura, reglas de negocio y errores encontrados y resueltos (causa y solución).
+- `Archives/Archivos_Nuevos [4T]/Programacion/Plan_Lotes_Frontend_AlojaME.pdf` — plan del frontend por lotes, con lo verificado en cada uno.
+- `Archives/Archivos_Nuevos [4T]/Gestion de desarrollo/` — dossier de gestión del proyecto (alcance, C4, EDT, estimaciones, riesgos, seguimiento y cierre).
+- `Archives/Archivos_Nuevos [4T]/Metodologia/` — auditoría de código con propuestas de mejora, diagramas UML y diseño de pruebas.
 - `GA/.env.example` — variables de entorno que necesita el backend.
 - `scriptv2.sql` — script SQL de referencia del esquema.
 - `GA/db/` — scripts de catálogo inicial y datos de prueba.

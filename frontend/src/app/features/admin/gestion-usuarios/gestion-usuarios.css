@@ -1,1 +1,19 @@
 /* Estilos de la tabla: globales (.tabla y .table-cards en styles.css, SCRUM-55). */
+
+/* El usuario de login va chico debajo del nombre: una columna menos. */
+.usuario__login {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+/* En desktop, "Editar" y "Desactivar" uno al lado del otro. */
+@media (min-width: 1024px) {
+  .tabla--usuarios .tabla__acciones {
+    white-space: nowrap;
+  }
+}
+
+.usuario__nombre {
+  font-weight: 600;
+}

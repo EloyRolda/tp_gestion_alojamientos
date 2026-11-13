@@ -14,13 +14,28 @@
 
       <section class="stack stack--tight">
         <h2>Alojamiento</h2>
-        <p>{{ r.alojamiento.titulo }}</p>
+        <p><a [routerLink]="['/alojamientos', r.alojamiento.idAlojamiento]">{{ r.alojamiento.titulo }}</a></p>
       </section>
 
-      <section class="stack stack--tight">
-        <h2>Cliente</h2>
-        <p>{{ r.cliente.nombre }} {{ r.cliente.apellido }}</p>
-      </section>
+      <!-- Las dos personas de la reserva, con link a su ficha. -->
+      <div class="partes">
+        <section class="stack stack--tight">
+          <h2>Cliente</h2>
+          <p><a [routerLink]="['/admin/usuarios', r.cliente.id]">{{ r.cliente.nombre }} {{ r.cliente.apellido }}</a></p>
+        </section>
+
+        <section class="stack stack--tight">
+          <h2>Anfitrión</h2>
+          @if (anfitrion(); as an) {
+            <p><a [routerLink]="['/admin/usuarios', an.id]">{{ an.nombre }} {{ an.apellido }}</a></p>
+            @if (anfitrionConAlias() === false) {
+              <p class="text-muted">Todavía no cargó su alias de cobro.</p>
+            }
+          } @else {
+            <p class="text-muted">Cargando…</p>
+          }
+        </section>
+      </div>
 
       <section class="stack stack--tight">
         <h2>Estadía</h2>
@@ -64,6 +79,17 @@
         <p class="text-danger">{{ error() }}</p>
       }
 
+      @if (puedeFinalizar(r) && anfitrionConAlias() === false) {
+        <p class="text-muted">El anfitrión todavía no cargó su alias de cobro: la estadía se va a poder finalizar cuando lo cargue en su perfil.</p>
+      }
+      @if (puedeFinalizar(r) && anfitrionConAlias() === true) {
+        <div class="form-actions">
+          <button type="button" class="btn btn--primario" (click)="finalizar()" [disabled]="procesando()">
+            {{ procesando() ? 'Procesando...' : 'Finalizar estadía' }}
+          </button>
+        </div>
+      }
+
       @if (puedeCancelar(r)) {
         <div class="form-actions">
           <button type="button" class="btn btn--peligro" (click)="cancelar()" [disabled]="procesando()">
@@ -79,8 +105,8 @@
         <p class="text-muted">Cancela la reserva con un reembolso a medida al cliente (el resto del monto base queda para el anfitrión). Usar solo para casos que no entran en las reglas automáticas.</p>
         <form class="stack" (submit)="$event.preventDefault(); enviarReembolso()">
           <div class="field">
-            <label for="montoReembolso">Monto a reembolsar al cliente</label>
-            <input id="montoReembolso" type="number" inputmode="decimal" min="0" step="0.01" required [ngModel]="montoReembolso()" (ngModelChange)="montoReembolso.set($event)" name="montoReembolso" />
+            <label for="montoReembolso">Monto a reembolsar al cliente (máximo ${{ montoMaximo(r) | number }})</label>
+            <input id="montoReembolso" type="number" inputmode="decimal" min="0" [max]="montoMaximo(r)" step="0.01" required [ngModel]="montoReembolso()" (ngModelChange)="montoReembolso.set($event)" name="montoReembolso" />
           </div>
           @if (errorReembolso()) {
             <p class="text-danger">{{ errorReembolso() }}</p>

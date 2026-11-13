@@ -10,19 +10,34 @@
         {{ a.direccion.calle }} {{ a.direccion.altura }}, {{ a.direccion.ciudad }}, {{ a.direccion.provincia }},
         {{ a.direccion.pais }}
       </p>
-      <p class="text-muted">Publicado por {{ a.anfitrion.nombre }} {{ a.anfitrion.apellido }}</p>
+      <p class="text-muted">
+        Publicado por
+        @if (esAdmin()) {
+          <!-- El admin puede ir a la ficha del anfitrion (sus otros alojamientos, reservas, etc.). -->
+          <a [routerLink]="['/admin/usuarios', a.anfitrion.id]">{{ a.anfitrion.nombre }} {{ a.anfitrion.apellido }}</a>
+        } @else {
+          {{ a.anfitrion.nombre }} {{ a.anfitrion.apellido }}
+        }
+      </p>
     </header>
 
     @if (imagenes().length > 0) {
       <div class="detalle__galeria" [class.detalle__galeria--unica]="imagenes().length === 1"
         [class.detalle__galeria--mosaico]="imagenes().length >= 5" aria-label="Galería de imágenes">
-        @for (imagen of imagenes(); track imagen.id; let primera = $first) {
-          <img [src]="imagen.url" [alt]="imagen.alt" [attr.loading]="primera ? null : 'lazy'" />
+        @for (imagen of imagenes(); track imagen.id; let primera = $first, i = $index) {
+          <button type="button" class="detalle__foto" (click)="fotoAbierta.set(i)"
+            [attr.aria-label]="'Ver foto ' + (i + 1) + ' de ' + imagenes().length + ' en grande'">
+            <img [src]="imagen.url" [alt]="imagen.alt" [attr.loading]="primera ? null : 'lazy'" />
+          </button>
         }
       </div>
-      @if (imagenes().length > 1) {
-        <p class="detalle__galeria-ayuda text-muted">Desliza para ver las {{ imagenes().length }} fotos.</p>
-      }
+      <p class="detalle__galeria-ayuda text-muted">
+        @if (imagenes().length > 1) {
+          <span class="detalle__galeria-deslizar">Deslizá para ver las {{ imagenes().length }} fotos.</span>
+        }
+        Tocá una foto para verla en grande.
+      </p>
+      <app-visor-fotos [fotos]="imagenes()" [(indice)]="fotoAbierta" />
     }
 
     <div class="detalle__cuerpo">
@@ -65,7 +80,15 @@
 
       <aside class="detalle__reserva" aria-label="Reservar">
         <p class="detalle__precio">${{ a.precioNoche | number }} <span class="detalle__precio-unidad text-muted">/ noche</span></p>
-        <button type="button" class="btn btn--primario detalle__reservar" (click)="reservar()">Reservar</button>
+        @if (esMio()) {
+          <a [routerLink]="['/anfitrion/alojamientos', a.idAlojamiento, 'editar']" class="btn detalle__reservar">Editar mi alojamiento</a>
+        } @else if (!a.activo) {
+          <p class="text-muted detalle__aviso-rol">Este alojamiento no está recibiendo reservas por ahora.</p>
+        } @else if (puedeReservar()) {
+          <button type="button" class="btn btn--primario detalle__reservar" (click)="reservar()">Reservar</button>
+        } @else {
+          <p class="text-muted detalle__aviso-rol">Las reservas se hacen con una cuenta de cliente.</p>
+        }
       </aside>
     </div>
   </article>

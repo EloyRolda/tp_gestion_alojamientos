@@ -12,6 +12,10 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 ///   - "avatar": la unica excepcion de color (cara amarilla con aro negro y
 ///     techo amarillo), porque queda mitad sobre el encabezado negro y mitad
 ///     sobre el fondo claro. El techo tiene su propia clase para animarlo.
+///   - "insignia": la cara amarilla con aro, ojos, sonrisa y techo negros.
+///     Es la insignia de las cartas de confirmacion y avisos: la cara ES el
+///     circulo que sobresale de la esquina de la carta. Misma excepcion de
+///     color que el avatar (amarillo + negro).
 ///
 /// El tamaño lo decide quien la usa (ancho del host); el alto sale solo.
 @Component({
@@ -49,6 +53,18 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
   `,
   template: `
     @switch (variante()) {
+      @case ('insignia') {
+        <svg viewBox="0 -14 256 247" focusable="false">
+          <path [attr.d]="cara" fill="var(--color-dorado)" />
+          <g fill="var(--color-ink)">
+            <path [attr.d]="aro" fill-rule="evenodd" />
+            <path [attr.d]="ojo1" />
+            <path [attr.d]="ojo2" />
+            <path [attr.d]="sonrisa" />
+            <path [attr.d]="techo" />
+          </g>
+        </svg>
+      }
       @case ('avatar') {
         <svg viewBox="0 -14 256 247" focusable="false">
           <g class="kaza__cara">
@@ -92,7 +108,7 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
   `,
 })
 export class Kaza {
-  readonly variante = input<'trazo' | 'maciza' | 'avatar'>('trazo');
+  readonly variante = input<'trazo' | 'maciza' | 'avatar' | 'insignia'>('trazo');
   /// Fondo sobre el que se dibuja: define el color de Kaza.
   readonly sobre = input<'oscuro' | 'claro'>('claro');
   /// Solo para la version maciza: color de los ojos y la sonrisa (el del fondo).

@@ -9,7 +9,8 @@ import { AvisoService } from '../../core/services/aviso.service';
 
 /// Encabezado de la app (SCRUM-63): logo con Kaza, buscador siempre a mano y el
 /// avatar con el menu de la cuenta. El menu se arma segun el rol autenticado
-/// (SCRUM-21) y se cierra al navegar (incluido el boton atras del navegador), al
+/// (SCRUM-21): cada rol ve solo lo suyo (el administrador no tiene "Mis reservas"
+/// ni "Mis alojamientos": no reserva ni publica) y se cierra al navegar (incluido el boton atras del navegador), al
 /// tocar afuera o con la tecla Escape.
 @Component({
   selector: 'app-navbar',
