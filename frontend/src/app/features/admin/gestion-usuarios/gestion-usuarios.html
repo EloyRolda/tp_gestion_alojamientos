@@ -32,6 +32,14 @@
       <button type="button" class="btn" (click)="limpiarBusqueda()">Ver todos los usuarios</button>
     </app-vacio>
   } @else {
+    <app-paginador
+      [total]="usuariosFiltrados().length"
+      [(pagina)]="pagina"
+      [(porPagina)]="porPagina"
+      idSelector="usuarios-por-pagina"
+      nombreSingular="usuario"
+      nombrePlural="usuarios"
+    />
     <div class="table-scroll">
       <table class="tabla table-cards tabla--usuarios">
         <thead>
@@ -45,7 +53,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (u of usuariosFiltrados(); track u.id) {
+          @for (u of usuariosVisibles(); track u.id) {
             <tr>
               <td data-label="Nombre">
                 <a [routerLink]="['/admin/usuarios', u.id]" class="usuario__nombre">{{ u.nombre }} {{ u.apellido }}</a>
@@ -70,5 +78,14 @@
         </tbody>
       </table>
     </div>
+    @if (usuariosFiltrados().length > porPagina()) {
+      <app-paginador
+        [total]="usuariosFiltrados().length"
+        [(pagina)]="pagina"
+        [(porPagina)]="porPagina"
+        [soloFlechas]="true"
+        nombrePlural="usuarios"
+      />
+    }
   }
 </section>

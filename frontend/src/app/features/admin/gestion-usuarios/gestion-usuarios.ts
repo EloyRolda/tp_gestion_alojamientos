@@ -1,5 +1,5 @@
 import { NOMBRE_TIPO_USUARIO } from '../../../core/utils/tipo-usuario.util';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -11,6 +11,7 @@ import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 import { coincide } from '../../../core/utils/busqueda.util';
 import { BuscadorLista } from '../../../shared/buscador-lista/buscador-lista';
 import { Vacio } from '../../../shared/vacio/vacio';
+import { Paginador } from '../../../shared/paginador/paginador';
 import { BajaUsuarioService, PlanBaja } from '../../../core/services/baja-usuario.service';
 
 type FiltroTipo = TipoUsuario | 'TODOS';
@@ -22,7 +23,7 @@ type FiltroTipo = TipoUsuario | 'TODOS';
 @Component({
   selector: 'app-gestion-usuarios',
   standalone: true,
-  imports: [DatePipe, FormsModule, RouterLink, Esqueleto, BuscadorLista, Vacio],
+  imports: [DatePipe, FormsModule, RouterLink, Esqueleto, BuscadorLista, Vacio, Paginador],
   templateUrl: './gestion-usuarios.html',
   styleUrl: './gestion-usuarios.css',
 })
@@ -55,8 +56,25 @@ export class GestionUsuarios {
     );
   });
 
+  /// Paginado: el admin elige ver de a 10, 20, 30 o 50 usuarios por página.
+  readonly pagina = signal(1);
+  readonly porPagina = signal(10);
+  readonly usuariosVisibles = computed(() => {
+    const lista = this.usuariosFiltrados();
+    const tam = this.porPagina();
+    const ultima = Math.max(1, Math.ceil(lista.length / tam));
+    const pagina = Math.min(Math.max(1, this.pagina()), ultima);
+    return lista.slice((pagina - 1) * tam, pagina * tam);
+  });
+
   constructor() {
     this.cargar();
+    // Buscar o cambiar el filtro vuelve a la primera página.
+    effect(() => {
+      this.busqueda();
+      this.filtro();
+      untracked(() => this.pagina.set(1));
+    });
   }
 
   limpiarBusqueda(): void {
