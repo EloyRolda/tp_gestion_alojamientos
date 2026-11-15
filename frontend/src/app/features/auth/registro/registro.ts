@@ -3,7 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { TipoUsuario, UsuarioRegistro } from '../../../core/models/usuario.model';
-import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { ErroresCampo, enfocarPrimerError, erroresDelBackend, hayErrores, sinError, validar, CAMPOS_CUENTA, reglasCuenta } from '../../../core/utils/validacion.util';
+import { ErrorCampo } from '../../../shared/error-campo/error-campo';
 
 const FORM_VACIO: UsuarioRegistro = {
   nombre: '',
@@ -20,7 +21,7 @@ const FORM_VACIO: UsuarioRegistro = {
 @Component({
   selector: 'app-registro',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, ErrorCampo],
   templateUrl: './registro.html',
   styleUrl: './registro.css',
 })
@@ -30,14 +31,23 @@ export class Registro {
   readonly form = signal<UsuarioRegistro>({ ...FORM_VACIO });
   readonly enviando = signal(false);
   readonly error = signal<string | null>(null);
+  /// Error de cada campo, debajo del campo (ver validacion.util.ts).
+  readonly errores = signal<ErroresCampo>({});
   readonly exito = signal(false);
 
   actualizarCampo<K extends keyof UsuarioRegistro>(campo: K, valor: UsuarioRegistro[K]): void {
     this.form.update((actual) => ({ ...actual, [campo]: valor }));
+    this.errores.update((e) => sinError(e, campo));
   }
 
   enviar(): void {
     this.error.set(null);
+    const errores = validar(this.form(), reglasCuenta(true));
+    this.errores.set(errores);
+    if (hayErrores(errores)) {
+      enfocarPrimerError(errores);
+      return;
+    }
     this.enviando.set(true);
     this.auth.registrar(this.form()).subscribe({
       next: () => {
@@ -46,7 +56,10 @@ export class Registro {
       },
       error: (err) => {
         this.enviando.set(false);
-        this.error.set(extraerMensajeError(err));
+        const { porCampo, general } = erroresDelBackend(err, CAMPOS_CUENTA);
+        this.errores.set(porCampo);
+        this.error.set(general);
+        enfocarPrimerError(porCampo);
       },
     });
   }

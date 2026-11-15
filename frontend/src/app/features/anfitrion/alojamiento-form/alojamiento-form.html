@@ -7,39 +7,47 @@
     <form class="stack" (submit)="$event.preventDefault(); guardar()">
       <div class="field">
         <label for="titulo">Título</label>
-        <input id="titulo" type="text" autocomplete="off" required [ngModel]="form().titulo" (ngModelChange)="actualizarCampo('titulo', $event)" name="titulo" />
+        <input id="titulo" type="text" autocomplete="off" required [ngModel]="form().titulo" (ngModelChange)="actualizarCampo('titulo', $event)" name="titulo" [attr.aria-invalid]="errores()['titulo'] ? true : null" [attr.aria-describedby]="errores()['titulo'] ? 'titulo-error' : null" />
+        <app-error-campo campo="titulo" [mensaje]="errores()['titulo']" />
       </div>
       <div class="field">
         <label for="descripcion">Descripción</label>
-        <textarea id="descripcion" rows="4" [ngModel]="form().descripcion" (ngModelChange)="actualizarCampo('descripcion', $event)" name="descripcion"></textarea>
+        <textarea id="descripcion" rows="4" [ngModel]="form().descripcion" (ngModelChange)="actualizarCampo('descripcion', $event)" name="descripcion" [attr.aria-invalid]="errores()['descripcion'] ? true : null" [attr.aria-describedby]="errores()['descripcion'] ? 'descripcion-error' : null" ></textarea>
+        <app-error-campo campo="descripcion" [mensaje]="errores()['descripcion']" />
       </div>
       <div class="form-grid">
         <div class="field">
           <label for="precioNoche">Precio por noche</label>
-          <input id="precioNoche" type="number" inputmode="decimal" min="0.01" step="0.01" required [ngModel]="form().precioNoche" (ngModelChange)="actualizarCampo('precioNoche', $event)" name="precioNoche" />
+          <input id="precioNoche" type="number" inputmode="decimal" min="0.01" step="0.01" required [ngModel]="form().precioNoche" (ngModelChange)="actualizarCampo('precioNoche', $event)" name="precioNoche" [attr.aria-invalid]="errores()['precioNoche'] ? true : null" [attr.aria-describedby]="errores()['precioNoche'] ? 'precioNoche-error' : null" />
+          <app-error-campo campo="precioNoche" [mensaje]="errores()['precioNoche']" />
         </div>
         <div class="field">
           <label for="capacidad">Capacidad (huéspedes)</label>
-          <input id="capacidad" type="number" inputmode="numeric" min="1" required [ngModel]="form().capacidad" (ngModelChange)="actualizarCampo('capacidad', $event)" name="capacidad" />
+          <input id="capacidad" type="number" inputmode="numeric" min="1" required [ngModel]="form().capacidad" (ngModelChange)="actualizarCampo('capacidad', $event)" name="capacidad" [attr.aria-invalid]="errores()['capacidad'] ? true : null" [attr.aria-describedby]="errores()['capacidad'] ? 'capacidad-error' : null" />
+          <app-error-campo campo="capacidad" [mensaje]="errores()['capacidad']" />
         </div>
       </div>
       <div class="form-grid form-grid--3">
         <div class="field">
           <label for="cantAmbientes">Ambientes</label>
-          <input id="cantAmbientes" type="number" inputmode="numeric" min="1" required [ngModel]="form().cantAmbientes" (ngModelChange)="actualizarCampo('cantAmbientes', $event)" name="cantAmbientes" />
+          <input id="cantAmbientes" type="number" inputmode="numeric" min="1" required [ngModel]="form().cantAmbientes" (ngModelChange)="actualizarCampo('cantAmbientes', $event)" name="cantAmbientes" [attr.aria-invalid]="errores()['cantAmbientes'] ? true : null" [attr.aria-describedby]="errores()['cantAmbientes'] ? 'cantAmbientes-error' : null" />
+          <app-error-campo campo="cantAmbientes" [mensaje]="errores()['cantAmbientes']" />
         </div>
         <div class="field">
           <label for="cantHabitaciones">Habitaciones</label>
-          <input id="cantHabitaciones" type="number" inputmode="numeric" min="1" required [ngModel]="form().cantHabitaciones" (ngModelChange)="actualizarCampo('cantHabitaciones', $event)" name="cantHabitaciones" />
+          <input id="cantHabitaciones" type="number" inputmode="numeric" min="1" required [ngModel]="form().cantHabitaciones" (ngModelChange)="actualizarCampo('cantHabitaciones', $event)" name="cantHabitaciones" [attr.aria-invalid]="errores()['cantHabitaciones'] ? true : null" [attr.aria-describedby]="errores()['cantHabitaciones'] ? 'cantHabitaciones-error' : null" />
+          <app-error-campo campo="cantHabitaciones" [mensaje]="errores()['cantHabitaciones']" />
         </div>
         <div class="field">
           <label for="cantBanios">Baños</label>
-          <input id="cantBanios" type="number" inputmode="numeric" min="1" required [ngModel]="form().cantBanios" (ngModelChange)="actualizarCampo('cantBanios', $event)" name="cantBanios" />
+          <input id="cantBanios" type="number" inputmode="numeric" min="1" required [ngModel]="form().cantBanios" (ngModelChange)="actualizarCampo('cantBanios', $event)" name="cantBanios" [attr.aria-invalid]="errores()['cantBanios'] ? true : null" [attr.aria-describedby]="errores()['cantBanios'] ? 'cantBanios-error' : null" />
+          <app-error-campo campo="cantBanios" [mensaje]="errores()['cantBanios']" />
         </div>
       </div>
       <div class="field">
         <label for="nombreTipoAlojamiento">Tipo de alojamiento</label>
-        <input id="nombreTipoAlojamiento" type="text" autocomplete="off" required list="tipos-catalogo" [ngModel]="form().nombreTipoAlojamiento" (ngModelChange)="actualizarCampo('nombreTipoAlojamiento', $event)" name="nombreTipoAlojamiento" />
+        <input id="nombreTipoAlojamiento" type="text" autocomplete="off" required list="tipos-catalogo" [ngModel]="form().nombreTipoAlojamiento" (ngModelChange)="actualizarCampo('nombreTipoAlojamiento', $event)" name="nombreTipoAlojamiento" [attr.aria-invalid]="errores()['nombreTipoAlojamiento'] ? true : null" [attr.aria-describedby]="errores()['nombreTipoAlojamiento'] ? 'nombreTipoAlojamiento-error' : null" />
+        <app-error-campo campo="nombreTipoAlojamiento" [mensaje]="errores()['nombreTipoAlojamiento']" />
         <datalist id="tipos-catalogo">
           @for (t of tipos(); track t.idTipoAlojamiento) {
             <option [value]="t.nombreTipo"></option>
@@ -53,27 +61,33 @@
           <div class="form-grid">
             <div class="field">
               <label for="dir-pais">País</label>
-              <input id="dir-pais" type="text" autocomplete="country-name" required [ngModel]="direccion().pais" (ngModelChange)="actualizarDireccion('pais', $event)" name="pais" />
+              <input id="dir-pais" type="text" autocomplete="country-name" required [ngModel]="direccion().pais" (ngModelChange)="actualizarDireccion('pais', $event)" name="pais" [attr.aria-invalid]="errores()['dir-pais'] ? true : null" [attr.aria-describedby]="errores()['dir-pais'] ? 'dir-pais-error' : null" />
+              <app-error-campo campo="dir-pais" [mensaje]="errores()['dir-pais']" />
             </div>
             <div class="field">
               <label for="dir-provincia">Provincia</label>
-              <input id="dir-provincia" type="text" autocomplete="address-level1" required [ngModel]="direccion().provincia" (ngModelChange)="actualizarDireccion('provincia', $event)" name="provincia" />
+              <input id="dir-provincia" type="text" autocomplete="address-level1" required [ngModel]="direccion().provincia" (ngModelChange)="actualizarDireccion('provincia', $event)" name="provincia" [attr.aria-invalid]="errores()['dir-provincia'] ? true : null" [attr.aria-describedby]="errores()['dir-provincia'] ? 'dir-provincia-error' : null" />
+              <app-error-campo campo="dir-provincia" [mensaje]="errores()['dir-provincia']" />
             </div>
             <div class="field">
               <label for="dir-ciudad">Ciudad</label>
-              <input id="dir-ciudad" type="text" autocomplete="address-level2" required [ngModel]="direccion().ciudad" (ngModelChange)="actualizarDireccion('ciudad', $event)" name="ciudad" />
+              <input id="dir-ciudad" type="text" autocomplete="address-level2" required [ngModel]="direccion().ciudad" (ngModelChange)="actualizarDireccion('ciudad', $event)" name="ciudad" [attr.aria-invalid]="errores()['dir-ciudad'] ? true : null" [attr.aria-describedby]="errores()['dir-ciudad'] ? 'dir-ciudad-error' : null" />
+              <app-error-campo campo="dir-ciudad" [mensaje]="errores()['dir-ciudad']" />
             </div>
             <div class="field">
               <label for="dir-calle">Calle</label>
-              <input id="dir-calle" type="text" autocomplete="address-line1" required [ngModel]="direccion().calle" (ngModelChange)="actualizarDireccion('calle', $event)" name="calle" />
+              <input id="dir-calle" type="text" autocomplete="address-line1" required [ngModel]="direccion().calle" (ngModelChange)="actualizarDireccion('calle', $event)" name="calle" [attr.aria-invalid]="errores()['dir-calle'] ? true : null" [attr.aria-describedby]="errores()['dir-calle'] ? 'dir-calle-error' : null" />
+              <app-error-campo campo="dir-calle" [mensaje]="errores()['dir-calle']" />
             </div>
             <div class="field">
               <label for="dir-altura">Altura</label>
-              <input id="dir-altura" type="number" autocomplete="off" inputmode="numeric" min="0" required [ngModel]="direccion().altura" (ngModelChange)="actualizarDireccion('altura', $event)" name="altura" />
+              <input id="dir-altura" type="number" autocomplete="off" inputmode="numeric" min="0" required [ngModel]="direccion().altura" (ngModelChange)="actualizarDireccion('altura', $event)" name="altura" [attr.aria-invalid]="errores()['dir-altura'] ? true : null" [attr.aria-describedby]="errores()['dir-altura'] ? 'dir-altura-error' : null" />
+              <app-error-campo campo="dir-altura" [mensaje]="errores()['dir-altura']" />
             </div>
             <div class="field">
               <label for="dir-codigoPostal">Código postal</label>
-              <input id="dir-codigoPostal" type="text" autocomplete="postal-code" required [ngModel]="direccion().codigoPostal" (ngModelChange)="actualizarDireccion('codigoPostal', $event)" name="codigoPostal" />
+              <input id="dir-codigoPostal" type="text" autocomplete="postal-code" required [ngModel]="direccion().codigoPostal" (ngModelChange)="actualizarDireccion('codigoPostal', $event)" name="codigoPostal" [attr.aria-invalid]="errores()['dir-codigoPostal'] ? true : null" [attr.aria-describedby]="errores()['dir-codigoPostal'] ? 'dir-codigoPostal-error' : null" />
+              <app-error-campo campo="dir-codigoPostal" [mensaje]="errores()['dir-codigoPostal']" />
             </div>
           </div>
         </fieldset>

@@ -113,20 +113,22 @@
           <form class="stack" (submit)="$event.preventDefault(); enviarReview()">
             <div class="field">
               <label for="puntuacion">Puntuación (1 a 5)</label>
-              <select id="puntuacion" [ngModel]="puntuacion()" (ngModelChange)="puntuacion.set($event)" name="puntuacion">
+              <select id="puntuacion" [ngModel]="puntuacion()" (ngModelChange)="puntuacion.set($event)" name="puntuacion" [attr.aria-invalid]="erroresReview()['puntuacion'] ? true : null" [attr.aria-describedby]="erroresReview()['puntuacion'] ? 'puntuacion-error' : null" >
                 @for (n of [5, 4, 3, 2, 1]; track n) {
                   <option [ngValue]="n">{{ '★'.repeat(n) }} ({{ n }})</option>
                 }
               </select>
+              <app-error-campo campo="puntuacion" [mensaje]="erroresReview()['puntuacion']" />
             </div>
             <div class="field">
               <label for="comentario">Comentario</label>
-              <textarea id="comentario" required maxlength="2000" rows="4" [ngModel]="comentario()" (ngModelChange)="comentario.set($event)" name="comentario"></textarea>
+              <textarea id="comentario" required maxlength="2000" rows="4" [ngModel]="comentario()" (ngModelChange)="comentario.set($event); erroresReview.set({})" name="comentario" [attr.aria-invalid]="erroresReview()['comentario'] ? true : null" [attr.aria-describedby]="erroresReview()['comentario'] ? 'comentario-error' : null" ></textarea>
+              <app-error-campo campo="comentario" [mensaje]="erroresReview()['comentario']" />
             </div>
             @if (errorReview()) {
               <p class="text-danger">{{ errorReview() }}</p>
             }
-            <button type="submit" class="btn btn--primario" [disabled]="enviandoReview() || !comentario().trim()">
+            <button type="submit" class="btn btn--primario" [disabled]="enviandoReview()">
               {{ enviandoReview() ? 'Enviando...' : 'Enviar reseña' }}
             </button>
           </form>

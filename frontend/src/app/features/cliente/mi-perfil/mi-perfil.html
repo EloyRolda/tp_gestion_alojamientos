@@ -8,32 +8,39 @@
       <div class="form-grid">
         <div class="field">
           <label for="nombre">Nombre</label>
-          <input id="nombre" autocomplete="given-name" type="text" required [ngModel]="form().nombre" (ngModelChange)="actualizarCampo('nombre', $event)" name="nombre" />
+          <input id="nombre" autocomplete="given-name" type="text" required [ngModel]="form().nombre" (ngModelChange)="actualizarCampo('nombre', $event)" name="nombre" [attr.aria-invalid]="errores()['nombre'] ? true : null" [attr.aria-describedby]="errores()['nombre'] ? 'nombre-error' : null" />
+          <app-error-campo campo="nombre" [mensaje]="errores()['nombre']" />
         </div>
         <div class="field">
           <label for="apellido">Apellido</label>
-          <input id="apellido" autocomplete="family-name" type="text" required [ngModel]="form().apellido" (ngModelChange)="actualizarCampo('apellido', $event)" name="apellido" />
+          <input id="apellido" autocomplete="family-name" type="text" required [ngModel]="form().apellido" (ngModelChange)="actualizarCampo('apellido', $event)" name="apellido" [attr.aria-invalid]="errores()['apellido'] ? true : null" [attr.aria-describedby]="errores()['apellido'] ? 'apellido-error' : null" />
+          <app-error-campo campo="apellido" [mensaje]="errores()['apellido']" />
         </div>
         <div class="field">
           <label for="usuarioLogin">Usuario</label>
-          <input id="usuarioLogin" autocomplete="username" type="text" required [ngModel]="form().usuarioLogin" (ngModelChange)="actualizarCampo('usuarioLogin', $event)" name="usuarioLogin" />
+          <input id="usuarioLogin" autocomplete="username" type="text" required [ngModel]="form().usuarioLogin" (ngModelChange)="actualizarCampo('usuarioLogin', $event)" name="usuarioLogin" [attr.aria-invalid]="errores()['usuarioLogin'] ? true : null" [attr.aria-describedby]="errores()['usuarioLogin'] ? 'usuarioLogin-error' : null" />
+          <app-error-campo campo="usuarioLogin" [mensaje]="errores()['usuarioLogin']" />
         </div>
         <div class="field">
           <label for="email">Email</label>
-          <input id="email" autocomplete="email" type="email" required [ngModel]="form().email" (ngModelChange)="actualizarCampo('email', $event)" name="email" />
+          <input id="email" autocomplete="email" type="email" required [ngModel]="form().email" (ngModelChange)="actualizarCampo('email', $event)" name="email" [attr.aria-invalid]="errores()['email'] ? true : null" [attr.aria-describedby]="errores()['email'] ? 'email-error' : null" />
+          <app-error-campo campo="email" [mensaje]="errores()['email']" />
         </div>
         <div class="field">
           <label for="telefono">Teléfono</label>
-          <input id="telefono" autocomplete="tel" type="tel" required [ngModel]="form().telefono" (ngModelChange)="actualizarCampo('telefono', $event)" name="telefono" />
+          <input id="telefono" autocomplete="tel" type="tel" required [ngModel]="form().telefono" (ngModelChange)="actualizarCampo('telefono', $event)" name="telefono" [attr.aria-invalid]="errores()['telefono'] ? true : null" [attr.aria-describedby]="errores()['telefono'] ? 'telefono-error' : null" />
+          <app-error-campo campo="telefono" [mensaje]="errores()['telefono']" />
         </div>
         <div class="field">
           <label for="password">Nueva contraseña (opcional)</label>
-          <input id="password" autocomplete="new-password" type="password" minlength="6" placeholder="Dejar en blanco para no cambiarla" [ngModel]="form().password" (ngModelChange)="actualizarCampo('password', $event)" name="password" />
+          <input id="password" autocomplete="new-password" type="password" minlength="6" placeholder="Dejar en blanco para no cambiarla" [ngModel]="form().password" (ngModelChange)="actualizarCampo('password', $event)" name="password" [attr.aria-invalid]="errores()['password'] ? true : null" [attr.aria-describedby]="errores()['password'] ? 'password-error' : null" />
+          <app-error-campo campo="password" [mensaje]="errores()['password']" />
         </div>
         @if (form().password) {
           <div class="field">
             <label for="password2">Repetir la nueva contraseña</label>
-            <input id="password2" autocomplete="new-password" type="password" [ngModel]="repetirPassword()" (ngModelChange)="repetirPassword.set($event)" name="password2" />
+            <input id="password2" autocomplete="new-password" type="password" [ngModel]="repetirPassword()" (ngModelChange)="actualizarRepetirPassword($event)" name="password2" [attr.aria-invalid]="errores()['password2'] ? true : null" [attr.aria-describedby]="errores()['password2'] ? 'password2-error' : null" />
+            <app-error-campo campo="password2" [mensaje]="errores()['password2']" />
           </div>
         }
       </div>
@@ -75,7 +82,10 @@
               spellcheck="false"
               [ngModel]="aliasCobroValor()"
               (ngModelChange)="actualizarAliasCobroValor($event)"
+              [attr.aria-invalid]="aliasCobroError() ? true : null"
+              [attr.aria-describedby]="aliasCobroError() ? 'aliasCobroValor-error' : null"
             />
+            <app-error-campo campo="aliasCobroValor" [mensaje]="aliasCobroError()" />
           </div>
           <button
             type="button"
@@ -104,7 +114,7 @@
           </div>
         }
 
-        @if (aliasCobroError()) {
+        @if (aliasCobroError() && aliasCobroPaso() === 'confirmar') {
           <p class="text-danger">{{ aliasCobroError() }}</p>
         }
         @if (aliasCobroExito()) {

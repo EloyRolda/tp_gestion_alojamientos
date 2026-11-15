@@ -1,8 +1,8 @@
 /* ============================================================
    AlojaME -- estilos globales.
 
-   Base responsive mobile-first (Lote 5) con la identidad visual de AlojaME
-   (Lote 6): paleta calida, tipografia Plus Jakarta Sans, controles
+   Base responsive mobile-first con la identidad visual de AlojaME:
+   paleta calida, tipografia Plus Jakarta Sans, controles
    redondeados y Kaza, la mascota, como marca.
 
    Breakpoints de la app (usar siempre estos, no inventar otros salvo que
@@ -707,6 +707,17 @@ textarea {
 .field textarea {
   min-height: 120px;
   resize: vertical;
+}
+
+/* Campo con error: borde rojo; el mensaje va justo debajo (app-error-campo). */
+.field [aria-invalid='true'],
+.field [aria-invalid='true']:hover {
+  border-color: var(--color-danger);
+}
+
+.field [aria-invalid='true']:focus {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px rgba(184, 58, 28, 0.2);
 }
 
 /* Filtros de un listado (un select suelto): a todo el ancho en mobile, sin

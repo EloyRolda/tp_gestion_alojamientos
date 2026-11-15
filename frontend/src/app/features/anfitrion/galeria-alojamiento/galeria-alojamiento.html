@@ -32,13 +32,15 @@
         <h2>Subir imagen</h2>
         <div class="field">
           <label for="archivo">Archivo</label>
-          <input id="archivo" type="file" accept="image/*" required (change)="onArchivoElegido($event)" />
+          <input id="archivo" type="file" accept="image/*" required (change)="onArchivoElegido($event)" [attr.aria-invalid]="errores()['archivo'] ? true : null" [attr.aria-describedby]="errores()['archivo'] ? 'archivo-error' : null" />
+          <app-error-campo campo="archivo" [mensaje]="errores()['archivo']" />
         </div>
         <div class="field">
           <label for="alt">Descripción de la imagen</label>
-          <input id="alt" type="text" autocomplete="off" required [ngModel]="alt()" (ngModelChange)="alt.set($event)" name="alt" />
+          <input id="alt" type="text" autocomplete="off" required [ngModel]="alt()" (ngModelChange)="alt.set($event); errores.set({})" name="alt" [attr.aria-invalid]="errores()['alt'] ? true : null" [attr.aria-describedby]="errores()['alt'] ? 'alt-error' : null" />
+          <app-error-campo campo="alt" [mensaje]="errores()['alt']" />
         </div>
-        <button type="submit" class="btn btn--primario" [disabled]="subiendo() || !archivoElegido()">
+        <button type="submit" class="btn btn--primario" [disabled]="subiendo()">
           {{ subiendo() ? 'Subiendo...' : 'Subir' }}
         </button>
       </form>

@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { UsuarioService } from '../../../core/services/usuario.service';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { ErroresCampo, enfocarPrimerError, erroresDelBackend, hayErrores, sinError, validar, CAMPOS_CUENTA, reglasCuenta } from '../../../core/utils/validacion.util';
+import { ErrorCampo } from '../../../shared/error-campo/error-campo';
 import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 import { AvisoService } from '../../../core/services/aviso.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -24,13 +26,13 @@ interface FormUsuario {
 /// FichaUsuario, con "Editar datos").
 ///
 /// SCRUM-42 / RF06, RF07. El admin edita los datos de CUALQUIER usuario
-/// (PUT /Usuario/actualizar/admin), a diferencia de Mi Perfil (Lote 2) que
+/// (PUT /Usuario/actualizar/admin), a diferencia de Mi Perfil, que
 /// solo deja a cada uno editar lo propio. Puede tocar "activo" ademas (el
 /// propio usuario no).
 @Component({
   selector: 'app-usuario-form',
   standalone: true,
-  imports: [FormsModule, RouterLink, Esqueleto],
+  imports: [FormsModule, RouterLink, Esqueleto, ErrorCampo],
   templateUrl: './usuario-form.html',
   styleUrl: './usuario-form.css',
 })
@@ -52,6 +54,8 @@ export class UsuarioForm {
   readonly cargando = signal(true);
   readonly guardando = signal(false);
   readonly error = signal<string | null>(null);
+  /// Error de cada campo, debajo del campo (ver validacion.util.ts).
+  readonly errores = signal<ErroresCampo>({});
   readonly exito = signal(false);
 
   constructor() {
@@ -84,11 +88,19 @@ export class UsuarioForm {
 
   actualizarCampo<K extends keyof FormUsuario>(campo: K, valor: FormUsuario[K]): void {
     this.form.update((actual) => (actual ? { ...actual, [campo]: valor } : actual));
+    this.errores.update((e) => sinError(e, campo));
   }
 
   async guardar(): Promise<void> {
     const f = this.form();
     if (!f) return;
+    this.error.set(null);
+    const errores = validar(f, reglasCuenta(false));
+    this.errores.set(errores);
+    if (hayErrores(errores)) {
+      enfocarPrimerError(errores);
+      return;
+    }
     const u = this.usuario();
     // Desmarcar "Cuenta activa" es una baja en cascada: se confirma antes.
     let plan: PlanBaja | null = null;
@@ -128,7 +140,10 @@ export class UsuarioForm {
         },
         error: (err) => {
           this.guardando.set(false);
-          this.error.set(extraerMensajeError(err));
+          const { porCampo, general } = erroresDelBackend(err, CAMPOS_CUENTA);
+          this.errores.set(porCampo);
+          this.error.set(general);
+          enfocarPrimerError(porCampo);
         },
       });
   }

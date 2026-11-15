@@ -7,6 +7,8 @@ import { ReviewService, ReviewRegistro } from '../../../core/services/review.ser
 import { Reserva } from '../../../core/models/reserva.model';
 import { calcularNoches, calcularTotal } from '../../../core/utils/reserva.util';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { ErroresCampo, enfocarPrimerError, erroresDelBackend, hayErrores, validar, reglas } from '../../../core/utils/validacion.util';
+import { ErrorCampo } from '../../../shared/error-campo/error-campo';
 import { Estado } from '../../../shared/estado/estado';
 import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 import { AvisoService } from '../../../core/services/aviso.service';
@@ -28,7 +30,7 @@ import { CalendarioRango, RangoOcupado } from '../../../shared/calendario-rango/
 @Component({
   selector: 'app-detalle-reserva',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, FormsModule, RouterLink, Estado, Esqueleto, CalendarioRango],
+  imports: [DatePipe, DecimalPipe, FormsModule, RouterLink, Estado, Esqueleto, CalendarioRango, ErrorCampo],
   templateUrl: './detalle-reserva.html',
   styleUrl: './detalle-reserva.css',
 })
@@ -51,6 +53,8 @@ export class DetalleReserva {
   readonly comentario = signal('');
   readonly enviandoReview = signal(false);
   readonly errorReview = signal<string | null>(null);
+  /// Errores de la reseña, debajo de cada campo (ver validacion.util.ts).
+  readonly erroresReview = signal<ErroresCampo>({});
   readonly reviewEnviada = signal(false);
 
   /// Cambiar fechas (solo SOLICITADA).
@@ -168,6 +172,15 @@ export class DetalleReserva {
     const r = this.reserva();
     if (!r) return;
     this.errorReview.set(null);
+    const errores = validar(
+      { puntuacion: this.puntuacion(), comentario: this.comentario() },
+      { puntuacion: [reglas.obligatorio], comentario: [reglas.obligatorio, reglas.maximoCaracteres(2000)] },
+    );
+    this.erroresReview.set(errores);
+    if (hayErrores(errores)) {
+      enfocarPrimerError(errores);
+      return;
+    }
     this.enviandoReview.set(true);
     const dto: ReviewRegistro = {
       idReserva: r.idReserva,
@@ -183,7 +196,9 @@ export class DetalleReserva {
       },
       error: (err) => {
         this.enviandoReview.set(false);
-        this.errorReview.set(extraerMensajeError(err));
+        const { porCampo, general } = erroresDelBackend(err, { puntuacion: 'puntuacion', comentario: 'comentario' });
+        this.erroresReview.set(porCampo);
+        this.errorReview.set(general);
       },
     });
   }

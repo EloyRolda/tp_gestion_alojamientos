@@ -3,6 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { ErroresCampo, enfocarPrimerError, erroresDelBackend, hayErrores, validar, reglas } from '../../../core/utils/validacion.util';
+import { ErrorCampo } from '../../../shared/error-campo/error-campo';
 
 type Estado = 'inicial' | 'verificando' | 'exito' | 'error';
 
@@ -12,7 +14,7 @@ type Estado = 'inicial' | 'verificando' | 'exito' | 'error';
 @Component({
   selector: 'app-verificacion',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, ErrorCampo],
   templateUrl: './verificacion.html',
   styleUrl: './verificacion.css',
 })
@@ -28,6 +30,8 @@ export class Verificacion {
   readonly reenviando = signal(false);
   readonly reenviado = signal(false);
   readonly errorReenvio = signal<string | null>(null);
+  /// Error del email, debajo del campo (ver validacion.util.ts).
+  readonly errores = signal<ErroresCampo>({});
 
   constructor() {
     effect(() => {
@@ -40,6 +44,12 @@ export class Verificacion {
 
   reenviar(): void {
     this.errorReenvio.set(null);
+    const errores = validar({ email: this.email() }, { email: [reglas.obligatorio, reglas.email] });
+    this.errores.set(errores);
+    if (hayErrores(errores)) {
+      enfocarPrimerError(errores);
+      return;
+    }
     this.reenviando.set(true);
     this.auth.reenviarVerificacion(this.email()).subscribe({
       next: () => {
@@ -48,7 +58,9 @@ export class Verificacion {
       },
       error: (err) => {
         this.reenviando.set(false);
-        this.errorReenvio.set(extraerMensajeError(err));
+        const { porCampo, general } = erroresDelBackend(err, { email: 'email' });
+        this.errores.set(porCampo);
+        this.errorReenvio.set(general);
       },
     });
   }

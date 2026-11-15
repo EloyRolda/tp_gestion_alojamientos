@@ -3,6 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { UsuarioService, UsuarioModificar, AliasCobroInfo } from '../../../core/services/usuario.service';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { ErroresCampo, enfocarPrimerError, erroresDelBackend, hayErrores, sinError, validar, CAMPOS_CUENTA, reglasCuenta } from '../../../core/utils/validacion.util';
+import { ErrorCampo } from '../../../shared/error-campo/error-campo';
 import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 import { AvisoService } from '../../../core/services/aviso.service';
 
@@ -29,11 +31,11 @@ const FORM_VACIO: FormPerfil = {
 /// precarga): si se deja vacia, no se manda en el PUT (UsuarioModificarDTO
 /// acepta todos los campos opcionales, solo pisa lo que venga no-nulo).
 /// Para ANFITRION suma el alias de cobro (CBU/CVU/alias) con el flujo de
-/// 2 pasos validar->confirmar que ya existia en el backend sin UI (Lote 4.1).
+/// 2 pasos validar->confirmar que ya existia en el backend.
 @Component({
   selector: 'app-mi-perfil',
   standalone: true,
-  imports: [FormsModule, Esqueleto],
+  imports: [FormsModule, Esqueleto, ErrorCampo],
   templateUrl: './mi-perfil.html',
   styleUrl: './mi-perfil.css',
 })
@@ -46,6 +48,8 @@ export class MiPerfil {
   readonly cargando = signal(true);
   readonly guardando = signal(false);
   readonly error = signal<string | null>(null);
+  /// Error de cada campo, debajo del campo (ver validacion.util.ts).
+  readonly errores = signal<ErroresCampo>({});
   /// Para no cambiar la contraseña por una con un error de tipeo (y quedar afuera).
   readonly repetirPassword = signal('');
   readonly exito = signal(false);
@@ -82,11 +86,26 @@ export class MiPerfil {
 
   actualizarCampo<K extends keyof FormPerfil>(campo: K, valor: FormPerfil[K]): void {
     this.form.update((actual) => ({ ...actual, [campo]: valor }));
+    this.errores.update((e) => sinError(e, campo));
+  }
+
+  actualizarRepetirPassword(valor: string): void {
+    this.repetirPassword.set(valor);
+    this.errores.update((e) => sinError(e, 'password2'));
   }
 
   guardar(): void {
     this.error.set(null);
     this.exito.set(false);
+    const errores = validar(this.form(), reglasCuenta(false));
+    if (this.form().password && this.form().password !== this.repetirPassword()) {
+      errores['password2'] = 'Las dos contraseñas no coinciden.';
+    }
+    this.errores.set(errores);
+    if (hayErrores(errores)) {
+      enfocarPrimerError(errores);
+      return;
+    }
     this.guardando.set(true);
 
     const actual = this.form();
@@ -97,11 +116,6 @@ export class MiPerfil {
       email: actual.email,
       telefono: actual.telefono,
     };
-    if (actual.password && actual.password !== this.repetirPassword()) {
-      this.error.set('Las dos contraseñas nuevas no coinciden.');
-      this.guardando.set(false);
-      return;
-    }
     if (actual.password.trim().length > 0) {
       dto.password = actual.password;
     }
@@ -117,13 +131,17 @@ export class MiPerfil {
       },
       error: (err) => {
         this.guardando.set(false);
-        this.error.set(extraerMensajeError(err));
+        const { porCampo, general } = erroresDelBackend(err, CAMPOS_CUENTA);
+        this.errores.set(porCampo);
+        this.error.set(general);
+        enfocarPrimerError(porCampo);
       },
     });
   }
 
   actualizarAliasCobroValor(valor: string): void {
     this.aliasCobroValor.set(valor);
+    this.aliasCobroError.set(null);
   }
 
   /// Paso 1: valida el alias/CBU/CVU contra el backend sin guardar nada todavia.
@@ -138,6 +156,8 @@ export class MiPerfil {
         this.aliasCobroInfo.set(info);
         if (info.valido) {
           this.aliasCobroPaso.set('confirmar');
+        } else {
+          this.aliasCobroError.set(info.mensaje || 'No es un alias, CBU o CVU válido. Revisá que esté bien escrito.');
         }
       },
       error: (err) => {

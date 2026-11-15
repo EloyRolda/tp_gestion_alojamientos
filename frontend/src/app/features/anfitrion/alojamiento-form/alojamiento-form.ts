@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -8,6 +9,8 @@ import { DireccionInput } from '../../../core/models/direccion.model';
 import { TipoAlojamiento } from '../../../core/models/tipo-alojamiento.model';
 import { Servicio, ServicioxAlojamiento } from '../../../core/models/servicio.model';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { ErroresCampo, enfocarPrimerError, erroresDelBackend, hayErrores, sinError, validar, Regla, reglas } from '../../../core/utils/validacion.util';
+import { ErrorCampo } from '../../../shared/error-campo/error-campo';
 import type { Punto } from '../../../shared/selector-ubicacion/selector-ubicacion';
 import { SelectorUbicacion } from '../../../shared/selector-ubicacion/selector-ubicacion';
 import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
@@ -57,10 +60,35 @@ const DIRECCION_VACIA: DireccionInput = {
 /// Ubicacion en el mapa (SCRUM-67): opcional. En alta viaja dentro de la
 /// direccion; en edicion se puede mover el punto (no la calle) y viaja como
 /// latitud/longitud del alojamiento. El mapa se carga con @defer.
+/// Reglas de cada campo (mismas que AlojamientoRegistroDTO y DireccionDTO).
+const REGLAS_ALOJAMIENTO: Record<string, Regla[]> = {
+  titulo: [reglas.obligatorio, reglas.maximoCaracteres(150)],
+  descripcion: [reglas.maximoCaracteres(3000)],
+  precioNoche: [reglas.obligatorio, reglas.numeroPositivo],
+  capacidad: [reglas.obligatorio, reglas.enteroPositivo],
+  cantAmbientes: [reglas.obligatorio, reglas.enteroPositivo],
+  cantHabitaciones: [reglas.obligatorio, reglas.enteroPositivo],
+  cantBanios: [reglas.obligatorio, reglas.enteroPositivo],
+  nombreTipoAlojamiento: [reglas.obligatorio, reglas.maximoCaracteres(100)],
+};
+const REGLAS_DIRECCION: Record<string, Regla[]> = {
+  'dir-pais': [reglas.obligatorio, reglas.maximoCaracteres(100)],
+  'dir-provincia': [reglas.obligatorio, reglas.maximoCaracteres(100)],
+  'dir-ciudad': [reglas.obligatorio, reglas.maximoCaracteres(100)],
+  'dir-calle': [reglas.obligatorio, reglas.maximoCaracteres(30)],
+  'dir-altura': [reglas.obligatorio, reglas.enteroNoNegativo],
+  'dir-codigoPostal': [reglas.obligatorio, reglas.maximoCaracteres(10)],
+};
+/// Campo del DTO -> id del input (la direccion viene anidada: "direccion.calle").
+const CAMPOS_ALOJAMIENTO: Record<string, string> = {
+  ...Object.fromEntries(Object.keys(REGLAS_ALOJAMIENTO).map((c) => [c, c])),
+  ...Object.fromEntries(Object.keys(REGLAS_DIRECCION).map((id) => ['direccion.' + id.slice(4), id])),
+};
+
 @Component({
   selector: 'app-alojamiento-form',
   standalone: true,
-  imports: [FormsModule, RouterLink, SelectorUbicacion, Esqueleto],
+  imports: [FormsModule, RouterLink, SelectorUbicacion, Esqueleto, ErrorCampo],
   templateUrl: './alojamiento-form.html',
   styleUrl: './alojamiento-form.css',
 })
@@ -91,6 +119,8 @@ export class AlojamientoForm {
   readonly cargando = signal(true);
   readonly enviando = signal(false);
   readonly error = signal<string | null>(null);
+  /// Error de cada campo, debajo del campo (ver validacion.util.ts).
+  readonly errores = signal<ErroresCampo>({});
 
   readonly tipos = signal<TipoAlojamiento[]>([]);
   readonly catalogoServicios = signal<Servicio[]>([]);
@@ -124,10 +154,12 @@ export class AlojamientoForm {
 
   actualizarCampo<K extends keyof FormAlojamiento>(campo: K, valor: FormAlojamiento[K]): void {
     this.form.update((actual) => ({ ...actual, [campo]: valor }));
+    this.errores.update((e) => sinError(e, campo));
   }
 
   actualizarDireccion<K extends keyof DireccionInput>(campo: K, valor: DireccionInput[K]): void {
     this.direccion.update((actual) => ({ ...actual, [campo]: valor }));
+    this.errores.update((e) => sinError(e, 'dir-' + campo));
   }
 
   toggleServicioElegido(nombre: string): void {
@@ -147,6 +179,26 @@ export class AlojamientoForm {
 
   guardar(): void {
     this.error.set(null);
+    const d = this.direccion();
+    const errores = this.esEdicion()
+      ? validar(this.form(), REGLAS_ALOJAMIENTO)
+      : validar(
+          {
+            ...this.form(),
+            'dir-pais': d.pais,
+            'dir-provincia': d.provincia,
+            'dir-ciudad': d.ciudad,
+            'dir-calle': d.calle,
+            'dir-altura': d.altura,
+            'dir-codigoPostal': d.codigoPostal,
+          },
+          { ...REGLAS_ALOJAMIENTO, ...REGLAS_DIRECCION },
+        );
+    this.errores.set(errores);
+    if (hayErrores(errores)) {
+      enfocarPrimerError(errores);
+      return;
+    }
     this.enviando.set(true);
 
     if (this.esEdicion()) {
@@ -170,10 +222,7 @@ export class AlojamientoForm {
           this.aviso.mostrar('Cambios guardados');
           this.router.navigate(['/anfitrion/alojamientos', a.idAlojamiento, 'editar']);
         },
-        error: (err) => {
-          this.enviando.set(false);
-          this.error.set(extraerMensajeError(err));
-        },
+        error: (err) => this.mostrarErrorAlGuardar(err),
       });
     } else {
       const f = this.form();
@@ -199,12 +248,17 @@ export class AlojamientoForm {
           this.aviso.mostrar('Alojamiento publicado', ['Ahora sumale fotos: las publicaciones con fotos se eligen mucho más.']);
           this.router.navigate(['/anfitrion/alojamientos', a.idAlojamiento, 'galeria']);
         },
-        error: (err) => {
-          this.enviando.set(false);
-          this.error.set(extraerMensajeError(err));
-        },
+        error: (err) => this.mostrarErrorAlGuardar(err),
       });
     }
+  }
+
+  private mostrarErrorAlGuardar(err: HttpErrorResponse): void {
+    this.enviando.set(false);
+    const { porCampo, general } = erroresDelBackend(err, CAMPOS_ALOJAMIENTO);
+    this.errores.set(porCampo);
+    this.error.set(general);
+    enfocarPrimerError(porCampo);
   }
 
   agregarServicioEnEdicion(): void {

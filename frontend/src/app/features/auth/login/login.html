@@ -11,9 +11,11 @@
         autocapitalize="none"
         required
         [ngModel]="identificador()"
-        (ngModelChange)="identificador.set($event)"
+        (ngModelChange)="identificador.set($event); errores.set({})"
         name="identificador"
+        [attr.aria-invalid]="errores()['identificador'] ? true : null" [attr.aria-describedby]="errores()['identificador'] ? 'identificador-error' : null"
       />
+      <app-error-campo campo="identificador" [mensaje]="errores()['identificador']" />
     </div>
     <div class="field">
       <label for="password">Contraseña</label>
@@ -23,9 +25,11 @@
         autocomplete="current-password"
         required
         [ngModel]="password()"
-        (ngModelChange)="password.set($event)"
+        (ngModelChange)="password.set($event); errores.set({})"
         name="password"
+        [attr.aria-invalid]="errores()['password'] ? true : null" [attr.aria-describedby]="errores()['password'] ? 'password-error' : null"
       />
+      <app-error-campo campo="password" [mensaje]="errores()['password']" />
     </div>
 
     @if (error()) {

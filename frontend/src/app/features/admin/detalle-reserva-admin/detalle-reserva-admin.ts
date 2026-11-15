@@ -7,6 +7,8 @@ import { PagoService } from '../../../core/services/pago.service';
 import { Reserva, UsuarioResumen } from '../../../core/models/reserva.model';
 import { calcularNoches, calcularTotal } from '../../../core/utils/reserva.util';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { ErroresCampo, enfocarPrimerError, erroresDelBackend, hayErrores, validar, reglas } from '../../../core/utils/validacion.util';
+import { ErrorCampo } from '../../../shared/error-campo/error-campo';
 import { Estado } from '../../../shared/estado/estado';
 import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 import { ConfirmacionService } from '../../../core/services/confirmacion.service';
@@ -16,6 +18,9 @@ import { hoyIso } from '../../../core/utils/fecha.util';
 import { AlojamientoService } from '../../../core/services/alojamiento.service';
 import { UsuarioService } from '../../../core/services/usuario.service';
 
+/// Mismo formato que la etiqueta del campo de reembolso ("$480.000").
+const MONTO = new Intl.NumberFormat('es-AR', { maximumFractionDigits: 2 });
+
 /// SCRUM-45/46 / RF24. Detalle de cualquier reserva de la plataforma, visto
 /// como admin: cancelar (regla automatica segun quien cancela) o reembolso
 /// manual a medida (POST /Pago/reembolso-admin, que cancela la reserva con
@@ -23,7 +28,7 @@ import { UsuarioService } from '../../../core/services/usuario.service';
 @Component({
   selector: 'app-detalle-reserva-admin',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, FormsModule, RouterLink, Estado, Esqueleto],
+  imports: [DatePipe, DecimalPipe, FormsModule, RouterLink, Estado, Esqueleto, ErrorCampo],
   templateUrl: './detalle-reserva-admin.html',
   styleUrl: './detalle-reserva-admin.css',
 })
@@ -49,6 +54,8 @@ export class DetalleReservaAdmin {
   readonly montoReembolso = signal<number | null>(null);
   readonly enviandoReembolso = signal(false);
   readonly errorReembolso = signal<string | null>(null);
+  /// Error del monto, debajo del campo (ver validacion.util.ts).
+  readonly errores = signal<ErroresCampo>({});
 
   constructor() {
     effect(() => {
@@ -145,13 +152,25 @@ export class DetalleReservaAdmin {
 
   async enviarReembolso(): Promise<void> {
     const r = this.reserva();
-    const monto = Number(this.montoReembolso());
-    if (!r || this.montoReembolso() === null || monto < 0) return;
+    if (!r) return;
     const maximo = this.montoMaximo(r);
-    if (monto > maximo) {
-      this.errorReembolso.set(`El reembolso no puede superar el monto base (${formatearPesos(maximo)}).`);
+    this.errorReembolso.set(null);
+    const errores = validar(
+      { montoReembolso: this.montoReembolso() },
+      {
+        montoReembolso: [
+          reglas.obligatorio,
+          reglas.numeroNoNegativo,
+          reglas.maximo(maximo, `No puede superar el monto base ($${MONTO.format(maximo)}).`),
+        ],
+      },
+    );
+    this.errores.set(errores);
+    if (hayErrores(errores)) {
+      enfocarPrimerError(errores);
       return;
     }
+    const monto = Number(this.montoReembolso());
     const ok = await this.confirmacion.pedir({
       titulo: 'Cancelar con reembolso manual',
       mensaje: [
@@ -174,7 +193,9 @@ export class DetalleReservaAdmin {
       },
       error: (err) => {
         this.enviandoReembolso.set(false);
-        this.errorReembolso.set(extraerMensajeError(err));
+        const { porCampo, general } = erroresDelBackend(err, { montoReembolsoCliente: 'montoReembolso' });
+        this.errores.set(porCampo);
+        this.errorReembolso.set(general);
       },
     });
   }

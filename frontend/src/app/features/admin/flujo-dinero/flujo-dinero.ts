@@ -25,6 +25,9 @@ const MESES = [
   'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic',
 ];
 
+/// Primer año que ofrece el selector de "Ingresos mensuales".
+const PRIMER_ANIO = 2020;
+
 /// SCRUM-47 / RF32. Panel financiero del admin: facturacion, comisiones,
 /// liquidado a anfitriones y reembolsado a clientes (con filtro opcional de
 /// fechas), ingresos mensuales del año, y cancelaciones agrupadas por motivo.
@@ -56,6 +59,10 @@ export class FlujoDineroComponent {
     return `del ${f.format(desdeIso(this.desde()))} al ${f.format(desdeIso(this.hasta()))}`;
   });
 
+  /// Año de "Ingresos mensuales": se elige de una lista (desde PRIMER_ANIO
+  /// hasta el actual, el mas reciente primero) en lugar de escribirlo, asi no
+  /// se puede pedir un año con letras, negativo o futuro.
+  readonly anios = Array.from({ length: new Date().getFullYear() - PRIMER_ANIO + 1 }, (_, i) => new Date().getFullYear() - i);
   readonly anio = signal(new Date().getFullYear());
   readonly ingresosMensuales = signal<IngresoMensual[]>([]);
   readonly cargandoIngresos = signal(true);
@@ -101,7 +108,8 @@ export class FlujoDineroComponent {
   }
 
 
-  cambiarAnio(): void {
+  elegirAnio(anio: number): void {
+    this.anio.set(Number(anio));
     this.cargarIngresosMensuales();
   }
 

@@ -5,6 +5,8 @@ import { GaleriaService } from '../../../core/services/galeria.service';
 import { AlojamientoService } from '../../../core/services/alojamiento.service';
 import { Imagen } from '../../../core/models/galeria.model';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { ErroresCampo, enfocarPrimerError, hayErrores, validar, reglas } from '../../../core/utils/validacion.util';
+import { ErrorCampo } from '../../../shared/error-campo/error-campo';
 import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 import { AvisoService } from '../../../core/services/aviso.service';
 import { VisorFotos } from '../../../shared/visor-fotos/visor-fotos';
@@ -17,10 +19,13 @@ const MAXIMO_IMAGENES = 10;
 /// ya existe siempre (se crea sola al publicar el alojamiento, ver
 /// AlojamientoService.crear en el backend) -- aca solo se suben/borran imagenes
 /// dentro de ella. Subida real contra Cloudinary (CloudinaryService del backend).
+/// Mismo limite que spring.servlet.multipart.max-file-size en el backend.
+const MAXIMO_BYTES = 10 * 1024 * 1024;
+
 @Component({
   selector: 'app-galeria-alojamiento',
   standalone: true,
-  imports: [FormsModule, RouterLink, Esqueleto, VisorFotos],
+  imports: [FormsModule, RouterLink, Esqueleto, VisorFotos, ErrorCampo],
   templateUrl: './galeria-alojamiento.html',
   styleUrl: './galeria-alojamiento.css',
 })
@@ -43,6 +48,8 @@ export class GaleriaAlojamiento {
 
   readonly archivoElegido = signal<File | null>(null);
   readonly alt = signal('');
+  /// Errores de la foto a subir, debajo de cada campo (ver validacion.util.ts).
+  readonly errores = signal<ErroresCampo>({});
   readonly subiendo = signal(false);
 
   readonly maximoAlcanzado = () => this.imagenes().length >= MAXIMO_IMAGENES;
@@ -59,12 +66,21 @@ export class GaleriaAlojamiento {
   onArchivoElegido(event: Event): void {
     const input = event.target as HTMLInputElement;
     this.archivoElegido.set(input.files?.[0] ?? null);
+    this.errores.set({});
   }
 
   subir(): void {
     const archivo = this.archivoElegido();
     const idGaleria = this.idGaleria();
-    if (!archivo || !idGaleria) return;
+    const errores = validar({ alt: this.alt() }, { alt: [reglas.obligatorio, reglas.maximoCaracteres(255)] });
+    if (!archivo) errores['archivo'] = 'Elegí una imagen.';
+    else if (!archivo.type.startsWith('image/')) errores['archivo'] = 'El archivo tiene que ser una imagen (JPG, PNG o WebP).';
+    else if (archivo.size > MAXIMO_BYTES) errores['archivo'] = 'La imagen pesa más de 10 MB. Elegí una más liviana.';
+    this.errores.set(errores);
+    if (hayErrores(errores) || !archivo || !idGaleria) {
+      enfocarPrimerError(errores);
+      return;
+    }
 
     this.error.set(null);
     this.subiendo.set(true);
@@ -78,7 +94,8 @@ export class GaleriaAlojamiento {
       },
       error: (err) => {
         this.subiendo.set(false);
-        this.error.set(extraerMensajeError(err));
+        // Un error al subir (formato, tamaño, Cloudinary) es de la foto: va debajo del archivo.
+        this.errores.set({ archivo: extraerMensajeError(err) });
       },
     });
   }

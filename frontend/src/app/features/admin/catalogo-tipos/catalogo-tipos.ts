@@ -1,8 +1,11 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CatalogoService } from '../../../core/services/catalogo.service';
 import { TipoAlojamiento } from '../../../core/models/tipo-alojamiento.model';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
+import { ErroresCampo, enfocarPrimerError, erroresDelBackend, hayErrores, validar, reglas } from '../../../core/utils/validacion.util';
+import { ErrorCampo } from '../../../shared/error-campo/error-campo';
 import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 import { AvisoService } from '../../../core/services/aviso.service';
 import { coincide } from '../../../core/utils/busqueda.util';
@@ -15,7 +18,7 @@ import { ConfirmacionService } from '../../../core/services/confirmacion.service
 @Component({
   selector: 'app-catalogo-tipos',
   standalone: true,
-  imports: [FormsModule, Esqueleto, BuscadorLista],
+  imports: [FormsModule, Esqueleto, BuscadorLista, ErrorCampo],
   templateUrl: './catalogo-tipos.html',
   styleUrl: './catalogo-tipos.css',
 })
@@ -30,6 +33,10 @@ export class CatalogoTipos {
   readonly tiposFiltrados = computed(() => this.tipos().filter((t) => coincide(this.busqueda(), t.nombreTipo)));
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
+  /// Errores de crear, renombrar y fusionar, cada uno debajo de su campo
+  /// (ver validacion.util.ts). Ej: "ya existe uno con ese nombre" va debajo del nombre.
+  readonly errores = signal<ErroresCampo>({});
+  private readonly reglaNombre = [reglas.obligatorio, reglas.maximoCaracteres(100)];
 
   readonly nombreNuevo = signal('');
   readonly creando = signal(false);
@@ -48,8 +55,12 @@ export class CatalogoTipos {
 
   crear(): void {
     const nombre = this.nombreNuevo().trim();
-    if (!nombre) return;
-
+    const errores = validar({ nombreNuevo: nombre }, { nombreNuevo: this.reglaNombre });
+    this.errores.set(errores);
+    if (hayErrores(errores)) {
+      enfocarPrimerError(errores);
+      return;
+    }
     this.error.set(null);
     this.creando.set(true);
     this.catalogoService.crearTipo(nombre).subscribe({
@@ -61,9 +72,16 @@ export class CatalogoTipos {
       },
       error: (err) => {
         this.creando.set(false);
-        this.error.set(extraerMensajeError(err));
+        this.errores.set({ nombreNuevo: this.mensajeDeCampo(err) });
       },
     });
+  }
+
+  /// Un solo campo por formulario: el error del backend (de validacion o de
+  /// negocio, ej. un nombre repetido) se muestra debajo de ese campo.
+  private mensajeDeCampo(err: HttpErrorResponse): string {
+    const { porCampo, general } = erroresDelBackend(err, {});
+    return general ?? Object.values(porCampo)[0] ?? '';
   }
 
   empezarEdicion(t: TipoAlojamiento): void {
@@ -73,12 +91,17 @@ export class CatalogoTipos {
 
   cancelarEdicion(): void {
     this.idEnEdicion.set(null);
+    this.errores.set({});
   }
 
   guardarEdicion(id: number): void {
     const nombre = this.nombreEditado().trim();
-    if (!nombre) return;
-
+    const errores = validar({ nombreEditado: nombre }, { nombreEditado: this.reglaNombre });
+    this.errores.set(errores);
+    if (hayErrores(errores)) {
+      enfocarPrimerError(errores);
+      return;
+    }
     this.error.set(null);
     this.guardandoEdicion.set(true);
     this.catalogoService.renombrarTipo(id, nombre).subscribe({
@@ -90,7 +113,7 @@ export class CatalogoTipos {
       },
       error: (err) => {
         this.guardandoEdicion.set(false);
-        this.error.set(extraerMensajeError(err));
+        this.errores.set({ nombreEditado: this.mensajeDeCampo(err) });
       },
     });
   }
@@ -98,7 +121,15 @@ export class CatalogoTipos {
   async fusionar(): Promise<void> {
     const origen = this.idOrigen();
     const destino = this.idDestino();
-    if (!origen || !destino || origen === destino) return;
+    const errores: ErroresCampo = {};
+    if (!origen) errores['origen'] = 'Elegí cuál querés eliminar.';
+    if (!destino) errores['destino'] = 'Elegí a cuál pasa todo.';
+    else if (origen === destino) errores['destino'] = 'Tiene que ser distinto del origen.';
+    this.errores.set(errores);
+    if (hayErrores(errores) || !origen || !destino) {
+      enfocarPrimerError(errores);
+      return;
+    }
     const nombre = (id: number) => this.tipos().find((x) => x.idTipoAlojamiento === id)?.nombreTipo ?? '';
     const ok = await this.confirmacion.pedir({
       titulo: 'Fusionar tipos',
@@ -123,7 +154,7 @@ export class CatalogoTipos {
       },
       error: (err) => {
         this.fusionando.set(false);
-        this.error.set(extraerMensajeError(err));
+        this.errores.set({ destino: this.mensajeDeCampo(err) });
       },
     });
   }

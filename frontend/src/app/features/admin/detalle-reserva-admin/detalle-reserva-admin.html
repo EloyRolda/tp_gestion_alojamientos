@@ -106,12 +106,13 @@
         <form class="stack" (submit)="$event.preventDefault(); enviarReembolso()">
           <div class="field">
             <label for="montoReembolso">Monto a reembolsar al cliente (máximo ${{ montoMaximo(r) | number }})</label>
-            <input id="montoReembolso" type="number" inputmode="decimal" min="0" [max]="montoMaximo(r)" step="0.01" required [ngModel]="montoReembolso()" (ngModelChange)="montoReembolso.set($event)" name="montoReembolso" />
+            <input id="montoReembolso" type="number" inputmode="decimal" min="0" [max]="montoMaximo(r)" step="0.01" required [ngModel]="montoReembolso()" (ngModelChange)="montoReembolso.set($event); errores.set({})" name="montoReembolso" [attr.aria-invalid]="errores()['montoReembolso'] ? true : null" [attr.aria-describedby]="errores()['montoReembolso'] ? 'montoReembolso-error' : null" />
+            <app-error-campo campo="montoReembolso" [mensaje]="errores()['montoReembolso']" />
           </div>
           @if (errorReembolso()) {
             <p class="text-danger">{{ errorReembolso() }}</p>
           }
-          <button type="submit" class="btn btn--primario" [disabled]="enviandoReembolso() || montoReembolso() === null">
+          <button type="submit" class="btn btn--primario" [disabled]="enviandoReembolso()">
             {{ enviandoReembolso() ? 'Procesando...' : 'Ejecutar reembolso manual' }}
           </button>
         </form>
