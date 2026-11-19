@@ -104,12 +104,12 @@ public class SecurityConfig {
                         // catalogo de alojamientos sin cuenta, el login solo hace
                         // falta para publicar, reservar o cualquier escritura).
                         .requestMatchers(HttpMethod.GET, "/TipoAlojamiento/listar").permitAll()
-                        .requestMatchers("/TipoAlojamiento/crear", "/TipoAlojamiento/reemplazar", "/TipoAlojamiento/eliminar/**").hasRole("ADMIN")
+                        .requestMatchers("/TipoAlojamiento/crear", "/TipoAlojamiento/reemplazar", "/TipoAlojamiento/uso", "/TipoAlojamiento/eliminar/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/TipoAlojamiento/*").hasRole("ADMIN")
 
                         // ── SERVICIO ─────────────────────────────────────────
                         .requestMatchers(HttpMethod.GET, "/Servicio/listar").permitAll()
-                        .requestMatchers("/Servicio/crear", "/Servicio/reemplazar", "/Servicio/eliminar/**").hasRole("ADMIN")
+                        .requestMatchers("/Servicio/crear", "/Servicio/reemplazar", "/Servicio/uso", "/Servicio/eliminar/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/Servicio/*").hasRole("ADMIN")
 
                         // ── ALOJAMIENTO ──────────────────────────────────────

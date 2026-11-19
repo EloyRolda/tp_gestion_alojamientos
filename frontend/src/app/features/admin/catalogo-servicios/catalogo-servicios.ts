@@ -1,7 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CatalogoService } from '../../../core/services/catalogo.service';
+import { forkJoin } from 'rxjs';
+import { CatalogoService, UsoCatalogo } from '../../../core/services/catalogo.service';
 import { Servicio } from '../../../core/models/servicio.model';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
 import { ErroresCampo, enfocarPrimerError, erroresDelBackend, hayErrores, validar, reglas } from '../../../core/utils/validacion.util';
@@ -47,6 +48,41 @@ export class CatalogoServicios {
   readonly idOrigen = signal<number | null>(null);
   readonly idDestino = signal<number | null>(null);
   readonly fusionando = signal(false);
+
+  /// Cuantos alojamientos usan cada entrada (GET /uso, solo admin). Se muestra
+  /// en la tabla y en el formulario de fusion, para que se vea cual es el
+  /// nombre correcto (el mas usado) y cuantos alojamientos se van a mover.
+  readonly uso = signal<UsoCatalogo>({});
+  usoDe(id: number | null): number {
+    return id == null ? 0 : (this.uso()[id] ?? 0);
+  }
+
+  /// Resumen en vivo de la fusion elegida: que se elimina, que se conserva y
+  /// cuantos alojamientos pasan. "alReves" avisa cuando se esta por eliminar
+  /// el que mas se usa (lo mas probable es que se hayan invertido los campos).
+  readonly vistaPrevia = computed(() => {
+    const origen = this.idOrigen();
+    const destino = this.idDestino();
+    if (!origen || !destino || origen === destino) return null;
+    return {
+      eliminado: this.nombreDe(origen),
+      conservado: this.nombreDe(destino),
+      movidos: this.usoDe(origen),
+      alReves: this.usoDe(origen) > this.usoDe(destino),
+    };
+  });
+
+  private nombreDe(id: number): string {
+    return this.servicios().find((x) => x.idServicio === id)?.nombreServicio ?? '';
+  }
+
+  /// Intercambia los dos campos (por si se eligieron al reves).
+  invertir(): void {
+    const origen = this.idOrigen();
+    this.idOrigen.set(this.idDestino());
+    this.idDestino.set(origen);
+    this.errores.set({});
+  }
 
   constructor() {
     this.cargar();
@@ -121,21 +157,26 @@ export class CatalogoServicios {
     const origen = this.idOrigen();
     const destino = this.idDestino();
     const errores: ErroresCampo = {};
-    if (!origen) errores['origen'] = 'Elegí cuál querés eliminar.';
-    if (!destino) errores['destino'] = 'Elegí a cuál pasa todo.';
-    else if (origen === destino) errores['destino'] = 'Tiene que ser distinto del origen.';
+    if (!origen) errores['origen'] = 'Elegí el que se elimina (el mal escrito o repetido).';
+    if (!destino) errores['destino'] = 'Elegí el que se conserva (el nombre correcto).';
+    else if (origen === destino) errores['destino'] = 'Tiene que ser distinto del que se elimina.';
     this.errores.set(errores);
     if (hayErrores(errores) || !origen || !destino) {
       enfocarPrimerError(errores);
       return;
     }
-    const nombre = (id: number) => this.servicios().find((x) => x.idServicio === id)?.nombreServicio ?? '';
+    const vista = this.vistaPrevia();
+    if (!vista) return;
+    const mensaje = [
+      `${this.cantidad(vista.movidos)} que hoy ${vista.movidos === 1 ? 'usa' : 'usan'} "${vista.eliminado}" ${vista.movidos === 1 ? 'pasa' : 'pasan'} a "${vista.conservado}", y "${vista.eliminado}" se elimina del catálogo.`,
+    ];
+    if (vista.alReves) {
+      mensaje.push(`Ojo: "${vista.eliminado}" es el más usado. Si el nombre correcto es ese, volvé e invertí los campos.`);
+    }
+    mensaje.push('Esto no se puede deshacer.');
     const ok = await this.confirmacion.pedir({
       titulo: 'Fusionar servicios',
-      mensaje: [
-        `Todo lo que hoy usa "${nombre(origen)}" va a pasar a "${nombre(destino)}", y "${nombre(origen)}" se elimina.`,
-        'Esto no se puede deshacer.',
-      ],
+      mensaje,
       aceptar: 'Fusionar',
       peligro: true,
     });
@@ -144,11 +185,13 @@ export class CatalogoServicios {
     this.error.set(null);
     this.fusionando.set(true);
     this.catalogoService.reemplazarServicio({ idOrigen: origen, idDestino: destino }).subscribe({
-      next: () => {
+      next: (r) => {
         this.fusionando.set(false);
         this.idOrigen.set(null);
         this.idDestino.set(null);
-        this.aviso.mostrar('Duplicados fusionados');
+        this.aviso.mostrar('Duplicados fusionados', [
+          `${this.cantidad(r.alojamientosMovidos)} ${r.alojamientosMovidos === 1 ? 'pasó' : 'pasaron'} de "${r.eliminado}" a "${r.conservado}".`,
+        ]);
         this.cargar();
       },
       error: (err) => {
@@ -177,11 +220,17 @@ export class CatalogoServicios {
     });
   }
 
+  /// "1 alojamiento" / "3 alojamientos".
+  cantidad(n: number): string {
+    return `${n} ${n === 1 ? 'alojamiento' : 'alojamientos'}`;
+  }
+
   private cargar(): void {
     this.cargando.set(true);
-    this.catalogoService.listarServicios().subscribe({
-      next: (s) => {
-        this.servicios.set(s);
+    forkJoin({ lista: this.catalogoService.listarServicios(), uso: this.catalogoService.usoServicios() }).subscribe({
+      next: ({ lista, uso }) => {
+        this.servicios.set(lista);
+        this.uso.set(uso);
         this.cargando.set(false);
       },
       error: (err) => {

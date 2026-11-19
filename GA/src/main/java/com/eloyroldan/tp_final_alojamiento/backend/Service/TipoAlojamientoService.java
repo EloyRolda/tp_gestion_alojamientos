@@ -1,5 +1,6 @@
 package com.eloyroldan.tp_final_alojamiento.backend.Service;
 
+import com.eloyroldan.tp_final_alojamiento.backend.DTO.Response.ResultadoFusionDTO;
 import com.eloyroldan.tp_final_alojamiento.backend.Exception.IdNoEncontradoException;
 import com.eloyroldan.tp_final_alojamiento.backend.Exception.ParametroInvalidoException;
 import com.eloyroldan.tp_final_alojamiento.backend.Model.TipoAlojamiento;
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -71,15 +73,22 @@ public class TipoAlojamientoService {
     /// El admin fusiona un tipo duplicado/mal escrito (origen) dentro de otro (destino):
     /// todos los alojamientos que usaban "origen" pasan a usar "destino", y "origen" se elimina.
     @Transactional
-    public void reemplazar(Long idOrigen, Long idDestino) {
+    public ResultadoFusionDTO reemplazar(Long idOrigen, Long idDestino) {
         if (idOrigen.equals(idDestino)) {
-            throw new ParametroInvalidoException("El origen y el destino no pueden ser el mismo tipo.");
+            throw new ParametroInvalidoException("El tipo que se elimina y el que se conserva no pueden ser el mismo.");
         }
         TipoAlojamiento origen = obtenerPorId(idOrigen);
         TipoAlojamiento destino = obtenerPorId(idDestino);
 
-        alojamientoService.reasignarTipoAlojamiento(origen.getIdTipoAlojamiento(), destino);
+        int movidos = alojamientoService.reasignarTipoAlojamiento(origen.getIdTipoAlojamiento(), destino);
         tipoAlojamientoRepository.delete(origen);
+        return new ResultadoFusionDTO(origen.getNombreTipo(), destino.getNombreTipo(), movidos);
+    }
+
+    /// Uso de cada tipo (idTipoAlojamiento -> cantidad de alojamientos), para que el
+    /// admin vea cual es el correcto antes de fusionar.
+    public Map<Long, Long> usoPorTipo() {
+        return alojamientoService.cantidadPorTipo();
     }
 
     @Transactional

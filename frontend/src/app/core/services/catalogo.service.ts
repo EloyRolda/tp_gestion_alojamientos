@@ -13,6 +13,18 @@ export interface ReemplazoCatalogo {
   idDestino: number;
 }
 
+/// Espejo de ResultadoFusionDTO: que se elimino, que se conservo y cuantos
+/// alojamientos pasaron de uno a otro.
+export interface ResultadoFusion {
+  eliminado: string;
+  conservado: string;
+  alojamientosMovidos: number;
+}
+
+/// id de la entrada del catalogo -> cantidad de alojamientos que la usan
+/// (las que no aparecen no tienen ninguno). Solo ADMIN.
+export type UsoCatalogo = Record<number, number>;
+
 /// Lectura publica de los catalogos administrables (backend: ambos GET /listar
 /// son permitAll). "crear"/"renombrar"/"reemplazar"/"eliminar" (SCRUM-43/44)
 /// son exclusivos ADMIN. El catalogo tambien se completa solo cuando un
@@ -34,8 +46,12 @@ export class CatalogoService {
     return this.http.put<TipoAlojamiento>(`${API_BASE_URL}/TipoAlojamiento/${id}`, { nombre });
   }
 
-  reemplazarTipo(dto: ReemplazoCatalogo): Observable<void> {
-    return this.http.put<void>(`${API_BASE_URL}/TipoAlojamiento/reemplazar`, dto);
+  reemplazarTipo(dto: ReemplazoCatalogo): Observable<ResultadoFusion> {
+    return this.http.put<ResultadoFusion>(`${API_BASE_URL}/TipoAlojamiento/reemplazar`, dto);
+  }
+
+  usoTipos(): Observable<UsoCatalogo> {
+    return this.http.get<UsoCatalogo>(`${API_BASE_URL}/TipoAlojamiento/uso`);
   }
 
   eliminarTipo(id: number): Observable<void> {
@@ -54,8 +70,12 @@ export class CatalogoService {
     return this.http.put<Servicio>(`${API_BASE_URL}/Servicio/${id}`, { nombre });
   }
 
-  reemplazarServicio(dto: ReemplazoCatalogo): Observable<void> {
-    return this.http.put<void>(`${API_BASE_URL}/Servicio/reemplazar`, dto);
+  reemplazarServicio(dto: ReemplazoCatalogo): Observable<ResultadoFusion> {
+    return this.http.put<ResultadoFusion>(`${API_BASE_URL}/Servicio/reemplazar`, dto);
+  }
+
+  usoServicios(): Observable<UsoCatalogo> {
+    return this.http.get<UsoCatalogo>(`${API_BASE_URL}/Servicio/uso`);
   }
 
   eliminarServicio(id: number): Observable<void> {

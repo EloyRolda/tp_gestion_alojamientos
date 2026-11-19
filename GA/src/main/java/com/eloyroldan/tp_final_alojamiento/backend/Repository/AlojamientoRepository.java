@@ -18,6 +18,11 @@ public interface AlojamientoRepository extends JpaRepository<Alojamiento, Long> 
 
     List<Alojamiento> findByTipoAlojamiento_IdTipoAlojamiento(Long idTipoAlojamiento);
 
+    /// Cuantos alojamientos usan cada tipo, en una sola consulta agrupada
+    /// (pantalla de catalogo del admin: ver el uso antes de fusionar).
+    @Query("select a.tipoAlojamiento.idTipoAlojamiento, count(a) from Alojamiento a group by a.tipoAlojamiento.idTipoAlojamiento")
+    List<Object[]> cantidadPorTipoRaw();
+
     /// Util para saber si una direccion compartida sigue en uso antes de tocarla/borrarla.
     List<Alojamiento> findByDireccion_IdDireccion(Long idDireccion);
     boolean existsByDireccion_IdDireccion(Long idDireccion);

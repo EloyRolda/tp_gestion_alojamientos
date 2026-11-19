@@ -3,12 +3,14 @@ package com.eloyroldan.tp_final_alojamiento.backend.RestController;
 import com.eloyroldan.tp_final_alojamiento.backend.DTO.Response.TipoAlojamientoResponseDTO;
 import com.eloyroldan.tp_final_alojamiento.backend.DTO.NombreCatalogoDTO;
 import com.eloyroldan.tp_final_alojamiento.backend.DTO.ReemplazoCatalogoDTO;
+import com.eloyroldan.tp_final_alojamiento.backend.DTO.Response.ResultadoFusionDTO;
 import com.eloyroldan.tp_final_alojamiento.backend.Service.TipoAlojamientoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/TipoAlojamiento")
@@ -38,8 +40,14 @@ public class TipoAlojamientoController {
 
     /// El admin fusiona un tipo duplicado/mal escrito dentro de otro.
     @PutMapping("/reemplazar")
-    public void reemplazar(@Valid @RequestBody ReemplazoCatalogoDTO dto) {
-        tipoAlojamientoService.reemplazar(dto.getIdOrigen(), dto.getIdDestino());
+    public ResultadoFusionDTO reemplazar(@Valid @RequestBody ReemplazoCatalogoDTO dto) {
+        return tipoAlojamientoService.reemplazar(dto.getIdOrigen(), dto.getIdDestino());
+    }
+
+    /// Solo admin: cuantos alojamientos usan cada entrada (id -> cantidad).
+    @GetMapping("/uso")
+    public Map<Long, Long> uso() {
+        return tipoAlojamientoService.usoPorTipo();
     }
 
     @DeleteMapping("/eliminar/{id}")

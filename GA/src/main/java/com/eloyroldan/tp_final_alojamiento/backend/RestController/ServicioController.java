@@ -3,12 +3,14 @@ package com.eloyroldan.tp_final_alojamiento.backend.RestController;
 import com.eloyroldan.tp_final_alojamiento.backend.DTO.Response.ServicioResponseDTO;
 import com.eloyroldan.tp_final_alojamiento.backend.DTO.NombreCatalogoDTO;
 import com.eloyroldan.tp_final_alojamiento.backend.DTO.ReemplazoCatalogoDTO;
+import com.eloyroldan.tp_final_alojamiento.backend.DTO.Response.ResultadoFusionDTO;
 import com.eloyroldan.tp_final_alojamiento.backend.Service.Servicio.ServicioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/Servicio")
@@ -39,8 +41,14 @@ public class ServicioController {
     /// El admin fusiona un servicio duplicado/mal escrito dentro de otro
     /// (ej: "Labarropa" -> "Lavarropa"), reasignando todos los alojamientos.
     @PutMapping("/reemplazar")
-    public void reemplazar(@Valid @RequestBody ReemplazoCatalogoDTO dto) {
-        servicioService.reemplazar(dto.getIdOrigen(), dto.getIdDestino());
+    public ResultadoFusionDTO reemplazar(@Valid @RequestBody ReemplazoCatalogoDTO dto) {
+        return servicioService.reemplazar(dto.getIdOrigen(), dto.getIdDestino());
+    }
+
+    /// Solo admin: cuantos alojamientos usan cada entrada (id -> cantidad).
+    @GetMapping("/uso")
+    public Map<Long, Long> uso() {
+        return servicioService.usoPorServicio();
     }
 
     @DeleteMapping("/eliminar/{id}")

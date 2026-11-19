@@ -1,5 +1,6 @@
 package com.eloyroldan.tp_final_alojamiento.backend.Service.Servicio;
 
+import com.eloyroldan.tp_final_alojamiento.backend.DTO.Response.ResultadoFusionDTO;
 import com.eloyroldan.tp_final_alojamiento.backend.Exception.IdNoEncontradoException;
 import com.eloyroldan.tp_final_alojamiento.backend.Exception.ParametroInvalidoException;
 import com.eloyroldan.tp_final_alojamiento.backend.Model.Servicio.Servicio;
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /// Catalogo compartido de servicios/comodidades (WiFi, Pileta, Lavarropas, etc).
 @Service
@@ -72,15 +74,21 @@ public class ServicioService {
     /// El admin fusiona un servicio duplicado/mal escrito (origen) dentro de otro (destino):
     /// reasigna todos los alojamientos que lo tenian y elimina el duplicado.
     @Transactional
-    public void reemplazar(Long idOrigen, Long idDestino) {
+    public ResultadoFusionDTO reemplazar(Long idOrigen, Long idDestino) {
         if (idOrigen.equals(idDestino)) {
-            throw new ParametroInvalidoException("El origen y el destino no pueden ser el mismo servicio.");
+            throw new ParametroInvalidoException("El servicio que se elimina y el que se conserva no pueden ser el mismo.");
         }
         Servicio origen = obtenerPorId(idOrigen);
         Servicio destino = obtenerPorId(idDestino);
 
-        servicioxAlojamientoService.fusionarAsignaciones(origen.getIdServicio(), destino);
+        int movidos = servicioxAlojamientoService.fusionarAsignaciones(origen.getIdServicio(), destino);
         servicioRepository.delete(origen);
+        return new ResultadoFusionDTO(origen.getNombreServicio(), destino.getNombreServicio(), movidos);
+    }
+
+    /// Uso de cada servicio (idServicio -> cantidad de alojamientos que lo tienen).
+    public Map<Long, Long> usoPorServicio() {
+        return servicioxAlojamientoService.cantidadPorServicio();
     }
 
     @Transactional

@@ -1,12 +1,10 @@
 package com.eloyroldan.tp_final_alojamiento.backend.Model.Servicio;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -18,13 +16,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /// Catalogo compartido de servicios/comodidades (WiFi, Pileta, Lavarropas, etc).
 /// Normalizado como: Primera letra mayuscula, resto minuscula. Si un anfitrion
 /// pide un servicio que no existe, se crea; si ya existe (comparacion sin
 /// distinguir mayusculas/minusculas), se reutiliza el existente.
+/// Sin coleccion inversa de ServicioxAlojamiento a proposito: la tabla puente la
+/// maneja solo ServicioxAlojamientoService. Antes habia una con cascade ALL +
+/// orphanRemoval y, al fusionar dos servicios, borrar el duplicado arrastraba
+/// tambien los vinculos recien movidos al correcto (el alojamiento se quedaba
+/// sin el servicio).
 //Lombok
 @Getter
 @Setter
@@ -32,7 +33,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(of = "idServicio")
-@ToString(exclude = "alojamientos")
+@ToString
 //JPA
 @Entity
 @Table(name = "servicio")
@@ -47,8 +48,4 @@ public class Servicio {
     @Size(max = 255)
     @Column(name = "nombre_servicio", length = 255, nullable = false, unique = true)
     private String nombreServicio;
-
-    @Builder.Default
-    @OneToMany(mappedBy = "servicio", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ServicioxAlojamiento> alojamientos = new ArrayList<>();
 }

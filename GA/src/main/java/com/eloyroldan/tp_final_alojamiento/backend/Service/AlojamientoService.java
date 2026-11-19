@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -120,12 +121,23 @@ public class AlojamientoService {
 
     /// Usado por TipoAlojamientoService al fusionar un tipo duplicado dentro de otro.
     @Transactional
-    public void reasignarTipoAlojamiento(Long idTipoOrigen, TipoAlojamiento destino) {
+    public int reasignarTipoAlojamiento(Long idTipoOrigen, TipoAlojamiento destino) {
         List<Alojamiento> afectados = listarPorTipoAlojamiento(idTipoOrigen);
         for (Alojamiento alojamiento : afectados) {
             alojamiento.setTipoAlojamiento(destino);
         }
         alojamientoRepository.saveAll(afectados);
+        return afectados.size();
+    }
+
+    /// idTipoAlojamiento -> cantidad de alojamientos que lo usan (los que no
+    /// aparecen no tienen ninguno).
+    public Map<Long, Long> cantidadPorTipo() {
+        Map<Long, Long> resultado = new HashMap<>();
+        for (Object[] fila : alojamientoRepository.cantidadPorTipoRaw()) {
+            resultado.put((Long) fila[0], (Long) fila[1]);
+        }
+        return resultado;
     }
 
     //---------------------------------------- CREAR ----------------------------------------

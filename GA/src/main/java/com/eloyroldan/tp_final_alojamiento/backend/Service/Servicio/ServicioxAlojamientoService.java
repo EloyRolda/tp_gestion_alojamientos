@@ -10,7 +10,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /// Administra la asignacion de Servicios a un Alojamiento (tabla puente). Es el unico
 /// que toca ServicioxAlojamientoRepository: ServicioService la usa a traves de este.
@@ -77,7 +79,7 @@ public class ServicioxAlojamientoService {
     /// origen pasa a apuntar a destino, salvo que el alojamiento ya tuviera destino
     /// asignado (en ese caso se descarta el duplicado, por la unique constraint).
     @Transactional
-    public void fusionarAsignaciones(Long idServicioOrigen, Servicio destino) {
+    public int fusionarAsignaciones(Long idServicioOrigen, Servicio destino) {
         List<ServicioxAlojamiento> asignaciones = servicioxAlojamientoRepository.findByServicio_IdServicio(idServicioOrigen);
         for (ServicioxAlojamiento asignacion : asignaciones) {
             boolean yaTieneDestino = servicioxAlojamientoRepository.existsByAlojamiento_IdAlojamientoAndServicio_IdServicio(
@@ -89,5 +91,15 @@ public class ServicioxAlojamientoService {
                 servicioxAlojamientoRepository.save(asignacion);
             }
         }
+        return asignaciones.size();
+    }
+
+    /// idServicio -> cantidad de alojamientos que lo tienen asignado.
+    public Map<Long, Long> cantidadPorServicio() {
+        Map<Long, Long> resultado = new HashMap<>();
+        for (Object[] fila : servicioxAlojamientoRepository.cantidadPorServicioRaw()) {
+            resultado.put((Long) fila[0], (Long) fila[1]);
+        }
+        return resultado;
     }
 }
