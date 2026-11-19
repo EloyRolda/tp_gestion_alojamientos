@@ -12,6 +12,8 @@ import { AvisoService } from '../../../core/services/aviso.service';
 import { coincide } from '../../../core/utils/busqueda.util';
 import { BuscadorLista } from '../../../shared/buscador-lista/buscador-lista';
 import { ConfirmacionService } from '../../../core/services/confirmacion.service';
+import { crearPaginado } from '../../../core/utils/paginado.util';
+import { Paginador } from '../../../shared/paginador/paginador';
 
 /// SCRUM-43 / RF09. Catalogo de tipos de alojamiento: alta, edicion (renombrar
 /// en el lugar), fusionar duplicados (ReemplazoCatalogoDTO: todo lo que usaba
@@ -19,7 +21,7 @@ import { ConfirmacionService } from '../../../core/services/confirmacion.service
 @Component({
   selector: 'app-catalogo-tipos',
   standalone: true,
-  imports: [FormsModule, Esqueleto, BuscadorLista, ErrorCampo],
+  imports: [FormsModule, Esqueleto, BuscadorLista, ErrorCampo, Paginador],
   templateUrl: './catalogo-tipos.html',
   styleUrl: './catalogo-tipos.css',
 })
@@ -32,6 +34,8 @@ export class CatalogoTipos {
   /// Busca por nombre (sin tildes ni mayusculas).
   readonly busqueda = signal('');
   readonly tiposFiltrados = computed(() => this.tipos().filter((t) => coincide(this.busqueda(), t.nombreTipo)));
+  /// Paginado de la lista (10/20/30/50 por pagina, SCRUM-74).
+  readonly paginado = crearPaginado(this.tiposFiltrados, () => this.busqueda());
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
   /// Errores de crear, renombrar y fusionar, cada uno debajo de su campo

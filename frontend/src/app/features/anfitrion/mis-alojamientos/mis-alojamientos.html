@@ -21,8 +21,9 @@
       [resultados]="alojamientosFiltrados().length"
       [total]="alojamientos().length"
     />
+    <app-paginador [total]="alojamientosFiltrados().length" [(pagina)]="paginado.pagina" [(porPagina)]="paginado.porPagina" [opciones]="[12, 24, 36, 48]" idSelector="mis-alojamientos-por-pagina" nombreSingular="alojamiento" nombrePlural="alojamientos" />
     <div class="grid-auto">
-      @for (a of alojamientosFiltrados(); track a.idAlojamiento) {
+      @for (a of paginado.visibles(); track a.idAlojamiento) {
         <app-alojamiento-card [alojamiento]="a" [aviso]="a.activo ? null : 'Inactivo'">
           <div acciones class="acciones-fila">
             <a [routerLink]="['/anfitrion/alojamientos', a.idAlojamiento, 'editar']" class="btn">Editar</a>
@@ -34,5 +35,8 @@
         </app-alojamiento-card>
       }
     </div>
+    @if (alojamientosFiltrados().length > paginado.porPagina()) {
+      <app-paginador [total]="alojamientosFiltrados().length" [(pagina)]="paginado.pagina" [(porPagina)]="paginado.porPagina" [opciones]="[12, 24, 36, 48]" [soloFlechas]="true" idSelector="mis-alojamientos-por-pagina" nombrePlural="alojamientos" />
+    }
   }
 </section>

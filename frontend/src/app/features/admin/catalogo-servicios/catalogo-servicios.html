@@ -20,6 +20,7 @@
           [resultados]="serviciosFiltrados().length"
           [total]="servicios().length"
         />
+        <app-paginador [total]="serviciosFiltrados().length" [(pagina)]="paginado.pagina" [(porPagina)]="paginado.porPagina" idSelector="servicios-por-pagina" nombreSingular="servicio" nombrePlural="servicios" />
         <div class="table-scroll">
           <table class="tabla table-cards tabla--catalogo">
             <thead>
@@ -30,7 +31,7 @@
               </tr>
             </thead>
             <tbody>
-              @for (s of serviciosFiltrados(); track s.idServicio) {
+              @for (s of paginado.visibles(); track s.idServicio) {
                 <tr>
                   @if (idEnEdicion() === s.idServicio) {
                     <td data-label="Servicio">
@@ -55,6 +56,9 @@
             </tbody>
           </table>
         </div>
+        @if (serviciosFiltrados().length > paginado.porPagina()) {
+          <app-paginador [total]="serviciosFiltrados().length" [(pagina)]="paginado.pagina" [(porPagina)]="paginado.porPagina" [soloFlechas]="true" idSelector="servicios-por-pagina" nombrePlural="servicios" />
+        }
       </div>
       <div class="catalogo__lateral stack">
         <form class="form-inline card" (submit)="$event.preventDefault(); crear()">

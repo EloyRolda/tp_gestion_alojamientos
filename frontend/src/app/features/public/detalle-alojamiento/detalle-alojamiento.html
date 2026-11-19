@@ -68,11 +68,15 @@
           @if (reviews().length === 0) {
             <p class="text-muted">Este alojamiento todavía no tiene reseñas.</p>
           } @else {
-            @for (review of reviews(); track review.idReview) {
+            <app-paginador [total]="reviews().length" [(pagina)]="paginadoReviews.pagina" [(porPagina)]="paginadoReviews.porPagina" idSelector="resenas-por-pagina" nombreSingular="reseña" nombrePlural="reseñas" />
+            @for (review of paginadoReviews.visibles(); track review.idReview) {
               <article class="card">
                 <p><strong>{{ review.nombreCliente }}</strong> &middot; {{ review.puntuacion }}/5 &middot; {{ review.fecha | date: 'dd/MM/yyyy' }}</p>
                 <p>{{ review.comentario }}</p>
               </article>
+            }
+            @if (reviews().length > paginadoReviews.porPagina()) {
+              <app-paginador [total]="reviews().length" [(pagina)]="paginadoReviews.pagina" [(porPagina)]="paginadoReviews.porPagina" [soloFlechas]="true" idSelector="resenas-por-pagina" nombrePlural="reseñas" />
             }
           }
         </section>

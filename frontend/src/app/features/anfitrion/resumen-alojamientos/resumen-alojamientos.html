@@ -59,6 +59,7 @@
     </div>
 
     <h2>Detalle por alojamiento</h2>
+    <app-paginador [total]="resumen().length" [(pagina)]="paginado.pagina" [(porPagina)]="paginado.porPagina" idSelector="resumen-por-pagina" nombreSingular="alojamiento" nombrePlural="alojamientos" />
     <div class="table-scroll">
       <table class="tabla table-cards">
         <thead>
@@ -70,7 +71,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (r of resumen(); track r.idAlojamiento) {
+          @for (r of paginado.visibles(); track r.idAlojamiento) {
             <tr>
               <td data-label="Alojamiento">{{ r.titulo }}</td>
               <td data-label="Ingresos totales">${{ r.ingresosTotales | number }}</td>
@@ -81,5 +82,8 @@
         </tbody>
       </table>
     </div>
+    @if (resumen().length > paginado.porPagina()) {
+      <app-paginador [total]="resumen().length" [(pagina)]="paginado.pagina" [(porPagina)]="paginado.porPagina" [soloFlechas]="true" idSelector="resumen-por-pagina" nombrePlural="alojamientos" />
+    }
   }
 </section>

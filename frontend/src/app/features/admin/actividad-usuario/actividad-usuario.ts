@@ -14,6 +14,8 @@ import { extraerMensajeError } from '../../../core/utils/http-error.util';
 import { calcularTotal } from '../../../core/utils/reserva.util';
 import { Estado } from '../../../shared/estado/estado';
 import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
+import { crearPaginado } from '../../../core/utils/paginado.util';
+import { Paginador } from '../../../shared/paginador/paginador';
 
 /// Todo lo que el admin necesita ver de un usuario, en su ficha (debajo de
 /// "Editar usuario"), con links para seguir el recorrido:
@@ -25,7 +27,7 @@ import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 @Component({
   selector: 'app-actividad-usuario',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, RouterLink, Estado, Esqueleto],
+  imports: [DatePipe, DecimalPipe, RouterLink, Estado, Esqueleto, Paginador],
   templateUrl: './actividad-usuario.html',
   styleUrl: './actividad-usuario.css',
 })
@@ -40,6 +42,8 @@ export class ActividadUsuario {
   readonly error = signal<string | null>(null);
   readonly resumenCliente = signal<ResumenCliente | null>(null);
   readonly alojamientos = signal<ResumenAlojamientoAnfitrion[]>([]);
+  /// Paginado de la lista (10/20/30/50 por pagina, SCRUM-74).
+  readonly paginadoAlojamientos = crearPaginado(this.alojamientos);
   /// Alojamiento completo por id: si esta publicado y quien es su anfitrion.
   readonly detalle = signal<Map<number, Alojamiento>>(new Map());
   readonly reservas = signal<Reserva[]>([]);
@@ -49,6 +53,8 @@ export class ActividadUsuario {
     this.reservas().filter((r) => r.estadoReserva === 'SOLICITADA' || r.estadoReserva === 'CONFIRMADA'),
   );
   readonly visibles = computed(() => (this.verTodas() ? this.reservas() : this.activas()));
+  /// Paginado de la lista (10/20/30/50 por pagina, SCRUM-74).
+  readonly paginadoReservas = crearPaginado(this.visibles, () => this.verTodas());
   readonly publicados = computed(() => this.alojamientos().filter((a) => this.detalle().get(a.idAlojamiento)?.activo).length);
   readonly ingresos = computed(() => this.alojamientos().reduce((t, a) => t + Number(a.ingresosTotales), 0));
   readonly reservasAnfitrion = computed(() => this.alojamientos().reduce((t, a) => t + a.cantidadReservas, 0));

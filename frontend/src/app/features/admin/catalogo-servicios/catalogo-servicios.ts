@@ -12,13 +12,15 @@ import { AvisoService } from '../../../core/services/aviso.service';
 import { coincide } from '../../../core/utils/busqueda.util';
 import { BuscadorLista } from '../../../shared/buscador-lista/buscador-lista';
 import { ConfirmacionService } from '../../../core/services/confirmacion.service';
+import { crearPaginado } from '../../../core/utils/paginado.util';
+import { Paginador } from '../../../shared/paginador/paginador';
 
 /// SCRUM-44 / RF10. Mismo criterio que SCRUM-43 (catalogo de tipos) pero para
 /// el catalogo de servicios/comodidades: alta, edicion, fusionar duplicados y eliminar.
 @Component({
   selector: 'app-catalogo-servicios',
   standalone: true,
-  imports: [FormsModule, Esqueleto, BuscadorLista, ErrorCampo],
+  imports: [FormsModule, Esqueleto, BuscadorLista, ErrorCampo, Paginador],
   templateUrl: './catalogo-servicios.html',
   styleUrl: './catalogo-servicios.css',
 })
@@ -31,6 +33,8 @@ export class CatalogoServicios {
   /// Busca por nombre (sin tildes ni mayusculas).
   readonly busqueda = signal('');
   readonly serviciosFiltrados = computed(() => this.servicios().filter((s) => coincide(this.busqueda(), s.nombreServicio)));
+  /// Paginado de la lista (10/20/30/50 por pagina, SCRUM-74).
+  readonly paginado = crearPaginado(this.serviciosFiltrados, () => this.busqueda());
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
   /// Errores de crear, renombrar y fusionar, cada uno debajo de su campo

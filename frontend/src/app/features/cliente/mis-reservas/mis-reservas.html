@@ -18,6 +18,7 @@
       [resultados]="reservasFiltradas().length"
       [total]="reservas().length"
     />
+    <app-paginador [total]="reservasFiltradas().length" [(pagina)]="paginado.pagina" [(porPagina)]="paginado.porPagina" idSelector="mis-reservas-por-pagina" nombreSingular="reserva" nombrePlural="reservas" />
     <div class="table-scroll">
       <table class="tabla table-cards">
         <thead>
@@ -31,7 +32,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (r of reservasFiltradas(); track r.idReserva) {
+          @for (r of paginado.visibles(); track r.idReserva) {
             <tr>
               <td data-label="Alojamiento">{{ r.alojamiento.titulo }}</td>
               <td data-label="Check-in">{{ r.fechaInicio | date: 'dd/MM/yyyy' }}</td>
@@ -44,5 +45,8 @@
         </tbody>
       </table>
     </div>
+    @if (reservasFiltradas().length > paginado.porPagina()) {
+      <app-paginador [total]="reservasFiltradas().length" [(pagina)]="paginado.pagina" [(porPagina)]="paginado.porPagina" [soloFlechas]="true" idSelector="mis-reservas-por-pagina" nombrePlural="reservas" />
+    }
   }
 </section>

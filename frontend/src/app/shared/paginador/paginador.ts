@@ -9,6 +9,7 @@ import { Component, computed, input, model } from '@angular/core';
   selector: 'app-paginador',
   standalone: true,
   template: `
+    @if (hayQuePaginar()) {
     <div class="paginador-barra" [class.paginador-barra--pie]="soloFlechas()">
       @if (!soloFlechas()) {
       <div class="paginador-barra__tamanio">
@@ -38,6 +39,7 @@ import { Component, computed, input, model } from '@angular/core';
         </nav>
       }
     </div>
+    }
   `,
   styles: `
     .paginador-barra {
@@ -46,6 +48,7 @@ import { Component, computed, input, model } from '@angular/core';
       align-items: center;
       justify-content: space-between;
       gap: var(--space-2) var(--space-3);
+      scroll-margin-top: var(--space-4);
     }
     .paginador-barra--pie {
       justify-content: center;
@@ -134,6 +137,9 @@ export class Paginador {
   /// Version para el pie de la lista: solo anterior / siguiente, centrados.
   readonly soloFlechas = input(false);
 
+  /// Si la lista entra entera con el tamaño mas chico no hay nada que elegir:
+  /// el paginado no se muestra (ej. un cliente con 3 reservas).
+  readonly hayQuePaginar = computed(() => this.total() > Math.min(...this.opciones()));
   readonly totalPaginas = computed(() => Math.max(1, Math.ceil(this.total() / this.porPagina())));
   readonly paginaActual = computed(() => Math.min(Math.max(1, this.pagina()), this.totalPaginas()));
   readonly desde = computed(() => (this.total() === 0 ? 0 : (this.paginaActual() - 1) * this.porPagina() + 1));
@@ -141,6 +147,18 @@ export class Paginador {
 
   irA(n: number): void {
     this.pagina.set(Math.min(Math.max(1, n), this.totalPaginas()));
+    // El de pie de lista vuelve al principio de SU lista (al paginador de arriba,
+    // que tiene el selector con este mismo id), para leer la pagina nueva desde
+    // el principio. Si no lo encuentra, vuelve al principio de la pantalla.
+    if (this.soloFlechas()) {
+      const suave = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const arriba = document.getElementById(this.idSelector())?.closest('.paginador-barra');
+      if (arriba) {
+        arriba.scrollIntoView({ block: 'start', behavior: suave ? 'smooth' : 'auto' });
+      } else {
+        window.scrollTo({ top: 0, behavior: suave ? 'smooth' : 'auto' });
+      }
+    }
   }
 
   /// Al cambiar el tamaño se vuelve a la primera página.

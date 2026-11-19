@@ -13,6 +13,8 @@ import { Review } from '../../../core/models/review.model';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
 import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 import { VisorFotos } from '../../../shared/visor-fotos/visor-fotos';
+import { crearPaginado } from '../../../core/utils/paginado.util';
+import { Paginador } from '../../../shared/paginador/paginador';
 
 /// SCRUM-24 / RF15, RF16, RF17, RF35. "id" se bindea solo desde la ruta
 /// :id gracias a withComponentInputBinding() (app.config.ts).
@@ -24,7 +26,7 @@ import { VisorFotos } from '../../../shared/visor-fotos/visor-fotos';
 @Component({
   selector: 'app-detalle-alojamiento',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, RouterLink, Esqueleto, VisorFotos],
+  imports: [DatePipe, DecimalPipe, RouterLink, Esqueleto, VisorFotos, Paginador],
   templateUrl: './detalle-alojamiento.html',
   styleUrl: './detalle-alojamiento.css',
 })
@@ -53,6 +55,8 @@ export class DetalleAlojamiento {
   /// Foto abierta en el visor a pantalla completa (null = cerrado).
   readonly fotoAbierta = signal<number | null>(null);
   readonly reviews = signal<Review[]>([]);
+  /// Paginado de la lista (10/20/30/50 por pagina, SCRUM-74).
+  readonly paginadoReviews = crearPaginado(this.reviews);
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
 

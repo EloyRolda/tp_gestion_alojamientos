@@ -20,6 +20,7 @@
           [resultados]="tiposFiltrados().length"
           [total]="tipos().length"
         />
+        <app-paginador [total]="tiposFiltrados().length" [(pagina)]="paginado.pagina" [(porPagina)]="paginado.porPagina" idSelector="tipos-por-pagina" nombreSingular="tipo" nombrePlural="tipos" />
         <div class="table-scroll">
           <table class="tabla table-cards tabla--catalogo">
             <thead>
@@ -30,7 +31,7 @@
               </tr>
             </thead>
             <tbody>
-              @for (t of tiposFiltrados(); track t.idTipoAlojamiento) {
+              @for (t of paginado.visibles(); track t.idTipoAlojamiento) {
                 <tr>
                   @if (idEnEdicion() === t.idTipoAlojamiento) {
                     <td data-label="Tipo">
@@ -55,6 +56,9 @@
             </tbody>
           </table>
         </div>
+        @if (tiposFiltrados().length > paginado.porPagina()) {
+          <app-paginador [total]="tiposFiltrados().length" [(pagina)]="paginado.pagina" [(porPagina)]="paginado.porPagina" [soloFlechas]="true" idSelector="tipos-por-pagina" nombrePlural="tipos" />
+        }
       </div>
       <div class="catalogo__lateral stack">
         <form class="form-inline card" (submit)="$event.preventDefault(); crear()">

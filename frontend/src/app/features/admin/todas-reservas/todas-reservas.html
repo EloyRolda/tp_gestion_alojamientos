@@ -27,6 +27,7 @@
   } @else if (reservasFiltradas().length === 0) {
     <app-vacio titulo="No hay reservas para mostrar" texto="Revisá la búsqueda o probá con otro estado en el filtro." />
   } @else {
+    <app-paginador [total]="reservasFiltradas().length" [(pagina)]="paginado.pagina" [(porPagina)]="paginado.porPagina" idSelector="todas-reservas-por-pagina" nombreSingular="reserva" nombrePlural="reservas" />
     <div class="table-scroll">
       <table class="tabla table-cards">
         <thead>
@@ -42,7 +43,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (r of reservasFiltradas(); track r.idReserva) {
+          @for (r of paginado.visibles(); track r.idReserva) {
             <tr>
               <td data-label="Alojamiento"><a [routerLink]="['/alojamientos', r.alojamiento.idAlojamiento]">{{ r.alojamiento.titulo }}</a></td>
               <td data-label="Cliente"><a [routerLink]="['/admin/usuarios', r.cliente.id]">{{ r.cliente.nombre }} {{ r.cliente.apellido }}</a></td>
@@ -63,5 +64,8 @@
         </tbody>
       </table>
     </div>
+    @if (reservasFiltradas().length > paginado.porPagina()) {
+      <app-paginador [total]="reservasFiltradas().length" [(pagina)]="paginado.pagina" [(porPagina)]="paginado.porPagina" [soloFlechas]="true" idSelector="todas-reservas-por-pagina" nombrePlural="reservas" />
+    }
   }
 </section>

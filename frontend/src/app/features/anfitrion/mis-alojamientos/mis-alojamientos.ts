@@ -10,13 +10,15 @@ import { AvisoService } from '../../../core/services/aviso.service';
 import { coincide } from '../../../core/utils/busqueda.util';
 import { BuscadorLista } from '../../../shared/buscador-lista/buscador-lista';
 import { ConfirmacionService } from '../../../core/services/confirmacion.service';
+import { crearPaginado } from '../../../core/utils/paginado.util';
+import { Paginador } from '../../../shared/paginador/paginador';
 
 /// SCRUM-35 / RF11, RF13. Listado de los alojamientos propios del anfitrión,
 /// con accion de activar/desactivar (RF13) via PUT /Alojamiento/actualizar.
 @Component({
   selector: 'app-mis-alojamientos',
   standalone: true,
-  imports: [RouterLink, AlojamientoCard, Esqueleto, Vacio, BuscadorLista],
+  imports: [RouterLink, AlojamientoCard, Esqueleto, Vacio, BuscadorLista, Paginador],
   templateUrl: './mis-alojamientos.html',
   styleUrl: './mis-alojamientos.css',
 })
@@ -35,6 +37,8 @@ export class MisAlojamientos {
       coincide(this.busqueda(), a.titulo, a.direccion.ciudad, a.direccion.calle, a.tipoAlojamiento.nombreTipo),
     ),
   );
+  /// Paginado de la grilla (12/24/36/48 por pagina, multiplos de 3 columnas; SCRUM-74).
+  readonly paginado = crearPaginado(this.alojamientosFiltrados, () => this.busqueda(), 12);
   readonly cambiandoEstado = signal<number | null>(null);
 
   constructor() {

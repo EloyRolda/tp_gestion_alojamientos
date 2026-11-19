@@ -20,6 +20,7 @@
       </div>
     </div>
 
+    <app-paginador [total]="cobros().length" [(pagina)]="paginado.pagina" [(porPagina)]="paginado.porPagina" idSelector="cobros-por-pagina" nombreSingular="cobro" nombrePlural="cobros" />
     <div class="table-scroll">
       <table class="tabla table-cards">
         <thead>
@@ -30,7 +31,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (c of cobros(); track c.idReserva) {
+          @for (c of paginado.visibles(); track c.idReserva) {
             <tr>
               <td data-label="Alojamiento">{{ c.tituloAlojamiento }}</td>
               <td data-label="Fin de estadía">{{ c.fechaFinEstadia | date: 'dd/MM/yyyy' }}</td>
@@ -40,5 +41,8 @@
         </tbody>
       </table>
     </div>
+    @if (cobros().length > paginado.porPagina()) {
+      <app-paginador [total]="cobros().length" [(pagina)]="paginado.pagina" [(porPagina)]="paginado.porPagina" [soloFlechas]="true" idSelector="cobros-por-pagina" nombrePlural="cobros" />
+    }
   }
 </section>

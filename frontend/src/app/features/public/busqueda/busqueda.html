@@ -122,6 +122,16 @@
             }
           </p>
           <div class="resultados-barra__derecha">
+          @if (modo() === 'lista' && resultados().length > opcionesPorPagina[0]) {
+            <div class="por-pagina">
+              <label for="busqueda-por-pagina">Mostrar</label>
+              <select id="busqueda-por-pagina" [value]="porPagina()" (change)="cambiarPorPagina($any($event.target).value)">
+                @for (o of opcionesPorPagina; track o) {
+                  <option [value]="o" [selected]="o === porPagina()">{{ o }}</option>
+                }
+              </select>
+            </div>
+          }
           @if (modo() === 'lista' && totalPaginas() > 1) {
             <ng-container [ngTemplateOutlet]="paginador" />
           }

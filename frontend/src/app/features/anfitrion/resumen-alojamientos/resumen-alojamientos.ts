@@ -8,13 +8,15 @@ import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 import { Vacio } from '../../../shared/vacio/vacio';
 import { GraficoBarras } from '../../../shared/grafico-barras/grafico-barras';
 import { RouterLink } from '@angular/router';
+import { crearPaginado } from '../../../core/utils/paginado.util';
+import { Paginador } from '../../../shared/paginador/paginador';
 
 /// SCRUM-41 / RF37. Un resumen por cada alojamiento propio: ingresos,
 /// cantidad de reservas y rating promedio (null si todavia no tiene reviews).
 @Component({
   selector: 'app-resumen-alojamientos',
   standalone: true,
-  imports: [InfoGrafico, DecimalPipe, Esqueleto, Vacio, RouterLink, GraficoBarras],
+  imports: [InfoGrafico, DecimalPipe, Esqueleto, Vacio, RouterLink, GraficoBarras, Paginador],
   templateUrl: './resumen-alojamientos.html',
   styleUrl: './resumen-alojamientos.css',
 })
@@ -22,6 +24,8 @@ export class ResumenAlojamientos {
   private readonly estadisticasService = inject(EstadisticasService);
 
   readonly resumen = signal<ResumenAlojamientoAnfitrion[]>([]);
+  /// Paginado de la lista (10/20/30/50 por pagina, SCRUM-74).
+  readonly paginado = crearPaginado(this.resumen);
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
 

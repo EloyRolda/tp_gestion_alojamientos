@@ -11,17 +11,19 @@ import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 import { Vacio } from '../../../shared/vacio/vacio';
 import { coincide } from '../../../core/utils/busqueda.util';
 import { BuscadorLista } from '../../../shared/buscador-lista/buscador-lista';
+import { crearPaginado } from '../../../core/utils/paginado.util';
+import { Paginador } from '../../../shared/paginador/paginador';
 
 type FiltroEstado = EstadoReserva | 'TODAS';
 
 /// SCRUM-38 / RF27. Reservas de TODOS los alojamientos del anfitrion logueado,
 /// con filtro por estado (en el cliente: ya viene todo en una sola llamada,
 /// filtrar de vuelta contra el backend no suma nada -- mismo criterio que
-/// BusquedaComponent del Lote 1).
+/// la búsqueda de alojamientos).
 @Component({
   selector: 'app-reservas-anfitrion',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, FormsModule, RouterLink, Estado, Esqueleto, Vacio, BuscadorLista],
+  imports: [DatePipe, DecimalPipe, FormsModule, RouterLink, Estado, Esqueleto, Vacio, BuscadorLista, Paginador],
   templateUrl: './reservas-anfitrion.html',
   styleUrl: './reservas-anfitrion.css',
 })
@@ -44,6 +46,8 @@ export class ReservasAnfitrion {
         coincide(b, r.idReserva, r.alojamiento.titulo, r.cliente.nombre, r.cliente.apellido),
     );
   });
+  /// Paginado de la lista (10/20/30/50 por pagina, SCRUM-74).
+  readonly paginado = crearPaginado(this.reservasFiltradas, () => [this.busqueda(), this.filtro()]);
 
   readonly estados: FiltroEstado[] = ['TODAS', 'SOLICITADA', 'CONFIRMADA', 'FINALIZADA', 'CANCELADA'];
 

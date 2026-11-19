@@ -13,12 +13,14 @@ import { coincide } from '../../../core/utils/busqueda.util';
 import { BuscadorLista } from '../../../shared/buscador-lista/buscador-lista';
 import { AlojamientoService } from '../../../core/services/alojamiento.service';
 import { Alojamiento } from '../../../core/models/alojamiento.model';
+import { crearPaginado } from '../../../core/utils/paginado.util';
+import { Paginador } from '../../../shared/paginador/paginador';
 
 type FiltroEstado = EstadoReserva | 'TODAS';
 
 /// SCRUM-45 / RF24. Todas las reservas de la plataforma (cualquier cliente,
 /// cualquier anfitrion), con filtro por estado -- mismo criterio que
-/// ReservasAnfitrion (Lote 3), pero sin acotar a "las mias".
+/// ReservasAnfitrion, pero sin acotar a "las mias".
 ///
 /// Alojamiento, cliente y anfitrion son links (al alojamiento y a la ficha de
 /// cada usuario). La reserva no trae al anfitrion: se resuelve aparte, una
@@ -26,7 +28,7 @@ type FiltroEstado = EstadoReserva | 'TODAS';
 @Component({
   selector: 'app-todas-reservas',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, FormsModule, RouterLink, Estado, Esqueleto, Vacio, BuscadorLista],
+  imports: [DatePipe, DecimalPipe, FormsModule, RouterLink, Estado, Esqueleto, Vacio, BuscadorLista, Paginador],
   templateUrl: './todas-reservas.html',
   styleUrl: './todas-reservas.css',
 })
@@ -60,6 +62,8 @@ export class TodasReservas {
         ),
     );
   });
+  /// Paginado de la lista (10/20/30/50 por pagina, SCRUM-74).
+  readonly paginado = crearPaginado(this.reservasFiltradas, () => [this.busqueda(), this.filtro()]);
 
   readonly estados: FiltroEstado[] = ['TODAS', 'SOLICITADA', 'CONFIRMADA', 'FINALIZADA', 'CANCELADA'];
 

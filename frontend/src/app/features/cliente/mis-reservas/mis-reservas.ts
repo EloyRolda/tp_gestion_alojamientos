@@ -10,12 +10,14 @@ import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 import { Vacio } from '../../../shared/vacio/vacio';
 import { coincide } from '../../../core/utils/busqueda.util';
 import { BuscadorLista } from '../../../shared/buscador-lista/buscador-lista';
+import { crearPaginado } from '../../../core/utils/paginado.util';
+import { Paginador } from '../../../shared/paginador/paginador';
 
 /// SCRUM-30 / RF26. Listado de las reservas propias del cliente logueado.
 @Component({
   selector: 'app-mis-reservas',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, RouterLink, Estado, Esqueleto, Vacio, BuscadorLista],
+  imports: [DatePipe, DecimalPipe, RouterLink, Estado, Esqueleto, Vacio, BuscadorLista, Paginador],
   templateUrl: './mis-reservas.html',
   styleUrl: './mis-reservas.css',
 })
@@ -30,6 +32,8 @@ export class MisReservas {
   readonly reservasFiltradas = computed(() =>
     this.reservas().filter((r) => coincide(this.busqueda().replace('#', ''), r.idReserva, r.alojamiento.titulo)),
   );
+  /// Paginado de la lista (10/20/30/50 por pagina, SCRUM-74).
+  readonly paginado = crearPaginado(this.reservasFiltradas, () => this.busqueda());
 
   constructor() {
     this.reservaService.listarPropios().subscribe({

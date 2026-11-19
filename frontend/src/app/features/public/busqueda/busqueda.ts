@@ -15,8 +15,9 @@ import { Vacio } from '../../../shared/vacio/vacio';
 import { Kaza } from '../../../shared/kaza/kaza';
 import { BuscadorLista } from '../../../shared/buscador-lista/buscador-lista';
 
-/// Tarjetas por pagina: 4 filas de 3 en desktop.
-const POR_PAGINA = 12;
+/// Tarjetas por pagina que se pueden elegir (SCRUM-74): multiplos de 3, para
+/// que la grilla de 3 columnas en desktop quede siempre completa. Arranca en 12.
+const OPCIONES_POR_PAGINA = [12, 24, 36, 48];
 
 /// SCRUM-23 / RF14, RF39. El backend no expone query params de filtro
 /// (/Alojamiento/listar siempre devuelve todo), asi que el filtro es
@@ -29,7 +30,7 @@ const POR_PAGINA = 12;
 /// muestra cuantos hay activos; en desktop los filtros son una barra lateral
 /// fija a la izquierda de la grilla de resultados.
 ///
-/// Paginado: la lista muestra de a POR_PAGINA tarjetas, con "anterior /
+/// Paginado: la lista muestra de a 12, 24, 36 o 48 tarjetas (a elegir), con "anterior /
 /// siguiente" arriba a la derecha y al pie; cualquier cambio de filtro vuelve
 /// a la pagina 1. El mapa muestra siempre todos los resultados.
 ///
@@ -143,10 +144,12 @@ export class Busqueda {
   });
 
   readonly pagina = signal(1);
-  readonly totalPaginas = computed(() => Math.max(1, Math.ceil(this.resultados().length / POR_PAGINA)));
+  readonly opcionesPorPagina = OPCIONES_POR_PAGINA;
+  readonly porPagina = signal(OPCIONES_POR_PAGINA[0]);
+  readonly totalPaginas = computed(() => Math.max(1, Math.ceil(this.resultados().length / this.porPagina())));
   readonly paginaActual = computed(() => Math.min(this.pagina(), this.totalPaginas()));
-  readonly desde = computed(() => (this.paginaActual() - 1) * POR_PAGINA + 1);
-  readonly hasta = computed(() => Math.min(this.paginaActual() * POR_PAGINA, this.resultados().length));
+  readonly desde = computed(() => (this.paginaActual() - 1) * this.porPagina() + 1);
+  readonly hasta = computed(() => Math.min(this.paginaActual() * this.porPagina(), this.resultados().length));
   readonly visibles = computed(() => this.resultados().slice(this.desde() - 1, this.hasta()));
 
   /// Filtros nuevos = resultados nuevos: se arranca de la primera pagina.
@@ -154,6 +157,12 @@ export class Busqueda {
     this.resultados();
     untracked(() => this.pagina.set(1));
   });
+
+  /// Cambiar cuantas tarjetas se ven vuelve a la primera pagina.
+  cambiarPorPagina(valor: string): void {
+    this.porPagina.set(Number(valor));
+    this.pagina.set(1);
+  }
 
   irAPagina(n: number): void {
     this.pagina.set(Math.min(Math.max(1, n), this.totalPaginas()));
