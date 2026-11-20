@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /// AlojamientoService es el "hub": lo llaman DireccionService, TipoAlojamientoService
 /// y ReservaService para validaciones cruzadas. Para evitar dependencia circular en la
@@ -40,6 +41,9 @@ public class AlojamientoService {
     @Lazy
     private final ReservaService reservaService;
 
+    @Lazy
+    private final FavoritoService favoritoService;
+
     //---------------------------------------- LISTAR (para controllers, como DTO) ----------------------------------------
 
     @Transactional
@@ -52,6 +56,25 @@ public class AlojamientoService {
     @Transactional
     public List<AlojamientoResponseDTO> listarPorAnfitrionDTO(Long idAnfitrion) {
         return conImagenPrincipal(alojamientoRepository.findByAnfitrionIdConDetalle(idAnfitrion));
+    }
+
+    /// DTOs de un conjunto de alojamientos, en una sola consulta y respetando el
+    /// orden de la lista de ids recibida (lo usa FavoritoService: del favorito mas
+    /// reciente al mas viejo). Los ids que ya no existen se saltean.
+    @Transactional
+    public List<AlojamientoResponseDTO> listarPorIdsDTO(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        Map<Long, Alojamiento> porId = new HashMap<>();
+        for (Alojamiento alojamiento : alojamientoRepository.findByIdsConDetalle(ids)) {
+            porId.put(alojamiento.getIdAlojamiento(), alojamiento);
+        }
+        List<Alojamiento> ordenados = ids.stream()
+                .map(porId::get)
+                .filter(Objects::nonNull)
+                .toList();
+        return conImagenPrincipal(ordenados);
     }
 
     @Transactional
@@ -242,6 +265,8 @@ public class AlojamientoService {
     /// No borra la Direccion (puede ser compartida por otros alojamientos). No permite
     /// borrar si hay reservas SOLICITADA/CONFIRMADA (primero hay que cancelarlas o
     /// esperar a que se resuelvan) — evita borrarle una estadia a un cliente sin aviso.
+    /// Limpia tambien los favoritos: la FK de favorito no tiene cascada y el alojamiento
+    /// puede estar guardado por varios clientes.
     @Transactional
     public void borrarPorId(Long id) {
         Alojamiento alojamiento = obtenerPorId(id);
@@ -250,6 +275,7 @@ public class AlojamientoService {
                     "No se puede borrar: hay reservas solicitadas o confirmadas sobre este alojamiento.");
         }
         reservaService.borrarPorAlojamientoId(alojamiento.getIdAlojamiento());
+        favoritoService.borrarPorAlojamientoId(alojamiento.getIdAlojamiento());
         servicioxAlojamientoService.borrarPorAlojamientoId(alojamiento.getIdAlojamiento());
         galeriaService.borrarPorAlojamientoId(alojamiento.getIdAlojamiento());
         alojamientoRepository.delete(alojamiento);

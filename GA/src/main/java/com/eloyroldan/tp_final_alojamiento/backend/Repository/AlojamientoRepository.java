@@ -61,4 +61,16 @@ public interface AlojamientoRepository extends JpaRepository<Alojamiento, Long> 
             where a.anfitrion.id = :idAnfitrion
             """)
     List<Alojamiento> findByAnfitrionIdConDetalle(@Param("idAnfitrion") Long idAnfitrion);
+
+    /// Mismo JOIN FETCH que findActivosConDetalle pero para un conjunto de ids
+    /// (listado de favoritos: los DTOs se arman en una sola consulta). El orden
+    /// final lo decide quien llama, segun el orden de la lista de ids.
+    @Query("""
+            select a from Alojamiento a
+            join fetch a.anfitrion
+            join fetch a.direccion
+            join fetch a.tipoAlojamiento
+            where a.idAlojamiento in :ids
+            """)
+    List<Alojamiento> findByIdsConDetalle(@Param("ids") List<Long> ids);
 }

@@ -158,6 +158,11 @@ public class SecurityConfig {
                         .requestMatchers("/Review/cliente/**", "/Review/registrar", "/Review/eliminar/**")
                             .hasAnyRole("ADMIN", "CLIENTE")
 
+                        // ── FAVORITO ─────────────────────────────────────────
+                        // Todo el bloque es del cliente y siempre sobre sus propios
+                        // favoritos (el dueño sale del JWT, nunca de un id del request).
+                        .requestMatchers("/Favorito/**").hasRole("CLIENTE")
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
