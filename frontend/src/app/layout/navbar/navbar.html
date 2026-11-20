@@ -61,6 +61,7 @@
             @if (rol() === 'CLIENTE') {
               <p class="perfil__grupo">Mis viajes</p>
               <a routerLink="/mis-reservas" routerLinkActive="perfil__item--activo">Mis reservas</a>
+              <a routerLink="/mis-favoritos" routerLinkActive="perfil__item--activo">Mis favoritos</a>
               <a routerLink="/mis-gastos" routerLinkActive="perfil__item--activo">Mis gastos</a>
             }
             @if (rol() === 'ANFITRION') {

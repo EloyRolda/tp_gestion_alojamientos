@@ -21,6 +21,7 @@
     @if (aviso()) {
       <span class="alojamiento-card__aviso">{{ aviso() }}</span>
     }
+    <app-boton-favorito [idAlojamiento]="alojamiento().idAlojamiento" />
   </div>
 
   <div class="alojamiento-card__cuerpo">

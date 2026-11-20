@@ -5,6 +5,22 @@
    - Desktop (>= 1024px): contenido + columna lateral de reserva que acompana
      el scroll. */
 
+/* ---------- titulo ---------- */
+
+/* El corazon de favoritos va al lado del titulo (RF41, SCRUM-77); si el titulo
+   es muy largo, el boton baja a la linea siguiente sin achicarse. */
+.detalle__titulo {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.detalle__titulo h1 {
+  margin: 0;
+  min-width: 0;
+}
+
 /* ---------- galeria ---------- */
 
 .detalle__galeria {

@@ -53,6 +53,16 @@
   transform: scale(1.04);
 }
 
+/* Corazon de favoritos (RF41, SCRUM-77): abajo a la derecha de la foto y por
+   encima del enlace estirado de la tarjeta, para poder tocarlo sin abrir el
+   detalle. */
+.alojamiento-card__media app-boton-favorito {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  z-index: 2;
+}
+
 .alojamiento-card__sin-foto {
   display: flex;
   flex-direction: column;

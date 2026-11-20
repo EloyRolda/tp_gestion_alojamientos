@@ -5,7 +5,10 @@
 } @else if (alojamiento(); as a) {
   <article class="detalle stack">
     <header class="stack stack--tight">
-      <h1>{{ a.titulo }}</h1>
+      <div class="detalle__titulo">
+        <h1>{{ a.titulo }}</h1>
+        <app-boton-favorito [idAlojamiento]="a.idAlojamiento" />
+      </div>
       <p class="text-muted">
         {{ a.direccion.calle }} {{ a.direccion.altura }}, {{ a.direccion.ciudad }}, {{ a.direccion.provincia }},
         {{ a.direccion.pais }}

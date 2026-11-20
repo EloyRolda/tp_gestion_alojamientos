@@ -1,0 +1,15 @@
+/* Grilla de tarjetas de favoritos: las mismas columnas que la búsqueda
+   (grid-auto, se acomoda sola al ancho) y una sola columna en el celular. */
+
+.grilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: var(--space-3);
+}
+
+/* El enlace del estado vacío mantiene el tamaño de toque mínimo (44 px). */
+.mis-favoritos__buscar {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}

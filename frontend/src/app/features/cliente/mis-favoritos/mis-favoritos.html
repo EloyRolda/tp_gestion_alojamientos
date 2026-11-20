@@ -1,0 +1,32 @@
+<h1>Mis favoritos</h1>
+
+@if (cargando()) {
+  <app-esqueleto />
+} @else if (error()) {
+  <p class="text-danger">{{ error() }}</p>
+} @else if (visibles().length === 0) {
+  <app-vacio
+    titulo="Todavía no guardaste favoritos"
+    texto="Tocá el corazón de un alojamiento para guardarlo acá."
+  >
+    <a routerLink="/buscar" class="btn mis-favoritos__buscar">Buscar alojamientos</a>
+  </app-vacio>
+} @else {
+  <div class="stack">
+    <div class="grilla">
+      @for (alojamiento of paginado.visibles(); track alojamiento.idAlojamiento) {
+        <app-alojamiento-card [alojamiento]="alojamiento" />
+      }
+    </div>
+
+    <app-paginador
+      [total]="visibles().length"
+      [(pagina)]="paginado.pagina"
+      [(porPagina)]="paginado.porPagina"
+      [opciones]="[12, 24, 36, 48]"
+      idSelector="favoritos-por-pagina"
+      nombreSingular="favorito"
+      nombrePlural="favoritos"
+    />
+  </div>
+}

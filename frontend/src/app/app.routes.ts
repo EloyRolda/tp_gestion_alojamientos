@@ -35,6 +35,7 @@ export const routes: Routes = [
   { path: 'perfil', title: 'Mi perfil', loadComponent: () => import('./features/cliente/mi-perfil/mi-perfil').then((m) => m.MiPerfil), canActivate: [authGuard] },
   { path: 'mis-reservas', title: 'Mis reservas', loadComponent: () => import('./features/cliente/mis-reservas/mis-reservas').then((m) => m.MisReservas), canActivate: [roleGuard(['CLIENTE'])] },
   { path: 'mis-reservas/:id', title: 'Detalle de la reserva', loadComponent: () => import('./features/cliente/detalle-reserva/detalle-reserva').then((m) => m.DetalleReserva), canActivate: [idNumericoGuard, roleGuard(['CLIENTE'])] },
+  { path: 'mis-favoritos', title: 'Mis favoritos', loadComponent: () => import('./features/cliente/mis-favoritos/mis-favoritos').then((m) => m.MisFavoritos), canActivate: [roleGuard(['CLIENTE'])] },
   { path: 'pago-resultado', title: 'Resultado del pago', loadComponent: () => import('./features/cliente/pago-resultado/pago-resultado').then((m) => m.PagoResultado), canActivate: [roleGuard(['CLIENTE'])] },
   {
     path: 'mis-gastos',
