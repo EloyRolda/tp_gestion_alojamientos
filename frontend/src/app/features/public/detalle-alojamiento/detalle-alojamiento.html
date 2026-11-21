@@ -24,7 +24,7 @@
       </p>
     </header>
 
-    @if (imagenes().length > 0) {
+    @if (hayImagenes()) {
       <div class="detalle__galeria" [class.detalle__galeria--unica]="imagenes().length === 1"
         [class.detalle__galeria--mosaico]="imagenes().length >= 5" aria-label="Galería de imágenes">
         @for (imagen of imagenes(); track imagen.id; let primera = $first, i = $index) {
@@ -35,7 +35,7 @@
         }
       </div>
       <p class="detalle__galeria-ayuda text-muted">
-        @if (imagenes().length > 1) {
+        @if (hayVariasImagenes()) {
           <span class="detalle__galeria-deslizar">Deslizá para ver las {{ imagenes().length }} fotos.</span>
         }
         Tocá una foto para verla en grande.
@@ -55,7 +55,7 @@
 
         <p class="detalle__descripcion">{{ a.descripcion }}</p>
 
-        @if (servicios().length > 0) {
+        @if (hayServicios()) {
           <section class="stack stack--tight">
             <h2>Servicios</h2>
             <ul class="detalle__servicios">
@@ -76,13 +76,24 @@
               <article class="card">
                 <p><strong>{{ review.nombreCliente }}</strong> &middot; {{ review.puntuacion }}/5 &middot; {{ review.fecha | date: 'dd/MM/yyyy' }}</p>
                 <p>{{ review.comentario }}</p>
+                @if (puedeReportarResena(review)) {
+                  <button type="button" class="btn" (click)="reportarResena(review)">Reportar</button>
+                }
               </article>
             }
-            @if (reviews().length > paginadoReviews.porPagina()) {
+            @if (hayMasPaginasDeResenas()) {
               <app-paginador [total]="reviews().length" [(pagina)]="paginadoReviews.pagina" [(porPagina)]="paginadoReviews.porPagina" [soloFlechas]="true" idSelector="resenas-por-pagina" nombrePlural="reseñas" />
             }
           }
         </section>
+
+        @if (puedeReportarPublicacion()) {
+          <section class="stack stack--tight">
+            <h2>Reportar esta publicación</h2>
+            <p class="text-muted">Si el alojamiento no existe, las fotos no son del lugar o la ubicación está mal, avisanos.</p>
+            <button type="button" class="btn" (click)="reportarPublicacion()">Reportar publicación</button>
+          </section>
+        }
       </div>
 
       <aside class="detalle__reserva" aria-label="Reservar">

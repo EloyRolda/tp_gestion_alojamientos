@@ -3,7 +3,7 @@
 
   @if (cargando()) {
     <app-esqueleto tipo="detalle" />
-  } @else if (error() && !reserva()) {
+  } @else if (errorSinReserva()) {
     <p class="text-danger">{{ error() }}</p>
   } @else if (reserva()) {
     @let r = reserva()!;
@@ -20,6 +20,9 @@
       <section class="stack stack--tight">
         <h2>Cliente</h2>
         <p>{{ r.cliente.nombre }} {{ r.cliente.apellido }}</p>
+        @if (puedeReportar()) {
+          <button type="button" class="btn" (click)="reportarCliente(r)">Reportar al cliente</button>
+        }
       </section>
 
       <section class="stack stack--tight">
@@ -54,16 +57,16 @@
         <p class="text-danger">{{ error() }}</p>
       }
 
-      @if (r.estadoReserva === 'SOLICITADA' && llegadaPasada(r)) {
+      @if (solicitudVencida(r)) {
         <p class="text-muted">La fecha de llegada ya pasó, así que esta solicitud ya no se puede confirmar.</p>
       }
-      @if (r.estadoReserva === 'CONFIRMADA' && r.pago?.estado === 'PENDIENTE') {
+      @if (esperandoPagoDelCliente(r)) {
         <p class="text-muted">Esperando el pago del cliente (tiene 48 horas desde que confirmaste).</p>
       }
-      @if (r.estadoReserva === 'CONFIRMADA' && r.pago?.estado === 'PAGADO' && !puedeFinalizar(r)) {
+      @if (finalizableMasAdelante(r)) {
         <p class="text-muted">Vas a poder finalizar la estadía desde el {{ finalizableDesde(r) | date: 'dd/MM/yyyy' }}, el día después del check-out.</p>
       }
-      @if ((puedeConfirmar(r) || puedeFinalizar(r)) && sinAliasCobro()) {
+      @if (necesitaAliasDeCobro(r)) {
         <p class="aviso-alias">
           @if (puedeFinalizar(r)) {
             Para finalizar la estadía necesitás cargar tu alias de cobro: es la cuenta a la que te transferimos.
@@ -80,7 +83,7 @@
             {{ procesando() ? 'Procesando...' : 'Confirmar reserva' }}
           </button>
         }
-        @if (puedeFinalizar(r) && !sinAliasCobro()) {
+        @if (puedeFinalizarConAlias(r)) {
           <button type="button" class="btn btn--primario" (click)="finalizar()" [disabled]="procesando()">
             {{ procesando() ? 'Procesando...' : 'Finalizar estadía' }}
           </button>

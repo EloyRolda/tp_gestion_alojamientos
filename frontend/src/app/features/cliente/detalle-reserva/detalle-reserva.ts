@@ -1,9 +1,11 @@
-import { Component, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ReservaService } from '../../../core/services/reserva.service';
 import { ReviewService, ReviewRegistro } from '../../../core/services/review.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { ReportarService } from '../../../core/services/reportar.service';
 import { Reserva } from '../../../core/models/reserva.model';
 import { calcularNoches, calcularTotal } from '../../../core/utils/reserva.util';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
@@ -27,6 +29,7 @@ import { CalendarioRango, RangoOcupado } from '../../../shared/calendario-rango/
 /// (Ademas: mientras la reserva esta SOLICITADA se pueden cambiar las fechas,
 /// con el mismo calendario del formulario de reserva.)
 /// reserva y solo tiene sentido en este contexto (FINALIZADA, sin reseña previa).
+/// RF44: tambien se puede reportar al anfitrion de esta reserva.
 @Component({
   selector: 'app-detalle-reserva',
   standalone: true,
@@ -41,6 +44,8 @@ export class DetalleReserva {
   private readonly aviso = inject(AvisoService);
   private readonly reviewService = inject(ReviewService);
   private readonly confirmacion = inject(ConfirmacionService);
+  private readonly auth = inject(AuthService);
+  private readonly reportar = inject(ReportarService);
 
   readonly reserva = signal<Reserva | null>(null);
   readonly cargando = signal(true);
@@ -48,6 +53,9 @@ export class DetalleReserva {
 
   readonly cancelando = signal(false);
   readonly errorCancelar = signal<string | null>(null);
+
+  /// Reportan los usuarios con sesion que no son administradores (RF44).
+  readonly puedeReportar = computed(() => this.auth.estaLogueado() && this.auth.rol() !== 'ADMIN');
 
   readonly puntuacion = signal(5);
   readonly comentario = signal('');
@@ -90,10 +98,39 @@ export class DetalleReserva {
     return r.estadoReserva === 'SOLICITADA';
   }
 
+  /// El boton "Cambiar fechas" solo se ve cuando el formulario esta cerrado.
+  puedeEditarFechasAhora(r: Reserva): boolean {
+    return this.puedeCambiarFechas(r) && !this.editandoFechas();
+  }
+
+  /// El plazo para pagar se muestra unicamente mientras el pago sigue pendiente.
+  mostrarPlazoPago(r: Reserva): boolean {
+    const pago = r.pago;
+    return pago?.estado === 'PENDIENTE' && !!pago.fechaLimitePago;
+  }
+
+  /// Mientras el pago este pendiente y exista link de checkout, se ofrece pagar.
+  puedePagarAhora(r: Reserva): boolean {
+    const pago = r.pago;
+    return pago?.estado === 'PENDIENTE' && !!pago.urlCheckout;
+  }
+
   /// El plazo de 48 h para pagar ya paso, pero el proceso que la cancela
   /// todavia no corrio: no tiene sentido mandar a pagar.
   pagoVencido(r: Reserva): boolean {
     return r.pago?.estado === 'PENDIENTE' && !!r.pago.fechaLimitePago && new Date(r.pago.fechaLimitePago) < new Date();
+  }
+
+  /// Reporta al anfitrion del alojamiento reservado (RF44). El nombre del
+  /// anfitrion no viene en el resumen de la reserva, asi que la carta lo nombra
+  /// como "tu anfitrion".
+  reportarAnfitrion(r: Reserva): void {
+    this.reportar.abrir({
+      tipo: 'USUARIO',
+      idObjetivo: r.alojamiento.idAnfitrion,
+      categoria: 'ANFITRION',
+      nombreObjetivo: 'tu anfitrión',
+    });
   }
 
   abrirCambioFechas(r: Reserva): void {
@@ -140,6 +177,11 @@ export class DetalleReserva {
 
   puedeResenar(r: Reserva): boolean {
     return r.estadoReserva === 'FINALIZADA' && !r.tieneReview;
+  }
+
+  /// Reserva finalizada que ya tiene reseña: en vez del formulario, un aviso.
+  yaResenada(r: Reserva): boolean {
+    return r.estadoReserva === 'FINALIZADA' && r.tieneReview;
   }
 
   async cancelar(): Promise<void> {

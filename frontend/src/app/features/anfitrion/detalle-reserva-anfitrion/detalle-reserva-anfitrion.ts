@@ -10,6 +10,7 @@ import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 import { AvisoService } from '../../../core/services/aviso.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ConfirmacionService } from '../../../core/services/confirmacion.service';
+import { ReportarService } from '../../../core/services/reportar.service';
 import { explicarCancelacion, explicarResultado, formatearPesos, notaPrevia } from '../../../core/utils/cancelacion.util';
 import { PAGOS_SIMULADOS } from '../../../core/config/api.config';
 import { hoyIso, sumarDias } from '../../../core/utils/fecha.util';
@@ -19,6 +20,7 @@ import { hoyIso, sumarDias } from '../../../core/utils/fecha.util';
 /// de pago), cancelar, finalizar (dispara el Payout -- la API de Payouts de
 /// MercadoPago rechaza las credenciales TEST de esta app con
 /// "Invalid signature", limitacion ajena a este codigo).
+/// RF44: tambien se puede reportar al cliente de esta reserva.
 @Component({
   selector: 'app-detalle-reserva-anfitrion',
   standalone: true,
@@ -33,14 +35,22 @@ export class DetalleReservaAnfitrion {
   private readonly aviso = inject(AvisoService);
   private readonly confirmacion = inject(ConfirmacionService);
   private readonly auth = inject(AuthService);
+  private readonly reportar = inject(ReportarService);
 
   /// Sin alias de cobro, la plataforma no tiene a donde transferirle al finalizar.
   readonly sinAliasCobro = computed(() => this.auth.usuario() != null && !this.auth.usuario()!.aliasCobro);
+
+  /// Reportan los usuarios con sesion que no son administradores (RF44).
+  readonly puedeReportar = computed(() => this.auth.estaLogueado() && this.auth.rol() !== 'ADMIN');
 
   readonly reserva = signal<Reserva | null>(null);
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
   readonly procesando = signal(false);
+
+  /// Error sin reserva cargada: se muestra en lugar de la pantalla (si ya habia
+  /// una reserva en pantalla, el error va adentro del detalle).
+  readonly errorSinReserva = computed(() => !!this.error() && !this.reserva());
 
   constructor() {
     effect(() => {
@@ -80,6 +90,43 @@ export class DetalleReservaAnfitrion {
   /// Dia desde el que se puede finalizar (para avisarlo mientras tanto).
   finalizableDesde(r: Reserva): string {
     return sumarDias(r.fechaFin, 1);
+  }
+
+  /// Solicitud que ya no se puede confirmar porque su fecha de llegada paso.
+  solicitudVencida(r: Reserva): boolean {
+    return r.estadoReserva === 'SOLICITADA' && this.llegadaPasada(r);
+  }
+
+  /// Confirmada con el pago todavia pendiente: se avisa que el cliente tiene 48 h.
+  esperandoPagoDelCliente(r: Reserva): boolean {
+    const pago = r.pago;
+    return r.estadoReserva === 'CONFIRMADA' && pago?.estado === 'PENDIENTE';
+  }
+
+  /// Ya pago, pero todavia no llego la fecha desde la que se puede finalizar.
+  finalizableMasAdelante(r: Reserva): boolean {
+    const pago = r.pago;
+    return r.estadoReserva === 'CONFIRMADA' && pago?.estado === 'PAGADO' && !this.puedeFinalizar(r);
+  }
+
+  /// Confirmar o finalizar necesitan alias de cobro: si no lo cargo, se avisa.
+  necesitaAliasDeCobro(r: Reserva): boolean {
+    return (this.puedeConfirmar(r) || this.puedeFinalizar(r)) && this.sinAliasCobro();
+  }
+
+  /// El boton "Finalizar estadía" solo aparece si hay alias de cobro cargado.
+  puedeFinalizarConAlias(r: Reserva): boolean {
+    return this.puedeFinalizar(r) && !this.sinAliasCobro();
+  }
+
+  /// Reporta al cliente de esta reserva (RF44).
+  reportarCliente(r: Reserva): void {
+    this.reportar.abrir({
+      tipo: 'USUARIO',
+      idObjetivo: r.cliente.id,
+      categoria: 'CLIENTE',
+      nombreObjetivo: `${r.cliente.nombre} ${r.cliente.apellido}`,
+    });
   }
 
   confirmar(): void {

@@ -46,7 +46,7 @@
             <dd><strong>${{ r.pago.montoTotalCliente | number }}</strong></dd>
             <dt>Estado del pago</dt>
             <dd><app-estado [valor]="r.pago.estado" /></dd>
-            @if (r.pago.fechaLimitePago && r.pago.estado === 'PENDIENTE') {
+            @if (mostrarPlazoPago(r)) {
               <dt>Plazo para pagar</dt>
               <dd>{{ r.pago.fechaLimitePago | date: 'dd/MM/yyyy HH:mm' }}</dd>
             }
@@ -58,7 +58,7 @@
 
           @if (pagoVencido(r)) {
             <p class="text-danger">Venció el plazo para pagar. La reserva se va a cancelar automáticamente.</p>
-          } @else if (r.pago.estado === 'PENDIENTE' && r.pago.urlCheckout) {
+          } @else if (puedePagarAhora(r)) {
             <a [href]="r.pago.urlCheckout" class="btn btn--primario no-print" target="_blank" rel="noopener">Pagar ahora con MercadoPago</a>
           }
         </section>
@@ -69,7 +69,7 @@
       }
 
       <div class="form-actions no-print">
-        @if (puedeCambiarFechas(r) && !editandoFechas()) {
+        @if (puedeEditarFechasAhora(r)) {
           <button type="button" class="btn" (click)="abrirCambioFechas(r)">Cambiar fechas</button>
         }
         @if (puedeCancelar(r)) {
@@ -81,6 +81,12 @@
           <p class="text-danger">{{ errorCancelar() }}</p>
         }
       </div>
+
+      @if (puedeReportar()) {
+        <div class="form-actions no-print">
+          <button type="button" class="btn" (click)="reportarAnfitrion(r)">Reportar al anfitrión</button>
+        </div>
+      }
     </article>
 
     @if (editandoFechas()) {
@@ -134,7 +140,7 @@
           </form>
         }
       </section>
-    } @else if (r.estadoReserva === 'FINALIZADA' && r.tieneReview) {
+    } @else if (yaResenada(r)) {
       <p class="text-muted no-print">Ya dejaste una reseña para esta reserva.</p>
     }
   }

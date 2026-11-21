@@ -4,11 +4,12 @@ import { RouterOutlet } from '@angular/router';
 import { Navbar } from './layout/navbar/navbar';
 import { Footer } from './layout/footer/footer';
 import { Confirmacion } from './shared/confirmacion/confirmacion';
+import { Reportar } from './shared/reportar/reportar';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, Navbar, Footer, Confirmacion],
+  imports: [RouterOutlet, Navbar, Footer, Confirmacion, Reportar],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })

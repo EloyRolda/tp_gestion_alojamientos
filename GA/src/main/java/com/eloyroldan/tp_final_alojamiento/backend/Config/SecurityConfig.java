@@ -163,6 +163,11 @@ public class SecurityConfig {
                         // favoritos (el dueño sale del JWT, nunca de un id del request).
                         .requestMatchers("/Favorito/**").hasRole("CLIENTE")
 
+                        // ── REPORTE ──────────────────────────────────────────
+                        // Un admin no reporta: moderar es su trabajo (SCRUM-79), no reportar.
+                        .requestMatchers(HttpMethod.POST, "/Reporte").hasAnyRole("CLIENTE", "ANFITRION")
+                        .requestMatchers(HttpMethod.GET, "/Reporte/motivos").hasAnyRole("ADMIN", "CLIENTE", "ANFITRION")
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

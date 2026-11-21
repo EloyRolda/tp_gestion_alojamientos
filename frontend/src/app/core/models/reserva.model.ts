@@ -8,6 +8,9 @@ export interface AlojamientoResumen {
   idAlojamiento: number;
   titulo: string;
   precioNoche: number;
+  /// Id del anfitrion del alojamiento: lo usa el detalle de la reserva para
+  /// ofrecer "Reportar al anfitrion" (RF44).
+  idAnfitrion: number;
 }
 
 /// Espejo de UsuarioResumenDTO.

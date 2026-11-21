@@ -58,6 +58,19 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     /// no resueltas (SOLICITADA o CONFIRMADA) para no borrarle una estadia a un cliente.
     boolean existsByAlojamiento_IdAlojamientoAndEstadoReservaIn(Long idAlojamiento, List<ESTADORESERVA> estados);
 
+    /// Cuenta las reservas que compartieron dos usuarios: uno como cliente y el
+    /// otro como anfitrion del alojamiento, en cualquiera de los dos sentidos.
+    /// Lo usa ReporteService para la regla "solo se reporta a quien tuvo una
+    /// reserva con vos" (RF44); devuelve un numero (no boolean) para que la
+    /// traduccion a booleano quede del lado del Service.
+    @Query("""
+            select count(r)
+            from Reserva r
+            where (r.cliente.id = :idA and r.alojamiento.anfitrion.id = :idB)
+               or (r.cliente.id = :idB and r.alojamiento.anfitrion.id = :idA)
+            """)
+    long contarCompartidas(@Param("idA") Long idA, @Param("idB") Long idB);
+
     //================================ ESTADISTICAS ================================
 
     /// Version "en lote" de lo que necesita EstadisticasController.resumenAnfitrion:

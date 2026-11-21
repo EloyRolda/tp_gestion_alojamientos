@@ -18,8 +18,13 @@ public class AlojamientoResumenDTO {
     private Long idAlojamiento;
     private String titulo;
     private BigDecimal precioNoche;
+    /// Id del anfitrion: el detalle de la reserva lo necesita para ofrecer
+    /// "Reportar al anfitrion" (RF44) sin traer el alojamiento completo.
+    /// Leer solo el id de una relacion LAZY no dispara otra consulta.
+    private Long idAnfitrion;
 
     public static AlojamientoResumenDTO desde(Alojamiento a) {
-        return new AlojamientoResumenDTO(a.getIdAlojamiento(), a.getTitulo(), a.getPrecioNoche());
+        return new AlojamientoResumenDTO(a.getIdAlojamiento(), a.getTitulo(), a.getPrecioNoche(),
+                a.getAnfitrion().getId());
     }
 }

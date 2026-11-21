@@ -316,6 +316,18 @@ public class ReservaService {
 
     //------------------------ USO INTERNO (otros services) ------------------------
 
+    /// True si los dos usuarios compartieron al menos una reserva: uno como
+    /// cliente y el otro como anfitrion del alojamiento, en cualquiera de los dos
+    /// sentidos. Lo usa ReporteService (RF44) para la regla de "solo se puede
+    /// reportar a quien tuvo una reserva con vos". Se mira el historial completo:
+    /// tambien cuenta una reserva cancelada (igual hubo trato entre ellos).
+    public boolean compartieronReserva(Long idUsuarioA, Long idUsuarioB) {
+        if (idUsuarioA == null || idUsuarioB == null || idUsuarioA.equals(idUsuarioB)) {
+            return false;
+        }
+        return reservaRepository.contarCompartidas(idUsuarioA, idUsuarioB) > 0;
+    }
+
     /// Usado por AlojamientoService al borrar un alojamiento: elimina cada Reserva
     /// (no un bulk delete) para que el orphanRemoval de Reserva.review se dispare igual.
     /// Primero borra los Pago asociados (FK sin cascada, ver PagoService.borrarPorAlojamiento).
