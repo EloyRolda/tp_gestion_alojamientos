@@ -1,0 +1,130 @@
+<section class="page-header">
+  <div>
+    <h1>Reportes</h1>
+    <p class="text-muted">Revisá lo que reportan los usuarios y decidí qué hacer con cada caso.</p>
+  </div>
+</section>
+
+<div class="filtros-lista">
+  <div class="field field--compacto">
+    <label for="reportes-estado">Estado</label>
+    <select id="reportes-estado" [value]="filtro()" (change)="cambiarFiltro($any($event.target).value)">
+      <option value="PENDIENTE">Pendientes</option>
+      <option value="RESUELTO">Resueltos</option>
+      <option value="TODOS">Todos</option>
+    </select>
+  </div>
+</div>
+
+@if (cargando()) {
+  <app-esqueleto tipo="tabla" />
+} @else if (error()) {
+  <p class="text-danger" role="alert">{{ error() }}</p>
+} @else if (reportes().length === 0) {
+  <app-vacio
+    titulo="No hay reportes para mostrar"
+    texto="Cuando alguien reporte un alojamiento o una persona, el caso va a aparecer acá."
+  />
+} @else {
+  @if (errorAccion()) {
+    <p class="text-danger" role="alert">{{ errorAccion() }}</p>
+  }
+
+  <div class="table-scroll">
+    <table class="tabla table-cards">
+      <thead>
+        <tr>
+          <th scope="col">Fecha</th>
+          <th scope="col">Reportó</th>
+          <th scope="col">Sobre</th>
+          <th scope="col">Motivo</th>
+          <th scope="col">Estado</th>
+          <th scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (reporte of paginado.visibles(); track reporte.id) {
+          <tr>
+            <td data-label="Fecha">{{ reporte.fechaCreacion | date: 'dd/MM/yyyy HH:mm' }}</td>
+
+            <td data-label="Reportó">
+              <a [routerLink]="['/admin/usuarios', reporte.idAutor]">{{ reporte.nombreAutor }}</a>
+            </td>
+
+            <td data-label="Sobre">
+              @if (reporte.tipo === 'ALOJAMIENTO') {
+                <a [routerLink]="['/alojamientos', reporte.idObjetivo]">{{ reporte.nombreObjetivo }}</a>
+              } @else {
+                <a [routerLink]="['/admin/usuarios', reporte.idObjetivo]">{{ reporte.nombreObjetivo }}</a>
+              }
+            </td>
+
+            <td data-label="Motivo">
+              <span class="detalle detalle--motivo">{{ reporte.etiquetaMotivo ?? reporte.motivo }}</span>
+              @if (reporte.detalle) {
+                <span class="detalle">{{ reporte.detalle }}</span>
+              }
+            </td>
+
+            <td data-label="Estado">
+              @if (reporte.estado === 'PENDIENTE') {
+                <span class="chip chip--pendiente">Pendiente</span>
+              } @else {
+                <span class="chip">Resuelto</span>
+                <span class="detalle">{{ etiquetaAccion(reporte.accionTomada) }}</span>
+                @if (reporte.fechaResolucion) {
+                  <span class="detalle">{{ reporte.fechaResolucion | date: 'dd/MM/yyyy HH:mm' }}</span>
+                }
+              }
+            </td>
+
+            <td class="tabla__acciones">
+              @if (reporte.estado === 'PENDIENTE') {
+                <button
+                  type="button"
+                  class="btn"
+                  [disabled]="resolviendo() === reporte.id"
+                  (click)="resolver(reporte, 'DESCARTAR')"
+                >
+                  Descartar
+                </button>
+
+                @if (reporte.tipo === 'ALOJAMIENTO') {
+                  <button
+                    type="button"
+                    class="btn btn--peligro"
+                    [disabled]="resolviendo() === reporte.id"
+                    (click)="resolver(reporte, 'OCULTAR_ALOJAMIENTO')"
+                  >
+                    Ocultar alojamiento
+                  </button>
+                } @else {
+                  <button
+                    type="button"
+                    class="btn btn--peligro"
+                    [disabled]="resolviendo() === reporte.id"
+                    (click)="resolver(reporte, 'DESACTIVAR_USUARIO')"
+                  >
+                    Desactivar usuario
+                  </button>
+                }
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- pagina/porPagina son signals (crearPaginado): se escriben con set(), no con
+       un two-way binding que las reemplazaria por un numero. -->
+  <app-paginador
+    [total]="reportes().length"
+    [pagina]="paginado.pagina()"
+    (paginaChange)="paginado.pagina.set($event)"
+    [porPagina]="paginado.porPagina()"
+    (porPaginaChange)="paginado.porPagina.set($event)"
+    nombreSingular="reporte"
+    nombrePlural="reportes"
+  />
+}

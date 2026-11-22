@@ -6,22 +6,32 @@ package com.eloyroldan.tp_final_alojamiento.backend.Service;
 
 import com.eloyroldan.tp_final_alojamiento.backend.DTO.ReporteRegistroDTO;
 import com.eloyroldan.tp_final_alojamiento.backend.DTO.Response.MotivoReporteDTO;
+import com.eloyroldan.tp_final_alojamiento.backend.DTO.Response.ReporteAdminDTO;
 import com.eloyroldan.tp_final_alojamiento.backend.DTO.Response.ReporteResponseDTO;
+import com.eloyroldan.tp_final_alojamiento.backend.Enum.ACCIONMODERACION;
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.ESTADOREPORTE;
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.MOTIVOREPORTE;
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.TIPOREPORTE;
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.TIPOUSUARIO;
+import com.eloyroldan.tp_final_alojamiento.backend.Exception.IdNoEncontradoException;
 import com.eloyroldan.tp_final_alojamiento.backend.Exception.ParametroInvalidoException;
 import com.eloyroldan.tp_final_alojamiento.backend.Model.Alojamiento;
 import com.eloyroldan.tp_final_alojamiento.backend.Model.Reporte;
 import com.eloyroldan.tp_final_alojamiento.backend.Model.Usuario;
 import com.eloyroldan.tp_final_alojamiento.backend.Repository.ReporteRepository;
+import com.eloyroldan.tp_final_alojamiento.backend.Service.Moderacion.AccionModeracionStrategy;
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +48,19 @@ public class ReporteService {
     private final AlojamientoService alojamientoService;
     private final UsuarioService usuarioService;
     private final ReservaService reservaService;
+
+    /// Estrategias de moderacion inyectadas por Spring y ya indexadas por su
+    /// ACCIONMODERACION en un Map, igual que PagoService con las politicas.
+    private final List<AccionModeracionStrategy> estrategias;
+    private Map<ACCIONMODERACION, AccionModeracionStrategy> estrategiasPorAccion;
+
+    @PostConstruct
+    void iniciar() {
+        estrategiasPorAccion = new HashMap<>();
+        for (AccionModeracionStrategy estrategia : estrategias) {
+            estrategiasPorAccion.put(estrategia.accion(), estrategia);
+        }
+    }
 
     //------------------------ CREAR ------------------------
 
@@ -69,6 +92,90 @@ public class ReporteService {
         return Arrays.stream(MOTIVOREPORTE.values())
                 .map(MotivoReporteDTO::desde)
                 .toList();
+    }
+
+    //------------------------ MODERACION ------------------------
+
+    /// Listado para la pantalla del administrador: reportes ordenados «pendientes
+    /// primero» y, dentro de cada estado, del mas nuevo al mas viejo. Los nombres
+    /// de objetivos y autores se resuelven con consultas agrupadas, sin N+1.
+    @Transactional
+    public List<ReporteAdminDTO> listarAdmin(ESTADOREPORTE estado) {
+        List<Reporte> reportes = reporteRepository.findParaAdmin(estado);
+
+        if (reportes.isEmpty()) {
+            return List.of();
+        }
+
+        Set<Long> idsAlojamientos = new HashSet<>();
+        Set<Long> idsUsuarios = new HashSet<>();
+
+        for (Reporte reporte : reportes) {
+            if (reporte.getTipo() == TIPOREPORTE.ALOJAMIENTO) {
+                idsAlojamientos.add(reporte.getIdObjetivo());
+            } else {
+                idsUsuarios.add(reporte.getIdObjetivo());
+            }
+        }
+
+        Map<Long, String> titulosAlojamientos = alojamientoService.titulosPorIds(idsAlojamientos);
+        Map<Long, String> nombresUsuarios = usuarioService.nombresPorIds(idsUsuarios);
+
+        return reportes.stream()
+                .map(r -> toDTO(r, titulosAlojamientos, nombresUsuarios))
+                .toList();
+    }
+
+    /// Resuelve un reporte pendiente con la accion elegida. Si la accion corresponde
+    /// a ocultar/desactivar, tambien cierra los demas pendientes del mismo objetivo.
+    @Transactional
+    public ReporteAdminDTO resolver(Long idReporte, ACCIONMODERACION accion) {
+        Reporte reporte = reporteRepository.findById(idReporte)
+                .orElseThrow(() -> new IdNoEncontradoException("Reporte no encontrado."));
+
+        if (reporte.getEstado() != ESTADOREPORTE.PENDIENTE) {
+            throw new ParametroInvalidoException("Este reporte ya fue resuelto.");
+        }
+
+        AccionModeracionStrategy estrategia = estrategiasPorAccion.get(accion);
+        if (estrategia == null) {
+            throw new ParametroInvalidoException("Acción de moderación no soportada.");
+        }
+
+        estrategia.aplicar(reporte);
+
+        LocalDateTime fechaResolucion = LocalDateTime.now();
+        reporte.setEstado(ESTADOREPORTE.RESUELTO);
+        reporte.setAccionTomada(accion);
+        reporte.setFechaResolucion(fechaResolucion);
+        reporte = reporteRepository.save(reporte);
+
+        if (accion == ACCIONMODERACION.OCULTAR_ALOJAMIENTO
+                || accion == ACCIONMODERACION.DESACTIVAR_USUARIO) {
+            List<Reporte> otrosPendientes = reporteRepository.findByTipoAndIdObjetivoAndEstado(
+                    reporte.getTipo(), reporte.getIdObjetivo(), ESTADOREPORTE.PENDIENTE);
+
+            for (Reporte otro : otrosPendientes) {
+                if (otro.getIdReporte().equals(reporte.getIdReporte())) {
+                    continue;
+                }
+                otro.setEstado(ESTADOREPORTE.RESUELTO);
+                otro.setAccionTomada(accion);
+                otro.setFechaResolucion(fechaResolucion);
+                reporteRepository.save(otro);
+            }
+        }
+
+        Map<Long, String> titulosAlojamientos = Map.of();
+        Map<Long, String> nombresUsuarios = Map.of();
+
+        if (reporte.getTipo() == TIPOREPORTE.ALOJAMIENTO) {
+            titulosAlojamientos = alojamientoService.titulosPorIds(List.of(reporte.getIdObjetivo()));
+        } else {
+            nombresUsuarios = usuarioService.nombresPorIds(List.of(reporte.getIdObjetivo()));
+        }
+
+        return toDTO(reporte, titulosAlojamientos, nombresUsuarios);
     }
 
     //------------------------ REGLAS ------------------------
@@ -147,5 +254,40 @@ public class ReporteService {
         }
         String limpio = detalle.trim();
         return limpio.isEmpty() ? null : limpio;
+    }
+
+    //------------------------ AUXILIAR ------------------------
+
+    /// Convierte un Reporte en el DTO del listado de moderacion. Los nombres de
+    /// los objetivos ya llegan resueltos por las consultas agrupadas de los services.
+    private ReporteAdminDTO toDTO(Reporte reporte,
+                                  Map<Long, String> titulosAlojamientos,
+                                  Map<Long, String> nombresUsuarios) {
+        String nombreObjetivo;
+        if (reporte.getTipo() == TIPOREPORTE.ALOJAMIENTO) {
+            nombreObjetivo = titulosAlojamientos.get(reporte.getIdObjetivo());
+        } else {
+            nombreObjetivo = nombresUsuarios.get(reporte.getIdObjetivo());
+        }
+
+        Usuario autor = reporte.getAutor();
+        String nombreAutor = autor != null ? autor.getNombre() + " " + autor.getApellido() : "";
+        Long idAutor = autor != null ? autor.getId() : null;
+
+        return new ReporteAdminDTO(
+                reporte.getIdReporte(),
+                reporte.getTipo(),
+                reporte.getIdObjetivo(),
+                nombreObjetivo,
+                idAutor,
+                nombreAutor,
+                reporte.getMotivo().name(),
+                MotivoReporteDTO.desde(reporte.getMotivo()).getEtiqueta(),
+                reporte.getDetalle(),
+                reporte.getEstado(),
+                reporte.getAccionTomada(),
+                reporte.getFechaCreacion(),
+                reporte.getFechaResolucion()
+        );
     }
 }

@@ -144,6 +144,12 @@ export const routes: Routes = [
     canActivate: [idNumericoGuard, roleGuard(['ADMIN'])],
   },
   {
+    path: 'admin/reportes',
+    title: 'Reportes',
+    loadComponent: () => import('./features/admin/reportes/reportes').then((m) => m.Reportes),
+    canActivate: [roleGuard(['ADMIN'])],
+  },
+  {
     path: 'admin/flujo-dinero',
     title: 'Flujo de dinero',
     loadComponent: () => import('./features/admin/flujo-dinero/flujo-dinero').then((m) => m.FlujoDineroComponent),

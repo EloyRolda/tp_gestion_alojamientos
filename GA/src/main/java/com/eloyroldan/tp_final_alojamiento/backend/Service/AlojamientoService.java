@@ -19,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,6 +104,20 @@ public class AlojamientoService {
     @Transactional
     public AlojamientoResponseDTO modificarDTO(AlojamientoModificarDTO dto) {
         return AlojamientoResponseDTO.desde(modificar(dto));
+    }
+
+    /// id -> titulo de cada alojamiento, en una sola consulta. Lo usa la
+    /// moderacion de reportes para no resolver el nombre del objetivo fila por fila.
+    public Map<Long, String> titulosPorIds(Collection<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Map.of();
+        }
+        List<Long> lista = new ArrayList<>(ids);
+        Map<Long, String> resultado = new HashMap<>();
+        for (Object[] fila : alojamientoRepository.titulosPorIds(lista)) {
+            resultado.put((Long) fila[0], (String) fila[1]);
+        }
+        return resultado;
     }
 
     //---------------------------------------- LISTAR ----------------------------------------
@@ -258,6 +274,15 @@ public class AlojamientoService {
         }
 
         return alojamientoRepository.save(alojamiento);
+    }
+
+    /// Moderacion (SCRUM-79): oculta o vuelve a publicar un alojamiento sin pasar por
+    /// el formulario completo de edicion. Lo usa la accion «Ocultar alojamiento».
+    @Transactional
+    public void cambiarActivo(Long id, boolean activo) {
+        Alojamiento alojamiento = obtenerPorId(id);
+        alojamiento.setActivo(activo);
+        alojamientoRepository.save(alojamiento);
     }
 
     //---------------------------------------- BORRAR ----------------------------------------

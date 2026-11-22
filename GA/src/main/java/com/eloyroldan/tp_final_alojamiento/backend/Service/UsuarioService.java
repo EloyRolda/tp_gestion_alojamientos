@@ -16,7 +16,11 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -49,6 +53,20 @@ public class UsuarioService {
 
     public List<Usuario> listarAdministradores() {
         return usuarioRepository.findAllByTipo(TIPOUSUARIO.ADMIN);
+    }
+
+    /// id de usuario -> "Nombre Apellido", en una sola consulta. Lo usa la
+    /// moderacion de reportes para no resolver el nombre del objetivo fila por fila.
+    public Map<Long, String> nombresPorIds(Collection<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Map.of();
+        }
+        List<Long> lista = new ArrayList<>(ids);
+        Map<Long, String> resultado = new HashMap<>();
+        for (Object[] fila : usuarioRepository.nombresPorIds(lista)) {
+            resultado.put((Long) fila[0], (String) fila[1]);
+        }
+        return resultado;
     }
 
     //---------------------------------------- OBTENER ----------------------------------------
@@ -166,6 +184,18 @@ public class UsuarioService {
         return actualizar(dto);
     }
 
+    /// Moderacion (SCRUM-79): da de baja o reactiva una cuenta sin pasar por el
+    /// formulario completo de edicion. Un administrador no se puede desactivar.
+    @Transactional
+    public void cambiarActivo(Long id, boolean activo) {
+        Usuario usuario = obtenerPorId(id);
+        if (!activo && usuario.getTipo() == TIPOUSUARIO.ADMIN) {
+            throw new ParametroInvalidoException("No se puede desactivar a un administrador.");
+        }
+        usuario.setActivo(activo);
+        usuarioRepository.save(usuario);
+    }
+
     private Usuario actualizar(UsuarioModificarDTO dto) {
 
         Usuario usuario = obtenerPorId(dto.getId());
@@ -232,7 +262,7 @@ public class UsuarioService {
     }
 
     /// Paso 2: se vuelve a validar del lado del servidor (nunca confiar en que el
-    /// front ya lo valido) y reci entonces se guarda.
+    /// front ya lo valido) y recien se guarda.
     @Transactional
     public AliasCobroInfoDTO confirmarAliasCobro(Long idUsuario, String valor) {
         AliasCobroInfoDTO info = aliasCobroService.validar(valor);

@@ -3,6 +3,8 @@ package com.eloyroldan.tp_final_alojamiento.backend.Repository;
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.TIPOUSUARIO;
 import com.eloyroldan.tp_final_alojamiento.backend.Model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -25,4 +27,10 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     List<Usuario> findAllByTipo(TIPOUSUARIO tipo);
     boolean existsByIdAndTipo(Long id, TIPOUSUARIO tipo);
+
+    /// Proyeccion liviana usada por UsuarioService.nombresPorIds para la
+    /// moderacion de reportes: id -> "Nombre Apellido". Una unica consulta
+    /// para todo el listado de reportes.
+    @Query("select u.id, concat(u.nombre, ' ', u.apellido) from Usuario u where u.id in :ids")
+    List<Object[]> nombresPorIds(@Param("ids") List<Long> ids);
 }

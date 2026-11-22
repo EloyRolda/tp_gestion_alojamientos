@@ -41,3 +41,24 @@ export interface Reporte {
   estado: EstadoReporte;
   fechaCreacion: string;
 }
+
+/// Espejo de ReporteAdminDTO: una fila del listado de moderacion (SCRUM-79), con
+/// los nombres del autor y del objetivo ya resueltos por el backend.
+export interface ReporteAdmin {
+  id: number;
+  tipo: TipoReporte;
+  idObjetivo: number;
+  /// Titulo del alojamiento o "Nombre Apellido" de la persona reportada.
+  nombreObjetivo: string;
+  idAutor: number;
+  nombreAutor: string;
+  motivo: string;
+  etiquetaMotivo: string | null;
+  detalle: string | null;
+  estado: EstadoReporte;
+  /// Null mientras el reporte esta pendiente.
+  accionTomada: AccionModeracion | null;
+  fechaCreacion: string;
+  /// Null mientras el reporte esta pendiente.
+  fechaResolucion: string | null;
+}

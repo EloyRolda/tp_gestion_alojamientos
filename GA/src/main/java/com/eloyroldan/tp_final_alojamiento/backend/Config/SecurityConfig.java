@@ -166,6 +166,8 @@ public class SecurityConfig {
                         // ── REPORTE ──────────────────────────────────────────
                         // Un admin no reporta: moderar es su trabajo (SCRUM-79), no reportar.
                         .requestMatchers(HttpMethod.POST, "/Reporte").hasAnyRole("CLIENTE", "ANFITRION")
+                        .requestMatchers(HttpMethod.GET, "/Reporte").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/Reporte/*/resolver").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/Reporte/motivos").hasAnyRole("ADMIN", "CLIENTE", "ANFITRION")
 
                         .anyRequest().authenticated()

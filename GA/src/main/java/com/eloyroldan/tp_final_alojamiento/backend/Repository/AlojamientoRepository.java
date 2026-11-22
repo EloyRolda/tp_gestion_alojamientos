@@ -73,4 +73,10 @@ public interface AlojamientoRepository extends JpaRepository<Alojamiento, Long> 
             where a.idAlojamiento in :ids
             """)
     List<Alojamiento> findByIdsConDetalle(@Param("ids") List<Long> ids);
+
+    /// Proyeccion liviana usada por AlojamientoService.titulosPorIds para la
+    /// moderacion de reportes: id -> titulo, sin traer las relaciones del
+    /// alojamiento. Una unica consulta para todo el listado de reportes.
+    @Query("select a.idAlojamiento, a.titulo from Alojamiento a where a.idAlojamiento in :ids")
+    List<Object[]> titulosPorIds(@Param("ids") List<Long> ids);
 }
