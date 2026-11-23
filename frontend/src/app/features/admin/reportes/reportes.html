@@ -109,6 +109,17 @@
                   </button>
                 }
               }
+
+              @if (reporte.estado === 'RESUELTO' && reporte.accionTomada === 'OCULTAR_ALOJAMIENTO') {
+                <button
+                  type="button"
+                  class="btn"
+                  [disabled]="resolviendo() === reporte.id"
+                  (click)="republicar(reporte)"
+                >
+                  Volver a publicar
+                </button>
+              }
             </td>
           </tr>
         }

@@ -5,11 +5,12 @@ import { Navbar } from './layout/navbar/navbar';
 import { Footer } from './layout/footer/footer';
 import { Confirmacion } from './shared/confirmacion/confirmacion';
 import { Reportar } from './shared/reportar/reportar';
+import { MotivoSuspension } from './shared/motivo-suspension/motivo-suspension';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, Navbar, Footer, Confirmacion, Reportar],
+  imports: [RouterOutlet, Navbar, Footer, Confirmacion, Reportar, MotivoSuspension],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })

@@ -44,7 +44,8 @@ export class ReporteService {
   }
 
   /// Resuelve un reporte pendiente con la accion elegida por el admin.
-  resolver(id: number, accion: AccionModeracion): Observable<ReporteAdmin> {
-    return this.http.post<ReporteAdmin>(`${this.url}/${id}/resolver`, { accion });
+  /// Para OCULTAR_ALOJAMIENTO o DESACTIVAR_USUARIO se envían motivo y detalle.
+  resolver(id: number, accion: AccionModeracion, motivo?: string, detalle?: string): Observable<ReporteAdmin> {
+    return this.http.post<ReporteAdmin>(`${this.url}/${id}/resolver`, { accion, motivo, detalle });
   }
 }

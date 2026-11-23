@@ -128,8 +128,10 @@ public class ReporteService {
 
     /// Resuelve un reporte pendiente con la accion elegida. Si la accion corresponde
     /// a ocultar/desactivar, tambien cierra los demas pendientes del mismo objetivo.
+    /// El motivo y el detalle que elige el admin pasan a la estrategia; si el motivo
+    /// no viene, se usa el del reporte.
     @Transactional
-    public ReporteAdminDTO resolver(Long idReporte, ACCIONMODERACION accion) {
+    public ReporteAdminDTO resolver(Long idReporte, ACCIONMODERACION accion, MOTIVOREPORTE motivo, String detalle) {
         Reporte reporte = reporteRepository.findById(idReporte)
                 .orElseThrow(() -> new IdNoEncontradoException("Reporte no encontrado."));
 
@@ -142,7 +144,8 @@ public class ReporteService {
             throw new ParametroInvalidoException("Acción de moderación no soportada.");
         }
 
-        estrategia.aplicar(reporte);
+        MOTIVOREPORTE motivoFinal = (motivo != null) ? motivo : reporte.getMotivo();
+        estrategia.aplicar(reporte, motivoFinal, detalle);
 
         LocalDateTime fechaResolucion = LocalDateTime.now();
         reporte.setEstado(ESTADOREPORTE.RESUELTO);

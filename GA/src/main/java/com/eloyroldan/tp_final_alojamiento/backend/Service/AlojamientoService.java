@@ -4,6 +4,8 @@ import com.eloyroldan.tp_final_alojamiento.backend.DTO.AlojamientoModificarDTO;
 import com.eloyroldan.tp_final_alojamiento.backend.DTO.AlojamientoRegistroDTO;
 import com.eloyroldan.tp_final_alojamiento.backend.DTO.DireccionDTO;
 import com.eloyroldan.tp_final_alojamiento.backend.DTO.Response.AlojamientoResponseDTO;
+import com.eloyroldan.tp_final_alojamiento.backend.DTO.Response.MotivoReporteDTO;
+import com.eloyroldan.tp_final_alojamiento.backend.Enum.MOTIVOREPORTE;
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.TIPOUSUARIO;
 import com.eloyroldan.tp_final_alojamiento.backend.Exception.IdNoEncontradoException;
 import com.eloyroldan.tp_final_alojamiento.backend.Exception.ParametroInvalidoException;
@@ -16,9 +18,12 @@ import com.eloyroldan.tp_final_alojamiento.backend.Service.Galeria.GaleriaServic
 import com.eloyroldan.tp_final_alojamiento.backend.Service.Servicio.ServicioxAlojamientoService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.HtmlUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,6 +36,7 @@ import java.util.Objects;
 /// construccion de beans, esas referencias de vuelta se inyectan con @Lazy en el otro lado.
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AlojamientoService {
 
     private final AlojamientoRepository alojamientoRepository;
@@ -39,6 +45,7 @@ public class AlojamientoService {
     private final UsuarioService usuarioService;
     private final GaleriaService galeriaService;
     private final ServicioxAlojamientoService servicioxAlojamientoService;
+    private final EmailService emailService;
 
     @Lazy
     private final ReservaService reservaService;
@@ -238,6 +245,13 @@ public class AlojamientoService {
     public Alojamiento modificar(AlojamientoModificarDTO dto) {
         Alojamiento alojamiento = obtenerPorId(dto.getIdAlojamiento());
 
+        // Regla 5: si el alojamiento fue ocultado por moderación, el anfitrión no
+        // puede reactivarlo tocando el propio formulario de edición.
+        if (dto.getActivo() != null && dto.getActivo() && alojamiento.getMotivoOcultamiento() != null) {
+            String etiqueta = MotivoReporteDTO.desde(alojamiento.getMotivoOcultamiento()).getEtiqueta();
+            throw new ParametroInvalidoException("Esta publicación fue ocultada por moderación (" + etiqueta + "). Escribinos para revisarla.");
+        }
+
         if (dto.getTitulo() != null) {
             alojamiento.setTitulo(dto.getTitulo());
         }
@@ -276,8 +290,66 @@ public class AlojamientoService {
         return alojamientoRepository.save(alojamiento);
     }
 
-    /// Moderacion (SCRUM-79): oculta o vuelve a publicar un alojamiento sin pasar por
-    /// el formulario completo de edicion. Lo usa la accion «Ocultar alojamiento».
+    /// Moderacion (SCRUM-79): oculta un alojamiento guardando motivo, detalle opcional y
+    /// fecha, y manda el correo al anfitrión. Si el correo falla, la ocultación queda hecha.
+    @Transactional
+    public void ocultarPorModeracion(Long id, MOTIVOREPORTE motivo, String detalle) {
+        Alojamiento alojamiento = obtenerPorId(id);
+        alojamiento.setActivo(false);
+        alojamiento.setMotivoOcultamiento(motivo);
+        // Un detalle en blanco se guarda como null (el textarea puede venir con espacios).
+        detalle = (detalle == null || detalle.isBlank()) ? null : detalle.trim();
+        alojamiento.setDetalleOcultamiento(detalle);
+        alojamiento.setFechaOcultamiento(LocalDateTime.now());
+        alojamientoRepository.save(alojamiento);
+
+        try {
+            Usuario anfitrion = alojamiento.getAnfitrion();
+            String nombreCompleto = anfitrion.getNombre() + " " + anfitrion.getApellido();
+            String titulo = alojamiento.getTitulo();
+            String etiqueta = MotivoReporteDTO.desde(motivo).getEtiqueta();
+
+            String html = "Hola " + HtmlUtils.htmlEscape(nombreCompleto)
+                    + ", tu publicación «" + HtmlUtils.htmlEscape(titulo) + "» fue ocultada. Motivo: "
+                    + HtmlUtils.htmlEscape(etiqueta) + ".";
+            if (detalle != null && !detalle.isBlank()) {
+                html += " Detalle: " + HtmlUtils.htmlEscape(detalle) + ".";
+            }
+
+            emailService.enviar(anfitrion.getEmail(), nombreCompleto, "Tu publicación «" + titulo + "» fue ocultada", html);
+        } catch (RuntimeException e) {
+            log.warn("No se pudo enviar correo de ocultamiento para alojamiento {}: {}", id, e.getMessage());
+        }
+    }
+
+    /// Vuelve a publicar un alojamiento que había sido ocultado por moderación.
+    /// Limpia los campos de ocultamiento y envía el correo de nueva publicación.
+    @Transactional
+    public void republicar(Long id) {
+        Alojamiento alojamiento = obtenerPorId(id);
+        alojamiento.setActivo(true);
+        alojamiento.setMotivoOcultamiento(null);
+        alojamiento.setDetalleOcultamiento(null);
+        alojamiento.setFechaOcultamiento(null);
+        alojamientoRepository.save(alojamiento);
+
+        try {
+            Usuario anfitrion = alojamiento.getAnfitrion();
+            String nombreCompleto = anfitrion.getNombre() + " " + anfitrion.getApellido();
+            String titulo = alojamiento.getTitulo();
+
+            String html = "Hola " + HtmlUtils.htmlEscape(nombreCompleto)
+                    + ", tu publicación «" + HtmlUtils.htmlEscape(titulo) + "» volvió a estar visible.";
+
+            emailService.enviar(anfitrion.getEmail(), nombreCompleto, "Tu publicación «" + titulo + "» volvió a estar visible", html);
+        } catch (RuntimeException e) {
+            log.warn("No se pudo enviar correo de republicación para alojamiento {}: {}", id, e.getMessage());
+        }
+    }
+
+    /// Cambio directo de activo, usado anteriormente por la moderación SCRUM-79.
+    /// Se mantiene por si otras partes del sistema todavía lo usan, aunque ahora
+    /// la lógica de moderación pasa por ocultarPorModeracion/republicar.
     @Transactional
     public void cambiarActivo(Long id, boolean activo) {
         Alojamiento alojamiento = obtenerPorId(id);

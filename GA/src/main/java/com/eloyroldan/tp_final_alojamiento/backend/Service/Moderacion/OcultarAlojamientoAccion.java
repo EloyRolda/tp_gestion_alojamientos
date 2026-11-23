@@ -3,6 +3,7 @@
 package com.eloyroldan.tp_final_alojamiento.backend.Service.Moderacion;
 
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.ACCIONMODERACION;
+import com.eloyroldan.tp_final_alojamiento.backend.Enum.MOTIVOREPORTE;
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.TIPOREPORTE;
 import com.eloyroldan.tp_final_alojamiento.backend.Exception.ParametroInvalidoException;
 import com.eloyroldan.tp_final_alojamiento.backend.Model.Reporte;
@@ -23,10 +24,10 @@ public class OcultarAlojamientoAccion implements AccionModeracionStrategy {
     }
 
     @Override
-    public void aplicar(Reporte reporte) {
+    public void aplicar(Reporte reporte, MOTIVOREPORTE motivo, String detalle) {
         if (reporte.getTipo() != TIPOREPORTE.ALOJAMIENTO) {
             throw new ParametroInvalidoException("Ocultar el alojamiento solo aplica a reportes sobre alojamientos.");
         }
-        alojamientoService.cambiarActivo(reporte.getIdObjetivo(), false);
+        alojamientoService.ocultarPorModeracion(reporte.getIdObjetivo(), motivo, detalle);
     }
 }

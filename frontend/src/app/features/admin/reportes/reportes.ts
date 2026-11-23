@@ -5,11 +5,15 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { AccionModeracion, ReporteAdmin } from '../../../core/models/reporte.model';
+import { AccionModeracion, CategoriaReporte, ReporteAdmin } from '../../../core/models/reporte.model';
 import { AvisoService } from '../../../core/services/aviso.service';
 import { ConfirmacionService } from '../../../core/services/confirmacion.service';
 import { ReporteService } from '../../../core/services/reporte.service';
+import { MotivoSuspensionService } from '../../../core/services/motivo-suspension.service';
+import { UsuarioService } from '../../../core/services/usuario.service';
+import { AlojamientoService } from '../../../core/services/alojamiento.service';
 import { crearPaginado } from '../../../core/utils/paginado.util';
+import { firstValueFrom } from 'rxjs';
 import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 import { Paginador } from '../../../shared/paginador/paginador';
 import { Vacio } from '../../../shared/vacio/vacio';
@@ -29,6 +33,9 @@ export class Reportes implements OnInit {
   private readonly reporteService = inject(ReporteService);
   private readonly avisos = inject(AvisoService);
   private readonly confirmacion = inject(ConfirmacionService);
+  private readonly motivoSuspension = inject(MotivoSuspensionService);
+  private readonly usuarioService = inject(UsuarioService);
+  private readonly alojamientoService = inject(AlojamientoService);
 
   /// Por defecto se entra a ver lo que falta resolver.
   protected readonly filtro = signal<FiltroReportes>('PENDIENTE');
@@ -51,24 +58,84 @@ export class Reportes implements OnInit {
     this.cargar();
   }
 
-  protected resolver(reporte: ReporteAdmin, accion: AccionModeracion): void {
-    this.pedirConfirmacion(reporte, accion).then((confirmado) => {
-      if (!confirmado) {
-        return;
-      }
+  protected async resolver(reporte: ReporteAdmin, accion: AccionModeracion): Promise<void> {
+    if (accion === 'DESCARTAR') {
+      const confirmado = await this.pedirConfirmacion(reporte, accion);
+      if (!confirmado) return;
       this.resolviendo.set(reporte.id);
       this.errorAccion.set('');
-
       this.reporteService.resolver(reporte.id, accion).subscribe({
         next: () => {
           this.resolviendo.set(null);
           this.avisarExito(this.mensajeExito(accion));
-          // Se recarga para que tambien se vean los otros reportes que cerró esta accion.
           this.cargar();
         },
         error: (err) => {
           this.resolviendo.set(null);
           this.errorAccion.set(mensajeDeError(err, 'No pudimos resolver el reporte.'));
+        },
+      });
+      return;
+    }
+
+    const confirmado = await this.pedirConfirmacion(reporte, accion);
+    if (!confirmado) return;
+
+    let categoria: CategoriaReporte = 'ALOJAMIENTO';
+    if (accion === 'DESACTIVAR_USUARIO') {
+      try {
+        const u = await firstValueFrom(this.usuarioService.mostrar(reporte.idObjetivo));
+        categoria = u.tipo === 'ANFITRION' ? 'ANFITRION' : 'CLIENTE';
+      } catch (err) {
+        this.errorAccion.set('No pudimos determinar el tipo de la cuenta reportada.');
+        return;
+      }
+    }
+
+    const motivo = await this.motivoSuspension.pedir({
+      titulo: accion === 'OCULTAR_ALOJAMIENTO' ? 'Ocultar alojamiento' : 'Desactivar usuario',
+      texto: `Elegí el motivo por el que se va a ${accion === 'OCULTAR_ALOJAMIENTO' ? 'ocultar el alojamiento' : 'desactivar la cuenta'}.`,
+      categoria,
+      motivoInicial: reporte.motivo,
+    });
+    if (!motivo) return;
+
+    this.resolviendo.set(reporte.id);
+    this.errorAccion.set('');
+    this.reporteService.resolver(reporte.id, accion, motivo.motivo, motivo.detalle).subscribe({
+      next: () => {
+        this.resolviendo.set(null);
+        this.avisarExito(this.mensajeExito(accion));
+        // Se recarga para que tambien se vean los otros reportes que cerró esta accion.
+        this.cargar();
+      },
+      error: (err) => {
+        this.resolviendo.set(null);
+        this.errorAccion.set(mensajeDeError(err, 'No pudimos resolver el reporte.'));
+      },
+    });
+  }
+
+  /// Botón para reponer una publicación ocultada por moderación.
+  protected republicar(reporte: ReporteAdmin): void {
+    this.confirmacion.pedir({
+      titulo: 'Volver a publicar',
+      mensaje: [`¿Querés volver a publicar «${reporte.nombreObjetivo}»?`],
+      aceptar: 'Volver a publicar',
+      peligro: false,
+    }).then((confirmado) => {
+      if (!confirmado) return;
+      this.errorAccion.set('');
+      this.resolviendo.set(reporte.id);
+      this.alojamientoService.republicar(reporte.idObjetivo).subscribe({
+        next: () => {
+          this.resolviendo.set(null);
+          this.avisarExito('La publicación volvió a estar visible.');
+          this.cargar();
+        },
+        error: (err) => {
+          this.resolviendo.set(null);
+          this.errorAccion.set(mensajeDeError(err, 'No pudimos volver a publicar.'));
         },
       });
     });

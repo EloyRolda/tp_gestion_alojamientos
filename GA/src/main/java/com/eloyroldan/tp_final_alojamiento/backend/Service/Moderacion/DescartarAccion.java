@@ -3,6 +3,7 @@
 package com.eloyroldan.tp_final_alojamiento.backend.Service.Moderacion;
 
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.ACCIONMODERACION;
+import com.eloyroldan.tp_final_alojamiento.backend.Enum.MOTIVOREPORTE;
 import com.eloyroldan.tp_final_alojamiento.backend.Model.Reporte;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +17,7 @@ public class DescartarAccion implements AccionModeracionStrategy {
 
     /// No hace nada sobre el objetivo: solo se guarda la resolucion del reporte.
     @Override
-    public void aplicar(Reporte reporte) {
+    public void aplicar(Reporte reporte, MOTIVOREPORTE motivo, String detalle) {
         // Sin efecto sobre el objetivo.
     }
 }

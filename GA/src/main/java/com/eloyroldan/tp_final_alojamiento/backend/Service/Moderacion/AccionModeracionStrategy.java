@@ -5,6 +5,7 @@
 package com.eloyroldan.tp_final_alojamiento.backend.Service.Moderacion;
 
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.ACCIONMODERACION;
+import com.eloyroldan.tp_final_alojamiento.backend.Enum.MOTIVOREPORTE;
 import com.eloyroldan.tp_final_alojamiento.backend.Model.Reporte;
 
 public interface AccionModeracionStrategy {
@@ -15,5 +16,9 @@ public interface AccionModeracionStrategy {
     /// Aplica el efecto de la accion sobre el objetivo del reporte. Si la accion
     /// no corresponde al tipo de objetivo, tiene que fallar con
     /// ParametroInvalidoException (el Controller la traduce a 400).
-    void aplicar(Reporte reporte);
+    ///
+    /// @param motivo  motivo que eligió el administrador. Si viene `null`, se usa
+    ///                el motivo original del reporte.
+    /// @param detalle detalle opcional de la moderación (puede ser `null`).
+    void aplicar(Reporte reporte, MOTIVOREPORTE motivo, String detalle);
 }

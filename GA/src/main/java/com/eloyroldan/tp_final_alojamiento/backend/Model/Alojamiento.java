@@ -1,6 +1,9 @@
 package com.eloyroldan.tp_final_alojamiento.backend.Model;
 
+import com.eloyroldan.tp_final_alojamiento.backend.Converter.MotivoReporteConverter;
+import com.eloyroldan.tp_final_alojamiento.backend.Enum.MOTIVOREPORTE;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
@@ -23,6 +26,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /// Alojamiento publicado por un anfitrion. No tiene tablas hijas por tipo
 /// (Casa/Depto/Hotel): el tipo es una referencia al catalogo TipoAlojamiento
@@ -108,4 +112,17 @@ public class Alojamiento {
     @JoinColumn(name = "id_tipo_alojamiento", nullable = false,
             foreignKey = @ForeignKey(name = "fk_alojamiento_tipo"))
     private TipoAlojamiento tipoAlojamiento;
+
+    /// Motivo por el que la moderación ocultó la publicación, junto con el detalle
+    /// opcional y la fecha. Hibernate crea estas columnas nullable por defecto.
+    @Convert(converter = MotivoReporteConverter.class)
+    @Column(name = "motivo_ocultamiento")
+    private MOTIVOREPORTE motivoOcultamiento;
+
+    @Size(max = 500)
+    @Column(name = "detalle_ocultamiento", length = 500)
+    private String detalleOcultamiento;
+
+    @Column(name = "fecha_ocultamiento")
+    private LocalDateTime fechaOcultamiento;
 }

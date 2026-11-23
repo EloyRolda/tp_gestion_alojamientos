@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { UsuarioService } from '../../../core/services/usuario.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { MotivoSuspensionService } from '../../../core/services/motivo-suspension.service';
 import { TipoUsuario, Usuario } from '../../../core/models/usuario.model';
 import { extraerMensajeError } from '../../../core/utils/http-error.util';
 import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
@@ -30,6 +31,7 @@ type FiltroTipo = TipoUsuario | 'TODOS';
 export class GestionUsuarios {
   private readonly usuarioService = inject(UsuarioService);
   private readonly baja = inject(BajaUsuarioService);
+  private readonly motivoSuspension = inject(MotivoSuspensionService);
   /// La propia cuenta del administrador no se desactiva desde aca (se quedaria
   /// afuera) y se edita desde Mi perfil (que mantiene la sesion si cambia el email).
   private readonly auth = inject(AuthService);
@@ -85,28 +87,52 @@ export class GestionUsuarios {
   /// Desactivar es en cascada (ver BajaUsuarioService): se pausan los
   /// alojamientos del anfitrion y se cancelan las reservas sin pago.
   async toggleActivo(u: Usuario): Promise<void> {
+    this.error.set(null);
     let plan: PlanBaja | null = null;
     if (u.activo) {
-      this.cambiandoEstado.set(u.id);
       plan = await this.baja.confirmarBaja(u);
       if (!plan) {
-        this.cambiandoEstado.set(null);
         return;
       }
+      const motivo = await this.motivoSuspension.pedir({
+        titulo: 'Motivo de la suspensión',
+        texto: `Elegí el motivo por el cual vas a desactivar a ${u.nombre} ${u.apellido}.`,
+        categoria: u.tipo === 'ANFITRION' ? 'ANFITRION' : 'CLIENTE',
+      });
+      if (!motivo) {
+        return;
+      }
+      this.cambiandoEstado.set(u.id);
+      this.usuarioService.actualizarComoAdmin({
+        id: u.id,
+        activo: false,
+        motivoSuspension: motivo.motivo,
+        detalleSuspension: motivo.detalle,
+      }).subscribe({
+        next: async () => {
+          if (plan) await this.baja.aplicarCascada(u, plan);
+          this.cambiandoEstado.set(null);
+          this.cargar();
+        },
+        error: (err) => {
+          this.cambiandoEstado.set(null);
+          this.error.set(extraerMensajeError(err));
+        },
+      });
+    } else {
+      this.cambiandoEstado.set(u.id);
+      this.usuarioService.actualizarComoAdmin({ id: u.id, activo: true }).subscribe({
+        next: async () => {
+          await this.baja.avisarReactivacion(u);
+          this.cambiandoEstado.set(null);
+          this.cargar();
+        },
+        error: (err) => {
+          this.cambiandoEstado.set(null);
+          this.error.set(extraerMensajeError(err));
+        },
+      });
     }
-    this.cambiandoEstado.set(u.id);
-    this.usuarioService.actualizarComoAdmin({ id: u.id, activo: !u.activo }).subscribe({
-      next: async () => {
-        if (plan) await this.baja.aplicarCascada(u, plan);
-        else await this.baja.avisarReactivacion(u);
-        this.cambiandoEstado.set(null);
-        this.cargar();
-      },
-      error: (err) => {
-        this.cambiandoEstado.set(null);
-        this.error.set(extraerMensajeError(err));
-      },
-    });
   }
 
   private cargar(): void {

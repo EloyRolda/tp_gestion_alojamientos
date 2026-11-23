@@ -1,5 +1,6 @@
 package com.eloyroldan.tp_final_alojamiento.backend.DTO;
 
+import com.eloyroldan.tp_final_alojamiento.backend.Enum.MOTIVOREPORTE;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -39,4 +40,12 @@ public class UsuarioModificarDTO {
     private String telefono;
 
     private Boolean activo;
+
+    /// Motivo y detalle de suspensión que sólo el administrador envía cuando
+    /// desactiva una cuenta. El detalle es opcional y tiene el mismo máximo que
+    /// el detalle de los reportes (500 caracteres).
+    private MOTIVOREPORTE motivoSuspension;
+
+    @Size(max = 500)
+    private String detalleSuspension;
 }

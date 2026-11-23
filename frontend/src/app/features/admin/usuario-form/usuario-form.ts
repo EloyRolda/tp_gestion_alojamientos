@@ -10,6 +10,7 @@ import { Esqueleto } from '../../../shared/esqueleto/esqueleto';
 import { AvisoService } from '../../../core/services/aviso.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { BajaUsuarioService, PlanBaja } from '../../../core/services/baja-usuario.service';
+import { MotivoSuspensionService } from '../../../core/services/motivo-suspension.service';
 import { Usuario } from '../../../core/models/usuario.model';
 
 interface FormUsuario {
@@ -44,6 +45,7 @@ export class UsuarioForm {
   private readonly aviso = inject(AvisoService);
   private readonly auth = inject(AuthService);
   private readonly baja = inject(BajaUsuarioService);
+  private readonly motivoSuspension = inject(MotivoSuspensionService);
   /// Usuario tal como esta guardado (para saber si se desactiva o reactiva).
   readonly usuario = signal<Usuario | null>(null);
   /// Un administrador no puede desactivarse a si mismo (se quedaria afuera).
@@ -104,9 +106,16 @@ export class UsuarioForm {
     const u = this.usuario();
     // Desmarcar "Cuenta activa" es una baja en cascada: se confirma antes.
     let plan: PlanBaja | null = null;
+    let motivoElegido: { motivo: string; detalle: string } | null = null;
     if (u && u.activo && !f.activo) {
       plan = await this.baja.confirmarBaja(u);
       if (!plan) return;
+      motivoElegido = await this.motivoSuspension.pedir({
+        titulo: 'Motivo de la suspensión',
+        texto: 'Elegí el motivo por el cual vas a desactivar a este usuario.',
+        categoria: u.tipo === 'ANFITRION' ? 'ANFITRION' : 'CLIENTE',
+      });
+      if (!motivoElegido) return;
     }
     const reactiva = !!u && !u.activo && f.activo;
 
@@ -124,6 +133,7 @@ export class UsuarioForm {
         telefono: f.telefono,
         activo: f.activo,
         ...(f.password.trim() ? { password: f.password } : {}),
+        ...(motivoElegido ? { motivoSuspension: motivoElegido.motivo, detalleSuspension: motivoElegido.detalle } : {}),
       })
       .subscribe({
         next: async () => {

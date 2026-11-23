@@ -59,6 +59,6 @@ public class ReporteController {
     @PostMapping("/{id}/resolver")
     public ResponseEntity<ReporteAdminDTO> resolver(@PathVariable Long id,
                                                     @Valid @RequestBody ResolverReporteDTO dto) {
-        return ResponseEntity.ok(reporteService.resolver(id, dto.getAccion()));
+        return ResponseEntity.ok(reporteService.resolver(id, dto.getAccion(), dto.getMotivo(), dto.getDetalle()));
     }
 }

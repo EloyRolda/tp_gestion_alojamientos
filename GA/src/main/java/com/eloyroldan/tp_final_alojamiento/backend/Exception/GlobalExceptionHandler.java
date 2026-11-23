@@ -74,6 +74,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("El usuario esta desactivado.");
     }
 
+    /// Nueva excepción de SCRUM-80: la cuenta está suspendida y la contraseña es
+    /// correcta. Se devuelve 403 con el mensaje específico que arma UsuarioService.
+    @ExceptionHandler(CuentaSuspendidaException.class)
+    public ResponseEntity<?> manejarCuentaSuspendida(CuentaSuspendidaException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> manejarCredencialesInvalidas(BadCredentialsException e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario o contrasenia invalidos.");

@@ -120,6 +120,8 @@ public class SecurityConfig {
                         .requestMatchers("/Alojamiento/listar/propios").hasAnyRole("ADMIN", "ANFITRION")
                         .requestMatchers("/Alojamiento/registrar").hasAnyRole("ADMIN", "ANFITRION")
                         .requestMatchers(HttpMethod.POST, "/Alojamiento/*/servicios").hasAnyRole("ADMIN", "ANFITRION", "CLIENTE")
+                        // SCRUM-80: volver a publicar un alojamiento ocultado por moderación
+                        .requestMatchers(HttpMethod.POST, "/Alojamiento/*/republicar").hasRole("ADMIN")
                         .requestMatchers(
                                 "/Alojamiento/actualizar", "/Alojamiento/eliminar/**",
                                 "/Alojamiento/*/servicios/**"

@@ -3,6 +3,8 @@ package com.eloyroldan.tp_final_alojamiento.backend.Service;
 import com.eloyroldan.tp_final_alojamiento.backend.DTO.UsuarioModificarDTO;
 import com.eloyroldan.tp_final_alojamiento.backend.DTO.UsuarioRegistroDTO;
 import com.eloyroldan.tp_final_alojamiento.backend.DTO.Response.AliasCobroInfoDTO;
+import com.eloyroldan.tp_final_alojamiento.backend.DTO.Response.MotivoReporteDTO;
+import com.eloyroldan.tp_final_alojamiento.backend.Enum.MOTIVOREPORTE;
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.TIPOUSUARIO;
 import com.eloyroldan.tp_final_alojamiento.backend.Exception.IdNoEncontradoException;
 import com.eloyroldan.tp_final_alojamiento.backend.Exception.ParametroInvalidoException;
@@ -12,10 +14,13 @@ import com.eloyroldan.tp_final_alojamiento.backend.Model.Usuario;
 import com.eloyroldan.tp_final_alojamiento.backend.Repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.HtmlUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,11 +30,13 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final AliasCobroService aliasCobroService;
+    private final EmailService emailService;
 
     /// VerificacionService depende de UsuarioService (para marcar el correo
     /// verificado y para buscar por email al reenviar), asi que esta referencia
@@ -179,21 +186,25 @@ public class UsuarioService {
     }
 
     /// El admin puede editar cualquier campo de cualquier usuario, incluido "activo".
+    /// Si va a desactivar (true->false) pide motivo y delega en suspender();
+    /// si va a reactivar (false->true) delega en reactivar().
     @Transactional
     public Usuario actualizarComoAdmin(UsuarioModificarDTO dto) {
-        return actualizar(dto);
-    }
+        Usuario usuario = obtenerPorId(dto.getId());
+        Boolean activoNuevo = dto.getActivo();
 
-    /// Moderacion (SCRUM-79): da de baja o reactiva una cuenta sin pasar por el
-    /// formulario completo de edicion. Un administrador no se puede desactivar.
-    @Transactional
-    public void cambiarActivo(Long id, boolean activo) {
-        Usuario usuario = obtenerPorId(id);
-        if (!activo && usuario.getTipo() == TIPOUSUARIO.ADMIN) {
-            throw new ParametroInvalidoException("No se puede desactivar a un administrador.");
+        if (activoNuevo != null && !activoNuevo.equals(usuario.getActivo())) {
+            if (activoNuevo) {
+                reactivar(dto.getId());
+            } else {
+                if (dto.getMotivoSuspension() == null) {
+                    throw new ParametroInvalidoException("Elegí el motivo de la suspensión.");
+                }
+                suspender(dto.getId(), dto.getMotivoSuspension(), dto.getDetalleSuspension());
+            }
         }
-        usuario.setActivo(activo);
-        usuarioRepository.save(usuario);
+
+        return actualizar(dto);
     }
 
     private Usuario actualizar(UsuarioModificarDTO dto) {
@@ -227,11 +238,92 @@ public class UsuarioService {
         if (dto.getPassword() != null) {
             usuario.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
-        if (dto.getActivo() != null) {
-            usuario.setActivo(dto.getActivo());
-        }
 
         return usuarioRepository.save(usuario);
+    }
+
+    //---------------------------------------- SUSPENSION / REACTIVACION ----------------------------------------
+
+    /// Da de baja una cuenta por moderación guardando motivo, detalle opcional y fecha.
+    /// No permite suspender a un administrador. El correo de aviso se intenta enviar,
+    /// pero si Brevo falla no detiene la suspensión.
+    @Transactional
+    public void suspender(Long id, MOTIVOREPORTE motivo, String detalle) {
+        Usuario usuario = obtenerPorId(id);
+        if (usuario.getTipo() == TIPOUSUARIO.ADMIN) {
+            throw new ParametroInvalidoException("No se puede suspender a un administrador.");
+        }
+
+        usuario.setActivo(false);
+        usuario.setMotivoSuspension(motivo);
+        // Un detalle en blanco se guarda como null (el textarea puede venir con espacios).
+        detalle = (detalle == null || detalle.isBlank()) ? null : detalle.trim();
+        usuario.setDetalleSuspension(detalle);
+        usuario.setFechaSuspension(LocalDateTime.now());
+        usuarioRepository.save(usuario);
+
+        try {
+            String nombreCompleto = usuario.getNombre() + " " + usuario.getApellido();
+            String etiqueta = MotivoReporteDTO.desde(motivo).getEtiqueta();
+
+            String html = "Hola " + HtmlUtils.htmlEscape(nombreCompleto)
+                    + ", tu cuenta fue suspendida. Motivo: " + HtmlUtils.htmlEscape(etiqueta) + ".";
+            if (detalle != null && !detalle.isBlank()) {
+                html += " Detalle: " + HtmlUtils.htmlEscape(detalle) + ".";
+            }
+            html += " Si creés que es un error, respondé este correo.";
+
+            emailService.enviar(usuario.getEmail(), nombreCompleto, "Tu cuenta de AlojaME fue suspendida", html);
+        } catch (RuntimeException e) {
+            log.warn("No se pudo enviar correo de suspensión para usuario {}: {}", usuario.getId(), e.getMessage());
+        }
+    }
+
+    /// Reactiva una cuenta suspendida limpiando los campos de suspensión y
+    /// enviando el correo de reactivación. Si el correo falla, la reactivación queda hecha.
+    @Transactional
+    public void reactivar(Long id) {
+        Usuario usuario = obtenerPorId(id);
+        usuario.setActivo(true);
+        usuario.setMotivoSuspension(null);
+        usuario.setDetalleSuspension(null);
+        usuario.setFechaSuspension(null);
+        usuarioRepository.save(usuario);
+
+        try {
+            String nombreCompleto = usuario.getNombre() + " " + usuario.getApellido();
+            String html = "Hola " + HtmlUtils.htmlEscape(nombreCompleto)
+                    + ", tu cuenta de AlojaME volvió a estar activa.";
+            emailService.enviar(usuario.getEmail(), nombreCompleto, "Tu cuenta de AlojaME volvió a estar activa", html);
+        } catch (RuntimeException e) {
+            log.warn("No se pudo enviar correo de reactivación para usuario {}: {}", usuario.getId(), e.getMessage());
+        }
+    }
+
+    /// Devuelve el mensaje de suspensión sólo si la contraseña coincide para el
+    /// identificador dado. Lo usa AuthController cuando Spring lanza DisabledException.
+    public Optional<String> mensajeDeSuspension(String identificador, String password) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmailOrUsuarioLoginOrTelefono(
+                identificador, identificador, identificador);
+        if (usuarioOpt.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Usuario usuario = usuarioOpt.get();
+        if (!passwordEncoder.matches(password, usuario.getPassword()) || Boolean.TRUE.equals(usuario.getActivo())) {
+            return Optional.empty();
+        }
+
+        String mensaje = "Tu cuenta está suspendida.";
+        if (usuario.getMotivoSuspension() != null) {
+            String etiqueta = MotivoReporteDTO.desde(usuario.getMotivoSuspension()).getEtiqueta();
+            mensaje = "Tu cuenta está suspendida: " + etiqueta + ".";
+            if (usuario.getDetalleSuspension() != null && !usuario.getDetalleSuspension().isBlank()) {
+                mensaje += " Detalle: " + usuario.getDetalleSuspension();
+            }
+        }
+
+        return Optional.of(mensaje);
     }
 
     //---------------------------------------- BORRAR (logico) ----------------------------------------

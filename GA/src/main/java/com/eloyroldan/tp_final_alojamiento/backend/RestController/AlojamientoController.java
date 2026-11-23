@@ -79,6 +79,13 @@ public class AlojamientoController {
         servicioxAlojamientoService.quitarServicio(id, idServicio);
     }
 
+    /// Nuevo endpoint de SCRUM-80: el administrador vuelve a publicar un
+    /// alojamiento que había sido ocultado por moderación.
+    @PostMapping("/{id}/republicar")
+    public void republicar(@PathVariable Long id) {
+        alojamientoService.republicar(id);
+    }
+
     /// Recibe solo el id (no la entidad) para no tener que navegar Alojamiento.anfitrion
     /// (relacion LAZY) desde el controller, fuera de una transaccion.
     private void verificarDuenioOAdmin(Long idAlojamiento, Authentication auth) {

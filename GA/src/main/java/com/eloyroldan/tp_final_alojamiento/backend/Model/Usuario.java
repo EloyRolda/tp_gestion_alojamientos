@@ -1,6 +1,8 @@
 package com.eloyroldan.tp_final_alojamiento.backend.Model;
 
 import com.eloyroldan.tp_final_alojamiento.backend.Converter.TipoUsuarioConverter;
+import com.eloyroldan.tp_final_alojamiento.backend.Converter.MotivoReporteConverter;
+import com.eloyroldan.tp_final_alojamiento.backend.Enum.MOTIVOREPORTE;
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.TIPOUSUARIO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
@@ -104,4 +106,17 @@ public class Usuario {
     /// ver charla de diseño), solo formato + identificacion de banco.
     @Column(name = "alias_cobro", length = 255)
     private String aliasCobro;
+
+    /// Motivo por el que se suspendió la cuenta. Se guarda junto con el detalle
+    /// opcional y la fecha para poder explicarle al usuario por qué fue suspendido.
+    @Convert(converter = MotivoReporteConverter.class)
+    @Column(name = "motivo_suspension")
+    private MOTIVOREPORTE motivoSuspension;
+
+    @Size(max = 500)
+    @Column(name = "detalle_suspension", length = 500)
+    private String detalleSuspension;
+
+    @Column(name = "fecha_suspension")
+    private LocalDateTime fechaSuspension;
 }

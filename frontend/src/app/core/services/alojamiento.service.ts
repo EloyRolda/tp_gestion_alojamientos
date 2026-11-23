@@ -69,4 +69,10 @@ export class AlojamientoService {
   quitarServicio(idAlojamiento: number, idServicio: number): Observable<void> {
     return this.http.delete<void>(`${API_BASE_URL}/Alojamiento/${idAlojamiento}/servicios/${idServicio}`);
   }
+
+  /// SCRUM-80: el administrador vuelve a publicar un alojamiento ocultado por
+  /// moderación. El endpoint exige rol ADMIN en SecurityConfig.
+  republicar(id: number): Observable<void> {
+    return this.http.post<void>(`${API_BASE_URL}/Alojamiento/${id}/republicar`, {});
+  }
 }

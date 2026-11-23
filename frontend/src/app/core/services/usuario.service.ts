@@ -25,6 +25,10 @@ export interface UsuarioModificar {
   password?: string;
   telefono?: string;
   activo?: boolean;
+  /// Solo el admin, al desactivar una cuenta: motivo (codigo de MOTIVOREPORTE)
+  /// y detalle opcional que le llegan por correo al usuario suspendido.
+  motivoSuspension?: string;
+  detalleSuspension?: string;
 }
 
 /// El propio usuario edita sus datos (PUT /Usuario/actualizar) o un ADMIN
