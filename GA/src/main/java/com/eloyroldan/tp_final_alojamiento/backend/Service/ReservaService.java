@@ -7,6 +7,10 @@ import com.eloyroldan.tp_final_alojamiento.backend.DTO.Response.ReservaResponseD
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.ESTADORESERVA;
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.MOTIVOCANCELACION;
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.TIPOUSUARIO;
+import com.eloyroldan.tp_final_alojamiento.backend.Evento.ReservaCancelada;
+import com.eloyroldan.tp_final_alojamiento.backend.Evento.ReservaConfirmada;
+import com.eloyroldan.tp_final_alojamiento.backend.Evento.ReservaFinalizada;
+import com.eloyroldan.tp_final_alojamiento.backend.Evento.ReservaSolicitada;
 import com.eloyroldan.tp_final_alojamiento.backend.Exception.IdNoEncontradoException;
 import com.eloyroldan.tp_final_alojamiento.backend.Exception.ParametroInvalidoException;
 import com.eloyroldan.tp_final_alojamiento.backend.Model.Alojamiento;
@@ -17,6 +21,7 @@ import com.eloyroldan.tp_final_alojamiento.backend.Repository.ReservaRepository;
 import jakarta.transaction.Transactional;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +55,10 @@ public class ReservaService {
     /// Metrica operativa (Micrometer/Actuator): cuantas reservas se crean, para
     /// poder graficar el ritmo de altas en el tiempo. Ver /actuator/prometheus.
     private final MeterRegistry meterRegistry;
+
+    /// Publicador de eventos de dominio para notificar cambios de estado de
+    /// reservas y pagos (ver paquete Evento).
+    private final ApplicationEventPublisher publicador;
 
     //------------------------ LISTAR ------------------------
 
@@ -123,6 +132,10 @@ public class ReservaService {
 
         Reserva guardada = reservaRepository.save(reserva);
         meterRegistry.counter("reservas.creadas").increment();
+
+        DatosReserva d = datosReserva(guardada);
+        publicador.publishEvent(new ReservaSolicitada(d.idReserva(), d.idCliente(), d.idAnfitrion(), d.tituloAlojamiento()));
+
         return guardada;
     }
 
@@ -197,6 +210,10 @@ public class ReservaService {
         reserva = reservaRepository.save(reserva);
 
         pagoService.crearPagoParaReserva(reserva);
+
+        DatosReserva d = datosReserva(reserva);
+        publicador.publishEvent(new ReservaConfirmada(d.idReserva(), d.idCliente(), d.idAnfitrion(), d.tituloAlojamiento()));
+
         return reserva;
     }
 
@@ -230,6 +247,10 @@ public class ReservaService {
             MOTIVOCANCELACION motivo = determinarMotivo(reserva, solicitante, esAnfitrionDuenio);
             pagoService.ejecutarCancelacion(reserva, motivo, null);
         }
+
+        DatosReserva d = datosReserva(reserva);
+        publicador.publishEvent(new ReservaCancelada(d.idReserva(), d.idCliente(), d.idAnfitrion(), d.tituloAlojamiento(), solicitante.getId()));
+
         return reserva;
     }
 
@@ -264,6 +285,10 @@ public class ReservaService {
         if (yaFueConfirmada) {
             pagoService.ejecutarCancelacion(reserva, MOTIVOCANCELACION.ADMIN, montoReembolso);
         }
+
+        DatosReserva d = datosReserva(reserva);
+        publicador.publishEvent(new ReservaCancelada(d.idReserva(), d.idCliente(), d.idAnfitrion(), d.tituloAlojamiento(), null));
+
         return reserva;
     }
 
@@ -285,6 +310,10 @@ public class ReservaService {
         reserva = reservaRepository.save(reserva);
 
         pagoService.ejecutarPayoutFinalizacion(reserva);
+
+        DatosReserva d = datosReserva(reserva);
+        publicador.publishEvent(new ReservaFinalizada(d.idReserva(), d.idCliente(), d.idAnfitrion(), d.tituloAlojamiento()));
+
         return reserva;
     }
 
@@ -352,6 +381,9 @@ public class ReservaService {
         Reserva reserva = obtenerPorId(idReserva);
         reserva.setEstadoReserva(ESTADORESERVA.CANCELADA);
         reservaRepository.save(reserva);
+
+        DatosReserva d = datosReserva(reserva);
+        publicador.publishEvent(new ReservaCancelada(d.idReserva(), d.idCliente(), d.idAnfitrion(), d.tituloAlojamiento(), null));
     }
 
     //------------------------ PARA CONTROLLERS (DTO) ------------------------
@@ -465,4 +497,17 @@ public class ReservaService {
         return reservaRepository.topAlojamientosPorCantidadReservas(
                 PageRequest.of(0, limite));
     }
+
+    //------------------------ AUXILIAR PARA EVENTOS ------------------------
+
+    private DatosReserva datosReserva(Reserva reserva) {
+        return new DatosReserva(
+                reserva.getIdReserva(),
+                reserva.getCliente().getId(),
+                reserva.getAlojamiento().getAnfitrion().getId(),
+                reserva.getAlojamiento().getTitulo()
+        );
+    }
+
+    private record DatosReserva(Long idReserva, Long idCliente, Long idAnfitrion, String tituloAlojamiento) {}
 }

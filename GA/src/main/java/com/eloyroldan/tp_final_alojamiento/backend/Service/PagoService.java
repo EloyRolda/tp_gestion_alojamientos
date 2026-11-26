@@ -10,6 +10,7 @@ import com.eloyroldan.tp_final_alojamiento.backend.DTO.Response.PreferenciaMerca
 import com.eloyroldan.tp_final_alojamiento.backend.DTO.Response.ResumenClienteDTO;
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.ESTADOPAGO;
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.MOTIVOCANCELACION;
+import com.eloyroldan.tp_final_alojamiento.backend.Evento.PagoAcreditado;
 import com.eloyroldan.tp_final_alojamiento.backend.Exception.IdNoEncontradoException;
 import com.eloyroldan.tp_final_alojamiento.backend.Exception.ParametroInvalidoException;
 import com.eloyroldan.tp_final_alojamiento.backend.Model.Pago;
@@ -23,6 +24,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -53,6 +55,10 @@ public class PagoService {
     private final PagoRepository pagoRepository;
     private final PasarelaDePagoService pasarelaDePagoService;
     private final MeterRegistry meterRegistry;
+
+    /// Publicador de eventos de dominio para notificar cambios de estado de
+    /// reservas y pagos (ver paquete Evento).
+    private final ApplicationEventPublisher publicador;
 
     /// Una PoliticaCancelacion por MOTIVOCANCELACION (Strategy): Spring inyecta
     /// todos los beans que implementan la interfaz, y se indexan por motivo en
@@ -216,6 +222,14 @@ public class PagoService {
             pago.setIdPagoExterno(idPagoExterno);
             pago.setFechaPago(LocalDateTime.now());
             pagoRepository.save(pago);
+
+            publicador.publishEvent(new PagoAcreditado(
+                    pago.getReserva().getIdReserva(),
+                    pago.getReserva().getCliente().getId(),
+                    pago.getReserva().getAlojamiento().getAnfitrion().getId(),
+                    pago.getReserva().getAlojamiento().getTitulo()
+            ));
+
             meterRegistry.counter("pagos.procesados", "resultado", "aprobado").increment();
             log.info("Pago confirmado para la reserva {}", idReserva);
         } else {
