@@ -7,6 +7,8 @@ import com.eloyroldan.tp_final_alojamiento.backend.DTO.Response.AlojamientoRespo
 import com.eloyroldan.tp_final_alojamiento.backend.DTO.Response.MotivoReporteDTO;
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.MOTIVOREPORTE;
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.TIPOUSUARIO;
+import com.eloyroldan.tp_final_alojamiento.backend.Evento.PublicacionOcultada;
+import com.eloyroldan.tp_final_alojamiento.backend.Evento.PublicacionRepublicada;
 import com.eloyroldan.tp_final_alojamiento.backend.Exception.IdNoEncontradoException;
 import com.eloyroldan.tp_final_alojamiento.backend.Exception.ParametroInvalidoException;
 import com.eloyroldan.tp_final_alojamiento.backend.Model.Alojamiento;
@@ -19,6 +21,7 @@ import com.eloyroldan.tp_final_alojamiento.backend.Service.Servicio.ServicioxAlo
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.HtmlUtils;
@@ -46,6 +49,7 @@ public class AlojamientoService {
     private final GaleriaService galeriaService;
     private final ServicioxAlojamientoService servicioxAlojamientoService;
     private final EmailService emailService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Lazy
     private final ReservaService reservaService;
@@ -303,6 +307,14 @@ public class AlojamientoService {
         alojamiento.setFechaOcultamiento(LocalDateTime.now());
         alojamientoRepository.save(alojamiento);
 
+        // El aviso interno sale aunque el correo de abajo falle.
+        eventPublisher.publishEvent(new PublicacionOcultada(
+                alojamiento.getAnfitrion().getId(),
+                alojamiento.getIdAlojamiento(),
+                alojamiento.getTitulo(),
+                MotivoReporteDTO.desde(motivo).getEtiqueta()
+        ));
+
         try {
             Usuario anfitrion = alojamiento.getAnfitrion();
             String nombreCompleto = anfitrion.getNombre() + " " + anfitrion.getApellido();
@@ -332,6 +344,13 @@ public class AlojamientoService {
         alojamiento.setDetalleOcultamiento(null);
         alojamiento.setFechaOcultamiento(null);
         alojamientoRepository.save(alojamiento);
+
+        // El aviso interno sale aunque el correo de abajo falle.
+        eventPublisher.publishEvent(new PublicacionRepublicada(
+                alojamiento.getAnfitrion().getId(),
+                alojamiento.getIdAlojamiento(),
+                alojamiento.getTitulo()
+        ));
 
         try {
             Usuario anfitrion = alojamiento.getAnfitrion();

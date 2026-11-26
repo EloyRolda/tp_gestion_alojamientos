@@ -34,4 +34,14 @@ public class RegistroDeEventos {
     public void escucharPagoAcreditado(PagoAcreditado evento) {
         log.info("Evento PagoAcreditado: reserva {}", evento.idReserva());
     }
+
+    @EventListener
+    public void escucharPublicacionOcultada(PublicacionOcultada evento) {
+        log.info("Evento PublicacionOcultada: alojamiento {}", evento.idAlojamiento());
+    }
+
+    @EventListener
+    public void escucharPublicacionRepublicada(PublicacionRepublicada evento) {
+        log.info("Evento PublicacionRepublicada: alojamiento {}", evento.idAlojamiento());
+    }
 }

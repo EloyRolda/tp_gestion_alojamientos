@@ -24,6 +24,10 @@
     </form>
 
     <div class="perfil">
+      @if (estaLogueado()) {
+        <app-campana />
+      }
+
       <button
         #botonPerfil
         type="button"

@@ -6,6 +6,7 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/ro
 import { AuthService } from '../../core/services/auth.service';
 import { Kaza } from '../../shared/kaza/kaza';
 import { AvisoService } from '../../core/services/aviso.service';
+import { Campana } from '../../shared/campana/campana';
 
 /// Encabezado de la app (SCRUM-63): logo con Kaza, buscador siempre a mano y el
 /// avatar con el menu de la cuenta. El menu se arma segun el rol autenticado
@@ -15,7 +16,7 @@ import { AvisoService } from '../../core/services/aviso.service';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, FormsModule, Kaza],
+  imports: [RouterLink, RouterLinkActive, FormsModule, Kaza, Campana],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
