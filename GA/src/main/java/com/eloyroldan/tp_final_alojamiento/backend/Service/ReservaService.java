@@ -3,6 +3,7 @@ package com.eloyroldan.tp_final_alojamiento.backend.Service;
 import com.eloyroldan.tp_final_alojamiento.backend.DTO.ReservaModificarDTO;
 import com.eloyroldan.tp_final_alojamiento.backend.DTO.ReservaRegistroDTO;
 import com.eloyroldan.tp_final_alojamiento.backend.DTO.Response.AlojamientoRankingDTO;
+import com.eloyroldan.tp_final_alojamiento.backend.DTO.Response.ParticipantesReservaDTO;
 import com.eloyroldan.tp_final_alojamiento.backend.DTO.Response.ReservaResponseDTO;
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.ESTADORESERVA;
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.MOTIVOCANCELACION;
@@ -22,6 +23,7 @@ import jakarta.transaction.Transactional;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -59,6 +61,11 @@ public class ReservaService {
     /// Publicador de eventos de dominio para notificar cambios de estado de
     /// reservas y pagos (ver paquete Evento).
     private final ApplicationEventPublisher publicador;
+
+    /// MensajeService depende de ReservaService (usa participantes()), asi que
+    /// en ReservaService esta referencia va @Lazy para romper el ciclo.
+    @Lazy
+    private final MensajeService mensajeService;
 
     //------------------------ LISTAR ------------------------
 
@@ -359,9 +366,10 @@ public class ReservaService {
 
     /// Usado por AlojamientoService al borrar un alojamiento: elimina cada Reserva
     /// (no un bulk delete) para que el orphanRemoval de Reserva.review se dispare igual.
-    /// Primero borra los Pago asociados (FK sin cascada, ver PagoService.borrarPorAlojamiento).
+    /// Primero borra los Pago asociados y los mensajes asociados (FK sin cascada).
     @Transactional
     public void borrarPorAlojamientoId(Long idAlojamiento) {
+        mensajeService.borrarPorAlojamiento(idAlojamiento);
         pagoService.borrarPorAlojamiento(idAlojamiento);
         reservaRepository.deleteByAlojamiento_IdAlojamiento(idAlojamiento);
     }
@@ -468,13 +476,14 @@ public class ReservaService {
 
     //------------------------ BORRAR (solo admin, limpieza) ------------------------
 
-    /// Primero borra el Pago asociado si existe (FK sin cascada, ver
-    /// PagoService.borrarPorReserva), despues la Reserva.
+    /// Primero borra el Pago asociado y los mensajes asociados (FK sin cascada),
+    /// despues la Reserva.
     @Transactional
     public void borrarPorId(Long id) {
         if (!reservaRepository.existsById(id)) {
             throw new IdNoEncontradoException("Error, la reserva no existe");
         }
+        mensajeService.borrarPorReserva(id);
         pagoService.borrarPorReserva(id);
         reservaRepository.deleteById(id);
     }
@@ -496,6 +505,30 @@ public class ReservaService {
     public List<AlojamientoRankingDTO> topPorCantidadReservas(int limite) {
         return reservaRepository.topAlojamientosPorCantidadReservas(
                 PageRequest.of(0, limite));
+    }
+
+    //------------------------ AUXILIAR PARA MENSAJES ------------------------
+
+    /// Devuelve los participantes de una reserva y el titulo del alojamiento.
+    /// Lo usa MensajeService para validar pertenencia y armar la conversación.
+    @Transactional
+    public ParticipantesReservaDTO participantes(Long idReserva) {
+        Reserva reserva = obtenerPorId(idReserva);
+        Usuario cliente = reserva.getCliente();
+        Usuario anfitrion = reserva.getAlojamiento().getAnfitrion();
+        return new ParticipantesReservaDTO(
+                reserva.getIdReserva(),
+                cliente.getId(),
+                nombreCompleto(cliente),
+                anfitrion.getId(),
+                nombreCompleto(anfitrion),
+                reserva.getAlojamiento().getTitulo(),
+                reserva.getEstadoReserva()
+        );
+    }
+
+    private String nombreCompleto(Usuario u) {
+        return u.getNombre() + " " + u.getApellido();
     }
 
     //------------------------ AUXILIAR PARA EVENTOS ------------------------

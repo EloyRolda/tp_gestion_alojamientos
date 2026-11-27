@@ -54,4 +54,9 @@ public class RegistroDeEventos {
     public void escucharReporteResuelto(ReporteResuelto evento) {
         log.info("Evento ReporteResuelto: reporte {}", evento.idReporte());
     }
+
+    @EventListener
+    public void escucharMensajeRecibido(MensajeRecibido evento) {
+        log.info("Evento MensajeRecibido: mensaje {} destinatario {}", evento.idMensaje(), evento.idDestinatario());
+    }
 }

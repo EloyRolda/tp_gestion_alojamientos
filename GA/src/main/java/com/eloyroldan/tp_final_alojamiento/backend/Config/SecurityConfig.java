@@ -168,6 +168,9 @@ public class SecurityConfig {
                         // ── NOTIFICACION ─────────────────────────────────────
                         .requestMatchers("/Notificacion/**").authenticated()
 
+                        // ── MENSAJE ─────────────────────────────────────────
+                        .requestMatchers("/Mensaje/**").hasAnyRole("CLIENTE", "ANFITRION")
+
                         // ── REPORTE ──────────────────────────────────────────
                         // Un admin no reporta: moderar es su trabajo (SCRUM-79), no reportar.
                         .requestMatchers(HttpMethod.POST, "/Reporte").hasAnyRole("CLIENTE", "ANFITRION")
