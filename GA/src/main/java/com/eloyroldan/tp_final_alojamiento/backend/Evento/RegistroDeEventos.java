@@ -44,4 +44,14 @@ public class RegistroDeEventos {
     public void escucharPublicacionRepublicada(PublicacionRepublicada evento) {
         log.info("Evento PublicacionRepublicada: alojamiento {}", evento.idAlojamiento());
     }
+
+    @EventListener
+    public void escucharReporteCreado(ReporteCreado evento) {
+        log.info("Evento ReporteCreado: reporte {}", evento.idReporte());
+    }
+
+    @EventListener
+    public void escucharReporteResuelto(ReporteResuelto evento) {
+        log.info("Evento ReporteResuelto: reporte {}", evento.idReporte());
+    }
 }

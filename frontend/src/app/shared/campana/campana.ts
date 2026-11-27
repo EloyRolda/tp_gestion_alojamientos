@@ -288,8 +288,11 @@ export class Campana {
         error: () => {},
       });
     }
-    this.cerrarPanel();
-    this.router.navigateByUrl(notificacion.enlace);
+
+    if (notificacion.enlace) {
+      this.cerrarPanel();
+      this.router.navigateByUrl(notificacion.enlace);
+    }
   }
 
   marcarTodas(): void {

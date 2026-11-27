@@ -13,6 +13,8 @@ import com.eloyroldan.tp_final_alojamiento.backend.Enum.ESTADOREPORTE;
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.MOTIVOREPORTE;
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.TIPOREPORTE;
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.TIPOUSUARIO;
+import com.eloyroldan.tp_final_alojamiento.backend.Evento.ReporteCreado;
+import com.eloyroldan.tp_final_alojamiento.backend.Evento.ReporteResuelto;
 import com.eloyroldan.tp_final_alojamiento.backend.Exception.IdNoEncontradoException;
 import com.eloyroldan.tp_final_alojamiento.backend.Exception.ParametroInvalidoException;
 import com.eloyroldan.tp_final_alojamiento.backend.Model.Alojamiento;
@@ -23,9 +25,11 @@ import com.eloyroldan.tp_final_alojamiento.backend.Service.Moderacion.AccionMode
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,6 +52,7 @@ public class ReporteService {
     private final AlojamientoService alojamientoService;
     private final UsuarioService usuarioService;
     private final ReservaService reservaService;
+    private final ApplicationEventPublisher eventPublisher;
 
     /// Estrategias de moderacion inyectadas por Spring y ya indexadas por su
     /// ACCIONMODERACION en un Map, igual que PagoService con las politicas.
@@ -67,7 +72,7 @@ public class ReporteService {
     @Transactional
     public Reporte crear(ReporteRegistroDTO dto, Usuario autor) {
         validarDetalle(dto);
-        validarObjetivoYmotivo(dto, autor);
+        String nombreObjetivo = validarObjetivoYmotivo(dto, autor);
         validarSinPendienteDuplicado(autor.getId(), dto);
 
         Reporte reporte = Reporte.builder()
@@ -79,7 +84,16 @@ public class ReporteService {
                 .estado(ESTADOREPORTE.PENDIENTE)
                 .build();
 
-        return reporteRepository.save(reporte);
+        reporte = reporteRepository.save(reporte);
+
+        String etiquetaMotivo = MotivoReporteDTO.desde(reporte.getMotivo()).getEtiqueta();
+        eventPublisher.publishEvent(new ReporteCreado(
+                reporte.getIdReporte(),
+                etiquetaMotivo,
+                nombreObjetivo
+        ));
+
+        return reporte;
     }
 
     @Transactional
@@ -153,6 +167,9 @@ public class ReporteService {
         reporte.setFechaResolucion(fechaResolucion);
         reporte = reporteRepository.save(reporte);
 
+        List<Reporte> resueltos = new ArrayList<>();
+        resueltos.add(reporte);
+
         if (accion == ACCIONMODERACION.OCULTAR_ALOJAMIENTO
                 || accion == ACCIONMODERACION.DESACTIVAR_USUARIO) {
             List<Reporte> otrosPendientes = reporteRepository.findByTipoAndIdObjetivoAndEstado(
@@ -166,6 +183,7 @@ public class ReporteService {
                 otro.setAccionTomada(accion);
                 otro.setFechaResolucion(fechaResolucion);
                 reporteRepository.save(otro);
+                resueltos.add(otro);
             }
         }
 
@@ -176,6 +194,22 @@ public class ReporteService {
             titulosAlojamientos = alojamientoService.titulosPorIds(List.of(reporte.getIdObjetivo()));
         } else {
             nombresUsuarios = usuarioService.nombresPorIds(List.of(reporte.getIdObjetivo()));
+        }
+
+        String nombreObjetivo;
+        if (reporte.getTipo() == TIPOREPORTE.ALOJAMIENTO) {
+            nombreObjetivo = titulosAlojamientos.get(reporte.getIdObjetivo());
+        } else {
+            nombreObjetivo = nombresUsuarios.get(reporte.getIdObjetivo());
+        }
+
+        for (Reporte resuelto : resueltos) {
+            Long idAutor = resuelto.getAutor() != null ? resuelto.getAutor().getId() : null;
+            eventPublisher.publishEvent(new ReporteResuelto(
+                    resuelto.getIdReporte(),
+                    idAutor,
+                    nombreObjetivo
+            ));
         }
 
         return toDTO(reporte, titulosAlojamientos, nombresUsuarios);
@@ -197,16 +231,16 @@ public class ReporteService {
     }
 
     /// Reglas 3, 4 y 6: quien puede reportar a quien y con que motivo.
-    private void validarObjetivoYmotivo(ReporteRegistroDTO dto, Usuario autor) {
+    private String validarObjetivoYmotivo(ReporteRegistroDTO dto, Usuario autor) {
         if (dto.getTipo() == TIPOREPORTE.ALOJAMIENTO) {
-            validarReporteDeAlojamiento(dto, autor);
+            return validarReporteDeAlojamiento(dto, autor);
         } else {
-            validarReporteDeUsuario(dto, autor);
+            return validarReporteDeUsuario(dto, autor);
         }
     }
 
     /// Regla 3: lo puede reportar cualquier usuario con sesion, salvo su propio anfitrion.
-    private void validarReporteDeAlojamiento(ReporteRegistroDTO dto, Usuario autor) {
+    private String validarReporteDeAlojamiento(ReporteRegistroDTO dto, Usuario autor) {
         Alojamiento alojamiento = alojamientoService.obtenerPorId(dto.getIdObjetivo());
         if (alojamiento.getAnfitrion().getId().equals(autor.getId())) {
             throw new ParametroInvalidoException("No podés reportar tu propio alojamiento.");
@@ -214,13 +248,14 @@ public class ReporteService {
         if (!dto.getMotivo().aplicaA(CATEGORIA_ALOJAMIENTO)) {
             throw new ParametroInvalidoException("El motivo elegido no corresponde a un alojamiento.");
         }
+        return alojamiento.getTitulo();
     }
 
     /// Regla 4: solo lo puede reportar quien compartio al menos una reserva con
     /// el (como cliente o como anfitrion). Nadie se reporta a si mismo y a un
     /// administrador no se lo puede reportar. Regla 6: el motivo tiene que
     /// corresponder al rol del reportado (cliente o anfitrion).
-    private void validarReporteDeUsuario(ReporteRegistroDTO dto, Usuario autor) {
+    private String validarReporteDeUsuario(ReporteRegistroDTO dto, Usuario autor) {
         if (autor.getId().equals(dto.getIdObjetivo())) {
             throw new ParametroInvalidoException("No podés reportarte a vos mismo.");
         }
@@ -238,6 +273,8 @@ public class ReporteService {
         if (!dto.getMotivo().aplicaA(categoria)) {
             throw new ParametroInvalidoException("El motivo elegido no corresponde a la persona que estás reportando.");
         }
+
+        return reportado.getNombre() + " " + reportado.getApellido();
     }
 
     /// Regla 5: un solo reporte pendiente por autor y objetivo.

@@ -3,7 +3,7 @@ export interface Notificacion {
   id: number;
   tipo: string;
   texto: string;
-  enlace: string;
+  enlace: string | null;
   leida: boolean;
   fecha: string;
 }

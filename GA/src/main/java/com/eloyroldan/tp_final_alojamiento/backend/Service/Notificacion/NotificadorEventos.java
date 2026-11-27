@@ -2,6 +2,8 @@ package com.eloyroldan.tp_final_alojamiento.backend.Service.Notificacion;
 
 import com.eloyroldan.tp_final_alojamiento.backend.Enum.TIPONOTIFICACION;
 import com.eloyroldan.tp_final_alojamiento.backend.Evento.*;
+import com.eloyroldan.tp_final_alojamiento.backend.Model.Usuario;
+import com.eloyroldan.tp_final_alojamiento.backend.Service.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -20,6 +22,7 @@ import java.util.Objects;
 public class NotificadorEventos {
 
     private final List<CanalNotificacion> canales;
+    private final UsuarioService usuarioService;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void escucharReservaSolicitada(ReservaSolicitada evento) {
@@ -125,6 +128,41 @@ public class NotificadorEventos {
                 TIPONOTIFICACION.PUBLICACION_REPUBLICADA,
                 "Tu publicación «" + evento.tituloAlojamiento() + "» volvió a estar visible.",
                 "/anfitrion/alojamientos",
+                false
+        );
+        enviar(aviso);
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
+    public void escucharReporteCreado(ReporteCreado evento) {
+        List<Usuario> administradores = usuarioService.listarAdministradores();
+
+        for (Usuario administrador : administradores) {
+            if (!administrador.getActivo()) {
+                continue;
+            }
+
+            Aviso aviso = new Aviso(
+                    administrador.getId(),
+                    TIPONOTIFICACION.REPORTE_NUEVO,
+                    "Nuevo reporte: " + evento.etiquetaMotivo() + " sobre «" + evento.nombreObjetivo() + "».",
+                    "/admin/reportes",
+                    false
+            );
+            enviar(aviso);
+        }
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
+    public void escucharReporteResuelto(ReporteResuelto evento) {
+        Aviso aviso = new Aviso(
+                evento.idAutor(),
+                TIPONOTIFICACION.REPORTE_RESUELTO,
+                "Revisamos tu reporte sobre «" + evento.nombreObjetivo() + "». Gracias por ayudarnos a cuidar la comunidad.",
+                // Sin enlace: texto vacio (no null), porque la columna enlace es NOT NULL
+                // en las bases ya creadas y ddl-auto=update no cambia eso. La campana
+                // trata el texto vacio como "aviso sin enlace".
+                "",
                 false
         );
         enviar(aviso);
